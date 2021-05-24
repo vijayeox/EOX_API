@@ -21,9 +21,9 @@ export default class LeftMenuTemplate extends React.Component {
     this.config = this.props.config;
     this.keepExpanded = this.props.keepExpanded;
     this.navigation = React.createRef();
-    this.appNavigationDiv = "navigation_"+this.appId;
+    this.appNavigationDiv = "navigation_" + this.appId;
     this.state = {
-      menus: this.props.menus?this.props.menus:[],
+      menus: this.props.menus ? this.props.menus : [],
       selected: "",
       expanded: this.keepExpanded ? true : false,
     };
@@ -56,7 +56,12 @@ export default class LeftMenuTemplate extends React.Component {
   render() {
     const { expanded, selected } = this.state;
     return (
-      <div className={"LeftMenuTemplate"+(this.props.proc.metadata.hideMenu ? " hideMenu" : "")}>
+      <div
+        className={
+          "LeftMenuTemplate" +
+          (this.props.proc.metadata.hideMenu ? " hideMenu" : "")
+        }
+      >
         <SideNav
           onSelect={this.onSelect}
           onToggle={this.onToggle}
@@ -64,58 +69,74 @@ export default class LeftMenuTemplate extends React.Component {
         >
           {this.keepExpanded ? null : <SideNav.Toggle />}
           <SideNav.Nav selected={selected}>
-            {this.state.menus && this.state.menus.length > 0? this.state.menus.map((menuitem, index) => {
-              return (
-                <NavItem eventKey={menuitem} key={index}>
-                  <NavIcon>
-                    <abbr title={menuitem.name} style={{ cursor: "pointer" }}>
-                      <i
-                        className={menuitem.icon}
-                        name={menuitem.name}
-                        style={{ fontSize: "1.5em", verticalAlign: "middle" }}
-                      />
-                    </abbr>
-                  </NavIcon>
-                  <NavText style={{ paddingRight: 32 }} name={menuitem.name} title={menuitem.name}>
-                    {menuitem.name.length > 18  ? menuitem.name.substring(0,18) + '...': menuitem.name}
-                  </NavText>
-                  {menuitem.submenu
-                    ? menuitem.submenu.map((subMenu, index2) => {
-                        return (
-                          <NavItem
-                            eventKey={subMenu}
-                            key={Math.floor(Math.random() * 100) + 1}
-                            expanded={true}
-                          >
-                            <NavIcon>
-                              <abbr
-                                title={subMenu.name}
-                                style={{ cursor: "pointer" }}
-                              >
-                                <i
-                                  className={subMenu.icon}
-                                  name={subMenu.name}
-                                  style={{
-                                    fontSize: "1.5em",
-                                    verticalAlign: "middle",
-                                  }}
-                                />
-                              </abbr>
-                            </NavIcon>
-                            <NavText
-                              style={{ paddingRight: 32 }}
-                              name={subMenu.name}
-                              title={subMenu.name}
+            {this.state.menus && this.state.menus.length > 0 ? (
+              this.state.menus.map((menuitem, index) => {
+                return (
+                  <NavItem
+                    eventKey={menuitem}
+                    key={index}
+                    disabled={this.state.selected.uuid == menuitem.uuid}
+                  >
+                    <NavIcon>
+                      <abbr title={menuitem.name} style={{ cursor: "pointer" }}>
+                        <i
+                          className={menuitem.icon}
+                          name={menuitem.name}
+                          style={{ fontSize: "1.5em", verticalAlign: "middle" }}
+                        />
+                      </abbr>
+                    </NavIcon>
+                    <NavText
+                      style={{ paddingRight: 32 }}
+                      name={menuitem.name}
+                      title={menuitem.name}
+                    >
+                      {menuitem.name.length > 18
+                        ? menuitem.name.substring(0, 18) + "..."
+                        : menuitem.name}
+                    </NavText>
+                    {menuitem.submenu
+                      ? menuitem.submenu.map((subMenu, index2) => {
+                          return (
+                            <NavItem
+                              eventKey={subMenu}
+                              key={Math.floor(Math.random() * 100) + 1}
+                              expanded={true}
                             >
-                              {subMenu.name.length > 18  ? subMenu.name.substring(0,18) + '...': subMenu.name}
-                            </NavText>
-                          </NavItem>
-                        );
-                      })
-                    : null}
-                </NavItem>
-              );
-            }):<div>No menu found</div>}
+                              <NavIcon>
+                                <abbr
+                                  title={subMenu.name}
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <i
+                                    className={subMenu.icon}
+                                    name={subMenu.name}
+                                    style={{
+                                      fontSize: "1.5em",
+                                      verticalAlign: "middle",
+                                    }}
+                                  />
+                                </abbr>
+                              </NavIcon>
+                              <NavText
+                                style={{ paddingRight: 32 }}
+                                name={subMenu.name}
+                                title={subMenu.name}
+                              >
+                                {subMenu.name.length > 18
+                                  ? subMenu.name.substring(0, 18) + "..."
+                                  : subMenu.name}
+                              </NavText>
+                            </NavItem>
+                          );
+                        })
+                      : null}
+                  </NavItem>
+                );
+              })
+            ) : (
+              <div>No menu found</div>
+            )}
           </SideNav.Nav>
         </SideNav>
         <Navigation
