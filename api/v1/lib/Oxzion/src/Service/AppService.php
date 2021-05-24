@@ -966,6 +966,10 @@ class AppService extends AbstractService
                 "path" => $this->config['APPS_FOLDER'] . "../bos/",
                 "type" => "bos"
             ]);
+            $this->logger->info("\nRunning App installer (View) - " . json_encode(
+                ["folders" => $buildFolders],
+                JSON_PRETTY_PRINT
+            ));
             $restClient = $this->restClient;
             $output = json_decode($restClient->post(
                 ($this->config['applicationUrl'] . "/installer"),
