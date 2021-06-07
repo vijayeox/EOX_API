@@ -179,7 +179,7 @@ class UserService extends AbstractService
                 $accountId = $account;
             } else {
                 if (isset($data['accountId']) && $data['accountId'] != '') {
-                    $accountId = $params['accountId'];
+                    $accountId = $data['accountId'];
                 } else {
                     if (AuthContext::get(AuthConstants::ACCOUNT_ID) != null) {
                         $accountId = AuthContext::get(AuthConstants::ACCOUNT_ID);
