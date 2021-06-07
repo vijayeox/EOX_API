@@ -5,16 +5,6 @@ CREATE TABLE IF NOT EXISTS `applicationConfig` (
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 DEFAULT CHARSET = utf8;
 
-
-INSERT INTO
-    `applicationConfig` (`type`, `value`)
-VALUES
-    (
-        'excelMapperURL',
-        'http://54.161.224.59:5000/api/FileUpload'
-    );
-
-
 INSERT INTO
     `applicationConfig` (`type`, `value`)
 VALUES
