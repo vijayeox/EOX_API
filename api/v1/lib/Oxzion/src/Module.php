@@ -58,6 +58,7 @@ class Module
                         $container->get(\App\Service\PageService::class),
                         $container->get(\Oxzion\Service\UserService::class),
                         $container->get(\Oxzion\Service\BusinessRoleService::class),
+                        $container->get(\Oxzion\Service\AppRegistryService::class),
                         $container->get(Messaging\MessageProducer::class)
                     );
                 },
@@ -125,7 +126,8 @@ class Module
                         $container->get(\Oxzion\Service\FieldService::class),
                         $container->get(\Oxzion\Service\EntityService::class),
                         $container->get(\Oxzion\Model\FileAttachmentTable::class),
-                        $container->get(\Oxzion\Service\SubscriberService::class)
+                        $container->get(\Oxzion\Service\SubscriberService::class),
+                        $container->get(\Oxzion\Service\BusinessParticipantService::class)
                     );
                 },
                 Service\RoleService::class => function ($container) {
@@ -190,6 +192,28 @@ class Module
                     $resultSetPrototype->setArrayObjectPrototype(new Model\Privilege());
                     return new TableGateway(
                         'ox_privilege',
+                        $container->get(AdapterInterface::class),
+                        null,
+                        $resultSetPrototype
+                    );
+                },
+                Service\ProfileService::class => function ($container) {
+                    return new Service\ProfileService(
+                        $container->get('config'),
+                        $container->get(AdapterInterface::class),
+                        $container->get(Model\ProfileTable::class)
+                    );
+                },
+                Model\ProfileTable::class => function ($container) {
+                    return new Model\ProfileTable(
+                        $container->get(Model\ProfileTableGateway::class)
+                    );
+                },
+                Model\ProfileTableGateway::class => function ($container) {
+                    $resultSetPrototype = new ResultSet();
+                    $resultSetPrototype->setArrayObjectPrototype(new Model\Profile());
+                    return new TableGateway(
+                        'ox_profile',
                         $container->get(AdapterInterface::class),
                         null,
                         $resultSetPrototype
@@ -311,7 +335,8 @@ class Module
                         $container->get(Service\PrivilegeService::class),
                         $container->get(Service\OrganizationService::class),
                         $container->get(Service\EntityService::class),
-                        $container->get(Messaging\MessageProducer::class)
+                        $container->get(Service\AppRegistryService::class),
+                        $container->get(Messaging\MessageProducer::class)                     
                     );
                 },
                 Model\OrganizationTable::class => function ($container) {
@@ -503,6 +528,17 @@ class Module
                         $container->get(AdapterInterface::class)
                     );
                 },
+                Service\AppRegistryService::class => function ($container) {
+                    $config = $container->get('config');
+                    $dbAdapter = $container->get(AdapterInterface::class);
+                    return new Service\AppRegistryService($config, $dbAdapter);
+                },
+                Service\BusinessParticipantService::class => function ($container) {
+                    $config = $container->get('config');
+                    $dbAdapter = $container->get(AdapterInterface::class);
+                    $entityService = $container->get(\Oxzion\Service\EntityService::class);
+                    return new Service\BusinessParticipantService($config, $dbAdapter, $entityService);
+                },
                 AppDelegate\AppDelegateService::class => function ($container) {
                     return new AppDelegate\AppDelegateService(
                         $container->get('config'),
@@ -517,8 +553,11 @@ class Module
                         $container->get(Service\CommentService::class),
                         $container->get(Service\EsignService::class),
                         $container->get(Service\FieldService::class),
-                        $container->get(Service\AccountService::class)
-                    );
+                        $container->get(Service\AccountService::class),
+                        $container->get(Service\BusinessParticipantService::class),
+                        $container->get(\Analytics\Service\QueryService::class),
+                        $container->get(Insurance\Service::class)
+                );
                 },
                 Document\DocumentBuilder::class => function ($container) {
                     return new Document\DocumentBuilder(
@@ -615,7 +654,7 @@ class Module
                         $container->get('config'),
                         $dbAdapter,
                         $container->get(Service\AccountService::class),
-                        $container->get(Service\AppService::class)
+                        $container->get(Service\AppRegistryService::class)
                     );
                 },
                 Service\WorkflowInstanceService::class => function ($container) {
@@ -699,7 +738,8 @@ class Module
                         $container->get(Service\WorkflowService::class),
                         $container->get(Service\UserService::class),
                         $container->get(Service\UserCacheService::class),
-                        $container->get(Service\RegistrationService::class)
+                        $container->get(Service\RegistrationService::class),
+                        $container->get(Service\BusinessParticipantService::class)   
                     );
                 },
                 Model\ServiceTaskInstanceTable::class => function ($container) {
@@ -762,6 +802,13 @@ class Module
                 Analytics\Relational\AnalyticsEnginePostgresImpl::class => function ($container) {
                     $dbAdapter = $container->get(AdapterInterface::class);
                     return new Analytics\Relational\AnalyticsEnginePostgresImpl($dbAdapter, $container->get('config'));
+                },
+                Insurance\Service::class => function ($container) {
+                    return new Insurance\Service(
+                        $container->get('config'),
+                        $container->get(AdapterInterface::class),
+                        $container->get(Messaging\MessageProducer::class)
+                    );
                 },
             ],
         ];

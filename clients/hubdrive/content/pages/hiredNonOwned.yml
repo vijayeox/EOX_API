@@ -1,0 +1,39 @@
+name: 'List Hired Non Owned'
+description: 'Shows a list of Hired Non Owned'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Hired Non Owned'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of Hired Non Owned</h5>'
+            operations:
+                title: "Create New"
+                actions:
+                    -
+                        name: Create New
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 7648dafe-cf9b-4d6d-bad2-4a1f3d4fc16c      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

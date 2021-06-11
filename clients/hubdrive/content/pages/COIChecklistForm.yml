@@ -1,0 +1,40 @@
+name: 'List Driver Checklist'
+description: 'Shows a list of Driver Applications'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Driver Checklist'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of Driver Checklist</h5>'
+            operations:
+                title: "Create Application"
+                actions:
+                    -
+                        name: Create Application
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: f7d6c928-e45c-4978-b321-2e612c67e756      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName
+               

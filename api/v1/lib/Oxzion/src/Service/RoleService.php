@@ -416,7 +416,7 @@ class RoleService extends AbstractService
                     `is_system_role`,`uuid`,`default_role`,`business_role_id`,`app_id`) 
                     (SELECT oxr.name,oxr.description,obr.account_id,oxr.is_system_role,UUID(),oxr.default_role,oxr.business_role_id ,$appId
                     FROM ox_role oxr 
-                    inner join ox_account_business_role obr on obr.business_role_id = oxr.business_role_id
+                    inner join ox_account_business_role obr on obr.business_role_id = oxr.business_role_id AND oxr.account_id IS NULL
                     inner join ox_business_role br on  br.id = obr.business_role_id
                     where obr.account_id = :accountId and br.app_id = :appId)";
             $params = ["accountId" => is_numeric($accountId) ? $accountId : $this->getIdFromUuid('ox_account', $accountId), "appId" => $appId];
@@ -424,11 +424,11 @@ class RoleService extends AbstractService
             $this->executeUpdateWithBindParameters($sqlQuery, $params);
             $sqlQuery = "INSERT INTO ox_role_privilege (`role_id`,`privilege_name`,
                         `permission`,`account_id`,`app_id`)
-                        (SELECT acr.id,oxrp.privilege_name,oxrp.permission,acr.account_id,oxrp.app_id
+                        (SELECT distiNCT acr.id,oxrp.privilege_name,oxrp.permission,acr.account_id,oxrp.app_id
                         FROM ox_role_privilege oxrp 
-                        inner join ox_role oxr on oxr.id = oxrp.role_id and oxrp.app_id = :appId
+                        inner join ox_role oxr on oxr.id = oxrp.role_id and oxrp.app_id = :appId And oxrp.account_id IS NULL AND oxr.account_id IS NULL
                         inner join ox_role acr on acr.name = oxr.name and acr.business_role_id = oxr.business_role_id
-                        inner join ox_account_business_role obr on obr.business_role_id = oxr.business_role_id
+                        inner join ox_account_business_role obr on obr.business_role_id = oxr.business_role_id AND obr.Account_id = acr.account_id
                         inner join ox_business_role br on  br.id = obr.business_role_id
                         WHERE obr.account_id = :accountId and br.app_id = :appId)";
             $this->logger->info("ROLE Privilege QUERY--$sqlQuery with params---".print_r($params, true));

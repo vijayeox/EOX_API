@@ -1,0 +1,407 @@
+ox_app:
+  - id: 199
+    name: "SampleApp"
+    uuid: "1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4"
+    category: "OTHERS"
+    type: 2
+    status: 4
+    isdefault: 0
+ox_address:
+  -
+    id: 8
+    address1: 'HSR'
+    address2: 'HSR'
+    city: 'Bangalore'
+    state: 'KARNATAKA'
+    country: 'India'
+    zip: 560080
+  - 
+    id: 9
+    address1: 'Ariyalur'
+    address2: 'Coimbatore'
+    city: 'Chennai'
+    state: 'Tamil Nadu'
+    country: 'India'
+    zip: 560079 
+  -
+    id: 10
+    address1: 'YELAHANKA'
+    address2: 'YELAHANKA'
+    city: 'Bangalore'
+    state: 'KARNATAKA'
+    country: 'India'
+    zip: 560081
+  - 
+    id: 11
+    address1: 'WhiteField'
+    address2: 'WhiteField'
+    city: 'Bangalore'
+    state: 'KARNATAKA'
+    country: 'India'
+    zip: 560179  
+  
+ox_organization:
+  -
+        id: 101
+        uuid: '915d207e-ac75-11ea-bb37-0242ac130002'
+        address_id: 8
+        created_by: 1
+        parent_id: null
+  -
+        id: 102
+        uuid: '915d22cc-ac75-11ea-bb37-0242ac130002'
+        address_id: 9  
+        created_by: 1
+        parent_id: null
+  -
+        id: 104
+        uuid: '415cd536-bb0d-11eb-8529-0242ac130003'
+        address_id: 10
+        created_by: 1
+        parent_id: null
+  -
+        id: 105
+        uuid: 'ac3a9550-bb0d-11eb-8529-0242ac130003'
+        address_id: 11 
+        created_by: 1
+        parent_id: null      
+
+ox_account:
+  -
+        id: 3
+        name: 'Sample Organization'
+        uuid: 'b6499a34-c100-4e41-bece-5822adca3844'
+        status: 'Active'
+        preferences: '{"currency":"INR","timezone":"Asia/Calcutta","dateformat":"dd/mm/yyyy"}'
+        contactid: 2
+        organization_id: 101
+  -
+        id: 4
+        name: 'Test Organization'
+        uuid: 'b6499a34-c100-4e41-bece-5822adca3abc'
+        status: 'Active'
+        preferences: '{"currency":"INR","timezone":"Asia/Calcutta","dateformat":"dd/mm/yyyy"}'
+        contactid: 2
+        organization_id: 102
+  -
+        id: 5
+        name: 'Sample Organization 2'
+        uuid: '415ccf14-bb0d-11eb-8529-0242ac130003'
+        status: 'Active'
+        preferences: '{"currency":"INR","timezone":"Asia/Calcutta","dateformat":"dd/mm/yyyy"}'
+        contactid: 2
+        organization_id: 101
+  -
+        id: 6
+        name: 'Test Organization 2'
+        uuid: '415ccffa-bb0d-11eb-8529-0242ac130003'
+        status: 'Active'
+        preferences: '{"currency":"INR","timezone":"Asia/Calcutta","dateformat":"dd/mm/yyyy"}'
+        contactid: 2
+        organization_id: 102  
+ox_person:        
+  -
+        id: 10
+        uuid: '308ce202-c8f9-11ea-87d0-0242ac130003'
+        firstname: 'Deepa'
+        lastname: 'Shree'
+        email: 'deepa@gmail.com'
+        date_of_birth: '1990-11-11'
+        gender: 'Female'
+        address_id: 8
+        phone: '+91-1234567890'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1  
+  -
+        id: 11
+        uuid: '308ce46e-c8f9-11ea-87d0-0242ac130003'
+        firstname: 'Deepa'
+        lastname: 'Kumar'
+        email: 'deepakum@gmail.com'
+        date_of_birth: '1990-11-11'
+        phone: '+91-1234567890'
+        gender: 'Female'
+        address_id: 9
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1   
+  -
+        id: 12
+        uuid: 'ac3a999c-bb0d-11eb-8529-0242ac130003'
+        firstname: 'Shweta'
+        lastname: 'Shree'
+        email: 'shweta@gmail.com'
+        date_of_birth: '1993-11-11'
+        gender: 'Female'
+        address_id: 8
+        phone: '+91-1234267890'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1  
+  -
+        id: 13
+        uuid: 'ac3a9e42-bb0d-11eb-8529-0242ac130003'
+        firstname: 'Suma'
+        lastname: 'Kumari'
+        email: 'sumakumari@gmail.com'
+        date_of_birth: '1890-11-11'
+        phone: '+91-1234567890'
+        gender: 'Female'
+        address_id: 9
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1          
+
+ox_user:
+  -
+        id: 6
+        uuid : '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de'
+        username: 'abc123'
+        password: '1619d7adc23f4f633f11014d2f22b7d8'
+        name: 'Deepa Shree'
+        account_id: 3
+        status: 'Active'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1
+        person_id: 10
+  -
+        id: 7
+        uuid : '2db1c5a3-8a82-4d5b-b60a-c648cf1e27ef'
+        username: 'abc134'
+        password: '1619d7adc23f4f633f11014d2f22b7d8'
+        name: 'Deepa Kumar'
+        account_id: 3
+        status: 'Active'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1
+        person_id: 11
+  -
+        id: 8
+        uuid : 'ac3a9f50-bb0d-11eb-8529-0242ac130003'
+        username: 'xyc123'
+        password: '1619d7adc23f4f633f11014d2f22b7d8'
+        name: 'Shweta Shree'
+        account_id: 3
+        status: 'Active'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1
+        person_id: 12
+  -
+        id: 9
+        uuid : '7398c112-bb0e-11eb-8529-0242ac130003'
+        username: 'abc675'
+        password: '1619d7adc23f4f633f11014d2f22b7d8'
+        name: 'Suma Kumari'
+        account_id: 3
+        status: 'Active'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1
+        person_id: 13      
+ox_employee:        
+  -
+        id: 10
+        uuid: '308ce568-c8f9-11ea-87d0-0242ac130003'
+        date_of_join: '2018-11-11'
+        designation: 'IT ANALYST'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1 
+        person_id: 10
+        org_id: 101
+  -
+        id: 11
+        uuid: '308ce7ca-c8f9-11ea-87d0-0242ac130003'
+        date_of_join: '2018-11-11'
+        designation: 'IT ANALYST'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1  
+        person_id: 11
+        org_id: 101   
+  -
+        id: 12
+        uuid: '7398c630-bb0e-11eb-8529-0242ac130003'
+        date_of_join: '2018-11-11'
+        designation: 'IT ANALYST'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1 
+        person_id: 12
+        org_id: 101
+  -
+        id: 13
+        uuid: '7398c540-bb0e-11eb-8529-0242ac130003'
+        date_of_join: '2018-11-11'
+        designation: 'IT ANALYST'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1  
+        person_id: 13
+        org_id: 101                  
+ox_account_user:
+  -
+    id : 10
+    user_id : 6
+    account_id: 3
+    default: 1
+  -
+    id : 11
+    user_id : 7
+    account_id: 4
+    default : 1
+  -
+    id : 12
+    user_id : 8
+    account_id: 5
+    default: 1
+  -
+    id : 13
+    user_id : 9
+    account_id: 6
+    default : 1  
+ox_business_role:
+  - id: 601
+    name: 'Independent Contractor'
+    uuid: 415cccb2-bb0d-11eb-8529-0242ac130003
+    app_id: 199
+    created_by: 1
+  - id: 602
+    name: 'Contractor carrier'
+    uuid: 7398c6ee-bb0e-11eb-8529-0242ac130003
+    app_id: 199  
+    created_by: 1
+ox_account_business_role:
+  - id: 666
+    account_id: 3
+    business_role_id: 601
+  - id: 667
+    account_id: 4
+    business_role_id: 601
+  - id: 668
+    account_id: 5
+    business_role_id: 602
+  - id: 669
+    account_id: 6
+    business_role_id: 602  
+  - id: 670
+    account_id: 3
+    business_role_id: 602    
+ox_business_relationship:
+  - buyer_account_business_role_id: 666
+    seller_account_business_role_id:  668  
+  - buyer_account_business_role_id: 667
+    seller_account_business_role_id: 669  
+ox_app_entity:
+  - id: 1
+    name: "entity1"
+    app_id: 199
+    date_created: "2019-06-26 00:00:00"
+    uuid: "d23d0c68-98c9-11e9-adc5-308d99c9145b"
+    created_by: 1
+    isdeleted: 0 
+ox_account_offering:
+  - account_business_role_id: 666
+    entity_id: 1       
+  - account_business_role_id: 668
+    entity_id: 1
+ox_app_registry:
+  - account_id: 1
+    app_id: 199
+  - account_id: 3
+    app_id: 199
+ox_field:
+  - id: 1
+    name: "field1"
+    app_id: 199
+    data_type: "text"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 2
+    entity_id: 1
+    index: 1
+  - id: 2
+    name: "field2"
+    app_id: 199
+    data_type: "text"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 1
+    entity_id: 1
+    index: 1
+  - id: 3
+    name: "expiry_date"
+    app_id: 199
+    data_type: "date"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 1
+    entity_id: 1
+    index: 1
+  - id: 4
+    name: "padi_number"
+    app_id: 199
+    data_type: "integer"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 4
+    entity_id: 1
+    index: 0
+  - id: 5
+    name: "policy_document"
+    text: "Addl Policy Documents"
+    app_id: 199
+    data_type: "document"
+    type: "document"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 5
+    entity_id: 1
+    index: 0
+  - id: 6
+    name: "coi_number"
+    text: "Policy Documents"
+    app_id: 199
+    data_type: "document"
+    type: "document"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 6
+    entity_id: 1
+    index: 0
+  - id: 7
+    name: "product"
+    text: "Product"
+    app_id: 199
+    data_type: "text"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 7
+    entity_id: 1
+    index: 1
+  - id: 8
+    name: "policy_period"
+    text: "Policy Period"
+    app_id: 199
+    data_type: "text"
+    template: '{"persistent" : "true"}'
+    required: 1
+    sequence: 7
+    entity_id: 1
+    index: 0

@@ -3,9 +3,12 @@ namespace App;
 
 use Mockery;
 use Oxzion\Service\CommandService;
+use Oxzion\Service\BusinessParticipantService;
 use Oxzion\Test\ControllerTest;
 use PHPUnit\DbUnit\DataSet\YamlDataSet;
 use Oxzion\Utils\FileUtils;
+use Oxzion\Auth\AuthConstants;
+use Oxzion\Auth\AuthContext;
 
 class PipelineControllerTest extends ControllerTest
 {
@@ -17,6 +20,15 @@ class PipelineControllerTest extends ControllerTest
 
     public function getDataSet()
     {
+        switch ($this->getName()) {
+            case 'testsetupBusinessRelationshipWithSellerAccountName':
+            case 'testsetupBusinessRelationshipWithSellerAccountId':
+            case 'testGetEntitySellerAccountWhenBuyerIsLoggedIn':
+            case 'testsetupBusinessRelationshipWithSellerLoggedIn':
+            case 'testCheckIfBusinessRelationshipExists':
+                return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/BusinessRelationship.yml");;
+            break;
+        }
         $dataset = new YamlDataSet(dirname(__FILE__) . "/../../Dataset/Workflow.yml");
         return $dataset;
     }
@@ -37,7 +49,9 @@ class PipelineControllerTest extends ControllerTest
         return $mockRestClient;
     }
 
-
+    public function getBusinessParticipantService(){
+        return $this->getApplicationServiceLocator()->get(BusinessParticipantService::class);
+    }
 
     public function testPipelineMailExecution()
     {
@@ -341,6 +355,96 @@ class PipelineControllerTest extends ControllerTest
         
     }
 
+    public function testsetupBusinessRelationshipWithSellerAccountName(){
+        $this->initAuthToken($this->adminUser);
+        $query = "Select * from ox_business_relationship";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals(2, count($result));
+        $data = ['command' => 'setupBusinessRelationship' , 'sellerAccountName' => 'Sample Organization' , 'buyerAccountId' => 'b6499a34-c100-4e41-bece-5822adca3abc' , 'businessRole' =>'Independent Contractor' ,'sellerBusinessRole' => 'Contractor carrier'];
+        $this->setJsonContent(json_encode($data));
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/pipeline', 'POST', $data);
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $query = "Select * from ox_business_relationship";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals(3, count($result));
+    }
 
+    public function testsetupBusinessRelationshipWithSellerAccountId(){
+        $this->initAuthToken($this->adminUser);
+        $query = "Select * from ox_business_relationship";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals(2, count($result));
+        $data = ['command' => 'setupBusinessRelationship' , 'sellerAccountId' => 'b6499a34-c100-4e41-bece-5822adca3844' , 'buyerAccountId' => 'b6499a34-c100-4e41-bece-5822adca3abc' , 'businessRole' =>'Independent Contractor' ,'sellerBusinessRole' => 'Contractor carrier'];
+        $this->setJsonContent(json_encode($data));
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/pipeline', 'POST', $data);
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $query = "Select * from ox_business_relationship";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals(3, count($result));
+    }
 
+    public function testsetupBusinessRelationshipWithSellerLoggedIn(){
+        $query = "Select * from ox_user";
+        $result = $this->executeQueryTest($query);
+        $this->noUser = $result[5]['username'];
+        $this->noUserId = $result[5]['uuid'];
+        $this->testAccountId = 3;
+        $this->testAccountUuid = 'b6499a34-c100-4e41-bece-5822adca3844';
+        AuthContext::put(AuthConstants::ACCOUNT_ID, $this->testAccountId);
+        AuthContext::put(AuthConstants::ACCOUNT_UUID, $this->testAccountUuid);
+        $this->initAuthToken($this->noUser);
+        $query = "Select * from ox_business_relationship";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals(2, count($result));
+        $data = ['command' => 'setupBusinessRelationship' , 'buyerAccountId' => 'b6499a34-c100-4e41-bece-5822adca3abc' , 'businessRole' =>'Independent Contractor' ,'sellerBusinessRole' => 'Contractor carrier'];
+        $this->setJsonContent(json_encode($data));
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/pipeline', 'POST', $data);
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $query = "Select * from ox_business_relationship";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals(3, count($result));
+    }
+    
+
+    public function testGetEntitySellerAccountWhenBuyerIsLoggedIn(){
+        $query = "Select * from ox_user";
+        $result = $this->executeQueryTest($query);
+        $this->noUser = $result[5]['username'];
+        $this->noUserId = $result[5]['uuid'];
+        $this->testAccountId = 3;
+        $this->testAccountUuid = 'b6499a34-c100-4e41-bece-5822adca3844';
+        AuthContext::put(AuthConstants::ACCOUNT_ID, $this->testAccountId);
+        AuthContext::put(AuthConstants::ACCOUNT_UUID, $this->testAccountUuid);
+        $this->initAuthToken($this->noUser);
+        $query = "Select * from ox_business_relationship";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals(2, count($result));
+        $data = ['entityId' => 1];
+        $getBusinessParticipantService = $this->getBusinessParticipantService();
+        $content = $getBusinessParticipantService->getEntitySellerAccount($data['entityId']);
+        $query = "SELECT sbr.account_id as sellerAccountId, bbr.account_id as buyerAccountId
+                   from ox_business_relationship obr 
+                   inner join ox_account_business_role sbr on sbr.id = obr.seller_account_business_role_id
+                   inner join ox_account_business_role bbr on bbr.id = obr.buyer_account_business_role_id
+                   inner join ox_account_offering oof on sbr.id = oof.account_business_role_id
+                   where oof.entity_id = 1 and bbr.account_id = 3 ";
+        $result = $this->executeQueryTest($query);
+        $this->assertEquals($result[0]['sellerAccountId'], $content);
+    }
+
+     public function testCheckIfBusinessRelationshipExists(){
+        $query = "Select * from ox_account";
+        $result = $this->executeQueryTest($query);
+        $buyerAccountId = $result[2]['id'];
+        $sellerAccountId = $result[4]['id'];
+        AuthContext::put(AuthConstants::ACCOUNT_ID, $buyerAccountId);
+        $this->initAuthToken($this->adminUser);
+        $entityId = 1;
+        $getBusinessParticipantService = $this->getBusinessParticipantService();
+        $content = $getBusinessParticipantService->checkIfBusinessRelationshipExists($entityId,$buyerAccountId, $sellerAccountId);
+        $this->assertTrue($content);
+    }
 }

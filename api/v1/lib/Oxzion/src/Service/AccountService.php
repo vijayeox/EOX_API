@@ -14,6 +14,7 @@ use Oxzion\OxServiceException;
 use Oxzion\EntityNotFoundException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\EntityService;
+use Oxzion\Service\AppRegistryService;
 use Oxzion\Utils\FileUtils;
 use Oxzion\Utils\FilterUtils;
 use Oxzion\Utils\UuidUtil;
@@ -32,6 +33,7 @@ class AccountService extends AbstractService
     private $privilegeService;
     private $organizationService;
     private $entityService;
+    private $appRegistryService;
     public static $userField = array('name' => 'ox_user.name', 'id' => 'ox_user.id', 'city' => 'ox_address.city', 'country' => 'ox_address.country', 'address' => 'ox_address.address1', 'address2' => 'ox_address.address2', 'state' => 'ox_address.state');
     public static $teamField = array('name' => 'oxg.name', 'description' => 'oxg.description', 'date_created' => 'oxg.date_created');
     public static $projectField = array('name' => 'oxp.name', 'description' => 'oxp.description', 'date_created' => 'oxp.date_created');
@@ -47,7 +49,7 @@ class AccountService extends AbstractService
     /**
      * @ignore __construct
      */
-    public function __construct($config, $dbAdapter, AccountTable $table, UserService $userService, RoleService $roleService, PrivilegeService $privilegeService, OrganizationService $organizationService, EntityService $entityService, MessageProducer $messageProducer)
+    public function __construct($config, $dbAdapter, AccountTable $table, UserService $userService, RoleService $roleService, PrivilegeService $privilegeService, OrganizationService $organizationService, EntityService $entityService, AppRegistryService $appRegistryService, MessageProducer $messageProducer)
     {
         parent::__construct($config, $dbAdapter);
         $this->table = $table;
@@ -58,6 +60,7 @@ class AccountService extends AbstractService
         $this->messageProducer = $messageProducer;
         $this->organizationService = $organizationService;
         $this->entityService = $entityService;
+        $this->appRegistryService = $appRegistryService;
     }
 
     /**
@@ -152,8 +155,8 @@ class AccountService extends AbstractService
         $params = $data;
         $params['preferences'] = array();
         $appId = null;
-        if (isset($params['app_id'])) {
-            $appId = $this->getAppId($params['app_id']);
+        if (isset($params['appId'])) {
+            $appId = $this->getAppId($params['appId']);
             $params['app_id'] = $appId;
         }
         if (!$appId) {
@@ -165,11 +168,11 @@ class AccountService extends AbstractService
             AuthContext::put(AuthConstants::REGISTRATION, true);
             $this->createAccount($params, null);
             $data['accountId'] = $params['uuid'];
+            $this->appRegistryService->createAppRegistry($this->getUuidFromId('ox_app', $appId),$data['accountId']);
             $this->setupBusinessRole($data, $data['accountId'], $this->getUuidFromId('ox_app', $appId));
             $this->roleService->createRolesByBusinessRole($data['accountId'], $appId);
             $user = $this->getContactUserForAccount($data['accountId']);
             $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
-
             $this->addIdentifierForAccount($appId, $params);
             $this->commit();
         } catch (Exception $e) {
@@ -267,7 +270,7 @@ class AccountService extends AbstractService
         }
         $bRole .=")";
         
-        $query = "INSERT INTO ox_account_business_role (account_id, business_role_id)
+        $query = "INSERT IGNORE INTO ox_account_business_role (account_id, business_role_id)
                     SELECT ".$accountId.", id from ox_business_role 
                     WHERE app_id = :appId and name in $bRole";
                     
@@ -500,6 +503,17 @@ class AccountService extends AbstractService
         $result = $this->executeQueryWithParams($select)->toArray();
         if (isset($result[0])) {
             return $result[0]['id'];
+        } else {
+            return null;
+        }
+    }
+
+    public function getAccountByName($name) {
+        $select = "SELECT uuid from ox_account where `name` = :name";
+        $params = ['name' => $name];
+        $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
+        if (isset($result[0])) {
+            return $result[0]['uuid'];
         } else {
             return null;
         }

@@ -211,14 +211,18 @@ class ProjectService extends AbstractService
         if (isset($data['parent_id'])) {
             $projParentId = $data['parent_id'];
         }
+
         if (isset($projParentId)) {
             $parentId = $this->getIdFromUuid('ox_project', $projParentId);
             $parent_uuid = $projParentId;
             $data['parent_id'] = $parentId;
-            if ($parentId == 0) {
+            if ($parentId === 0) {
                 throw new ServiceException("Project parent is invalid", "project.parent.invalid", OxServiceException::ERR_CODE_NOT_FOUND);
             }
+        } else {
+            $data['parent_id'] = NULL;
         }
+        
         $obj = $this->table->getByUuid($id, array());
         if (is_null($obj)) {
             throw new ServiceException("Updating non-existent Project", "non.existent.project", OxServiceException::ERR_CODE_NOT_FOUND);

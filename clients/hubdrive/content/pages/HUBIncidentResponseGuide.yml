@@ -1,0 +1,39 @@
+name: 'List HUB Incident Response Guide'
+description: 'Shows a list of HUB Incident Response Guide'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/HUB Incident Response Guide'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of HUB Incident Response Guide</h5>'
+            operations:
+                title: "Create New"
+                actions:
+                    -
+                        name: Create New
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 293d4c16-0497-4475-af2d-609b968b0aef      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

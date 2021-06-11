@@ -1,0 +1,39 @@
+name: 'List Telematics Policy And Procedure'
+description: 'Shows a list of Telematics Policy And Procedure'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Telematics Policy And Procedure'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of Telematics Policy And Procedure</h5>'
+            operations:
+                title: "Create New"
+                actions:
+                    -
+                        name: Create New
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: b2224391-2017-42de-a4d5-f4d7b8719afe      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

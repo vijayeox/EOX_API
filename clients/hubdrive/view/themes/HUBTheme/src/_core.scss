@@ -1,0 +1,42 @@
+.osjs-root {
+  font-family: $font-family;
+  color: $font-color;
+}
+
+//
+// Browser
+//
+
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+::-webkit-scrollbar-button {
+  background: transparent;
+  color: $scrollbar-button-foreground;
+  width: 15px;
+  height: 7px;
+  display: none;
+}
+
+::-webkit-scrollbar-track {
+  border: $scrollbar-track-border;
+  background: $scrollbar-track-background;
+}
+
+::-webkit-scrollbar-track-piece {
+  background: $scrollbar-track-background;
+}
+
+::-webkit-scrollbar-thumb {
+  border: $scrollbar-button-border;
+  background: $scrollbar-button-background;
+}
+
+::-webkit-scrollbar-corner {
+  background: $scrollbar-track-background;
+}
+
+::-webkit-resizer {
+  background: $scrollbar-track-background;
+}

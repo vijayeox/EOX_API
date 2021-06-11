@@ -66,8 +66,10 @@ class Persistence extends AbstractService
      * @param $sqlQuery
      * @return \Zend\Db\Adapter\Driver\ResultInterface
      */
-    public function insertQuery($sqlQuery)
+
+    public function insertQuery($sqlQuery,array $params = [])
     {
+    
         $parsedData = new PHPSQLParser($sqlQuery);
         $parsedArray = $parsedData->parsed;
         $adapter=$this->dbAdapter;
@@ -135,14 +137,14 @@ class Persistence extends AbstractService
         } catch (Exception $e) {
             return 0;
         }
-        return $queryExecute = $this->generateSQLFromArray($parsedArray);
+        return $queryExecute = $this->generateSQLFromArray($parsedArray,$params);
     }
 
     /**
      * @param $sqlQuery
      * @return \Zend\Db\Adapter\Driver\ResultInterface
      */
-    public function updateQuery($sqlQuery)
+    public function updateQuery($sqlQuery,array $params = [])
     {
         $parsedData = new PHPSQLParser($sqlQuery);
         $parsedArray = $parsedData->parsed;
@@ -154,7 +156,7 @@ class Persistence extends AbstractService
             return 0;
         }
 
-        return $queryExecute = $this->generateSQLFromArray($parsedArray);
+        return $queryExecute = $this->generateSQLFromArray($parsedArray,$params);
     }
 
 
@@ -163,7 +165,7 @@ class Persistence extends AbstractService
      * @param $returnArray
      * @return array
      */
-    public function selectQuery($sqlQuery, $returnArray = false)
+    public function selectQuery($sqlQuery,array $params = [], $returnArray = false)
     {
         $parsedData = new PHPSQLParser($sqlQuery);
         $parsedArray = $parsedData->parsed;
@@ -173,7 +175,7 @@ class Persistence extends AbstractService
         } catch (Exception $e) {
             return 0;
         }
-        $queryExecute = $this->generateSQLFromArray($parsedArray);
+        $queryExecute = $this->generateSQLFromArray($parsedArray,$params);
         if ($returnArray === true) {
             return $this->toArray($queryExecute);
         } else {
@@ -185,7 +187,7 @@ class Persistence extends AbstractService
      * @param $sqlQuery
      * @return \Zend\Db\Adapter\Driver\ResultInterface
      */
-    public function deleteQuery($sqlQuery)
+    public function deleteQuery($sqlQuery,array $params = [])
     {
         $parsedData = new PHPSQLParser($sqlQuery);
         $parsedArray = $parsedData->parsed;
@@ -202,7 +204,7 @@ class Persistence extends AbstractService
         } catch (Exception $e) {
             return 0;
         }
-        return $queryExecute = $this->generateSQLFromArray($parsedArray);
+        return $queryExecute = $this->generateSQLFromArray($parsedArray,$params);
     }
 
     private function getReferenceClause($parsedArray, $key, $data, $tableArrayList, $queryStatement)
@@ -237,11 +239,11 @@ class Persistence extends AbstractService
         return $parsedArray;
     }
 
-    private function generateSQLFromArray($parsedArray)
+    private function generateSQLFromArray($parsedArray, array $params = [])
     {
         $adapter = $this->dbAdapter;
         $statement = new PHPSQLCreator($parsedArray);
-        $statement3 = $adapter->query($statement->created);
+        $statement3 = $adapter->createStatement($statement->created,$params);
         return $statement3->execute();
     }
 
@@ -251,8 +253,17 @@ class Persistence extends AbstractService
         if (!$tableAliasName) {
             $tableAliasName = $tableName;
         }
-        $columnResult = $adapter->query("SELECT TABLE_NAME, GROUP_CONCAT(COLUMN_NAME) as column_list FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name LIKE '$tableName' GROUP BY TABLE_NAME");
+
+        $tableName = str_replace('`',"",$tableName);
+        $query = "SELECT TABLE_NAME, GROUP_CONCAT(COLUMN_NAME) as column_list
+                 FROM INFORMATION_SCHEMA.COLUMNS 
+                 WHERE table_name  ='$tableName' AND
+                 table_schema = '$this->database'
+                 GROUP BY TABLE_NAME";
+        $columnResult = $adapter->query($query);
         $resultSet1 = $columnResult->execute();
+
+
         while ($resultSet1->next()) {
             $resultTableName = $resultSet1->current();
             $columnList = explode(",", $resultTableName['column_list']);

@@ -1,0 +1,34 @@
+ox_profile:
+-
+    id: 1
+    uuid: '3450c623-1361-4c85-8203-e255ac995c4a'
+    name: 'Default profile'
+    dashboard_uuid: 'aa1befce-1234-4266-bbd6-d8da5571b10a'
+    html: null
+    type: 'dashboard'
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    precedence: 1
+    role_id: null
+-
+    id: 2
+    uuid: '1123c623-1123-4c45-8203-e255ac995c4a'
+    name: 'Manager profile'
+    dashboard_uuid: 'abcbefce-1111-4266-bbd6-d8da5571b10a'
+    html: null
+    type: 'dashboard'
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    precedence: 2
+    role_id: 5
+-
+    id: 3
+    uuid: '3333623-1361-4c85-8203-e255ac995c4a'
+    name: 'Employee profile'
+    dashboard_uuid: 'bb1befce-2222-4266-bbd6-d8da5571b10a'
+    html: null
+    type: 'dashboard'
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    precedence: 1
+    role_id: 6

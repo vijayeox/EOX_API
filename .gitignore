@@ -29,6 +29,7 @@
 /integrations/workflow/ProcessEngine/bin/
 /setup/mysql/*
 /view/view_built
+view/node_modules/*
 /clients/DiveInsurance/view/apps/DiveInsurance/dist/
 /clients/DiveInsurance/view/apps/DiveInsurance/node_modules/
 /clients/EOXAppBuilder/view/apps/EOXAppBuilder/dist/

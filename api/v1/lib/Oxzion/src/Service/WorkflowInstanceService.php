@@ -218,6 +218,10 @@ class WorkflowInstanceService extends AbstractService
         if (isset($params['CreateNewUser'])) {
             unset($params['CreateNewUser']);
         }
+        if (isset($params['appId'])) {
+            $params['app_id'] = $params['appId'];
+            $params['appId'] = null;
+        }
         $workflow = $this->workflowService->getWorkflow($workflowId, $params['appId']);
         if (empty($workflow)) {
             $this->logger->info("EMPTY WORKFLOW --- ");

@@ -15,6 +15,8 @@ use Oxzion\Service\FieldService;
 use Oxzion\Service\FormService;
 use Oxzion\Service\WorkflowService;
 use Oxzion\Service\BusinessRoleService;
+use Oxzion\Service\AppRegistryService;
+use Oxzion\Service\UserService;
 use Oxzion\Utils\ExecUtils;
 use Oxzion\Utils\FileUtils;
 use Oxzion\Utils\FilterUtils;
@@ -33,7 +35,6 @@ use Oxzion\InvalidParameterException;
 use Oxzion\App\AppArtifactNamingStrategy;
 use Oxzion\Model\Entity;
 use Oxzion\ValidationException;
-use Oxzion\Service\UserService;
 use Oxzion\Messaging\MessageProducer;
 
 class AppService extends AbstractService
@@ -55,6 +56,7 @@ class AppService extends AbstractService
     private $roleService;
     private $userService;
     private $businessRoleService;
+    private $appRegistryService;
     private $messageProducer;
 
     public function setMessageProducer($messageProducer)
@@ -65,7 +67,7 @@ class AppService extends AbstractService
     /**
      * @ignore __construct
      */
-    public function __construct($config, $dbAdapter, AppTable $table, WorkflowService $workflowService, FormService $formService, FieldService $fieldService, JobService $jobService, $accountService, $entityService, $privilegeService, $roleService, $menuItemService, $pageService, UserService $userService, BusinessRoleService $businessRoleService, MessageProducer $messageProducer)
+    public function __construct($config, $dbAdapter, AppTable $table, WorkflowService $workflowService, FormService $formService, FieldService $fieldService, JobService $jobService, $accountService, $entityService, $privilegeService, $roleService, $menuItemService, $pageService, UserService $userService, BusinessRoleService $businessRoleService, AppRegistryService $appRegistryService, MessageProducer $messageProducer)
     {
         parent::__construct($config, $dbAdapter);
         $this->table = $table;
@@ -80,6 +82,7 @@ class AppService extends AbstractService
         $this->pageService = $pageService;
         $this->jobService = $jobService;
         $this->businessRoleService = $businessRoleService;
+        $this->appRegistryService = $appRegistryService;
         $this->userService = $userService;
         $this->messageProducer = $messageProducer;
         $this->restClient = new RestClient(null);
@@ -273,6 +276,7 @@ class AppService extends AbstractService
                     $temp = $this->createOrUpdateApp($ymlData);
                     if ($temp) {
                         FileUtils::copyDir($path, $temp);
+                        $originalPath = $path;
                         $path = $temp;
                     }
                     $this->processBusinessRoles($ymlData);
@@ -325,7 +329,10 @@ class AppService extends AbstractService
             $this->removeViewAppOnError($path);
             throw $e;
         } finally {
-            $this->createOrUpdateApplicationDescriptor($path, $ymlData);
+            $this->setupOrUpdateApplicationDirectoryStructure($ymlData);
+            if (isset($originalPath)) {
+                $this->createOrUpdateApplicationDescriptor($originalPath, $ymlData);
+            }
         }
         return $ymlData;
     }
@@ -438,6 +445,8 @@ class AppService extends AbstractService
             } else {
                 throw new ServiceException('Failed Installing Organisation','org.install.failed');
             }
+        } elseif (isset($yamlData['app']['autoinstall']) && $yamlData['app']['autoinstall'] == true && App::PRE_BUILT == $yamlData['app']['type']) {
+            $this->installApp(AuthContext::get(AuthConstants::ACCOUNT_UUID), $yamlData, $path);
         }
     }
 
@@ -471,13 +480,11 @@ class AppService extends AbstractService
         try {
             $this->beginTransaction();
             $appId = $yamlData['app']['uuid'];
-            if (isset($yamlData['org'])) {
-                $bRoleResult = $this->accountService->setupBusinessOfferings($yamlData['org'], $accountId, $appId);
-                $this->createRole($yamlData, false, $accountId, $bRoleResult);         
-            }
+            $bRoleResult = ((isset($yamlData['org']))) ? $this->accountService->setupBusinessOfferings($yamlData['org'], $accountId, $appId) : null;
+            $this->createRole($yamlData, false, $accountId, $bRoleResult);         
             $user = $this->accountService->getContactUserForAccount($accountId);
             $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
-            $result = $this->createAppRegistry($appId, $accountId);
+            $result = $this->appRegistryService->createAppRegistry($appId, $accountId);
             $this->logger->info("PATH--- $path");
             $this->setupAccountFiles($path, $accountId, $appId);
             // Assign AppRoles to Logged in User if Logged in Org and Installed Org are same
@@ -1206,10 +1213,9 @@ class AppService extends AbstractService
     {
         $pageSize = 20;
         $offset = 0;
-        $where = "";
         $sort = "name";
+        $where = " WHERE ox_app.status != 1";
 
-        $cntQuery = "SELECT count(ox_app.id) as count FROM `ox_app` inner join ox_user oc on oc.id=ox_app.created_by left join ox_user om on om.id=ox_app.modified_by ";
         if (count($filterParams) > 0 || sizeof($filterParams) > 0) {
             $filterArray = json_decode($filterParams['filter'], true);
             if (isset($filterArray[0]['filter'])) {
@@ -1231,7 +1237,7 @@ class AppService extends AbstractService
                     $filterList = $filterArray[0]['filter']['filters'];
                 }
                 $filter = FilterUtils::filterArray($filterList, $filterlogic, array('name'=>'ox_app.name','date_modified'=>'DATE(ox_app.date_modified)','modified_user'=>'om.name','created_user'=>'oc.name'));
-                $where = " WHERE " . $filter;
+                $where .= " AND " . $filter;
             }
             if (isset($filterArray[0]['sort']) && count($filterArray[0]['sort']) > 0) {
                 $sort = $filterArray[0]['sort'];
@@ -1240,15 +1246,16 @@ class AppService extends AbstractService
             $pageSize = isset($filterArray[0]['take']) ? $filterArray[0]['take'] : 10;
             $offset = isset($filterArray[0]['skip']) ? $filterArray[0]['skip'] : 0;
         }
-        $where .= strlen($where) > 0 ? " AND ox_app.status!=1" : "WHERE ox_app.status!=1";
-        $sort = " ORDER BY " . $sort;
-        $limit = " LIMIT " . $pageSize . " offset " . $offset;
+        $fromTable = " FROM `ox_app` inner join ox_user oc on oc.id=ox_app.created_by left join ox_user om on om.id=ox_app.modified_by";
+        $cntQuery = "SELECT count(ox_app.id) as count" . $fromTable;
         $resultSet = $this->executeQuerywithParams($cntQuery . $where);
         $count = $resultSet->toArray()[0]['count'];
         if (0 == $count) {
             return;
         }
-        $query = "SELECT ox_app.*,oc.name as created_user,om.name as modified_user FROM `ox_app` inner join ox_user oc on oc.id=ox_app.created_by left join ox_user om on om.id=ox_app.modified_by " . $where . " " . $sort . " " . $limit;
+        $sort = " ORDER BY " . $sort;
+        $limit = " LIMIT " . $pageSize . " offset " . $offset;
+        $query = "SELECT ox_app.*,oc.name as created_user,om.name as modified_user" . $fromTable . $where . $sort . $limit;
         $resultSet = $this->executeQuerywithParams($query);
         $result = $resultSet->toArray();
         for ($x = 0; $x < sizeof($result); $x++) {
@@ -1343,34 +1350,6 @@ class AppService extends AbstractService
         return $this->formService->createForm($formData);
     }
 
-    public function createAppRegistry($appId, $accountId)
-    {
-        $sql = $this->getSqlObject();
-        //Code to check if the app is already registered for the account
-        $queryString = "select count(ar.id) as count
-        from ox_app_registry as ar
-        inner join ox_app ap on ap.id = ar.app_id
-        inner join ox_account acct on acct.id = ar.account_id
-        where ap.uuid = :appId and acct.uuid = :accountId";
-        $params = array("appId" => is_array($appId) ? $appId['value'] : $appId, "accountId" => $accountId);
-        $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
-        if ($resultSet[0]['count'] == 0) {
-            try {
-                $this->beginTransaction();
-                $insert = "INSERT into ox_app_registry (app_id, account_id, start_options)
-                select ap.id, acct.id, ap.start_options from ox_app as ap, ox_account as acct where ap.uuid = :appId and acct.uuid = :accountId";
-                $params = array("appId" => $appId, "accountId" => $accountId);
-                $result = $this->executeUpdateWithBindParameters($insert, $params);
-                $this->commit();
-                return $result->getAffectedRows();
-            } catch (Exception $e) {
-                $this->rollback();
-                throw $e;
-            }
-        }
-        return 0;
-    }
-
     public function registerApps($data)
     {
         $apps = json_decode($data['applist'], true);
@@ -1443,7 +1422,7 @@ class AppService extends AbstractService
         $this->logger->debug("Adding App to registry");
         $data['accountId'] = isset($data['accountId']) ? $data['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
         $app = $this->table->getByName($data['app_name']);
-        return $this->createAppRegistry($app->uuid, $data['accountId']);
+        return $this->appRegistryService->createAppRegistry($app->uuid, $data['accountId']);
     }
 
     public function processEntity(&$yamlData, $assoc_id = null)

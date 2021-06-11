@@ -1,0 +1,15 @@
+{
+  "name": "diveinsurance_gui",
+  "version": "1.0.0",
+  "description": "GUI components for DiveInsurance client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "EOX Product",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/runtime": "^7.9.2",
+    "react": "^16.13.1"
+  }
+}

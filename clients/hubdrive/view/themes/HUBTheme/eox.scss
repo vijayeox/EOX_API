@@ -1,0 +1,385 @@
+@import "variables";
+
+* {
+  box-sizing: border-box;
+  font-family: $font, Arial;
+}
+
+// Osjs Window
+.osjs-window {
+  border-width: 0 !important;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.osjs-window-inner {
+  background-color: $white;
+  overflow: hidden;
+}
+
+.osjs-window-header {
+  background-color: $primary;
+  color: $white;
+  min-height: 2.75em !important;
+
+  .osjs-window-button {
+    //   min-width: 2.75em!important;
+  }
+}
+
+.osjs-window-title {
+}
+
+// Icon Fills
+.fill-white {
+  fill: $white;
+}
+
+// Page Header
+.custom.osjs-panel {
+  color: white;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  background-color: $primary;
+  padding: 10px;
+}
+
+//App Pills
+.osjs-panel-item--clickable {
+  font-size: 12px;
+  color: white;
+  border-radius: 20px;
+  padding: 3px 3px 3px 10px;
+  display: inline-block;
+}
+
+.osjs-panel-item--clickable:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.app-x {
+  display: inline-block;
+  vertical-align: middle;
+  width: 19px;
+  height: 19px;
+  background: $primary;
+  border-radius: 10px;
+}
+
+//Main Menu
+.appmenu .app-bar {
+  background-color: white;
+  padding: 0;
+  @extend .box-shadow;
+}
+
+.app-bar .caption {
+  font-weight: 800;
+  color: $grey;
+  text-transform: uppercase;
+  padding: 20px 0px 15px;
+  border-bottom: 2px dotted $grey;
+}
+
+.appmenu .app-bar .app {
+  min-height: auto;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px dashed rgba($grey, 0.5);
+  color: $primary;
+}
+
+.appmenu .app-bar .app:hover {
+  background: rgba($text, 0.05);
+}
+
+.appmenu .app-bar .category {
+  padding: 25px 20px 0px;
+}
+
+.appmenu:before {
+  bottom: 100%;
+  left: 50px;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: #fff;
+  border-width: 10px;
+  margin-left: -10px;
+}
+
+.appmenu .app-bar .category .caption {
+  background: none;
+  color: $primary;
+  margin: 0;
+}
+
+//Profile Menu
+.profile-content {
+  background-color: white;
+  padding: 5px 15px 5px;
+  @extend .box-shadow;
+  min-width: 220px;
+}
+
+.profile-dropdown-div {
+  border-bottom: 1px dashed rgba($grey, 0.5);
+}
+
+.profile-dropdown-image {
+  width: 60px;
+  height: 60px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.profile-dropdown-text {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+a.logout {
+  margin: 10px 0 5px;
+  display: block;
+}
+
+a.logout .profile-dropdown-div {
+  border: none;
+  padding-bottom: 0;
+}
+
+a.logout .profile-dropdown-image {
+  width: 36px;
+  height: 36px;
+  max-height: none;
+  max-width: none;
+  vertical-align: middle;
+  display: inline-block;
+  margin: 5px 8px 0 0;
+}
+
+.osjs-panel[data-position="top"] .profile-content:before {
+  bottom: 100%;
+  border-bottom-color: #fff;
+}
+
+.osjs-panel[data-position="bottom"] .profile-content:before {
+  top: 100%;
+  border-top-color: #fff;
+}
+
+.profile-dropdown-text {
+  font-size: 16px;
+  font-size: 16px;
+}
+
+.osjs-panel-item[data-name="tray"] {
+}
+
+.osjs-window-icon > div {
+  width: 1.65em !important;
+  height: 1.65em !important;
+  background-color: #275261;
+  margin-top: 10px;
+  margin-right: 7px;
+}
+
+//Common
+.box-shadow {
+  box-shadow: 0 0 10px $shadow;
+}
+
+.fill-white path {
+  fill: white;
+}
+
+.osjs-window-header.pl10 .osjs-window-icon {
+  background-color: transparent !important;
+}
+
+//not the right way;
+
+// Search Container
+.osjs-search-container {
+  @extend .box-shadow;
+  border-radius: 4px;
+  background: white !important;
+  border: 1px rgba($grey, 0.5) solid;
+}
+
+input[type="text"].osjs-search-input {
+  margin-bottom: 0;
+  border: none;
+  padding: 5px 10px;
+  height: auto;
+  font-size: 20px;
+}
+
+//.osjs-notifications
+.osjs-notification {
+  border-radius: 4px;
+  @extend .box-shadow;
+}
+
+//Resizers
+.osjs-window-resize[data-direction="n"] {
+  cursor: n-resize;
+  top: 0;
+}
+
+.osjs-window-resize[data-direction="w"] {
+  cursor: w-resize;
+  left: 0;
+}
+
+.osjs-window-resize[data-direction="s"] {
+  cursor: s-resize;
+  bottom: 0;
+}
+
+.osjs-window-resize[data-direction="se"] {
+  cursor: se-resize;
+  bottom: 0;
+  right: 0;
+}
+
+.osjs-window-resize[data-direction="e"] {
+  cursor: e-resize;
+  right: 0;
+}
+
+.osjs-window-resize[data-direction="ne"],
+.osjs-window-resize[data-direction="nw"],
+.osjs-window-resize[data-direction="sw"] {
+  cursor: sw-resize;
+  display: none;
+}
+
+//Do not use - for mockups only
+
+.app-menu-not-req {
+  position: absolute;
+  top: 45px;
+  left: 0;
+}
+
+.profile-menu-not-req {
+  position: absolute;
+  top: 45px;
+  right: 32px;
+}
+
+//formio
+.page-item.active .page-link {
+  background-color: $secondary;
+  border-color: $secondary;
+}
+
+.page-item {
+  &.active .page-link {
+    z-index: 3;
+    color: $white;
+    background-color: $secondary !important;
+    border-color: $secondary !important;
+  }
+}
+
+.Navigation {
+  // Page Breadcrumb Name/Title
+  .activeBreadcrumb a {
+    color: $secondary !important;
+
+    &:hover,
+    &focus {
+      color: $royal-blue !important;
+      text-decoration: underline !important;
+    }
+  }
+
+  // View and Attachment Tab
+  .tab-link-active {
+    color: $shocking-blue !important;
+    box-shadow: inset 0 -2px 0 $shocking-blue !important;
+  }
+
+  // Chart Send Button
+  .commentsPage .commentsSaveButton {
+    background-color: $secondary;
+    opacity: 1;
+    cursor: pointer;
+
+    &:hover,
+    &focus {
+      background-color: $hopeful-green;
+      opacity: 1;
+    }
+  }
+}
+
+//formio - All Button
+
+.formio-form {
+  .btn {
+    &.btn-secondary,
+    &.btn-primary {
+      &.btn-wizard-nav-cancel, // Cancel Button
+      &.formio-button-remove-row, // Remove Row Button
+      &.btn-wizard-nav-previous {
+        // Previous Page Button
+        color: #0678d5;
+        background-color: transparent;
+        text-decoration: none;
+        border: 4px solid #0678d5;
+        border-radius: 40px;
+        font: normal 500 16px Gotham;
+        outline: #0678d5 none 0px;
+        padding: 8px 26px 6px;
+
+        &:hover,
+        &:focus {
+          color: #3ebd3e;
+          text-decoration: none;
+          border: 4px solid #3ebd3e;
+          border-radius: 40px 40px 40px 40px;
+          font: normal 500 16px Gotham;
+          outline: #3ebd3e none 0px;
+          padding: 8px 26px 6px;
+        }
+      }
+    }
+
+    &.btn-primary {
+      &.btn-wizard-nav-next, // Next Button
+      &.formio-button-add-row, // Add Row Button
+      &.btn-wizard-nav-submit {
+        // Submit Button
+        color: #ffffff;
+        background-color: #0678d5;
+        border: 4px solid #0678d5;
+        border-radius: 40px;
+        font: normal 500 1rem Gotham;
+        outline: #0678d5 none 0px;
+        padding: 8px 34px 6px;
+
+        &:hover,
+        &:focus {
+          color: #ffffff;
+          background-color: #3ebd3e;
+          text-decoration: none;
+          border: 4px solid #3ebd3e;
+          border-radius: 40px;
+          font: normal 500 16px Gotham;
+          outline: #3ebd3e none 0px;
+          padding: 8px 34px 6px;
+        }
+      }
+    }
+  }
+}

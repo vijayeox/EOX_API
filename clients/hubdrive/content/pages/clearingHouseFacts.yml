@@ -1,0 +1,39 @@
+name: 'List clearing House Facts'
+description: 'Shows a list of clearing House Facts'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/clearing House Facts'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of clearing House Facts</h5>'
+            operations:
+                title: "Report New Violation"
+                actions:
+                    -
+                        name: Report New Violation
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: b4dc782e-85c9-4246-a9ca-ee68b12fddee      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

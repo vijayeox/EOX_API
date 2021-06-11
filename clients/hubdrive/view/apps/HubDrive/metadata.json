@@ -1,0 +1,24 @@
+{
+    "type": "application",
+    "name": "HubDrive",
+    "appId": "a4b1f073-fc20-477f-a804-1aa206938c42",
+    "category": "EXAMPLE_CATEGORY",
+    "autostart": true,
+    "singleton": true,
+    "icon": "icon.png",
+    "icon_white": "icon_white.png",
+    "icon_black": "icon_black.png",
+    "hidden": false,
+    "defaultAppforOrgs": true,
+    "server": "server.js",
+    "title": {
+        "en_EN": "HubDriveOnline"
+    },
+    "description": {
+        "en_EN": "HubDriveOnline"
+    },
+    "files": [
+        "main.js",
+        "main.css"
+    ]
+}

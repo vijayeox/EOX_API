@@ -9,6 +9,7 @@ use Zend\Db\Adapter\AdapterInterface;
 use Oxzion\Controller\AbstractApiController;
 use Oxzion\ValidationException;
 use Oxzion\Workflow\Camunda\WorkflowException;
+use Oxzion\DelegateException;
 use Zend\Http\Request as HttpRequest;
 use Exception;
 
@@ -56,7 +57,10 @@ class PipelineController extends AbstractApiController
                 return $this->getErrorResponse("Task has already been claimed by someone else", 409);
             }
             return $this->getErrorResponse($e->getMessage(), 409);
-        } catch (Exception $e) {
+        } catch (DelegateException $e) {
+            return $this->getErrorResponse($e->getMessage(), 409);
+        } 
+        catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }

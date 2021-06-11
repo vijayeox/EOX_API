@@ -20,6 +20,7 @@ class SmartyTemplateProcessorTest extends TestCase
         $params['cacheDir'] = __DIR__."/Data/";
         $params['configsDir'] = __DIR__."/Data/";
         $params['compileDir'] = __DIR__."/Data/";
+        $params['OITemplateDir'] = __DIR__."/Data/";
         $this->parser->init($params);
         $this->assertEquals(true, true);
     }
@@ -31,6 +32,7 @@ class SmartyTemplateProcessorTest extends TestCase
         $params['cacheDir'] = __DIR__."/template/";
         $params['configsDir'] = __DIR__."/template/";
         $params['compileDir'] = __DIR__."/template/";
+        $params['OITemplateDir'] = __DIR__."/template/";
         $this->parser->init($params);
         copy(__DIR__."/template/GenericTemplate.tpl", __DIR__."/template/Template.tpl");
         copy(__DIR__."/template/Template.tpl", __DIR__."/../../../../data/template/Template.tpl");

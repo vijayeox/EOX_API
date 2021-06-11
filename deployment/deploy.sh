@@ -718,6 +718,57 @@ arrowhead()
         echo -e "${YELLOW}Started view service!${RESET}"
     fi
 }
+
+hubdrive()
+{
+    cd ${TEMP}
+    echo -e "${YELLOW}Copying EOX apps...${RESET}"
+    if [ ! -d "./clients/hubdrive" ] ;
+    then
+        echo -e "${RED}EOX Apps was not packaged so skipping it\n${RESET}"
+    else
+        echo -e "${GREEN}Stopping view service${RESET}"
+        systemctl stop view
+        cd ${TEMP}/clients
+        echo -e "${YELLOW}Copying EOX Apps to /opt/oxzion/eoxapps directory${RESET}"
+        mkdir -p /opt/oxzion/eoxapps
+        rsync -rl --delete ./hubdrive /opt/oxzion/eoxapps
+        chmod 777 -R /opt/oxzion/eoxapps
+        echo -e "${YELLOW}Building hubdrive app using deployapp API${RESET}"
+        jwt=$(curl --location --request POST 'http://localhost:8080/auth' --form 'username=admintest' --form 'password=Welcome2eox!' 2>/dev/null | jq -r '.data.jwt')
+        curl --location --request POST 'http://localhost:8080/app/deployapp' -H 'Authorization: Bearer '${jwt}'' -F 'path=/opt/oxzion/eoxapps/hubdrive'
+        echo -e "${YELLOW}Copying EOX Apps directory Complete!${RESET}"
+        echo -e "${GREEN}Building and Running package discover in bos${RESET}"
+        cd /opt/oxzion/view/bos/
+        npm run build
+        npm run package:discover
+        chown www-data:www-data -R /opt/oxzion/eoxapps
+        chmod 777 -R /opt/oxzion/eoxapps
+        cd /opt/oxzion/view/apps/hubdrive/
+        rm -rf /opt/oxzion/view/apps/hubdrive/node_modules
+        npm install --unsafe-perm
+        npm run build
+        cd /opt/oxzion/view/themes/hubdriveTheme/
+        rm -rf /opt/oxzion/view/themes/hubdriveTheme/node_modules
+        npm install --unsafe-perm
+        npm run build
+        chown www-data:www-data -R /opt/oxzion/view
+        systemctl start view
+        echo -e "${YELLOW}Started view service!${RESET}"
+    fi
+}
+
+
+
+
+
+
+
+
+
+
+
+
 covid()
 {
     cd ${TEMP}

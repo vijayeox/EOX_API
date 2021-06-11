@@ -4,6 +4,7 @@ app:
     category: EXAMPLE_CATEGORY
     type: 1
     autostart: false
+    autoinstall: true
     version: 1
     uuid: 41b77ef3-41db-4a52-8eb8-ba3ac9a9d771
     status: 4

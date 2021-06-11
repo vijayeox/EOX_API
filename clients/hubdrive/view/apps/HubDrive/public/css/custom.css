@@ -1,0 +1,639 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-y: scroll;
+ min-height: 100% !important;
+    height: 100%;
+}
+
+body {
+  font-family: "Lato Sans", sans-serif;
+ min-height: 100% !important;
+    height: 100%;
+}
+body #root{
+  min-height: 100% !important;
+    height: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: #053b6d;
+  transition: 0.5s ease;
+}
+a:hover {
+  color: #053b6d;
+}
+.btn-default:hover {
+    color: #053b6d;
+    background-color: #ffffff;
+    border-color: #275262;
+}
+.form {
+  padding: 40px 40px 35px 40px;
+  margin: 0px auto;
+  
+}
+.registerActivated #signup{
+      display: block;
+    max-width: 700px;
+    margin: 0 auto;
+}
+.registerActivated #signup .form-group:not(.formio-component-iAgree){
+    margin-bottom:0;
+    /*max-width: 300px;*/
+    margin: 0 auto;
+    position: relative !important;
+}
+.registerActivated #signup .form-group.formio-component-iAgree .form-check-input{
+  position: relative;
+}
+.registerActivated #signup .form-group.formio-component-iAgree{
+  margin-top:20px;
+  margin-top:20px;
+}
+.registerActivated #signup .form-group.formio-component-employeesAndContractors label{
+  line-height: 33px;
+}
+.registerActivated #signup .form-group.formio-component-gender .form-radio div:nth-child(1){
+ float: left;
+ margin-right: 50px;
+}
+
+.registerActivated #signup .form-group.formio-component-gender .form-radio div:nth-child(1) label {
+    font-size: 18px;
+    margin-left: -75%;
+    line-height: 32px;
+}
+
+.Onboarding{
+  background-color: red;
+}
+.companyinfo{
+  padding-top: 0px !important;
+}
+.personalThank{
+    position: absolute;
+    top: 0;
+    margin-top: 22px !important;
+    width: 100%;
+    left: 0;
+    text-align: center;
+}
+.personalThank1{
+    position: absolute;
+    top: 0;
+    margin-top: 60px !important;
+    width: 100%;
+    left: 0;
+    text-align: center;
+}
+
+.registerActivated #signup .form-group.formio-component-gender .form-radio div:nth-child(2) label {
+    font-size: 18px;
+    line-height: 32px;
+}
+.registerActivated #signup .form-group.formio-component-ms label{
+  line-height: 53px;
+}
+.registerActivated #signup .form-group:first-child input{
+-webkit-border-top-left-radius: 3px;
+-webkit-border-top-right-radius: 3px;
+-moz-border-radius-topleft: 3px;
+-moz-border-radius-topright: 3px;
+border-top-left-radius: 3px;
+border-top-right-radius: 3px;
+}
+.formio-component-getStartedNow1{ text-align: center; margin-bottom:15px; padding-bottom: 15px }
+.formio-component-getStartedNow1 button{
+  background:#4157d9 !important;
+  padding:10px 70px;
+}
+.registerActivated #signup .formio-component-html1 p{
+  margin-left: 25% !important;
+  font-size: 23px;
+}    
+.list-inline{
+  text-align: center;
+}
+.registerActivated #signup .form-group input{border-radius:2px; margin-top:10px;}
+.registerActivated #signup .agentdesignation{
+  margin-top: 10px !important;
+}
+.registerActivated #signup .form-group .formio-errors{
+  margin-top:0;
+  /*background: green;*/
+}
+.tab-group {
+  list-style: none;
+  padding: 20px 0;
+  margin: 0px;
+  text-align: right;
+
+}
+.tab-group .tab{
+  display:inline-block;
+}
+.tab-group .tab a{background: #fff;
+    border: 1px solid #ccc;
+    color: #6b6b6b;
+    padding: 10px 15px;
+    border-radius: 5px;}
+/*.tab-group .tab.active{
+  display:none;
+}*/
+.tab-group .tab a{
+  width:auto;
+}
+.tab-group:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.tab-group li a {
+  display: block;
+  text-decoration: none;
+  padding: 15px;
+  background: rgba(160, 179, 176, 0.25);
+  color: #a0b3b0;
+  font-size: 20px;
+  float: left;
+  width: 50%;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.5s ease;
+}
+.tab-group li a:hover {
+  background: #053b6d;
+  color: #ffffff;
+}
+.tab-group .active a {
+  background: #053b6d;
+  color: #ffffff;
+}
+
+.tab-content > div:last-child {
+  display: none;
+}
+
+h1 {
+  text-align: center;
+  color:#333;
+  font-weight: 300;
+  margin: 0 0 40px;
+}
+
+.labelField {
+  position: relative;
+  -webkit-transform: translateY(6px);
+  transform: translateY(6px);
+  left: 13px;
+  transition: all 0.25s ease;
+  -webkit-backface-visibility: hidden;
+  pointer-events: none;
+  font-size: 22px;
+  top: 36px;
+  left: -80px;
+}
+
+*/ label .req {
+  margin: 2px;
+  color: #053b6d;
+}
+
+label.active {
+  -webkit-transform: translateY(50px);
+  transform: translateY(50px);
+  font-size: 14px;
+  top: -45px;
+  position: relative;
+  left: -108px;
+}
+label.active .req {
+  opacity: 0;
+}
+
+label.highlight {
+  color: #434343;
+}
+
+.formio-component-submit .submit-success::after {
+  font-size: 12px;
+  top: 2px;
+}
+
+.inputField,
+textarea {
+  font-size: 22px;
+  display: block;
+  /* width: 100%;
+  height: 100%; */
+  padding: 5px 10px;
+  background: none;
+  background-image: none;
+  border: 1px solid #a0b3b0;
+  border-radius: 0;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+input:focus,
+textarea:focus {
+  outline: 0;
+  border-color: #053b6d;
+}
+
+textarea {
+  border: 2px solid #a0b3b0;
+  resize: vertical;
+}
+
+.field-wrap {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.top-row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.top-row > div {
+  float: left;
+  width: 48%;
+  margin-right: 4%;
+}
+.top-row > div:last-child {
+  margin: 0;
+}
+.bg-primary {
+    background-color: #053b6d !important;
+    color: white;
+}
+.button {
+  -webkit-appearance: none;
+  width: 100%;
+  cursor: pointer;
+  min-width: 100px;
+  border-radius: 0.25em;
+  text-align: center;
+  padding: 15px 40px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  background-color: #053b6d;
+  color: #fff;
+  font-size: 17px;
+  margin-left: auto;
+  font-weight: 500;
+  box-shadow: 0px 2px 6px -1px rgba(0, 0, 0, 0.13);
+  border: none;
+  transition: all 0.5s ease;
+  outline: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.button:hover,
+.button:focus {
+  background: #053b6d;
+}
+
+.hideBorders > td {
+  border-top: unset;
+}
+
+.button-block {
+  display: block;
+  width: 100%;
+}
+
+.forgot {
+  text-align: right;
+}
+
+.inputDiv {
+  text-align: -webkit-center;
+  text-align: -moz-center;
+}
+.LoginDiv {
+  width: 40%;
+}
+.btn-success:hover {
+  color: #fff;
+  background-color: #053b6d !important;
+  border-color: #053b6d !important;
+}
+.panel-primary > .panel-heading {
+  color: #fff;
+  background-color: #053b6d !important;
+  border-color: #053b6d !important;
+}
+.panel-primary {
+  border-color: #275262 !important;
+}
+.btn-primary {
+  background-color: #053b6d !important;
+  border-color: #053b6d !important;
+}
+
+label {
+  font-size: 12.5px;
+  color: #000;
+  opacity: 0.8;
+  font-weight: 400;
+}
+.floating-label input {
+  font-size: 16px;
+  padding: 20px 0px;
+  height: 56px;
+  border: none;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  width: 280px;
+  box-sizing: border-box;
+  transition: all 0.3s linear;
+  color: #000;
+  font-weight: 400;
+  -webkit-appearance: none;
+}
+input:focus {
+  border-bottom: solid 1px #053b6d;
+  outline: 0;
+  box-shadow: 0 2px 6px -8px rgba(182, 157, 230, 0.45);
+}
+.floating-label {
+  position: relative;
+  margin-bottom: 15px;
+  width: 100%;
+}
+.floating-label label {
+  position: absolute;
+  top: calc(50% - 13px);
+  left: 0;
+  opacity: 0;
+  transition: all 0.3s ease;
+  padding-left: 22px;
+}
+.floating-label input {
+  width: calc(100% - 44px);
+  display: flex;
+}
+.floating-label .icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 56px;
+  width: 44px;
+  display: flex;
+}
+.floating-label input:not(:placeholder-shown) {
+  padding: 28px 0px 12px 0px;
+}
+.floating-label input:not(:placeholder-shown) + label {
+  -webkit-transform: translateY(-10px);
+  transform: translateY(-10px);
+  opacity: 0.7;
+}
+
+.floating-label input:not(:valid):not(:focus) + input {
+  -webkit-animation-name: shake-shake;
+  animation-name: shake-shake;
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+}
+
+@-webkit-keyframes shake-shake {
+  0% {
+    -webkit-transform: translateX(-3px);
+    transform: translateX(-3px);
+  }
+  20% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  40% {
+    -webkit-transform: translateX(-3px);
+    transform: translateX(-3px);
+  }
+  60% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  80% {
+    -webkit-transform: translateX(-3px);
+    transform: translateX(-3px);
+  }
+  100% {
+    -webkit-transform: translateX(0px);
+    transform: translateX(0px);
+  }
+}
+
+@keyframes shake-shake {
+  0% {
+    -webkit-transform: translateX(-3px);
+    transform: translateX(-3px);
+  }
+  20% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  40% {
+    -webkit-transform: translateX(-3px);
+    transform: translateX(-3px);
+  }
+  60% {
+    -webkit-transform: translateX(3px);
+    transform: translateX(3px);
+  }
+  80% {
+    -webkit-transform: translateX(-3px);
+    transform: translateX(-3px);
+  }
+  100% {
+    -webkit-transform: translateX(0px);
+    transform: translateX(0px);
+  }
+}
+.loginBlock {
+  text-align: -webkit-center;
+}
+
+.formio-component-submit .submit-fail::after {
+  top: 2px;
+}
+
+.control-label--hidden{
+  right: 8px;
+  top: 4px;
+}
+
+.alert .control-label--hidden{
+  right: 25px;
+  top: 18px;
+}
+
+.formio-component-select .control-label--hidden.field-required{
+  right: 45px;
+}
+
+.formio-component-select.alert .control-label--hidden.field-required{
+  right: 65px;
+}
+
+#wrongPassword {
+  text-align: center;
+  background-color: #a94442;
+  color: white;
+  border-radius: 10px;
+  line-height: 25px;
+  margin-bottom: 15px;
+}
+
+.swal2-popup {
+  font-size: 15px !important;
+}
+.resetPassword {
+  cursor: pointer;
+}
+.signUpWrapper{
+  background-repeat: no-repeat;
+  background-size:auto 100%;
+  background-attachment: fixed;
+  height:auto;
+  min-height:100%;
+}
+.signUpWrapper.removeCurvedBg{
+  background-image:none;
+  background-color: #008583;
+}
+.signUpWrapper.removeCurvedBg .registerActivated #signup{
+  max-width:800px;
+}
+.signUpWrapper.removeCurvedBg .tab-content{
+  background-color: #fff;
+  padding-top: 50px;
+}
+.signUpWrapper.removeCurvedBg .tab-content .list-inline{
+  padding-bottom:50px;
+  margin-top:50px;
+}
+.signUpWrapper.removeCurvedBg .tab-group{
+display: none;
+}
+.signUpWrapper.removeCurvedBg .tab-content .page-item .page-link{
+  border: 0;
+
+}
+.signUpWrapper.removeCurvedBg .tab-content .page-item .page-link:hover{
+  background:transparent !important;
+
+}
+.signUpWrapper.removeCurvedBg.step-1:before{
+  content:"Onboarding Step1: Personal Information";
+display:block;
+max-width:100%;
+padding:20px 55px;
+color:#fff;
+font-size: 20px;
+
+}
+.signUpWrapper.removeCurvedBg.step-2:before{
+  content:"Onboarding Step2: Company Information";
+  display:block;
+max-width:100%;
+padding:20px 55px;
+color:#fff;
+font-size: 20px;
+
+}
+.signUpWrapper.removeCurvedBg .page-item{
+  position: relative;
+  border-top: 1px solid #ddd;
+}
+.signUpWrapper.removeCurvedBg .page-item .page-link{
+  padding-top:20px;
+}
+.signUpWrapper.removeCurvedBg .page-item:before{
+  content:"";
+  
+  display: block;
+    width: 50%;
+}
+.signUpWrapper.removeCurvedBg .form-group.has-feedback.formio-component.formio-component-radio.formio-component-doYouHaveEmployeesAndContractors.insuredEmployeesAndContractors{
+  max-width:100%;
+}
+.signUpWrapper.removeCurvedBg .page-item:after{
+  content:"";
+  width:20px;
+  height:20px;
+  background-color: #007bff;
+  border-radius: 20px;
+  display: block;
+  position: absolute;
+  left:50%;
+  top:-10px;
+}
+.signUpWrapper.removeCurvedBg .page-item:nth-child(2).active:before{
+  
+  content:"";
+  width:50%;
+  position: absolute;
+  left:0;
+  top:0;
+
+}
+.signUpWrapper.removeCurvedBg .page-item.active .page-link{
+  background-color: transparent !important;
+  color:#007bff;
+}
+.signUpWrapper.removeCurvedBg .form{
+  padding-top:0;
+  position: relative;
+}
+.signUpWrapper.removeCurvedBg .form .formio-form{
+   position: static !important;
+}
+.signUpWrapper.removeCurvedBg .form .formio-form div:nth-child(1){
+   position: static !important;
+}
+.signUpWrapper.removeCurvedBg .page-link:hover{
+  background-color: none !important;
+}
+.signUpWrapper.removeCurvedBg .hub-registration nav[aria-label="navigation"]{
+  display: block;
+}
+.signUpWrapper{
+ 
+  height:auto;
+  min-height:100%;
+}
+/*.hub-registration nav[aria-label="navigation"]{
+  display:none;
+  padding-top: 80px;
+}*/
+.btn-default {
+    color: #fff;
+    background-color: #053b6d;
+    border-color: #053b6d;
+}
+
+.formio-errors.invalid-feedback{
+  display:block;
+}
+/* .test{
+  display:none;
+} */
+@media (min-width: 900px){
+.container.hub-registration{
+max-width:100%;
+min-height:600px;
+}
+}
+
+.mrRadio {
+    margin-right: 105px !important;
+    margin-top: 10px !important;
+}
+ 

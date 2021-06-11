@@ -17,7 +17,7 @@ class AnalyticsEngineImpl extends AnalyticsAbstract
 
     public function __construct($appDBAdapter, $appConfig, ElasticService $elasticService)
     {
-        parent::__construct(null, $appDBAdapter, $appConfig);
+        parent::__construct($appDBAdapter, $appConfig);
         $this->elasticService = $elasticService;
     }
 

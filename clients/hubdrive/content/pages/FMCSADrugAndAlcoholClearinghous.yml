@@ -1,0 +1,39 @@
+name: 'List FMCSA Drug And Alcohol Clearing Hous'
+description: 'Shows a list of FMCSA Drug And Alcohol Clearing Hous'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/FMCSA Drug And Alcohol Clearing Hous'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of FMCSA Drug And Alcohol Clearing Hous</h5>'
+            operations:
+                title: "Create New"
+                actions:
+                    -
+                        name: Create New
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 12b378fb-fdd3-49f2-99f0-1c688923bd2c      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

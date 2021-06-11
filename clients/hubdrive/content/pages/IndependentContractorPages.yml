@@ -1,0 +1,136 @@
+name: 'List Independent Contractor Pages'
+description: 'Shows a list of Independent Contractor Pages'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Independent Contractor Pages'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of Independent Contractor Pages</h5>'
+            actions:
+                    -
+                        name: HUB Incident Response Guide
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 293d4c16-0497-4475-af2d-609b968b0aef
+                                fileId: '{{uuid}}'
+                        icon: 'far fa-pencil-alt'
+                    -
+                        name: Certificate Of Violations
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 272ba695b-73e4-439f-8a78-20e8a8628a50
+                                fileId: '{{uuid}}'
+            operations:
+                title: "Independent Contractor Pages"
+                actions:
+                    -
+                        name: HUB Incident Response Guide
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 293d4c16-0497-4475-af2d-609b968b0aef
+                                fileId: '{{uuid}}'
+                        icon: 'far fa-pencil-alt'
+                    -
+                        name: Certificate Of Violations
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 272ba695b-73e4-439f-8a78-20e8a8628a50
+                                fileId: '{{uuid}}'
+                    -
+                        name: Hired Non Owned
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 7648dafe-cf9b-4d6d-bad2-4a1f3d4fc16c
+                                fileId: '{{uuid}}'
+                    -
+                        name: Common Violations
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: a286dfbd-5ce2-446f-a3ca-8d8d6a90408a
+                                fileId: '{{uuid}}'
+                    -
+                        name: Telematics Policy And Procedure
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: b2224391-2017-42de-a4d5-f4d7b8719afe
+                                fileId: '{{uuid}}'
+                    -
+                        name: FMCSR Commercial Vehicle
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 3a9c32a8-cc02-49b0-91bd-61d91b04d27b
+                                fileId: '{{uuid}}'
+                    -
+                        name: CDL Drug And Alcohol Clearinghouse Checklist
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 011c261c-4223-4aaa-bc99-002b037184fd
+                                fileId: '{{uuid}}'
+                    -
+                        name: FMCSA Drug And Alcohol Clearing Hous
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 12b378fb-fdd3-49f2-99f0-1c688923bd2c
+                                fileId: '{{uuid}}'
+                    -
+                        name: DOT Drug And Alcohol Clearing house
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: cffb5747-8f44-4038-baf8-c5488b7ec94d
+                                fileId: '{{uuid}}'
+                    -
+                        name: How To Survive A Dot Audit
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 9ccee23a-e134-47aa-9736-0c022a29a0a8
+                                fileId: '{{uuid}}'
+
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName
+                -
+                    title: City
+                    field: city
+               

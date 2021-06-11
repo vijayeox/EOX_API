@@ -41,5 +41,6 @@ return [
     'Esign',
     'Import',
     'Ims',
-    'Kra'
+    'Kra',
+    'Profile'
 ];

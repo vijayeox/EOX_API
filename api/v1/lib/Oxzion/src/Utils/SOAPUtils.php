@@ -1,7 +1,6 @@
 <?php
 namespace Oxzion\Utils;
 
-use Exception;
 use SoapClient;
 use SoapHeader;
 use Webmozart\Assert\Assert;
@@ -24,30 +23,40 @@ class SOAPUtils
         $this->options = array_merge($defaultOptions, array_intersect_key($options, $defaultOptions));
         $this->options['prefix'] = array_flip($this->xml->getDocNamespaces())[$this->options['defaultNamespace']];
     }
+
     private function setWsdl($wsdl)
     {
         if (substr($wsdl, 0, 4) === 'http') {
             $this->client = new SoapClient($wsdl);
         }
         if (substr($wsdl, 0, 4) === 'http' || is_file($wsdl)) {
-            $wsdl = file_get_contents($wsdl);
+            try {
+                $temp_wsdl = $wsdl;
+                ob_start();
+                $wsdl = file_get_contents($wsdl);
+            } catch (\Exception $e) {}
+            if (!$wsdl) {
+                ob_clean();
+                throw new ServiceException('Cannot fetch the service from '.$temp_wsdl, 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
+            }
         }
         $this->xml = simplexml_load_string($wsdl);
     }
+
     public function setHeader(string $namespace, string $name, array $data)
     {
         $header = new SoapHeader($namespace, $name, $data);
         $this->client->__setSoapHeaders($header);
     }
 
-    public function makeCall(string $function, array $data, bool $clean = true)
+    public function makeCall(string $function, array &$data = [], bool $clean = true)
     {
         if ($errors = $this->getValidData($function, $data)) {
             throw new ServiceException(json_encode($errors), 'validation.errors', OxServiceException::ERR_CODE_NOT_ACCEPTABLE);
         }
         try {
             $response = $this->client->{$function}($data);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
         }
         if ($clean) {
@@ -55,6 +64,7 @@ class SOAPUtils
         }
         return $response;
     }
+
     private function cleanResponse($response)
     {
         if (is_object($response)) {
@@ -67,6 +77,7 @@ class SOAPUtils
     {
         return in_array($function, $this->getFunctions());
     }
+
     public function getFunctions()
     {
         $functions = array();
@@ -162,6 +173,7 @@ class SOAPUtils
         }
         return $parameters;
     }
+
     private function processElements($type)
     {
         $parameters = array();
@@ -176,6 +188,7 @@ class SOAPUtils
         }
         return $parameters;
     }
+
     private function processElementType($element)
     {
         $type = explode(':', $element->attributes()['type']);
@@ -209,6 +222,7 @@ class SOAPUtils
             }
         }
     }
+
     private function processSimpleType($type)
     {
         $parameters = array();

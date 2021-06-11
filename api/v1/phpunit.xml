@@ -25,6 +25,9 @@
         <testsuite name="Kra Fixtures">
             <directory>./module/Kra/test</directory>
         </testsuite>
+        <testsuite name="Profile Fixtures">
+            <directory>./module/Profile/test</directory>
+        </testsuite>
         <testsuite name="App Fixtures">
             <directory>./module/App/test/Controller/App/AppArtifactControllerTest.php</directory>
             <directory>./module/App/test/Controller/App/AppControllerTest.php</directory>
@@ -69,6 +72,7 @@
             <directory>./lib/Oxzion/test/Service/WorkflowServiceTest.php</directory>
             <directory>./lib/Oxzion/test/Service/BusinessRoleServiceTest.php</directory>
             <directory>./lib/Oxzion/test/Service/EsignServiceTest.php</directory>
+            <directory>./lib/Oxzion/test/Service/ProjectServiceTest.php</directory>
         </testsuite>
         <testsuite name="Callback Fixtures">
             <directory>./module/Callback/test</directory>

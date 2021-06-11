@@ -26,6 +26,7 @@ use Oxzion\Utils\UuidUtil;
 use Oxzion\Service\UserCacheService;
 use Oxzion\Service\RegistrationService;
 use Oxzion\Utils\ArrayUtils;
+use Oxzion\Service\BusinessParticipantService;
 
 class CommandService extends AbstractService
 {
@@ -39,6 +40,7 @@ class CommandService extends AbstractService
     private $jobService;
     private $userCacheService;
     private $registrationService;
+    private $businessParticipantService;
     /**
      * @ignore __construct
      */
@@ -48,7 +50,7 @@ class CommandService extends AbstractService
         $this->restClient = $restClient;
     }
 
-    public function __construct($config, $dbAdapter, TemplateService $templateService, AppDelegateService $appDelegateService, FileService $fileService, JobService $jobService, MessageProducer $messageProducer, WorkflowInstanceService $workflowInstanceService, WorkflowService $workflowService, UserService $userService, UserCacheService $userCacheService, RegistrationService $registrationService)
+    public function __construct($config, $dbAdapter, TemplateService $templateService, AppDelegateService $appDelegateService, FileService $fileService, JobService $jobService, MessageProducer $messageProducer, WorkflowInstanceService $workflowInstanceService, WorkflowService $workflowService, UserService $userService, UserCacheService $userCacheService, RegistrationService $registrationService, BusinessParticipantService $businessParticipantService)
     {
         $this->messageProducer = $messageProducer;
         $this->templateService = $templateService;
@@ -63,6 +65,7 @@ class CommandService extends AbstractService
         $this->jobService = $jobService;
         $this->userCacheService = $userCacheService;
         $this->registrationService = $registrationService;
+        $this->businessParticipantService = $businessParticipantService;
     }
 
     public function setMessageProducer($messageProducer)
@@ -77,6 +80,13 @@ class CommandService extends AbstractService
         if (isset($data['appId'])) {
             $appId = $this->getIdFromUuid('ox_app', $data['appId']);
             $accountId = isset($data['accountId']) && !empty($data['accountId']) ? $this->getIdFromUuid('ox_account', $data['accountId']) : AuthContext::get(AuthConstants::ACCOUNT_ID);
+            if(empty($accountId) && isset($data['accountName'])) {
+                $select = "SELECT id from ox_account where `name` = :accountName";
+                $selectQuery = array("accountName" => $data['accountName']);
+                $this->logger->info("Executing query $select with params - ".json_encode($selectQuery));
+                $result = $this->executeQuerywithBindParameters($select, $selectQuery)->toArray();
+                $accountId = !empty($result) ? $result[0]['id'] : null;
+            }
             if ($accountId) {
                 $select = "SELECT * from ox_app_registry where account_id = :accountId AND app_id = :appId";
                 $selectQuery = array("accountId" => $accountId, "appId" => $appId);
@@ -131,7 +141,7 @@ class CommandService extends AbstractService
                     if (is_array($result)) {
                         $inputData = $result;
                         $inputData['app_id'] = isset($data['app_id']) ? $data['app_id'] : null;
-                        $inputData['accountId'] = isset($data['accountId']) ? $data['accountId'] : null;
+                        $inputData['accountId'] = isset($data['accountId']) ? $data['accountId'] : (isset($inputData['accountId']) ? $inputData['accountId'] : null);
                         $inputData['workFlowId'] = isset($data['workFlowId']) ? $data['workFlowId'] : null;
                         $outputData = array_merge($outputData, $result);
                     }
@@ -245,13 +255,34 @@ class CommandService extends AbstractService
                 $this->logger->info("Activity Instance Form");
                 return $this->getActivityInstanceForm($data);
                 break;
-
             case 'snooze':
                 $this->logger->info("Snooze File");
                 return $this->snoozeFile($data);
+            case 'setupBusinessRelationship':
+                return $this->setupBusinessRelationship($data);
             default:
                 break;
         };
+    }
+
+    private function setupBusinessRelationship($data){
+        if (isset($data['sellerAccountName'])) {
+            $response =  $this->getDataByParams('ox_account',array('uuid'), array('name' => $data['sellerAccountName']))->toArray();
+            if (count($response) > 0) {                
+                $sellerAccountId = $response[0]['uuid'];
+            } else {
+                throw new ServiceException("Seller Account Not Found", "seller.account.notfound", OxServiceException::ERR_CODE_NOT_FOUND );                
+            }
+        } else if(isset($data['sellerAccountId'])){
+            $sellerAccountId = $data['sellerAccountId'];
+        } else {
+            $sellerAccountId = AuthContext::get(AuthConstants::ACCOUNT_UUID);
+        }
+        $buyerAccountId = isset($data['buyerAccountId']) ? $data['buyerAccountId'] : (isset($data['accountId']) ? $data['accountId'] : null);
+        $buyerBusinessRole  = $data['businessRole'];
+        $sellerBusinessRole = $data['sellerBusinessRole'];
+        $appId = $data['appId'];
+        return $this->businessParticipantService->setupBusinessRelationship($buyerAccountId, $sellerAccountId, $buyerBusinessRole, $sellerBusinessRole,$appId);
     }
 
     private function snoozeFile($data)
@@ -293,8 +324,8 @@ class CommandService extends AbstractService
         if (!isset($user)) {
             throw new ServiceException("User not found", 'user.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
         }
-        if (isset($data['app_id'])) {
-            if ($app = $this->getIdFromUuid('ox_app', $data['app_id'])) {
+        if (isset($data['appId'])) {
+            if ($app = $this->getIdFromUuid('ox_app', $data['appId'])) {
                 $appId = $app;
             }
         } else {

@@ -279,9 +279,11 @@ class FileController extends AbstractApiController
     public function auditAction()
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
+        $filterParams = $this->params()->fromQuery();
+
         try {
             if ($params['fileId']) {
-                $result = $this->fileService->getAuditLog($params['fileId']);
+                $result = $this->fileService->getAuditLog($params['fileId'], $filterParams);
             } else {
                 return $this->getErrorResponse("Validation Errors", 404, "FileNotFound");
             }

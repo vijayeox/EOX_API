@@ -410,4 +410,19 @@ class QueryService extends AbstractService
         }
         return $data;
     }
+
+    public function runMultipleQueriesWithoutCombine($uuidList, $overRides = null)
+    {
+        $aggCheck = 0;
+        $data = array();
+        $resultCount = count($uuidList);
+        $index = 1;
+        foreach ($uuidList as $key => $value) {
+            $this->logger->info("Executing AnalyticsQuery with input -" . $value);
+            $queryData = $this->executeAnalyticsQuery($value, $overRides);
+            $this->logger->info("Executing AnalyticsQuery returned -" . print_r($queryData, true));
+            $data[]=$queryData['data'];
+        }
+        return $data;
+    }
 }

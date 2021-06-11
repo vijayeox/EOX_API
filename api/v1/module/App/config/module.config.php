@@ -1008,7 +1008,7 @@ return [
                 'options' => [
                     'route' => '/app/:appUuid/archive/download',
                     'constraints' => [
-                        'appUuid' => UuidUtil::UUID_PATTERN
+                        'appUuid' => UuidUtil::UUID_PATTERN,
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,

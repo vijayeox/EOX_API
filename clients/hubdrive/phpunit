@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+require_once __DIR__."/vendor/autoload.php";
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+$apiLocation = $_ENV["API_LOCATION"];
+
+$_ENV['ENV'] = 'test';
+$_SERVER['argv'] = array($apiLocation.'/vendor/bin/doctrine-migrations', 'migrations:migrate', '-n', '--db-configuration', __DIR__."/$apiLocation/migration-db.php", '--configuration', __DIR__."/$apiLocation/Migrations.yml");
+print(__DIR__."/$apiLocation/vendor/autoload.php");
+require_once __DIR__."/$apiLocation/vendor/autoload.php";
+require __DIR__ ."/$apiLocation/config/autoload/local.php";
+
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
+
+$helperSet = new HelperSet();
+$helperSet->set(new QuestionHelper(), 'question');
+
+$cli = \Doctrine\Migrations\Tools\Console\ConsoleRunner::createApplication($helperSet);
+$cli->setAutoExit(false);
+$code = $cli->run();
+if($code == 0){
+    $_SERVER['argv'] = array();
+    include __DIR__ . "/$apiLocation/vendor/bin/phpunit";
+}
+?>

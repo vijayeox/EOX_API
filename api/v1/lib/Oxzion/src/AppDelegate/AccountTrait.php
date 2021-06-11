@@ -2,12 +2,14 @@
 namespace Oxzion\AppDelegate;
 
 use Oxzion\Service\AccountService;
+use Oxzion\Service\BusinessParticipantService;
 use Logger;
 
 trait AccountTrait
 {
     protected $logger;
     private $accountService;
+    private $businessParticipantService;
     
     public function __construct()
     {
@@ -20,8 +22,22 @@ trait AccountTrait
         $this->accountService = $accountService;
     }
 
-    protected function registerAccount($data)
+    public function setBusinessParticipantService(BusinessParticipantService $businessParticipantService)
+    {
+        $this->logger->info("SET BUSINESS PARTICIPANT SERVICE");
+        $this->businessParticipantService = $businessParticipantService;
+    }
+
+    protected function registerAccount(&$data)
     {
         return $this->accountService->registerAccount($data);
+    }
+
+    protected function checkIfBusinessRelationshipExists($businessRole,$appId,$accountId){
+        return $this->businessParticipantService->checkIfBusinessRelationshipExists($businessRole,$appId,$accountId);
+    }
+
+    protected function getAccountByName($name) {
+        return $this->accountService->getAccountByName($name);
     }
 }

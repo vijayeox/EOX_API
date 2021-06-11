@@ -1,0 +1,152 @@
+.osjs-gui-button {
+  & > button {
+    @include button;
+  }
+}
+.osjs-notification{
+  background-color: #275261 !important;
+}
+.osjs-gui-input,
+.osjs-gui-field {
+  select,
+  textarea,
+  input {
+    @include input;
+
+    font-size: inherit;
+    font-family: $font-family;
+  }
+}
+
+.osjs-gui-tabs-header {
+  & > div {
+    @include view;
+
+    &.osjs__active {
+      border-bottom-color: $window-background;
+      background-color: transparent;
+    }
+  }
+}
+
+.osjs-gui-tabs-panes {
+  margin-top: -1px;
+
+  & > div {
+    @include view;
+
+    &.osjs__active {
+      background-color: transparent;
+    }
+  }
+}
+
+.osjs-gui-toggle-field {
+  & > label {
+    & > span.osjs-toggle-input {
+      &::before {
+        @include button;
+      }
+
+      &::after {
+        margin: 1px;
+      }
+    }
+
+    & > input[type=radio] + span.osjs-toggle-input::before {
+      border-radius: 100%;
+    }
+  }
+}
+
+.osjs-gui-icon-view-wrapper {
+  @include input;
+
+  .osjs__active .osjs__label,
+  .osjs__active .osjs__image {
+    background: $active-background;
+    color: $active-foreground;
+  }
+}
+
+.osjs-gui-menu {
+  ul {
+    @include panel;
+    // @include window;
+  }
+
+  li:hover > div > span {
+    background-color: #fff;
+    color: #000;
+  }
+
+  .osjs__disabled {
+    opacity: 0.5;
+  }
+}
+
+.osjs-gui-menubar {
+  & > div {
+    cursor: pointer;
+
+    &:hover {
+      background-color: $active-background;
+      color: $active-foreground;
+    }
+  }
+}
+
+.osjs-notification {
+  @include panel;
+
+  .osjs-notification-title {
+    font-weight: bold;
+  }
+
+  .osjs-notification-message {
+    margin-top: 1em;
+  }
+}
+
+.osjs-gui-progressbar-wrapper {
+  @include view;
+
+  color: $progress-foreground;
+}
+
+.osjs-gui-progressbar-value {
+  background: $progress-background;
+}
+
+.osjs-gui-list-view {
+  .osjs__active {
+    background: $active-background;
+    color: $active-foreground;
+  }
+
+  .rows:not([data-zebra="false"]) > div:nth-child(2n+1):not(.osjs__active) {
+    background-color: $zebra-background;
+  }
+}
+
+.osjs-gui-list-view-wrapper {
+  @include input;
+}
+
+.osjs-gui-list-view-header {
+  @include view;
+
+  border: 0 none;
+}
+
+.osjs-gui-box-styled {
+  @include input;
+}
+
+.osjs-gui-expander {
+  &-header {
+    @include view;
+
+    border: 0 none;
+  }
+}

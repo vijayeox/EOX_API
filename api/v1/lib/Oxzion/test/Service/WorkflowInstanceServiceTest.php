@@ -131,6 +131,7 @@ class WorkflowInstanceServiceTest extends AbstractServiceTest
             switch ($key) {
                 case 'workflowId':
                 case 'app_id':
+                case 'appId':
                 case 'entity_id':
                 case 'uuid':
                 case 'accountId':
@@ -166,7 +167,7 @@ class WorkflowInstanceServiceTest extends AbstractServiceTest
 
     public function testStartWorkflowSetupIdentityField()
     {
-        $params = array('app_id' => '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4', 'field1' => 1, 'field2' => 2, 'workflowId' => '1141cd2e-cb14-11e9-a32f-2a2ae2dbcce4' ,'identifier_field' =>'id_field','id_field' => '2020', 'email' => 'brian@gmail.com', 'address1' => 'addr1', 'type' => 'INDIVIDUAL', "businessRole" => "Policy Holder",
+        $params = array('appId' => '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4', 'field1' => 1, 'field2' => 2, 'workflowId' => '1141cd2e-cb14-11e9-a32f-2a2ae2dbcce4' ,'identifier_field' =>'id_field','id_field' => '2020', 'email' => 'brian@gmail.com', 'address1' => 'addr1', 'type' => 'INDIVIDUAL', "businessRole" => "Policy Holder",
           'address2' => "", 'city' => 'city', 'state' => 'state', 'country' => 'country', 'zip' => 2323 , 'firstname' => 'brian', 'lastname' => 'test');
         $processId = '8ddf83c0-4971-4bac-9bf7-49264db1172e';
         $this->setupMockProcessEngine();
@@ -216,7 +217,7 @@ class WorkflowInstanceServiceTest extends AbstractServiceTest
         $this->assertEquals($acctUserResult[0]['id'], $userRoleResult[0]['account_user_id']);
 
         $sqlQuery = "SELECT ar.* from ox_app_registry ar inner join ox_app a on a.id = ar.app_id 
-                        where a.uuid = '".$params['app_id']."' AND account_id = $accountId";
+                        where a.uuid = '".$params['appId']."' AND account_id = $accountId";
 
         $result = $this->runQuery($sqlQuery);
         $this->assertEquals(1, count($result));
