@@ -106,6 +106,7 @@ RUN chmod 755 /*.sh
 RUN mkdir -p /app/api
 RUN mkdir -p /app/view
 RUN mkdir -p /app/camel
+RUN mkdir -p /app/smtp
 RUN mkdir -p /app/workflow
 RUN mkdir -p /app/clients
 
