@@ -1,1 +1,0 @@
-Put the Static CSS/JS files which need to be loaded in the server in this folder.the files can be accessed using <url>/static/<filename>
