@@ -5,26 +5,27 @@ use Oxzion\Utils\FileUtils;
 use Oxzion\Utils\SOAPUtils;
 use Oxzion\ServiceException;
 use Oxzion\OxServiceException;
-use Oxzion\Service\AbstractService;
-use Oxzion\Messaging\MessageProducer;
 
-class Service extends AbstractService
+class Service
 {
-    private $messageProducer;
     private $soapClient;
+    private $config;
     private $handle;
     private $token;
     /**
      * @ignore __construct
      */
-    public function __construct($config, $dbAdapter, MessageProducer $messageProducer)
+    public function __construct($config)
     {
-        parent::__construct($config, $dbAdapter);
-        $this->messageProducer = $messageProducer;
+        $this->config = $config;
     }
     private function getConfig()
     {
         return $this->config['ims'];
+    }
+    public function setConfig($config)
+    {
+        $this->setSoapClient($config);
     }
     public function setSoapClient($handle)
     {
@@ -56,6 +57,7 @@ class Service extends AbstractService
 
     public function search($data)
     {
+        $response = array();
         switch ($this->handle) {
             case 'InsuredFunctions':
                 $response = $this->searchInsured($data);
@@ -73,8 +75,9 @@ class Service extends AbstractService
         return $response;
     }
 
-    public function create(&$data, $commit = true)
+    public function create(&$data)
     {
+        $response = array();
         switch ($this->handle) {
             case 'InsuredFunctions':
                 $response = $this->createInsured($data);
@@ -87,6 +90,26 @@ class Service extends AbstractService
                 break;
             default:
                 throw new ServiceException("Create not avaliable for " . $this->handle, 'search.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
+                break;
+        }
+        return $response;
+    }
+
+    public function update(&$data) {
+        $response = array();
+        switch ($this->handle) {
+            default:
+                throw new ServiceException("Update not avaliable for " . $this->handle, 'update.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
+                break;
+        }
+        return $response;
+    }
+
+    public function delete(&$data) {
+        $response = array();
+        switch ($this->handle) {
+            default:
+                throw new ServiceException("Delete not avaliable for " . $this->handle, 'delete.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
                 break;
         }
         return $response;
@@ -156,6 +179,7 @@ class Service extends AbstractService
         return $this->makeCall('AddProducer', $data);
     }
 
+    public function searchQuote() {}
     public function createQuote($data)
     {
         //Get all the producer information from IMS/DB
@@ -166,11 +190,6 @@ class Service extends AbstractService
 
         //Use the information from Producer and Insured info to create a Quote
         return $this->makeCall('AddQuote', $data);
-    }
-
-    public function searchQuote()
-    {
-
     }
 
     public function producerFunctionAction($functionName, $data)

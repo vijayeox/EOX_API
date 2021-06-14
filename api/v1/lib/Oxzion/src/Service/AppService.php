@@ -480,10 +480,8 @@ class AppService extends AbstractService
         try {
             $this->beginTransaction();
             $appId = $yamlData['app']['uuid'];
-            if (isset($yamlData['org'])) {
-                $bRoleResult = $this->accountService->setupBusinessOfferings($yamlData['org'], $accountId, $appId);
-                $this->createRole($yamlData, false, $accountId, $bRoleResult);         
-            }
+            $bRoleResult = ((isset($yamlData['org']))) ? $this->accountService->setupBusinessOfferings($yamlData['org'], $accountId, $appId) : null;
+            $this->createRole($yamlData, false, $accountId, $bRoleResult);         
             $user = $this->accountService->getContactUserForAccount($accountId);
             $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
             $result = $this->appRegistryService->createAppRegistry($appId, $accountId);

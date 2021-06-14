@@ -32,9 +32,7 @@ class Module implements ConfigProviderInterface
             'factories' => [
                 ImsService::class => function ($container) {
                     return new ImsService(
-                        $container->get('config'),
-                        $container->get(AdapterInterface::class),
-                        $container->get(\Oxzion\Messaging\MessageProducer::class)
+                        $container->get('config')
                     );
                 },
 
