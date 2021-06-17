@@ -128,6 +128,12 @@ class SOAPUtils
                             $errors[$key] = 'Invalid value selected';
                         }
                         break;
+                    case 'date':
+                        if ($data[$key]) {
+                            if ((strlen($data[$key]) != 10) || checkdate(date('m', strtotime($data[$key])), date('d', strtotime($data[$key])), date('Y', strtotime($data[$key]))))
+                                $errors[$key] = 'Invalid Date';
+                        }
+                        break;
                     case 'pattern':
                         if (!preg_match('/'.$value['pattern'].'/m', $data[$key])) {
                             $errors[$key] = 'Incorrect format';
