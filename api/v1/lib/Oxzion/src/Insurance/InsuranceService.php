@@ -5,9 +5,8 @@ use Oxzion\ServiceException;
 use Oxzion\OxServiceException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Messaging\MessageProducer;
-use Oxzion\Insurance\Ims\Service as ImsService;
 
-class Service extends AbstractService
+class InsuranceService extends AbstractService
 {
     private $services;
 
@@ -15,14 +14,14 @@ class Service extends AbstractService
     {
         parent::__construct($config, $dbAdapter);
         $this->services = [
-            "IMS" => new ImsService($config)
+            "IMS" => new Ims\ImsEngineImpl($config)
         ];
     }
 
-    public function getService(String $service, $config)
+    public function getService(String $service, $serviceConfig)
     {
         if (isset($this->services[$service])) {
-            return $this->setConfig($this->services[$service], $config);
+            return $this->setConfig($this->services[$service], $serviceConfig);
         }
         throw new ServiceException("Service not avaliable for " . $service, 'service.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
     }
@@ -32,6 +31,11 @@ class Service extends AbstractService
             $service->setConfig($config);
         }
         return $service;
+    }
+
+    public function setService(String $serviceName, $serviceObj)
+    {
+        $this->services[$serviceName] = $serviceObj;
     }
 
 }

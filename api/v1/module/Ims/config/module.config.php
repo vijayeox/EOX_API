@@ -40,10 +40,21 @@ return [
                     ],
                 ],
             ],
+            'documentFunctionStructure' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/ims/document/getFunctionStructure[/:operation]',
+                    'defaults' => [
+                        'controller' => Controller\DocumentController::class,
+                        'method' => 'GET',
+                        'action' => 'getFunctionStructure',
+                    ],
+                ],
+            ],
             'insured' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/ims/insured',
+                    'route' => '/ims/insured[/:operation]',
                     'defaults' => [
                         'controller' => Controller\InsuredController::class,
                     ],
@@ -52,7 +63,7 @@ return [
             'producer' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/ims/producer',
+                    'route' => '/ims/producer[/:operation]',
                     'defaults' => [
                         'controller' => Controller\ProducerController::class,
                     ],
@@ -61,97 +72,18 @@ return [
             'quote' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/ims/quote',
+                    'route' => '/ims/quote[/:operation]',
                     'defaults' => [
                         'controller' => Controller\QuoteController::class,
                     ],
                 ],
             ],
-            'createInsured' => [
+            'document' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/ims/createInsured[/:operation]',
+                    'route' => '/ims/document[/:operation]',
                     'defaults' => [
-                        'controller' => Controller\InsuredController::class,
-                        'action' => 'createInsured',
-                        'method' => 'POST',
-                    ],
-                ],
-            ],
-            'createProducer' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/ims/createProducer[/:operation]',
-                    'defaults' => [
-                        'controller' => Controller\ProducerController::class,
-                        'action' => 'createProducer',
-                        'method' => 'POST',
-                    ],
-                ],
-            ],
-            'createQuote' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/ims/createQuote[/:operation]',
-                    'defaults' => [
-                        'controller' => Controller\QuoteController::class,
-                        'action' => 'createQuote',
-                        'method' => 'POST',
-                    ],
-                ],
-            ],
-            'createDocument' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/ims/createDocument[/:operation]',
-                    'defaults' => [
-                        'controller' => Controller\QuoteController::class,
-                        'action' => 'createDocument',
-                        'method' => 'POST',
-                    ],
-                ],
-            ],
-            'getInsured' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/ims/getInsured[/:operation]',
-                    'defaults' => [
-                        'controller' => Controller\InsuredController::class,
-                        'action' => 'getInsured',
-                        'method' => 'POST',
-                    ],
-                ],
-            ],
-            'getProducer' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/ims/getProducer[/:operation]',
-                    'defaults' => [
-                        'controller' => Controller\ProducerController::class,
-                        'action' => 'getProducer',
-                        'method' => 'POST',
-                    ],
-                ],
-            ],
-            'getQuote' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/ims/getQuote[/:operation]',
-                    'defaults' => [
-                        'controller' => Controller\QuoteController::class,
-                        'action' => 'getQuote',
-                        'method' => 'POST',
-                    ],
-                ],
-            ],
-            'getDocument' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/ims/getDocument[/:operation]',
-                    'defaults' => [
-                        'controller' => Controller\QuoteController::class,
-                        'action' => 'getDocument',
-                        'method' => 'POST',
+                        'controller' => Controller\DocumentController::class,
                     ],
                 ],
             ],

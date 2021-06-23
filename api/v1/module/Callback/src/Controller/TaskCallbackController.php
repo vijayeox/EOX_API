@@ -125,7 +125,7 @@ class TaskCallbackController extends AbstractApiControllerHelper
             $this->log->info(TaskCallbackController::class . ":Deletion of User from task failed");
             return $this->getErrorResponse("failed to delete user", 400, $response['data']);
         }
-        return $this->getErrorResponse("Adding User To Task Failure ", 400);
+        return $this->getErrorResponse("Deleting User from Task Failure ", 400);
     }
 
     public function createTeamAction()

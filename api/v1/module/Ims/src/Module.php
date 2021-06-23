@@ -3,9 +3,7 @@
 namespace Ims;
 
 use Oxzion\Error\ErrorHandler;
-use Oxzion\Insurance\Ims\Service as ImsService;
-use Oxzion\Messaging\MessageProducer;
-use Zend\Db\Adapter\AdapterInterface;
+use Oxzion\Insurance\InsuranceService;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\Mvc\ModuleRouteListener;
 use Zend\Mvc\MvcEvent;
@@ -30,12 +28,6 @@ class Module implements ConfigProviderInterface
     {
         return [
             'factories' => [
-                ImsService::class => function ($container) {
-                    return new ImsService(
-                        $container->get('config')
-                    );
-                },
-
             ],
         ];
     }
@@ -46,22 +38,22 @@ class Module implements ConfigProviderInterface
             'factories' => [
                 Controller\ProducerController::class => function ($container) {
                     return new Controller\ProducerController(
-                        $container->get(ImsService::class)
+                        $container->get(InsuranceService::class)
                     );
                 },
                 Controller\InsuredController::class => function ($container) {
                     return new Controller\InsuredController(
-                        $container->get(ImsService::class)
+                        $container->get(InsuranceService::class)
                     );
                 },
                 Controller\QuoteController::class => function ($container) {
                     return new Controller\QuoteController(
-                        $container->get(ImsService::class)
+                        $container->get(InsuranceService::class)
                     );
                 },
                 Controller\DocumentController::class => function ($container) {
                     return new Controller\DocumentController(
-                        $container->get(ImsService::class)
+                        $container->get(InsuranceService::class)
                     );
                 },
 

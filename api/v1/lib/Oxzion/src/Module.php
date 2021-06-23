@@ -556,7 +556,7 @@ class Module
                         $container->get(Service\AccountService::class),
                         $container->get(Service\BusinessParticipantService::class),
                         $container->get(\Analytics\Service\QueryService::class),
-                        $container->get(Insurance\Service::class)
+                        $container->get(Insurance\InsuranceService::class)
                 );
                 },
                 Document\DocumentBuilder::class => function ($container) {
@@ -803,8 +803,8 @@ class Module
                     $dbAdapter = $container->get(AdapterInterface::class);
                     return new Analytics\Relational\AnalyticsEnginePostgresImpl($dbAdapter, $container->get('config'));
                 },
-                Insurance\Service::class => function ($container) {
-                    return new Insurance\Service(
+                Insurance\InsuranceService::class => function ($container) {
+                    return new Insurance\InsuranceService(
                         $container->get('config'),
                         $container->get(AdapterInterface::class),
                         $container->get(Messaging\MessageProducer::class)

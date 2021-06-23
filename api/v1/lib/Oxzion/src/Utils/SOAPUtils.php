@@ -3,7 +3,6 @@ namespace Oxzion\Utils;
 
 use SoapClient;
 use SoapHeader;
-use Webmozart\Assert\Assert;
 use Oxzion\ServiceException;
 use Oxzion\OxServiceException;
 
@@ -34,10 +33,11 @@ class SOAPUtils
                 $temp_wsdl = $wsdl;
                 ob_start();
                 $wsdl = file_get_contents($wsdl);
-            } catch (\Exception $e) {}
-            if (!$wsdl) {
-                ob_clean();
-                throw new ServiceException('Cannot fetch the service from '.$temp_wsdl, 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
+            } catch (\Exception $e) {} finally {
+                ob_end_clean();
+                if (!$wsdl) {
+                    throw new ServiceException('Cannot fetch the service from '.$temp_wsdl, 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
+                }
             }
         }
         $this->xml = simplexml_load_string($wsdl);
@@ -60,15 +60,19 @@ class SOAPUtils
             throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
         }
         if ($clean) {
-            return $this->cleanResponse($response);
+            return $this->cleanResponse($response, $function);
         }
         return $response;
     }
 
-    private function cleanResponse($response)
+    private function cleanResponse($response, String $function)
     {
+        // $resultProperty = $function . 'Result';
+        // if (property_exists($response, $resultProperty)) {
+        //     $response = $response->$resultProperty;
+        // }
         if (is_object($response)) {
-            return json_decode(json_encode($response), true);
+            $response = json_decode(json_encode($response), true);
         }
         return $response;
     }
@@ -96,56 +100,42 @@ class SOAPUtils
         }
         $data = array_intersect_key($data, $functionStruct);
         foreach ($functionStruct as $key => $value) {
-            if ($value['required'] && !isset($data[$key])) {
-                $errors[$key] = 'Required Field';
-            } elseif (isset($data[$key]) && !$value['nillable'] && !$data[$key]) {
-                $errors[$key] = 'Value cannot be Nill';
-            }
-            if (isset($data[$key]) && isset($value['type'])) {
-                switch ($value['type']) {
-                    case 'string':
-                        break;
-                    case 'int':
-                        if (!is_int($data[$key])) {
-                            if (preg_match('/^[-]?[\d]*$/m', $data[$key])) {
-                                $data[$key] = (int) $data[$key];
-                            } else {
-                                $errors[$key] = 'Integer value Expected';
-                            }
-                        }
-                        break;
-                    case 'boolean':
-                        if (!is_bool($data[$key])) {
-                            if (preg_match('/^(true|false)$/m', strtolower($data[$key]))) {
-                                $data[$key] = (strtolower($data[$key]) == 'true') ? true : false;
-                            } else {
-                                $errors[$key] = 'Boolean value Expected';
-                            }
-                        }
-                        break;
-                    case 'enumeration':
-                        if (!in_array($data[$key], $value['enumeration'])) {
-                            $errors[$key] = 'Invalid value selected';
-                        }
-                        break;
-                    case 'date':
-                        if ($data[$key]) {
-                            if ((strlen($data[$key]) != 10) || checkdate(date('m', strtotime($data[$key])), date('d', strtotime($data[$key])), date('Y', strtotime($data[$key]))))
-                                $errors[$key] = 'Invalid Date';
-                        }
-                        break;
-                    case 'pattern':
-                        if (!preg_match('/'.$value['pattern'].'/m', $data[$key])) {
-                            $errors[$key] = 'Incorrect format';
-                        }
-                        break;
-                    default:
-                        throw new ServiceException("Unable to validate ".json_encode($value)." = ".$data[$key], 'validation.errors', OxServiceException::ERR_CODE_NOT_FOUND);
-                        break;
+            if (!isset($data[$key])) {
+                if (!$value['required']) {
+                    continue;
                 }
-            }
-            if (isset($functionStruct[$key]['children']) && $data[$key]) {
-                $errors = array_merge($errors, $this->getValidData($functionStruct[$key]['children'], $data[$key], $errors));
+                $errors[$key] = 'Required Field';
+            } elseif (!$value['nillable'] && !$data[$key]) {
+                $errors[$key] = 'Value cannot be Nill';
+            } else {
+                if (isset($value['type']) && $value['type']) {
+                    switch ($value['type']) {
+                        case 'enumeration':
+                            $valid = ValidationUtils::isValid('inArray', ['data' => $data[$key], 'options' => $value['enumeration']], true);
+                            break;
+                        case 'pattern':
+                            $valid = ValidationUtils::isValid('regex', ['data' => $data[$key], 'regex' => '/'.$value['pattern'].'/m'], true);
+                            break;
+                        default:
+                            $valid = ValidationUtils::isValid($value['type'], $data[$key], true);
+                            break;
+                    }
+                    if ($valid !== true) $errors[$key] = $valid;
+                }
+                if (isset($functionStruct[$key]['children']) && $data[$key]) {
+                    if (!is_array($data[$key]) && ValidationUtils::isValid('json', $data[$key])) {
+                        $data[$key] = json_decode($data[$key], true);
+                    }
+                    if (is_array($data[$key])) {
+                        if (is_int(key($data[$key]))) {
+                            foreach ($data[$key] as &$cvalue) {
+                                $errors = array_merge($errors, $this->getValidData($functionStruct[$key]['children'], $cvalue, $errors));
+                            }
+                        } else {
+                            $errors = array_merge($errors, $this->getValidData($functionStruct[$key]['children'], $data[$key], $errors));
+                        }
+                    }
+                }
             }
         }
         return $errors;

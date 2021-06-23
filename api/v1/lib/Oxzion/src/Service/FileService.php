@@ -2122,16 +2122,14 @@ class FileService extends AbstractService
         try {
             if (isset($data['name'])) {
                 $newName = $data['name'];
-                $ext = pathinfo($newName, PATHINFO_EXTENSION);
-                $tempname = str_replace(".".$ext, "", $newName);
-                if (!preg_match('/^[\w .-]+$/i', $tempname)) {
+                if (!preg_match('/^[\w .-]+$/i', pathinfo($newName)['filename'])) {
                     throw new ServiceException("Unsupported Filename.\nFilename cannot contain special characters except -_ and space", "attachment.filename.invalid");
                 }
             } else {
                 throw new ServiceException("name is required and not specified", "attachment.newName.unspecified");
             }
             $attachmentFilter['uuid'] = $data['attachmentId'];
-            $attachmentRecord = $this->getDataByParams('ox_file_attachment', array("url","path","originalName","name",'id'), $attachmentFilter, null)->toArray();
+            $attachmentRecord = $this->getDataByParams('ox_file_attachment', array("url", "path", "originalName", "name", 'id'), $attachmentFilter)->toArray();
             if (!empty($attachmentRecord) && !is_null($attachmentRecord)) {
                 $this->beginTransaction();
                 $attachmentName = $attachmentRecord[0]['name'];
