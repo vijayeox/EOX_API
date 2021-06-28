@@ -20,6 +20,7 @@ class ValidationUtils
                     assert::string($value);
                     break;
                 case 'int':
+                case 'long':
                     assert::integerish($value);
                     break;
                 case 'float':
@@ -55,6 +56,11 @@ class ValidationUtils
                 case 'json':
                     if (!validate::json()->validate($value)) {
                         throw new \Exception("Invalid Json", 1);
+                    }
+                    break;
+                case 'url':
+                    if (!validate::url()->validate($value)) {
+                        throw new \Exception("Invalid Url", 1);
                     }
                     break;
                 case 'xml':

@@ -7,10 +7,10 @@ use Oxzion\Controller\AbstractApiController;
 class AbstractController extends AbstractApiController
 {
     protected $imsService;
-    public function __construct(InsuranceService $insuranceService, String $functionClass)
+    public function __construct(InsuranceService $insuranceService, String $handle)
     {
         parent::__construct();
-        $this->imsService = $insuranceService->getService('IMS', $functionClass);
+        $this->imsService = $insuranceService->getService('IMS', ['handle' => $handle]);
     }
 
     public function getFunctionStructureAction()

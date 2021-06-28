@@ -18,24 +18,17 @@ class InsuranceService extends AbstractService
         ];
     }
 
-    public function getService(String $service, $serviceConfig)
+    public function getService(String $client, Array $data)
     {
-        if (isset($this->services[$service])) {
-            return $this->setConfig($this->services[$service], $serviceConfig);
+        if (isset($this->services[$client])) {
+            return $this->setConfig($this->services[$client], $data);
         }
-        throw new ServiceException("Service not avaliable for " . $service, 'service.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
+        throw new ServiceException("Service not avaliable for " . $client, 'service.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
     }
-    private function setConfig($service, $config)
+    private function setConfig($service, Array $data)
     {
-        if (method_exists($service, 'setConfig')) {
-            $service->setConfig($config);
-        }
+        $service->setConfig($data);
         return $service;
-    }
-
-    public function setService(String $serviceName, $serviceObj)
-    {
-        $this->services[$serviceName] = $serviceObj;
     }
 
 }

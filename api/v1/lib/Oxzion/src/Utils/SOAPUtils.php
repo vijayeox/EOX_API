@@ -1,52 +1,27 @@
 <?php
 namespace Oxzion\Utils;
 
-use SoapClient;
 use SoapHeader;
 use Oxzion\ServiceException;
 use Oxzion\OxServiceException;
+use SimpleXMLElement;
+use SoapClient;
 
-class SOAPUtils
+class SOAPUtils extends \SoapClient
 {
     private $xml;
-    private $client;
     private $options;
 
-    public function __construct($wsdl, array $options = array())
+    public function __construct(String $wsdl, Array $options = [])
     {
-        $this->setWsdl($wsdl);
-
-        $defaultOptions = array(
-            'defaultNamespace' => 'http://www.w3.org/2001/XMLSchema'
-        );
-        $this->options = array_merge($defaultOptions, array_intersect_key($options, $defaultOptions));
-        $this->options['prefix'] = array_flip($this->xml->getDocNamespaces())[$this->options['defaultNamespace']];
-    }
-
-    private function setWsdl($wsdl)
-    {
-        if (substr($wsdl, 0, 4) === 'http') {
-            $this->client = new SoapClient($wsdl);
-        }
-        if (substr($wsdl, 0, 4) === 'http' || is_file($wsdl)) {
-            try {
-                $temp_wsdl = $wsdl;
-                ob_start();
-                $wsdl = file_get_contents($wsdl);
-            } catch (\Exception $e) {} finally {
-                ob_end_clean();
-                if (!$wsdl) {
-                    throw new ServiceException('Cannot fetch the service from '.$temp_wsdl, 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
-                }
-            }
-        }
-        $this->xml = simplexml_load_string($wsdl);
+        parent::__construct($wsdl, $options);
+        $this->processXml($wsdl, $options);
     }
 
     public function setHeader(string $namespace, string $name, array $data)
     {
         $header = new SoapHeader($namespace, $name, $data);
-        $this->client->__setSoapHeaders($header);
+        $this->__setSoapHeaders($header);
     }
 
     public function makeCall(string $function, array &$data = [], bool $clean = true)
@@ -55,7 +30,7 @@ class SOAPUtils
             throw new ServiceException(json_encode($errors), 'validation.errors', OxServiceException::ERR_CODE_NOT_ACCEPTABLE);
         }
         try {
-            $response = $this->client->{$function}($data);
+            $response = $this->{$function}($data);
         } catch (\Exception $e) {
             throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
         }
@@ -65,32 +40,33 @@ class SOAPUtils
         return $response;
     }
 
-    private function cleanResponse($response, String $function)
-    {
-        // $resultProperty = $function . 'Result';
-        // if (property_exists($response, $resultProperty)) {
-        //     $response = $response->$resultProperty;
-        // }
-        if (is_object($response)) {
-            $response = json_decode(json_encode($response), true);
-        }
-        return $response;
-    }
-
-    public function isValidFunction(string $function)
-    {
-        return in_array($function, $this->getFunctions());
-    }
-
     public function getFunctions()
     {
-        $functions = array();
-        $functions = $this->client->__getFunctions();
-        foreach ($functions as $function) {
+        $functions = [];
+        foreach ($this->__getFunctions() as $function) {
             preg_match_all('/^(\w+) (\w+)\((.*)\)$/m', $function, $parts);
             $functions[$parts[2][0]] = $parts[3][0];
         }
         return array_keys($functions);
+    }
+
+    public function getFunctionStruct(String $function)
+    {
+        if (!$this->isValidFunction($function)) {
+            throw new ServiceException("Requested function not found", 'function.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
+        }
+
+        $parameters = array();
+        $schema = $this->xml->children($this->options['wsdlNamespace'])->children($this->options['xmlNamespace'])->schema;
+        foreach ($schema->element as $methodNode) {
+        if ($methodNode->attributes()['name'] == $function) {
+                foreach ($methodNode->children(current($methodNode->getNamespaces())) as $type) {
+                    $parameters = array_merge($parameters, $this->processElements($type));
+                }
+                break;
+            }
+        }
+        return $parameters;
     }
 
     public function getValidData($functionStruct, array &$data, array $errors = [])
@@ -105,7 +81,7 @@ class SOAPUtils
                     continue;
                 }
                 $errors[$key] = 'Required Field';
-            } elseif (!$value['nillable'] && !$data[$key]) {
+            } elseif (isset($value['nillable']) && !$value['nillable'] && !$data[$key]) {
                 $errors[$key] = 'Value cannot be Nill';
             } else {
                 if (isset($value['type']) && $value['type']) {
@@ -141,33 +117,38 @@ class SOAPUtils
         return $errors;
     }
 
-    public function getFunctionStruct(string $function)
+    private function isValidFunction(string $function)
     {
-        if (!$this->isValidFunction($function)) {
-            throw new ServiceException("Requested function not found", 'function.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
-        }
+        return in_array($function, $this->getFunctions());
+    }
 
-        $targetPath = '/wsdl:definitions/wsdl:types/'.$this->options['prefix'].':schema';
-        if ($this->xml->attributes()['targetNamespace']) {
-            $targetPath .= '[@targetNamespace="'.$this->xml->attributes()['targetNamespace'].'"]';
-        }
-        $schemas = $this->xml->xpath($targetPath);
-
-        if (count($schemas) != 1) {
-            throw new ServiceException("Schema not found", 'schema.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
-        }
-
-        $parameters = array();
-        $schema = current($schemas);
-        foreach ($schema->children(current($schema->getNamespaces())) as $methodNode) {
-            if ($methodNode->attributes()['name'] == $function) {
-                foreach ($methodNode->children(current($methodNode->getNamespaces())) as $type) {
-                    $parameters = array_merge($parameters, $this->processElements($type));
+    private function processXml(String $wsdl, Array $options = [])
+    {
+            try {
+                ob_start();
+                if (is_file($wsdl) || ValidationUtils::isValid('url', $wsdl)) {
+                    $this->xml = simplexml_load_file($wsdl, "SimpleXMLElement", LIBXML_PARSEHUGE);
+                } elseif (ValidationUtils::isValid('xml', $wsdl)) {
+                    $this->xml = simplexml_load_string($wsdl, "SimpleXMLElement", LIBXML_PARSEHUGE);
                 }
-                break;
+            } catch (\Exception $e) {
+                throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
+            } finally {
+                ob_end_clean();
+                if (!$this->xml instanceof SimpleXMLElement) {
+                    throw new ServiceException('Cannot fetch the service from '.$wsdl, 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
             }
         }
-        return $parameters;
+
+        $defaultOptions = array(
+            'prefix' => '',
+            'xmlNamespace' => 'http://www.w3.org/2001/XMLSchema',
+            'wsdlNamespace' => 'http://schemas.xmlsoap.org/wsdl/'
+        );
+        $this->options = array_merge($defaultOptions, array_intersect_key($options, $defaultOptions));
+        if (!$this->options['prefix']) {
+            $this->options['prefix'] = array_search($this->options['xmlNamespace'], $this->xml->getDocNamespaces());
+        }
     }
 
     private function processElements($type)
@@ -175,11 +156,26 @@ class SOAPUtils
         $parameters = array();
         foreach ($type->children(current($type->getNamespaces())) as $value) {
             foreach ($value->children(current($value->getNamespaces())) as $element) {
-                $parameters[$element->attributes()['name']->__toString()] = array(
-                    'name' => $element->attributes()['name']->__toString(),
-                    'required' => ((int) $element->attributes()['minOccurs']) ? true : false,
-                    'nillable' => ((bool) $element->attributes()['nillable']) ? true : false
-                ) + $this->processElementType($element);
+                $elementName = $element->attributes()['name']->__toString();
+                $parameters[$elementName] = [
+                    'name' => $elementName
+                ];
+                $parameter = &$parameters[$elementName];
+                foreach ($element->attributes() as $key => $value) {
+                    switch ($key) {
+                        case 'type':
+                            $parameter += is_array($type = $this->processElementType($element)) ? $type : ['type' => $element->attributes()['type']];
+                            break;
+                        case 'minOccurs':
+                            $parameter['required'] = ((int) $element->attributes()['minOccurs']) ? true : false;
+                            break;
+                        case 'nillable':
+                            $parameter['nillable'] = ((int) $element->attributes()['nillable']) ? true : false;
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
         }
         return $parameters;
@@ -187,17 +183,19 @@ class SOAPUtils
 
     private function processElementType($element)
     {
-        $type = explode(':', $element->attributes()['type']);
-        if ($type[1] && $type[0] === $this->options['prefix']) {
-            return array('type' => $type[1]);
-        } elseif (!$type[1]) {
-            return array('type' => $type[0]);
+        list($ns, $name) = explode(':', $element->attributes()['type']);
+        if ($name && $ns === array_search($this->options['xmlNamespace'], $element->getDocNamespaces())) {
+            return array('type' => $name);
+        } elseif (!$name) {
+            return array('type' => $ns);
         }
 
+        // Need to write the below block better
         $elementTypes = array('simpleType', 'complexType');
-        $targetPath = '/wsdl:definitions/wsdl:types/'.$this->options['prefix'].':schema/'.$this->options['prefix'].':';
+        $wsdl = $this->xml->children($this->options['wsdlNamespace']);
+        $targetPath = $this->options['prefix'].':schema/'.$this->options['prefix'].':';
         foreach ($elementTypes as $elementType) {
-            $elementTypeDom = $this->xml->xpath($targetPath.$elementType.'[@name="'.$type[1].'"]');
+            $elementTypeDom = $wsdl->xpath($targetPath.$elementType.'[@name="'.$name.'"]');
             if (count($elementTypeDom) > 1) {
                 throw new ServiceException("More than one element found", 'schema.error', OxServiceException::ERR_CODE_CONFLICT);
             } elseif (count($elementTypeDom) == 0) {
@@ -239,4 +237,17 @@ class SOAPUtils
         }
         return array('type' => $element->getName(), $element->getName() => $parameters);
     }
+
+    private function cleanResponse($response, String $function)
+    {
+        // $resultProperty = $function . 'Result';
+        // if (property_exists($response, $resultProperty)) {
+        //     $response = $response->$resultProperty;
+        // }
+        if (is_object($response)) {
+            $response = json_decode(json_encode($response), true);
+        }
+        return $response;
+    }
+
 }

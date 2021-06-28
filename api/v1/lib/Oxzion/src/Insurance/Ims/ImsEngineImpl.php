@@ -26,14 +26,14 @@ class ImsEngineImpl implements InsuranceEngine
     {
         return $this->config['ims'];
     }
-    public function setConfig($handle)
+    public function setConfig($data)
     {
-        $this->setSoapClient($handle);
+        $this->setSoapClient($data['handle']);
     }
     private function setSoapClient($handle)
     {
         $this->handle = $handle;
-        $this->soapClient = new SOAPUtils($this->getConfig()['apiUrl'] . $this->handle . ".asmx?wsdl");
+        $this->soapClient = new SOAPUtils($this->getConfig()['wsdlUrl'] . $this->handle . ".asmx?wsdl");
         $this->soapClient->setHeader('http://tempuri.org/IMSWebServices/' . $this->handle, 'TokenHeader', ['Token' => $this->getToken()]);
     }
     private function getToken()
@@ -42,7 +42,7 @@ class ImsEngineImpl implements InsuranceEngine
             return $this->token;
         }
         $config = $this->getConfig();
-        $soapClient = new SOAPUtils($config['apiUrl']."logon.asmx?wsdl");
+        $soapClient = new SOAPUtils($config['wsdlUrl']."logon.asmx?wsdl");
         $LoginIMSUser = $soapClient->makeCall('LoginIMSUser', $config);
         $this->token = current($LoginIMSUser)['Token'];
         return $this->token;
@@ -70,7 +70,7 @@ class ImsEngineImpl implements InsuranceEngine
                 else
                     break;
             }
-            if (is_string($tmpResponse) && \Oxzion\Utils\ValidationUtils::isValid('xml', $tmpResponse)) {
+            if (is_string($tmpResponse) && ValidationUtils::isValid('xml', $tmpResponse)) {
                 $response = \Oxzion\Utils\XMLUtils::parseString($tmpResponse, true);
             }
         }
@@ -111,7 +111,8 @@ class ImsEngineImpl implements InsuranceEngine
         $searchMethod = 'ClearInsuredAsXml';
         $searchMethods = array(
             'insuredGuid' => 'InsuredGuid',
-            'insuredContactGuid' => 'GetInsuredGuidFromContactGuid'
+            'insuredContactGuid' => 'GetInsuredGuidFromContactGuid',
+            'SSN' => 'FindInsuredBySSN'
         );
         foreach ($searchMethods as $key => $method) {
             if (isset($data[$key])) {
@@ -124,6 +125,9 @@ class ImsEngineImpl implements InsuranceEngine
                 $insureds = array(['InsuredGuid' => $data['insuredGuid']]);
                 break;
             case 'GetInsuredGuidFromContactGuid':
+                $insureds = array(['InsuredGuid' => current($this->makeCall($searchMethod, $data))]);
+                break;
+            case 'FindInsuredBySSN':
                 $insureds = array(['InsuredGuid' => current($this->makeCall($searchMethod, $data))]);
                 break;
             case 'ClearInsuredAsXml':
@@ -304,7 +308,7 @@ class ImsEngineImpl implements InsuranceEngine
                 break;
             case 'ExecuteCommand':
             case 'ExecuteDataSet':
-                $handle = 'dataaccess';
+                $handle = 'DataAccess';
                 break;
             default:
                 $handle = $this->initialHandle;
@@ -312,7 +316,7 @@ class ImsEngineImpl implements InsuranceEngine
                 break;
         }
         if ($this->handle != $handle) {
-            $this->setConfig($handle);
+            $this->setConfig(['handle' => $handle]);
         }
     }
 

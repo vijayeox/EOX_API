@@ -24,7 +24,7 @@ trait InsuranceTrait
     public function setServiceType($data)
     {
         $this->logger->info("Set Service -> " . print_r($data, true));
-        $this->service = $this->insuranceService->getService($data['service'], $data['config']);
+        $this->service = $this->insuranceService->getService($data['client'], $data);
     }
 
     // eg. call $service->search(["searchString" => "demo", "startWith" => true]);

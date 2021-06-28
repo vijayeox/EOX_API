@@ -3,6 +3,6 @@ namespace Oxzion\Insurance;
 
 interface InsuranceEngine
 {
-    public function setConfig($config);
+    public function setConfig($data);
 
 }
