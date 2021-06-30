@@ -18,10 +18,24 @@ class SOAPUtils extends \SoapClient
         $this->processXml($wsdl, $options);
     }
 
-    public function setHeader(string $namespace, string $name, array $data)
+    public function setHeader(string $namespace, string $name, $data, bool $mustUnderstand = false)
     {
-        $header = new SoapHeader($namespace, $name, $data);
+        $header = new SoapHeader($namespace, $name, $data, $mustUnderstand);
         $this->__setSoapHeaders($header);
+    }
+    public function setWsseHeader($username, $password) {
+        $domRequest = new \DOMDocument();
+        $security = $domRequest->createElementNS('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'wsse:Security');
+        $usernameToken = $domRequest->createElement('wsse:UsernameToken');
+        $username = $domRequest->createElement('wsse:Username', $username);
+        $password = $domRequest->createElement('wsse:Password', $password);
+        $usernameToken->appendChild($username);
+        $usernameToken->appendChild($password);
+        $security->appendChild($usernameToken);
+        $domRequest->appendChild($security);
+
+        $soapVar = new \SoapVar($domRequest->saveHTML(), XSD_ANYXML);
+        $this->setHeader('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'Security', $soapVar, true);
     }
 
     public function makeCall(string $function, array &$data = [], bool $clean = true)
