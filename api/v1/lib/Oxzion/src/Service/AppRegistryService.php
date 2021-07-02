@@ -16,7 +16,7 @@ class AppRegistryService extends AbstractService
         parent::__construct($config, $dbAdapter);
     }
 
-    public function createAppRegistry($appId, $accountId)
+    public function createAppRegistry($appId, $accountId, $startOptions = [])
     {
         $sql = $this->getSqlObject();
         //Code to check if the app is already registered for the account
@@ -42,6 +42,10 @@ class AppRegistryService extends AbstractService
                 throw $e;
             }
         }
+        $updateQuery = "UPDATE ox_app_registry SET start_options = :startOptions where app_id = :appId and account_id = :accountId";
+        $params = array("appId" => is_numeric($appId) ? $appId : $this->getIdFromUuid('ox_app', $appId), "accountId" => is_numeric($accountId) ? $accountId : $this->getIdFromUuid('ox_account', $accountId), "startOptions" => !empty($startOptions) ? json_encode($startOptions) : null);
+        $this->logger->info("UPDATEREGISTRY STARTOPTIONS $$updateQuery with params---" . print_r($params, true));
+        $this->executeUpdateWithBindParameters($updateQuery, $params);
         return 0;
     }
 }
