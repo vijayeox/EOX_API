@@ -39,7 +39,7 @@ RUN rm -rf /var/lib/apt/lists/* && curl -sL https://deb.nodesource.com/setup_8.x
  && apt-get update \
  && apt-get install -y nodejs
 RUN apt-get clean
-ADD http://www.phpdoc.org/phpDocumentor.phar /usr/local/bin/phpdoc
+ADD https://www.phpdoc.org/phpDocumentor.phar /usr/local/bin/phpdoc
 RUN chmod 755 /usr/local/bin/phpdoc
 
 RUN mkdir -p /app/view
