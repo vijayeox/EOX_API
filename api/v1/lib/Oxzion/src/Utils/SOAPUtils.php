@@ -1,11 +1,8 @@
 <?php
 namespace Oxzion\Utils;
 
-use SoapHeader;
 use Oxzion\ServiceException;
 use Oxzion\OxServiceException;
-use SimpleXMLElement;
-use SoapClient;
 
 class SOAPUtils extends \SoapClient
 {
@@ -20,7 +17,7 @@ class SOAPUtils extends \SoapClient
 
     public function setHeader(string $namespace, string $name, $data, bool $mustUnderstand = false)
     {
-        $header = new SoapHeader($namespace, $name, $data, $mustUnderstand);
+        $header = new \SoapHeader($namespace, $name, $data, $mustUnderstand);
         $this->__setSoapHeaders($header);
     }
     public function setWsseHeader($username, $password) {
@@ -38,7 +35,7 @@ class SOAPUtils extends \SoapClient
         $this->setHeader('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'Security', $soapVar, true);
     }
 
-    public function makeCall(string $function, array &$data = [], bool $clean = true)
+    public function makeCall(string $function, array $data = [], bool $clean = true)
     {
         if ($errors = $this->getValidData($function, $data)) {
             throw new ServiceException(json_encode($errors), 'validation.errors', OxServiceException::ERR_CODE_NOT_ACCEPTABLE);
@@ -58,10 +55,11 @@ class SOAPUtils extends \SoapClient
     {
         $functions = [];
         foreach ($this->__getFunctions() as $function) {
-            preg_match_all('/^(\w+) (\w+)\((.*)\)$/m', $function, $parts);
-            $functions[$parts[2][0]] = $parts[3][0];
+            preg_match_all('/^(\w+) (\w+)\((\w+) (\$\w+)\)$/m', $function, $parts);
+            $functions[] = $parts[2][0];
+            $functions[] = $parts[3][0];
         }
-        return array_keys($functions);
+        return array_unique($functions);
     }
 
     public function getFunctionStruct(String $function)
@@ -91,40 +89,48 @@ class SOAPUtils extends \SoapClient
         $data = array_intersect_key($data, $functionStruct);
         foreach ($functionStruct as $key => $value) {
             if (!isset($data[$key])) {
-                if (!$value['required']) {
-                    continue;
-                }
+                if (!$value['required']) continue;
                 $errors[$key] = 'Required Field';
             } elseif (isset($value['nillable']) && !$value['nillable'] && !$data[$key]) {
                 $errors[$key] = 'Value cannot be Nill';
             } else {
-                if (isset($value['type']) && $value['type']) {
+                if (!empty($value['type'])) {
                     switch ($value['type']) {
                         case 'enumeration':
-                            $valid = ValidationUtils::isValid('inArray', ['data' => $data[$key], 'options' => $value['enumeration']], true);
+                            $tempData = ['data' => $data[$key], 'options' => $value['enumeration']];
+                            $valid = ValidationUtils::isValid('inArray', $tempData, true);
                             break;
                         case 'pattern':
-                            $valid = ValidationUtils::isValid('regex', ['data' => $data[$key], 'regex' => '/'.$value['pattern'].'/m'], true);
+                            $tempData = ['data' => $data[$key], 'regex' => '/'.$value['pattern'].'/m'];
+                            $valid = ValidationUtils::isValid('regex', $tempData, true);
                             break;
                         default:
                             $valid = ValidationUtils::isValid($value['type'], $data[$key], true);
                             break;
                     }
+                    if (isset($tempData)) unset($tempData);
                     if ($valid !== true) $errors[$key] = $valid;
-                }
-                if (isset($functionStruct[$key]['children']) && $data[$key]) {
+                } elseif (isset($value['children']) && $data[$key]) {
                     if (!is_array($data[$key]) && ValidationUtils::isValid('json', $data[$key])) {
                         $data[$key] = json_decode($data[$key], true);
                     }
                     if (is_array($data[$key])) {
                         if (is_int(key($data[$key]))) {
-                            foreach ($data[$key] as &$cvalue) {
-                                $errors = array_merge($errors, $this->getValidData($functionStruct[$key]['children'], $cvalue, $errors));
+                            foreach ($data[$key] as $ckey => &$cvalue) {
+                                $error = $this->getValidData($value['children'], $cvalue);
+                                if ($error) {
+                                    $errors[$key][$ckey] = $error;
+                                }
                             }
                         } else {
-                            $errors = array_merge($errors, $this->getValidData($functionStruct[$key]['children'], $data[$key], $errors));
+                            $error = $this->getValidData($value['children'], $data[$key]);
+                            if ($error) {
+                                $errors[$key] = $error;
+                            }
                         }
                     }
+                } else {
+                    $errors[$key] = 'Could not process '.$key;
                 }
             }
         }
@@ -149,7 +155,7 @@ class SOAPUtils extends \SoapClient
                 throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
             } finally {
                 ob_end_clean();
-                if (!$this->xml instanceof SimpleXMLElement) {
+                if (!$this->xml instanceof \SimpleXMLElement) {
                     throw new ServiceException('Cannot fetch the service from '.$wsdl, 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
             }
         }

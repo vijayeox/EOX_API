@@ -19,7 +19,7 @@ class QueryService extends AbstractService
     private $total_count;
     public static $queryFields = array('uuid' => 'q.uuid', 'name' => 'q.name', 'datasource_uuid' => 'd.uuid', 'configuration' => 'q.configuration', 'ispublic' => 'q.ispublic', 'created_by' => 'q.created_by', 'version' => 'q.version', 'account_id' => 'q.account_id');
 
-    public function __construct($config, $dbAdapter, QueryTable $table, $datasourceService)
+    public function __construct($config, $dbAdapter, QueryTable $table, DataSourceService $datasourceService)
     {
         parent::__construct($config, $dbAdapter);
         $this->table = $table;
@@ -242,7 +242,7 @@ class QueryService extends AbstractService
     private function runQuery($configuration, $datasource_uuid, $overRides = null)
     {
         $analyticsEngine = $this->datasourceService->getAnalyticsEngine($datasource_uuid);
-        $parameters = json_decode($configuration, 1);
+        $parameters = (!is_array($configuration)) ? json_decode($configuration, 1) : $configuration;
 
         // if (isset($parameters['filter']) && is_string($parameters['filter'])) {
         //     $exp_config = json_decode($parameters['filter'], 1);

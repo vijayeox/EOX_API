@@ -12,7 +12,7 @@ class ValidationUtils
     const MESSAGE = true;
     const EXCEPTION = 'EXCEPTION';
 
-    public static function isValid(String $type, $value, $getMessage = self::BOOL, $customMessage = null)
+    public static function isValid(String $type, &$value, $getMessage = self::BOOL, $customMessage = null)
     {
         try {
             switch (strtolower($type)) {
@@ -22,15 +22,18 @@ class ValidationUtils
                 case 'int':
                 case 'long':
                     assert::integerish($value);
+                    $value = (int) $value;
                     break;
                 case 'float':
                 case 'decimal':
                     assert::float($value);
+                    $value = (float) $value;
                     break;
                 case 'boolean':
                     if (!validate::BoolVal()->validate($value)) {
                         throw new \Exception("Expected a boolean", 1);
                     }
+                    $value = (bool) $value;
                     break;
                 case 'email':
                     assert::email($value);
