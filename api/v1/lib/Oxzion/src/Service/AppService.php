@@ -484,7 +484,8 @@ class AppService extends AbstractService
             $this->createRole($yamlData, false, $accountId, $bRoleResult);         
             $user = $this->accountService->getContactUserForAccount($accountId);
             $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
-            $result = $this->appRegistryService->createAppRegistry($appId, $accountId);
+            $startOptions = $this->getAppStartOptions($appId, $yamlData['org']);
+            $result = $this->appRegistryService->createAppRegistry($appId, $accountId, $startOptions);
             $this->logger->info("PATH--- $path");
             $this->setupAccountFiles($path, $accountId, $appId);
             // Assign AppRoles to Logged in User if Logged in Org and Installed Org are same
@@ -499,6 +500,35 @@ class AppService extends AbstractService
             throw $e;
         }
     }
+
+    public function getAppStartOptions($appId, $yamlOrgData)
+    {
+        $appStartOptions = $this->getDataByParams('ox_app', array('start_options'), array('uuid' => $appId))->toArray();
+        if (count($appStartOptions) > 0) {
+            if (is_string($appStartOptions[0]['start_options'])) {
+                $startOptions = json_decode($appStartOptions[0]['start_options'], true);
+            } else {
+                $startOptions = $appStartOptions[0]['start_options'];
+            }
+        }
+        if (!isset($startOptions)) {
+
+            $startOptions = [];
+        }
+        if (isset($yamlOrgData['start_options'])) {
+            if (is_string($yamlOrgData['start_options'])) {
+                $ymlOrgStartOptions = json_decode($yamlOrgData['start_options'], true);
+            } else {
+                $ymlOrgStartOptions = $yamlOrgData['start_options'];
+            }
+        }
+        if (!isset($ymlOrgStartOptions)) {
+            $ymlOrgStartOptions = [];
+        }
+
+        return array_merge($startOptions, $ymlOrgStartOptions);
+    }
+    
     public function processJobsForAccount($appId, $accountId)
     {
         $appId = is_numeric($appId) ? $appId : $this->getIdFromUuid('ox_app', $appId);

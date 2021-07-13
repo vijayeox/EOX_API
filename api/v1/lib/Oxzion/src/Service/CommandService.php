@@ -95,13 +95,9 @@ class CommandService extends AbstractService
                 if (count($result) == 0) {
                     throw new ServiceException("App Does not belong to the account", "app.for.account.not.found");
                 }
-            } else {
-                if ((isset($data['command']) && $data['command'] != 'register_account')
-                || (isset($data['commands']) && $data['commands'][0] != 'register_account')
-                ) {
-                    throw new ServiceException("You are not authorized to use this command", "app.for.register account");
-                } else {
-                }
+            } elseif ((isset($data['command']) && $data['command'] != 'register_account') || (isset($data['commands']) && $data['commands'][0] != 'register_account')
+            ) {
+                throw new ServiceException("You are not authorized to use this command", "app.for.register account");
             }
             $data['app_id'] = $appId;
         }

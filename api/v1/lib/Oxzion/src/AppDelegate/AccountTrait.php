@@ -40,4 +40,9 @@ trait AccountTrait
     protected function getAccountByName($name) {
         return $this->accountService->getAccountByName($name);
     }
+
+    protected function getAccountID($uuid) {
+        return $this->accountService->getAccountIdByUuid($uuid);
+    }
+
 }
