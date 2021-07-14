@@ -81,7 +81,7 @@ return [
         "callbackUrl" => 'https://qa3.eoxvantage.com/esign/event'
     ],
     'ims' => [
-        'apiUrl' => 'https://ws2.mgasystems.com/ims_demo/',
+        'wsdlUrl' => 'https://ws2.mgasystems.com/ims_demo/',
         "userName" => "vantage.agora",
         "tripleDESEncryptedPassword" => "9srGG5hflGT0aDrgsxs3GQ=="
     ],

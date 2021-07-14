@@ -5,11 +5,9 @@ namespace App\Controller;
 * Pipleline Api
 */
 use Oxzion\Service\CommandService;
-use Zend\Db\Adapter\AdapterInterface;
 use Oxzion\Controller\AbstractApiControllerHelper;
 use Oxzion\ValidationException;
 use Oxzion\EntityNotFoundException;
-use Zend\Http\Request as HttpRequest;
 
 class CommandController extends AbstractApiControllerHelper
 {
@@ -25,8 +23,7 @@ class CommandController extends AbstractApiControllerHelper
     }
     public function executeCommandsAction()
     {
-        $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
-        $params = array_merge($params, $this->params()->fromQuery());
+        $params = array_merge($this->extractPostData(), $this->params()->fromRoute(), $this->params()->fromQuery());
         $appUuid = $this->params()->fromRoute()['appId'];
         unset($params['method']);
         unset($params['controller']);
@@ -65,7 +62,7 @@ class CommandController extends AbstractApiControllerHelper
             $this->log->info(":Entity Not found -" . $e->getMessage());
             $response = ['data' => $params];
             return $this->getErrorResponse($e->getMessage(), 404, $response);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log->error(":Error -" . $e->getMessage(), $e);
             $response = ['data' => $params];
             return $this->getErrorResponse($e->getMessage(), 500, $response);

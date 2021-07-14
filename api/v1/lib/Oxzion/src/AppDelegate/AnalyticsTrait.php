@@ -18,7 +18,7 @@ trait AnalyticsTrait
     }
     public function setQueryService(QueryService $queryService)
     {
-        $this->logger->info("SET Query SERVICE -> " . $queryService);
+        $this->logger->info("SET Query SERVICE -> " . get_class($queryService));
         $this->queryService = $queryService;
     }
     public function setConfig($data)
