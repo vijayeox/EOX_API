@@ -242,7 +242,7 @@ class QueryService extends AbstractService
     private function runQuery($configuration, $datasource_uuid, $overRides = null)
     {
         $analyticsEngine = $this->datasourceService->getAnalyticsEngine($datasource_uuid);
-        $parameters = json_decode($configuration, 1);
+        $parameters = is_string($configuration) ? json_decode($configuration, 1) : $configuration;
 
         // if (isset($parameters['filter']) && is_string($parameters['filter'])) {
         //     $exp_config = json_decode($parameters['filter'], 1);
