@@ -710,8 +710,9 @@ class UserService extends AbstractService
      * @method GET
      * @return array $dataget list of Users
      */
-    public function getUsers($filterParams = null, $baseUrl = '', $params = null)
+    public function getUsers($filterParams = null, $baseUrl = "", $params = null)
     {
+        $baseUrl == "" ? $baseUrl = $this->config["baseUrl"] : null;
         if (isset($params['accountId'])) {
             if (!SecurityManager::isGranted('MANAGE_ACCOUNT_READ') &&
                 ($params['accountId'] != AuthContext::get(AuthConstants::ACCOUNT_UUID))) {
