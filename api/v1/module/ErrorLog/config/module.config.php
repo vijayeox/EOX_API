@@ -43,6 +43,19 @@ return [
                     ],
                 ],
             ],
+            'logger' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/logger',
+                    'defaults' => [
+                        'controller' => Controller\LoggerController::class,
+                        'access' => [
+                            // SET ACCESS CONTROL
+                            'post' => ''
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

@@ -47,6 +47,9 @@ class Module implements ConfigProviderInterface
                         $container->get(AdapterInterface::class)
                     );
                 },
+                Controller\LoggerController::class => function ($container) {
+                    return new Controller\LoggerController();
+                },
                 Controller\RetryController::class => function ($container) {
                     return new Controller\RetryController(
                         $container->get(ErrorLogService::class),
