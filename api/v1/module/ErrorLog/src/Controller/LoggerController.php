@@ -18,7 +18,19 @@ class LoggerController extends AbstractApiController
     public function create($data)
     {
         try {
-            $this->log->{$data['level']}(print_r($data['message'], true));
+	        switch (strtolower($data['level'])) {
+	            case 'trace':
+	            case 'debug':
+	            case 'info':
+	            case 'warn':
+	            case 'error':
+	            case 'fatal':
+	                break;
+	            default:
+	                $data['level'] = 'info';
+	                break;
+	        }
+            $this->log->{strtolower($data['level'])}(print_r($data['message'], true));
             return $this->getSuccessResponseWithData($data);
         } catch (\Exception $e) {
             $response = ['data' => $data, 'errors' => $e->getMessage()];
