@@ -175,12 +175,15 @@ class ImsEngineImpl implements InsuranceEngine
                 break;
             case 'ProducerSearch':
                 $ProducerSearchResult = current($this->makeCall($searchMethod, $data));
+                if (!empty($ProducerSearchResult['ProducerLocation']) && isset($ProducerSearchResult['ProducerLocation']['ProducerLocationGuid'])) {
+                    $ProducerSearchResult['ProducerLocation'] = [$ProducerSearchResult['ProducerLocation']];
+                }
                 $producers = array_map(function($ProducerLocation) {
                     return [
                         'producerLocationGuid' => $ProducerLocation['ProducerLocationGuid'],
                         'GetProducerInfoResult' => $ProducerLocation
                     ];
-                }, (isset($ProducerSearchResult['ProducerLocation']) ? $ProducerSearchResult['ProducerLocation'] : []));
+                }, (!empty($ProducerSearchResult['ProducerLocation']) ? $ProducerSearchResult['ProducerLocation'] : []));
                 unset($ProducerSearchResult);
                 break;
             case 'ProducerClearance':
