@@ -1504,7 +1504,7 @@ class UserService extends AbstractService
     }
 
     public function getUserDataByIdentifier($appId, $identifier, $identifierField){
-        $select = "SELECT oxu.uuid as userId, oxa.uuid as accountId,oxa.id as account_id, oxae.id as entityId
+        $select = "SELECT oxu.uuid as userId,oxu.id as user_id, oxa.uuid as accountId,oxa.id as account_id, oxae.id as entityId
                     FROM ox_wf_user_identifier owui
                     INNER JOIN ox_user oxu ON oxu.id = owui.user_id
                     INNER JOIN ox_account oxa ON oxa.id = owui.account_id
