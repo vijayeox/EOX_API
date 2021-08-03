@@ -22,8 +22,13 @@ class ProfileService extends AbstractService
         $this->table = $table;
     }
 
-    public function getProfilesforUser($userId, $data)
+    public function getProfilesforUser($userIdGuid)
     {
+        if (!empty($userIdGuid)) {
+            $userId = $this->getIdFromUuid('ox_user', $userIdGuid);
+        } else {
+            $userId = AuthContext::get(AuthConstants::USER_ID);
+        }
         try {
             $select = "SELECT pr.*
                 from ox_profile as pr
