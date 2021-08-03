@@ -499,13 +499,7 @@ class AccountService extends AbstractService
 
     public function getAccountIdByUuid($uuid)
     {
-        $select = "SELECT id from ox_account where uuid = '" . $uuid . "'";
-        $result = $this->executeQueryWithParams($select)->toArray();
-        if (isset($result[0])) {
-            return $result[0]['id'];
-        } else {
-            return null;
-        }
+        return $this->getIdFromUuid('ox_account', $uuid);
     }
 
     public function getAccountByName($name) {

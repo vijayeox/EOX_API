@@ -50,31 +50,23 @@ class ImsEngineImpl implements InsuranceEngine
     private function makeCall(string $method, array $data, bool $suppressError = false)
     {
         $this->checkHandle($method);
-        $xmlToArray = isset($data['xmlToArray']) ? $data['xmlToArray'] : null;
-        if ($suppressError) {
-            try {
-                $response = $this->soapClient->makeCall($method, $data);
-            } catch (\Exception $e) {}
-        } else {
+        try {
             $response = $this->soapClient->makeCall($method, $data);
-        }
-        if (!isset($response) || !$response) {
+        } catch (\Exception $e) {
+            if (!$suppressError) throw $e;
             $response = [];
         }
-
-        if ($xmlToArray) {
+        if (isset($data['xmlToArray'])) {
             $tmpResponse = $response;
-            foreach (explode(',', $xmlToArray) as $value) {
-                if (isset($tmpResponse[$value]))
-                    $tmpResponse = &$tmpResponse[$value];
-                else
-                    break;
+            foreach (explode(',', $data['xmlToArray']) as $indexName) {
+                if (!isset($tmpResponse[$indexName])) break;
+                $tmpResponse = &$tmpResponse[$indexName];
             }
             if (is_string($tmpResponse) && ValidationUtils::isValid('xml', $tmpResponse)) {
                 $response = \Oxzion\Utils\XMLUtils::parseString($tmpResponse, true);
             }
+            unset($data['xmlToArray']);
         }
-
         return $response;
     }
 
@@ -112,7 +104,8 @@ class ImsEngineImpl implements InsuranceEngine
         $searchMethods = array(
             'insuredGuid' => 'InsuredGuid',
             'insuredContactGuid' => 'GetInsuredGuidFromContactGuid',
-            'SSN' => 'FindInsuredBySSN'
+            'SSN' => 'FindInsuredBySSN',
+            'FEIN' => 'FindInsuredBySSN'
         );
         foreach ($searchMethods as $key => $method) {
             if (isset($data[$key])) {
@@ -124,30 +117,32 @@ class ImsEngineImpl implements InsuranceEngine
             case 'InsuredGuid':
                 $insureds = array(['InsuredGuid' => $data['insuredGuid']]);
                 break;
+            case 'FindInsuredBySSN':
+                $data['SSN'] = (empty($data['SSN'])) ? $data['FEIN'] : $data['SSN'];
             case 'GetInsuredGuidFromContactGuid':
                 $insureds = array(['InsuredGuid' => current($this->makeCall($searchMethod, $data))]);
                 break;
-            case 'FindInsuredBySSN':
-                $insureds = array(['InsuredGuid' => current($this->makeCall($searchMethod, $data))]);
-                break;
             case 'ClearInsuredAsXml':
-                $InsuredList = $this->makeCall($searchMethod, $data + ['xmlToArray'=>'ClearInsuredAsXmlResult']);
+                $InsuredList = $this->makeCall($searchMethod, $data + ['xmlToArray' => 'ClearInsuredAsXmlResult']);
                 $insureds = array_map(function($insured){
                     return ['InsuredGuid' => $insured['InsuredGuid'], 'Clearance' => $insured];
                 }, (isset($InsuredList['Clearance']['Insured']) ? $InsuredList['Clearance']['Insured'] : []));
                 unset($InsuredList);
                 break;
         }
-        $responseArray = [];
-        foreach ($insureds as $key => $insured) {
-            $GetInsured = $this->makeCall('GetInsured', array('insuredGuid' => $insured['InsuredGuid']));
-            $GetInsuredPolicyInfo = $this->makeCall('GetInsuredPolicyInfo', array('insuredGuid' => $insured['InsuredGuid']));
-            $GetInsuredPrimaryLocation = $this->makeCall('GetInsuredPrimaryLocation', array('insuredGuid' => $insured['InsuredGuid']));
-            $HasSubmissions = $this->makeCall('HasSubmissions', array('insuredguid' => $insured['InsuredGuid']));
-
-            $responseArray[] = array_merge($insured, $GetInsured, $GetInsuredPrimaryLocation, $HasSubmissions, $GetInsuredPolicyInfo);
+        if (empty($insureds)) {
+            throw new ServiceException("Insured not found", 'insured.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
         }
-        return $responseArray;
+        foreach ($insureds as &$insured) {
+            if (!ValidationUtils::isValid('uuidStrict', $insured['InsuredGuid'])) continue;
+            $insuredGuid = array('insuredGuid' => $insured['InsuredGuid']);
+            $insured += $this->makeCall('GetInsured', $insuredGuid);
+            $insured += $this->makeCall('GetInsuredPrimaryLocation', $insuredGuid);
+            $insured += $this->makeCall('HasSubmissions', array('insuredguid' => $insured['InsuredGuid']));
+            $insured += $this->makeCall('GetInsuredPolicyInfo', $insuredGuid);
+            unset($insuredGuid);
+        }
+        return $insureds;
     }
     public function searchProducer($data)
     {
@@ -165,63 +160,84 @@ class ImsEngineImpl implements InsuranceEngine
         }
         switch ($searchMethod) {
             case 'ProducerLocationGuid':
-                $producers = array(['ProducerLocationGuid' => $data['producerLocationGuid']]);
+                $producers = array(['producerLocationGuid' => $data['producerLocationGuid']]);
                 break;
             case 'GetProducerInfoByContact':
                 $GetProducerInfoByContactResult = current($this->makeCall($searchMethod, $data));
-                $producers = array(['ProducerLocationGuid' => $GetProducerInfoByContactResult['ProducerLocationGuid']]);
+                if (!empty($GetProducerInfoByContactResult['ProducerLocationGuid'])) {
+                    $producers = array([
+                        'producerLocationGuid' => $GetProducerInfoByContactResult['ProducerLocationGuid'],
+                        'GetProducerInfoResult' => $GetProducerInfoByContactResult,
+                        'ProducerContactGuid' => $data['producerContactGuid']
+                    ]);
+                }
+                unset($GetProducerInfoByContactResult);
                 break;
             case 'ProducerSearch':
                 $ProducerSearchResult = current($this->makeCall($searchMethod, $data));
-                $producers = array_map(function($ProducerLocation){
-                    return ['ProducerLocationGuid' => $ProducerLocation['ProducerLocationGuid'], 'GetProducerInfoResult' => $ProducerLocation];
+                $producers = array_map(function($ProducerLocation) {
+                    return [
+                        'producerLocationGuid' => $ProducerLocation['ProducerLocationGuid'],
+                        'GetProducerInfoResult' => $ProducerLocation
+                    ];
                 }, (isset($ProducerSearchResult['ProducerLocation']) ? $ProducerSearchResult['ProducerLocation'] : []));
                 unset($ProducerSearchResult);
                 break;
             case 'ProducerClearance':
-                $ProducerClearanceResult = $this->makeCall($searchMethod, $data);
-                if (isset(current($ProducerClearanceResult)['guid'])) {
-                    foreach (current($ProducerClearanceResult)['guid'] as $guid) {
-                        $GetProducerResult[$guid] = ['ProducerGuid' => $guid];
-                        $GetProducerResult[$guid] += $this->makeCall('GetProducerUnderwriter', ['ProducerEntity' => $guid, 'LineGuid' => '00000000-0000-0000-0000-000000000000']);
+                $ProducerClearanceResult = current($this->makeCall($searchMethod, $data));
+                $producers = [];
+                if ($ProducerClearanceResult) {
+                    $ProducerClearanceResult = is_array($ProducerClearanceResult['guid']) ? $ProducerClearanceResult['guid'] : [$ProducerClearanceResult['guid']];
+                    foreach ($ProducerClearanceResult as $producerContactGuid) {
+                        $GetProducerInfoByContactResult = current($this->makeCall('GetProducerInfoByContact', ['producerContactGuid' => $producerContactGuid]));
+                        $producers[] = array(
+                            'producerLocationGuid' => $GetProducerInfoByContactResult['ProducerLocationGuid'],
+                            'GetProducerInfoResult' => $GetProducerInfoByContactResult,
+                            'ProducerContactGuid' => $producerContactGuid
+                        );
+                        unset($GetProducerInfoByContactResult);
                     }
                 }
-                return isset($GetProducerResult) ? array_values($GetProducerResult) : [];
+                unset($ProducerClearanceResult);
                 break;
         }
-        if (!$producers) {
+        if (empty($producers)) {
             throw new ServiceException("Producer not found", 'producer.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
         }
         foreach ($producers as &$producer) {
-            if (ValidationUtils::isValid('uuidStrict', $producer['ProducerLocationGuid'])) {
-                if (!isset($producer['GetProducerInfoResult'])) {
-                    $producer += $this->makeCall('GetProducerInfo', array('producerLocationGuid' => $producer['ProducerLocationGuid']));
+            if (ValidationUtils::isValid('uuidStrict', $producer['producerLocationGuid'])) {
+                if (empty($producer['GetProducerInfoResult'])) {
+                    $producer += $this->makeCall('GetProducerInfo', array('producerLocationGuid' => $producer['producerLocationGuid']));
                 }
-                if (isset(($producer['GetProducerInfoResult']['LocationCode'])) && $producer['GetProducerInfoResult']['LocationCode']) {
-                    $GetProducerContactByLocationCodeResult = $this->makeCall('GetProducerContactByLocationCode', array('locationCode' => $producer['GetProducerInfoResult']['LocationCode']));
-                    $producer += $GetProducerContactByLocationCodeResult;
-                    $producer += $this->makeCall('GetProducerContactInfo', array('producerContactGuid' => current($GetProducerContactByLocationCodeResult)));
+                unset($producer['producerLocationGuid']);
+                if (empty($producer['ProducerContactGuid']) && !empty($producer['GetProducerInfoResult']['LocationCode'])) {
+                    $producer += ['ProducerContactGuid' => current($this->makeCall('GetProducerContactByLocationCode', array('locationCode' => $producer['GetProducerInfoResult']['LocationCode'])))];
+                }
+                if (!empty($producer['ProducerContactGuid'])) {
+                    $producer += $this->makeCall('GetProducerContactInfo', array('producerContactGuid' => $producer['ProducerContactGuid']));
+                    // $producer += $this->makeCall('GetProducerUnderwriter', ['ProducerEntity' => $producer['ProducerContactGuid'], 'LineGuid' => '00000000-0000-0000-0000-000000000000']);
                 }
             }
-            unset($producer['ProducerLocationGuid']);
         }
         return array_filter($producers);
     }
     public function searchQuote($data)
     {
         $quote = [];
-        if (isset($data['quoteGuid']) && ValidationUtils::isValid('uuidStrict', $data['quoteGuid'])) {
+        if (!empty($data['quoteGuid']) && ValidationUtils::isValid('uuidStrict', $data['quoteGuid'])) {
             $quote += ['QuoteGuid' => $data['quoteGuid']];
-            $quote += $this->makeCall('AutoAddQuoteOptions', array('quoteGuid' => $quote['QuoteGuid']));
-            $quote += $this->makeCall('GetPolicyInformation', array('quoteGuid' => $quote['QuoteGuid'], 'xmlToArray' => 'GetPolicyInformationResult'));
-            $quote += $this->makeCall('GetControlNumber', array('quoteGuid' => $quote['QuoteGuid']));
+            $quoteGuid = array('quoteGuid' => $quote['QuoteGuid']);
+            $quote += $this->makeCall('AutoAddQuoteOptions', $quoteGuid);
+            $quote += $this->makeCall('GetPolicyInformation', $quoteGuid + array('xmlToArray' => 'GetPolicyInformationResult'));
+            $quote += $this->makeCall('GetControlNumber', $quoteGuid);
             // if (isset($quote['GetControlNumberResult']) && ValidationUtils::isValid('int', $quote['GetControlNumberResult'])) {
             //     $quote += $this->makeCall('GetControlInformation', array('controls' => (String) $quote['GetControlNumberResult']));
             // }
-            $quote += $this->makeCall('GetSubmissionGroupGuidFromQuoteGuid', array('quoteGuid' => $quote['QuoteGuid']));
-            $quote += $this->makeCall('GetAvailableInstallmentOptions', array('quoteGuid' => $quote['QuoteGuid']));
+            $quote += $this->makeCall('GetSubmissionGroupGuidFromQuoteGuid', $quoteGuid);
+            $quote += $this->makeCall('GetAvailableInstallmentOptions', $quoteGuid);
+            unset($quoteGuid);
         } else {
-            throw new ServiceException("Invalid Quote uuid", 'quote.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
+            throw new ServiceException("Invalid quoteGuid - " . $data['quoteGuid'], 'quote.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
         }
         return $quote;
     }
@@ -249,47 +265,109 @@ class ImsEngineImpl implements InsuranceEngine
                 throw new ServiceException("Invalid search request", 'document.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
                 break;
         }
-        if (isset($document['QuoteGuid']) && ValidationUtils::isValid('uuidStrict', $document['QuoteGuid'])) {
+        if (!empty($document['QuoteGuid']) && ValidationUtils::isValid('uuidStrict', $document['QuoteGuid'])) {
+            $QuoteGuid = ['QuoteGuid' => $document['QuoteGuid']];
             if (isset($data['folderID'])) {
                 $document += $this->makeCall('GetDocumentFromFolder', array('quoteGuid' => $document['QuoteGuid'], 'folderID' => $data['folderID']));
             } else {
-                $document += $this->makeCall('GetPolicyDocumentsList', array('QuoteGuid' => $document['QuoteGuid'], 'xmlToArray' => 'GetPolicyDocumentsListResult'));
+                $document += $this->makeCall('GetPolicyDocumentsList', $QuoteGuid + array('xmlToArray' => 'GetPolicyDocumentsListResult'));
             }
             if (isset($data['RaterID'])) {
-                $document += $this->makeCall('GetPolicyRatingSheetByRater', array('QuoteGuid' => $document['QuoteGuid'], 'RaterID' => $data['RaterID']));
+                $document += $this->makeCall('GetPolicyRatingSheetByRater', $QuoteGuid + array('RaterID' => $data['RaterID']));
             } else {
-                $document += $this->makeCall('GetPolicyRatingSheet', array('QuoteGuid' => $document['QuoteGuid']), true);
+                $document += $this->makeCall('GetPolicyRatingSheet', $QuoteGuid, true);
             }
-            unset($document['QuoteGuid']);
+            unset($QuoteGuid);
         } else {
-            throw new ServiceException("Invalid Quote uuid", 'document.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
+            throw new ServiceException("Invalid quoteGuid - " . $document['QuoteGuid'], 'document.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
         }
         return $document;
     }
 
     public function create($data)
     {
-        $response = array();
+        $response = [];
         switch ($this->handle) {
             case 'InsuredFunctions':
-                $response = $this->makeCall('AddInsuredWithContact', $data);
+                $response = $this->makeCall('AddInsuredWithLocation', $data);
                 break;
             case 'ProducerFunctions':
                 $response = $this->makeCall('AddProducerWithLocation', $data);
                 break;
             case 'QuoteFunctions':
-                $response = $this->makeCall('AddQuoteWithAutocalculateDetails', $data);
+                if (empty($data['quote']['Submission'])) {
+                    $response = $this->makeCall('AddSubmission', $data['submission']);
+                    $data['quote']['Submission'] = current($response);
+                }
+                $response += $this->makeCall('AddQuoteWithAutocalculateDetailsQuote', $data['quote']);
                 break;
             default:
                 throw new ServiceException("Create not avaliable for " . $this->handle, 'create.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
                 break;
         }
-        return $response;
+        return ['data' => $data, 'response' => $response];
     }
 
     public function perform(String $method, array $data)
     {
         return $this->makeCall($method, $data);
+    }
+
+    public function getQuotingParams(Array $data = [])
+    {
+        // return $this->getQuotingParams(['programCode' => 'APPL8']);
+        $response = $this->makeCall('ExecuteCommand', [
+            "procedureName" => "ValidCompanyLinesXml",
+            "parameters" => "<string>@programCode</string><string>".$data['programCode']."</string>"
+        ]);
+        if (is_string($response['ExecuteCommandResult']) && ValidationUtils::isValid('xml', $response['ExecuteCommandResult'])) {
+            $response = \Oxzion\Utils\XMLUtils::xmlToArray($response['ExecuteCommandResult']);
+            if (isset($response['CompanyLine'])) {
+                $response = $this->processCompanyLines($response['CompanyLine']);
+            }
+        }
+        $response += ["SupplementaryDataResult" => $this->makeCall('ExecuteDataSet', [
+            "procedureName" => "SupplementaryData",
+            "parameters" => ' ',
+            "xmlToArray" => "ExecuteDataSetResult"
+        ])];
+        return $response;
+    }
+
+    private function processCompanyLines(Array $CompanyLines)
+    {
+        $result = [];
+        foreach ($CompanyLines as $CompanyLine) {
+            if (isset($CompanyLine['Offices']['Office']['@attributes'])) {
+                $CompanyLine['Offices']['Office'] = [$CompanyLine['Offices']['Office']];
+            }
+            foreach ($CompanyLine['Offices']['Office'] as $Office) {
+                $result['QuotingAndIssuingOffices'][$Office['@attributes']['OfficeGuid']] = $Office['@attributes']['QuotingAndIssuingOffice'];
+                $result['Lines'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']] = $CompanyLine['LineName'];
+                if (isset($CompanyLine['Users']['User']['@attributes'])) {
+                    $CompanyLine['Users']['User'] = [$CompanyLine['Users']['User']];
+                }
+                foreach ($CompanyLine['Users']['User'] as $User) {
+                    $result['Underwriters'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$User['@attributes']['UserGUID']] = $User['@attributes']['UserName'];
+                }
+                $result['States'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']] = $CompanyLine['StateID'];
+                $result['Company'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']] = $CompanyLine['LocationName'];
+
+                if (isset($CompanyLine['BillTypes']['BillType']['@attributes'])) {
+                    $CompanyLine['BillTypes']['BillType'] = [$CompanyLine['BillTypes']['BillType']];
+                }
+                foreach ($CompanyLine['BillTypes']['BillType'] as $BillType) {
+                    $result['BillTypes'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']][$BillType['@attributes']['BillingTypeID']] = $BillType['@attributes']['BillingType'];
+                }
+                if (isset($Office['CostCenters']['CostCenter']['@attributes'])) {
+                    $Office['CostCenters']['CostCenter'] = [$Office['CostCenters']['CostCenter']];
+                }
+                foreach ($Office['CostCenters']['CostCenter'] as $CostCenter) {
+                    $result['CostCenters'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']][$CostCenter['@attributes']['CostCenterID']] = $CostCenter['@attributes']['Name'];
+                }
+            }
+        }
+        return ['CompanyLines' => $result];
     }
 
     private function checkHandle(String $method) {
