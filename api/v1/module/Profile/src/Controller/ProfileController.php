@@ -44,13 +44,12 @@ class ProfileController extends AbstractApiController
     {
         $params = $this->params()->fromRoute();
         $data = $this->params()->fromQuery();
+        $userIdGuid = null;
         if (isset($params['userId'])) {
-            $userId = $this->getIdFromUuid('ox_user', $params['userId']);
-        } else {
-            $userId = AuthContext::get(AuthConstants::USER_ID);
+            $userIdGuid = $params['userId'];
         }
         try {
-            $profileList = $this->profileService->getProfilesforUser($userId, $data);
+            $profileList = $this->profileService->getProfilesforUser($userIdGuid);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);

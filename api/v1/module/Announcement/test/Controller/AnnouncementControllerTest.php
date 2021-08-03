@@ -46,11 +46,11 @@ class AnnouncementControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']), 6);
-        $this->assertEquals($content['data'][3]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033abc');
-        $this->assertEquals($content['data'][3]['name'], 'Announcement 3');
-        $this->assertEquals($content['data'][4]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033f7a');
-        $this->assertEquals($content['data'][4]['name'], 'Announcement 2');
+        $this->assertEquals(count($content['data']), 5);
+        $this->assertEquals($content['data'][4]['uuid'], '9068b460-2943-4508-bd4c-2b29238700f3');
+        $this->assertEquals($content['data'][4]['name'], 'Announcement 1');
+        $this->assertEquals($content['data'][3]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033f7a');
+        $this->assertEquals($content['data'][3]['name'], 'Announcement 2');
     }
 
     public function testGetListWithType()
@@ -100,12 +100,11 @@ class AnnouncementControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']), 6);
-        $this->assertEquals($content['data'][3]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033abc');
-        $this->assertEquals($content['data'][3]['name'], 'Announcement 3');
-        $this->assertEquals($content['data'][4]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033f7a');
-        $this->assertEquals($content['data'][4]['name'], 'Announcement 2');
-        $this->assertEquals($content['data'][5]['name'], 'Announcement 1');
+        $this->assertEquals(count($content['data']), 5);
+        $this->assertEquals($content['data'][3]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033f7a');
+        $this->assertEquals($content['data'][3]['name'], 'Announcement 2');
+        $this->assertEquals($content['data'][4]['uuid'], '9068b460-2943-4508-bd4c-2b29238700f3');
+        $this->assertEquals($content['data'][4]['name'], 'Announcement 1');
     }
 
     public function testGetListWithExpirationStartDate()

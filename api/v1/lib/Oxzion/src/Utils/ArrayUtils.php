@@ -1,6 +1,7 @@
 <?php
 
 namespace Oxzion\Utils;
+use Rogervila\ArrayDiffMultidimensional;
 
 class ArrayUtils
 {
@@ -116,5 +117,19 @@ class ArrayUtils
         $start = array_splice($arr, 0, array_search($find, array_keys($arr)));
         unset($start[$move]);  // only important if $move is in $start
         return $start + $elem + $arr;
+    }
+
+    /**
+     * Returns an array with the differences between $array1 and $array2
+     * $strict variable defines if comparison must be strict or not
+     *
+     * @param array $array1
+     * @param array $array2
+     * @param bool $strict
+     *
+     * @return array
+     */
+    public static function compareMultiDimensionalArrays($arr1,$arr2) {
+        return ArrayDiffMultidimensional::compare($arr1, $arr2);
     }
 }

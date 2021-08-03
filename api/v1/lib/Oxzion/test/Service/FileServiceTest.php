@@ -1523,7 +1523,7 @@ class FileServiceTest extends AbstractServiceTest
         if (!file_exists($folderPath)) {
             $check = mkdir($folderPath, 0777, true);
         }
-        $filePath = $config['APP_DOCUMENT_FOLDER']."53012471-2863-4949-afb1-e69b0891c98a/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/".$attachmentName;
+        $filePath = $folderPath.$attachmentName;
         if (!file_exists($filePath)) {
             touch($filePath);
         }

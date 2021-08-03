@@ -110,7 +110,7 @@ class WorkflowService extends AbstractService
             $workFlowId = $data['id'];
             $workflowDeploymentId = $data['workflow_deployment_id'];
             $processes = $this->getProcessManager()->parseBPMN($file, $appId);
-            $path = dirname($file) . "/../../forms/";
+            $path = dirname($file) . "/../forms/";
             $startFormId = null;
             $workFlowList = array();
             $workFlowFormIds = array();

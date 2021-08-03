@@ -23,7 +23,7 @@ use Oxzion\Service\AccountService;
 use Oxzion\EntityNotFoundException;
 use Oxzion\Service\BusinessParticipantService;
 use \Analytics\Service\QueryService;
-use oxzion\Insurance\Service as InsuranceService;
+use oxzion\Insurance\InsuranceService;
 
 class AppDelegateService extends AbstractService
 {
@@ -90,9 +90,14 @@ class AppDelegateService extends AbstractService
         $this->fileService = $fileService;
     }
 
+    public function setInsuranceService($insuranceService)
+    {
+        $this->insuranceService = $insuranceService;
+    }
+
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService);
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService );
         return $appDelegateService;
     }
 
