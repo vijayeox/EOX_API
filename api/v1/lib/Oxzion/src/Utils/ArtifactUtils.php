@@ -14,22 +14,28 @@ class ArtifactUtils
         $templateDir = $config['TEMPLATE_FOLDER'];
         $accountId = isset($params['accountId']) ? $params['accountId'] : (isset($params['accountId']) ? $params['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID));
         self::$logger->info("accountId - $accountId");
+        if (isset($params['app_id'])) {
+            $appId = $params['app_id'];
+        }
+        if (isset($params['appId'])) {
+            $appId = $params['appId'];
+        }
         if (isset($accountId)) {
             $path = $accountId."/".$template;
-            if (isset($params['appId'])) {
-                $path = $accountId."/".$params['appId']."/".$template;
+            if (isset($appId)) {
+                $path = $accountId."/".$appId."/".$template;
             }
         } else {
             $path = $template;
         }
         self::$logger->info("Path - $path, template directory - $templateDir,template - $template");
         if (is_file($templateDir.$path)) {
-            if (isset($params['appId']) && isset($accountId)) {
-                $path = $templateDir.$accountId."/".$params['appId'];
+            if (isset($appId) && isset($accountId)) {
+                $path = $templateDir.$accountId."/".$appId;
                 return $path;
             }
-            elseif(isset($params['appId']) && !isset($accountId)){
-                $path = $templateDir."/".$params['appId'];
+            elseif(isset($appId) && !isset($accountId)){
+                $path = $templateDir."/".$appId;
                 return $path;
             }
             else
