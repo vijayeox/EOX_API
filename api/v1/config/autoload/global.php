@@ -83,7 +83,7 @@ return [
     'ims' => [
         'wsdlUrl' => 'https://ws2.mgasystems.com/ims_demo/',
         "userName" => "vantage.agora",
-        "tripleDESEncryptedPassword" => "9srGG5hflGT0aDrgsxs3GQ=="
+        "tripleDESEncryptedPassword" => "OTuR+YbRcAHFpdBB1uYL+A=="
     ],
     'DELEGATE_FOLDER'=>__DIR__.'/../../data/delegate/',
     'ENTITY_FOLDER'=>__DIR__.'/../../data/entity/',
