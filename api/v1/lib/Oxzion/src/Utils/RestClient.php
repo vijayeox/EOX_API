@@ -4,7 +4,6 @@ namespace Oxzion\Utils;
 use Exception;
 use Oxzion\HttpException;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\MultipartStream;
 
 class RestClient
 {
@@ -53,31 +52,36 @@ class RestClient
         throw new HttpException($var, $response->getStatusCode());
     }
 
-    public function postMultiPart($url, $formParams = array(), $fileParams = array(), array $headers = null)
+    public function postMultiPart($url, $formParams = array(), $fileParams = array(), array $headers = [])
     {
-        $boundary = uniqid();
         $multipart_form = array();
         if ($formParams) {
             foreach ($formParams as $key => $value) {
-                $multipart_form[] = array('name' => $key, 'contents' => $value);
+                $multipart_form[] = array(
+                    'name' => $key,
+                    'contents' => is_array($value) ? json_encode($value) : $value
+                );
             }
         }
         if ($fileParams) {
             foreach ($fileParams as $key => $value) {
-                $multipart_form[] = array('name' => $key, 'contents' => fopen($value, 'r'), 'headers' => ['Content-Type' => 'application/octet-stream']);
+                $multipart_form[] = array(
+                    'name' => (is_string($key)) ? $key : FileUtils::getFileName($value),
+                    'contents' => fopen($value, 'r'),
+                    'headers' => ['Content-Type' => 'application/octet-stream']
+                );
             }
         }
-        $headerList = ['Connection' => 'close', 'Content-Type' => 'multipart/form-data; boundary=' . $boundary];
-        if ($headers) {
-            $headerList = array_merge($headerList, $headers);
-        }
-        $params = ['headers' => $headerList, 'body' => new MultipartStream($multipart_form, $boundary)];
+        $params = [
+            'headers' => $headers + ['Connection' => 'close'],
+            'multipart' => $multipart_form
+        ];
         $response = $this->client->post($url, $params);
-        $var = $response->getBody()->getContents();
+        $data = $response->getBody()->getContents();
         if ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300) {
-            return $var;
+            return $data;
         }
-        throw new HttpException($var, $response->getStatusCode());
+        throw new HttpException($data, $response->getStatusCode());
     }
 
     public function post($url, $formParams = array())
