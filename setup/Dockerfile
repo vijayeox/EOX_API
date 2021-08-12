@@ -34,7 +34,7 @@ RUN groupmod -g ${BOOT2DOCKER_GID} staff
 ENV DEBIAN_FRONTEND noninteractive
 
 # Setup Nodejs
-RUN rm -rf /var/lib/apt/lists/* && curl -sL https://deb.nodesource.com/setup_8.x | bash - 
+RUN rm -rf /var/lib/apt/lists/* && curl -sL https://deb.nodesource.com/setup_14.x | bash - 
 
 RUN add-apt-repository -y ppa:ondrej/php && \
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C && \
