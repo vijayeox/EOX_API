@@ -355,7 +355,8 @@ class ImsEngineImpl implements InsuranceEngine
                     $result['Underwriters'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$User['@attributes']['UserGUID']] = $User['@attributes']['UserName'];
                 }
                 $result['States'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']] = $CompanyLine['StateID'];
-                $result['Company'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']] = $CompanyLine['LocationName'];
+                $result['CompanyLocations'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']] = $CompanyLine['LocationName'];
+                $result['CompanyLines'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']][$CompanyLine['CompanyLineGUID']] = $CompanyLine['CompanyLineGUID'];
 
                 if (isset($CompanyLine['BillTypes']['BillType']['@attributes'])) {
                     $CompanyLine['BillTypes']['BillType'] = [$CompanyLine['BillTypes']['BillType']];
