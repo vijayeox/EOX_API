@@ -19,6 +19,7 @@ class SpreadsheetParserImpl implements SpreadsheetParser
         $type = "";
         switch (strtolower($ext)) {
             case 'xlsx':
+            case 'xlsm':
                 $type = 'Xlsx';
                 break;
             case 'xls':
@@ -126,6 +127,18 @@ class SpreadsheetParserImpl implements SpreadsheetParser
                 $rowMapper->resetData();
             } else {
                 $data[$sheetName] = $worksheetData->toArray();
+                for ($i = 0; $i < sizeof($data[$sheetName]); $i++) {
+                    $row = $data[$sheetName][$i];
+                    for ($j = 0; $j < sizeof($row); $j++) {
+                        $cell = $worksheetData->getCellByColumnAndRow($j, $i, false);
+                        if (!is_null($cell)) {
+                            if ($cell->isFormula()) {
+                                $data[$sheetName][$i][$j] =
+                                    $cell->getOldCalculatedValue();
+                            }
+                        }
+                    }
+                }
             }
         }
 
