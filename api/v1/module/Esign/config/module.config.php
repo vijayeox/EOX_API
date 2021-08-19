@@ -7,6 +7,7 @@ use Zend\Router\Http\Segment;
 return [
     'router' => [
         'routes' => [
+
             'esignStatus' => [
                 'type' => Segment::class,
                 'options' => [
@@ -15,9 +16,9 @@ return [
                         'controller' => Controller\EsignController::class,
                         'action' => 'getStatus',
                         'method' => 'GET'
-                        ],
                     ],
                 ],
+            ],
 
             'esignCallback' => [
                 'type' => Segment::class,
@@ -27,9 +28,10 @@ return [
                         'controller' => Controller\EsignCallbackController::class,
                         'action' => 'signEvent',
                         'method' => 'POST'
-                        ],
                     ],
-                ]
-            ],
+                ],
+            ]
+
         ],
-    ];
+    ],
+];
