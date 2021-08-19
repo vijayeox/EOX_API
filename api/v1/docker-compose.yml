@@ -3,7 +3,6 @@ services:
     zf:
         build:
             context: ./docker
-            dockerfile: Dockerfile
         environment:
             HOST: ${HOST}
             DB_HOST: ${DB_HOST}
