@@ -275,7 +275,7 @@ class AppService extends AbstractService
                     case 'initialize':
                     $temp = $this->createOrUpdateApp($ymlData);
                     if ($temp) {
-                        FileUtils::copyDir($path, $temp);
+                            FileUtils::copyDir($path, $temp);
                         $originalPath = $path;
                         $path = $temp;
                     }
@@ -629,8 +629,10 @@ class AppService extends AbstractService
         if (isset($yamlData['job'])) {
             $appUuid = $yamlData['app']['uuid'];
             $this->processDeletedJobs($yamlData['job'], $appUuid);
-            foreach ($yamlData['job'] as $data) {
+            foreach ($yamlData['job'] as &$job) {
                 try {
+                    $job['uuid'] = isset($job['uuid']) ? $job['uuid'] : UuidUtil::uuid();
+                    $data = $job;
                     if (!isset($data['name']) || !isset($data['url']) || !isset($data['uuid']) || !isset($data['cron'])) {
                         throw new ServiceException('Job Name/url/uuid/cron not specified', 'job.details.not.specified');
                     }

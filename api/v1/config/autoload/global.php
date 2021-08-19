@@ -81,9 +81,9 @@ return [
         "callbackUrl" => 'https://qa3.eoxvantage.com/esign/event'
     ],
     'ims' => [
-        'wsdlUrl' => 'https://ws2.mgasystems.com/ims_demo/',
+        'wsdlUrl' => 'https://ws2.mgasystems.com/ims_axon/',
         "userName" => "vantage.agora",
-        "tripleDESEncryptedPassword" => "OTuR+YbRcAHFpdBB1uYL+A=="
+        "tripleDESEncryptedPassword" => "9srGG5hflGT0aDrgsxs3GQ=="
     ],
     'DELEGATE_FOLDER'=>__DIR__.'/../../data/delegate/',
     'ENTITY_FOLDER'=>__DIR__.'/../../data/entity/',

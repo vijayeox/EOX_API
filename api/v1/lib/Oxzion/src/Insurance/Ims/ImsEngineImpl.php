@@ -304,6 +304,9 @@ class ImsEngineImpl implements InsuranceEngine
                 }
                 $response += $this->makeCall('AddQuoteWithAutocalculateDetailsQuote', $data['quote']);
                 break;
+            case 'DocumentFunctions':
+                $response = $this->makeCall('SaveRatingSheet', $data);
+                break;
             default:
                 throw new ServiceException("Create not avaliable for " . $this->handle, 'create.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
                 break;
