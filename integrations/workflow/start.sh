@@ -38,7 +38,8 @@ if [ "http://$IP:8080" != "$applicationurl" ]; then
 	chmod 777 ./docker/entrypoint.sh
 
 	docker rm wf_build
-	docker build -t workflow_build docker && docker run --network="host" --name="wf_build" -it -v ${PWD}:/camunda workflow_build
+	docker build -t workflow_build docker
+	docker run --network="host" --name="wf_build" -it -v ${PWD}:/camunda workflow_build
 
 fi
 

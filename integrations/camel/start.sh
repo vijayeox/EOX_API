@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ ! -e ./.env ]; then
+	echo "Please set .env file up"
+	exit
+fi
+
 dirName="$(tr [A-Z] [a-z] <<< "${PWD##*/}")"
 echo "Stopping container if already running..."
 docker stop "${dirName//_}_camel_1"
@@ -26,7 +31,7 @@ else
 	IP="$IP" docker-compose up --build
 fi
 
-echo "Camel and ActiveMQ are being served in the background on port 8081 and 8161 respectively."
+echo "Camel and ActiveMQ are being served in the background on port 8085 and 8161 respectively."
 echo "Please wait for few seconds before the service is available on the browser."
 
 while true; do
