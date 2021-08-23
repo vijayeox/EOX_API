@@ -11,4 +11,4 @@ RUN apk add --no-cache \
 
 WORKDIR /camunda
 
-ENTRYPOINT ["../dockerbuild.sh"]
+ENTRYPOINT ["./docker/entrypoint.sh"]
