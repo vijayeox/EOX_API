@@ -1,1 +1,7 @@
 /.env
+IdentityService/.gradle/
+IdentityService/build/
+IdentityService/dist/
+ProcessEngine/.gradle/
+ProcessEngine/build/
+ProcessEngine/dist/
