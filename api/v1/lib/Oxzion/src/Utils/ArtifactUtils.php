@@ -51,7 +51,7 @@ class ArtifactUtils
     public static function getDocumentFilePath($templateDir, $fileUuid, $params = array())
     {
         $accountId = isset($params['accountId']) ? $params['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
-        if (isset($accountId)) {
+        if (!empty($accountId)) {
             $path = $accountId."/".$fileUuid."/";
         } else {
             $path = $fileUuid."/";

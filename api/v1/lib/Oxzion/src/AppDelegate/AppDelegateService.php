@@ -182,7 +182,7 @@ class AppDelegateService extends AbstractService
                     $obj->setInsuranceService($this->insuranceService);
                 }
                 if (method_exists($obj, "setAppDelegateService")) {
-                    $obj->setAppDelegateService($this->setAppDelegateService());
+                    $obj->setAppDelegateService($this->setAppDelegateService(), $appId);
                 }
                 $persistenceService = $this->getPersistence($appId);
 

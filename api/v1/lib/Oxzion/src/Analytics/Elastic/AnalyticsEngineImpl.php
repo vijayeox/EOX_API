@@ -35,11 +35,11 @@ class AnalyticsEngineImpl extends AnalyticsAbstract
     public function getData($app_name, $entity_name, $parameters)
     {
         $this->logger->debug('Run query parameters:');
-        $this->logger->debug(
-            ['app_name'=>$app_name,
-            'entity_name'=>$entity_name,
-            'parameters'=>$parameters]
-        );
+        $this->logger->debug([
+            'app_name' => $app_name,
+            'entity_name' => $entity_name,
+            'parameters' => $parameters
+        ]);
         try {
             $accountId = AuthContext::get(AuthConstants::ACCOUNT_ID);
             $query = $this->formatQuery($parameters);
