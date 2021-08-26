@@ -112,10 +112,10 @@ class DashboardService extends AbstractService
 
     public function getDashboard($uuid)
     {
-        $query = 'select uuid, name, ispublic, description, dashboard_type, date_created, content, version, if(created_by=:created_by, true, false) as is_owner, isdeleted, filter_configuration, export_configuration from ox_dashboard where account_id=:account_id and uuid=:uuid and (ispublic=true or created_by=:created_by) and isdeleted=false';
+        $query = 'select uuid, name, ispublic, description, dashboard_type, date_created, content, version, if(created_by=:created_by, true, false) as is_owner, isdeleted, filter_configuration, export_configuration from ox_dashboard where uuid=:uuid and (ispublic=true or created_by=:created_by) and isdeleted=false';
         $queryParams = [
             'created_by' => AuthContext::get(AuthConstants::USER_ID),
-            'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),
+        //    'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),  // Removing the dashboard filtering to allow different accounts
             'uuid' => $uuid,
         ];
         try {

@@ -244,7 +244,15 @@ class WidgetService extends AbstractService
     public function getWidget($uuid, $params)
     {
         $overRides = [];
-        $query = 'SELECT w.uuid, w.ispublic, w.date_created, w.name, w.configuration, w.expression, w.exclude_overrides, IF(w.created_by=:created_by, true, false) AS is_owner, w.version,v.renderer, v.type, q.uuid AS query_uuid, wq.sequence AS query_sequence, wq.configuration AS query_configuration FROM ox_widget w JOIN ox_visualization v on w.visualization_id=v.id JOIN ox_widget_query wq ON w.id=wq.ox_widget_id JOIN ox_query q ON wq.ox_query_id=q.id WHERE w.isdeleted=false and w.account_id=:account_id and w.uuid=:uuid AND (w.ispublic=true OR w.created_by=:created_by) ORDER BY wq.sequence ASC';
+        if (!isset($params['data'])) {
+            $query = 'SELECT w.uuid, w.ispublic, w.date_created, w.name, w.configuration, w.expression, w.exclude_overrides, IF(w.created_by=:created_by, true, false) AS is_owner, w.version,v.renderer, v.type, q.uuid AS query_uuid, wq.sequence AS query_sequence, wq.configuration AS query_configuration FROM ox_widget w JOIN ox_visualization v on w.visualization_id=v.id JOIN ox_widget_query wq ON w.id=wq.ox_widget_id JOIN ox_query q ON wq.ox_query_id=q.id WHERE w.isdeleted=false and w.uuid=:uuid AND (w.ispublic=true OR w.created_by=:created_by) ORDER BY wq.sequence ASC';
+            $queryParams['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
+        } else {
+            $query = 'SELECT w.uuid, w.ispublic, w.date_created, w.name, w.configuration, w.expression, w.exclude_overrides, IF(w.created_by=:created_by, true, false) AS is_owner, w.version,v.renderer, v.type, q.uuid AS query_uuid, wq.sequence AS query_sequence, wq.configuration AS query_configuration FROM ox_widget w JOIN ox_visualization v on w.visualization_id=v.id JOIN ox_widget_query wq ON w.id=wq.ox_widget_id JOIN ox_query q ON wq.ox_query_id=q.id WHERE w.isdeleted=false and w.account_id=:account_id and w.uuid=:uuid AND (w.ispublic=true OR w.created_by=:created_by) ORDER BY wq.sequence ASC';    
+            $queryParams['created_by'] = AuthContext::get(AuthConstants::USER_ID);
+            $queryParams['uuid'] = $uuid;
+
+        }
         $queryParams = [
             'created_by' => AuthContext::get(AuthConstants::USER_ID),
             'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),
@@ -303,7 +311,7 @@ class WidgetService extends AbstractService
         $data = array();
         $uuidList = array_column($resultSet, 'query_uuid');
         $filter = null;
-        $overRidesAllowed = ['group', 'sort', 'field', 'date-period', 'date-range', 'filter', 'expression', 'round', 'pivot', 'skip', 'top', 'filter_grid', 'orderby'];
+        $overRidesAllowed = ['group', 'sort', 'field', 'date-period', 'date-range', 'filter', 'expression', 'round', 'pivot', 'skip', 'top', 'filter_grid', 'orderby','use_participants'];
         if (!empty($firstRow['exclude_overrides'])) {
             if (strtolower($firstRow['exclude_overrides'] == 'all')) {
                 unset($overRidesAllowed[array_search('filter', $overRidesAllowed)]);
