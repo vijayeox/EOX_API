@@ -20,9 +20,7 @@ do
 	esac
 done
 
-sed -ri -e "s/^HOST=.*/HOST=$IP/" \
-	-ri -e "s/^DB_HOST=.*/DB_HOST=$IP/" \
-	.env
+sed -ri -e "s/([0-9]{1,3}\.){3}[0-9]{1,3}/${IP}/" .env
 
 docker-compose up -d --build
 echo "API is being served in the background on port 8080."

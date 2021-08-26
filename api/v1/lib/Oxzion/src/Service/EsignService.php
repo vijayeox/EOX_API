@@ -147,10 +147,12 @@ class EsignService extends AbstractService
      */
     private function uploadDocument($docUrl, array $signers)
     {
-        $data = $this->assignData($docUrl, $signers);
-        $fileData = array(FileUtils::getFileName($docUrl) => $docUrl );
-        $headers = array( 'Authorization'=> 'Bearer '. $this->getAuthToken() );
-        $response = $this->restClient->postMultiPart($this->config['esign']['docurl'].'documents', $data, $fileData, $headers);
+        $response = $this->restClient->postMultiPart(
+            $this->config['esign']['docurl'].'documents',
+            $this->assignData($signers),
+            [$docUrl],
+            array( 'Authorization' => 'Bearer '. $this->getAuthToken())
+        );
         $returnDocId = json_decode($response, true);
         return $returnDocId['data']['id'];
     }
@@ -196,46 +198,50 @@ class EsignService extends AbstractService
         return $data['data']['status'];
     }
 
-    private function assignData($docUrl, $data)
+    private function assignData($data)
     {
-        $fileName = FileUtils::getFileName($docUrl);
         $callbackUrl = $this->config['esign']['callbackUrl'];
         $returnArray = array(
             'name' => $data['name'],
-            'message' => isset($data['message']) ? ($data['message']) : 'Please sign here',
+            'message' => !empty($data['message']) ? $data['message'] : 'Please review and sign the document.',
+            'participants' => array(),
+            'fields' => array(),
             'action' => 'send',
-            'callback[url]' => $callbackUrl,
-            'callback.url' => $callbackUrl
+            'callback[url]' => $callbackUrl
         );
 
-        if (isset($data['cc']) && is_array($data['cc'])) {
+        foreach ($data['signers'] as $signer) {
+            $returnArray['participants'][$signer['participant']['email']] = [
+                'name' => $signer['participant']['name'],
+                'email' => $signer['participant']['email']
+            ];
+            foreach ($signer['fields'] as $key => $field) {
+                $returnArray['fields'][$signer['participant']['email'].$key] = [
+                    'name' => $field['name'],
+                    'required' => true,
+                    'pageNumber' => (int) $field['pageNumber'],
+                    'x' => (int) $field['x'],
+                    'y' => (int) $field['y'],
+                    'height' => 2,
+                    'width' => (int) $field['width'],
+                    'type' => !empty($field['type']) ? strtoupper($field['type']) : 'SIGNATURE',
+                    'assignedTo' => json_encode($returnArray['participants'][$signer['participant']['email']]),
+                ];
+            }
+        }
+        if (!empty($data['cc']) && is_array($data['cc'])) {
             $ccList = array();
             foreach ($data['cc'] as $cc) {
-                $ccList[] = ['name' => $cc['name'],
-                'email' => $cc['email']];
+                $ccList[$cc['email']] = [
+                    'name' => $cc['name'],
+                    'email' => $cc['email']
+                ];
             }
-            $data['cc'] = json_encode($ccList);
-        }
-        
-        foreach ($data['signers'] as $signer) {
-            foreach ($signer['fields'] as $key => $field) {
-                $fields = array(
-                    "fields[$key][name]" => $field['name'],
-                    "fields[$key][height]" => $field['height'],
-                    "fields[$key][width]" => $field['width'],
-                    "fields[$key][pageNumber]" => $field['pageNumber'],
-                    "fields[$key][x]" => $field['x'],
-                    "fields[$key][y]" => $field['y'],
-                    "fields[$key][type]" => 'SIGNATURE',
-                    "fields[$key][required]" => true,
-                    "fields[$key][assignedTo]" =>json_encode(array("name" => $signer['participant']['name'],"email" => $signer['participant']['email'])),
-                    "participants[$key][name]" => $signer['participant']['name'],
-                    "participants[$key][email]" => $signer['participant']['email']
-                );
-                $returnArray = array_merge($returnArray, $fields);
-            }
+            $returnArray['cc'] = json_encode(array_values($ccList));
         }
 
+        $returnArray['fields'] = json_encode(array_values($returnArray['fields']));
+        $returnArray['participants'] = json_encode(array_values($returnArray['participants']));
         $this->logger->info("Data of Doc -".json_encode($returnArray));
         return $returnArray;
     }
