@@ -1,15 +1,16 @@
 version: '3.5'
 services:
-    zf:
+    wf:
         build:
             context: .
             args:
-                DB_USERNAME: ${DB_USERNAME}
-                DB_PASSWORD: ${DB_PASSWORD}
                 DB_HOST: ${DB_HOST}
+                API_DB: ${API_DB}
                 CAMUNDA_DB: ${CAMUNDA_DB}
-                API_DB : ${API_DB}
-        network_mode: "host"    
+        environment:
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            API_DB_USERNAME: ${DB_USERNAME}
+            API_DB_PASSWORD: ${DB_PASSWORD}
         ports:
             - "8090:8090"
-        

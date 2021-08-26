@@ -3,15 +3,14 @@ services:
     camel:
         build:
             context: ./docker
-            args:
-                HOST: ${HOST}
-                DB_USERNAME: ${DB_USERNAME}
-                DB_PASSWORD: ${DB_PASSWORD}
-                DB_HOST: ${DB_HOST}
-                QUARTZ_DB: ${QUARTZ_DB}
-                API_DB : ${API_DB}
-                ELASTIC_CLUSTER : ${ELASTIC_CLUSTER}
-        network_mode: "host"    
+        environment:
+            HOST: ${HOST}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_HOST: ${DB_HOST}
+            QUARTZ_DB: ${QUARTZ_DB}
+            API_DB : ${API_DB}
+            ELASTIC_CLUSTER : ${ELASTIC_CLUSTER}
         ports:
             - "8161:8161"
             - "8085:8085"
@@ -22,4 +21,4 @@ services:
             - "61614:61614"
         volumes:
             - ./:/workspace/app
-            - ../../:/app      
+            - ../../:/app

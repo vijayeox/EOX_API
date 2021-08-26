@@ -17,20 +17,20 @@
 
 
 ## API Properties
-oxzion.host=localhost
+oxzion.host=127.0.0.1
 oxzion.port=8080
 
 ## DB Properties
 db.user=root
-db.password=root
-db.host=jdbc:mysql://localhost:3306/oxzionapi
+db.password=password
+db.host=jdbc:mysql://127.0.0.1:3306/{{API_DB}}
 
 ## Web Socket Properties
 websocket.port=8081
-websocket.host=localhost
+websocket.host=127.0.0.1
 websocket.channel=notification
 
 # Elastic Search Properties
-elasticsearch.clusterName=oxzion
+elasticsearch.clusterName={{ELASTIC_CLUSTER}}
 elasticsearch.port=9200
 elasticsearch.host=localhost
