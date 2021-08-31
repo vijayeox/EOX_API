@@ -213,7 +213,10 @@ class EsignService extends AbstractService
         foreach ($data['signers'] as $signer) {
             $returnArray['participants'][$signer['participant']['email']] = [
                 'name' => $signer['participant']['name'],
-                'email' => $signer['participant']['email']
+                'email' => $signer['participant']['email'],
+                'phone' => empty($signer['participant']['phone']) ? '' : $signer['participant']['phone'],
+                'sms' => empty($signer['participant']['phone']) ? false : (isset($signer['participant']['sms']) ? $signer['participant']['sms'] : true)
+
             ];
             foreach ($signer['fields'] as $key => $field) {
                 $returnArray['fields'][$signer['participant']['email'].$key] = [
