@@ -431,6 +431,7 @@ class FileService extends AbstractService
     public function updateFileAttributes($fileId)
     {
         $this->logger->info("FILEID xx---".$fileId);
+        $fileId = (!empty($fileId) && !is_numeric($fileId)) ? $this->getIdFromUuid('ox_file', $fileId) : $fileId;
         $obj = $this->table->get($fileId);
         if (is_null($obj)) {
             throw new EntityNotFoundException("Invalid File Id");
@@ -440,7 +441,7 @@ class FileService extends AbstractService
         $fields = json_decode($obj['data'], true);
         $this->updateFileAttributesInternal($obj['entity_id'], $fields, $fileId);
     }
-    
+
     private function updateFileUserContext($obj)
     {
         $accountId = $obj['account_id'];

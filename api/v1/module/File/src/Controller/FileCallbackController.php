@@ -37,7 +37,7 @@ class FileCallbackController extends AbstractApiControllerHelper
     {
         $data = $this->extractPostData();
         try {
-            $fileId = isset($data['id']) ? $data['id'] : null;
+            $fileId = !empty($data['id']) ? $data['id'] : (!empty($data['uuid']) ? $data['uuid'] : null);
             if (!$fileId) {
                 throw new EntityNotFoundException("Invalid File Id");
             }
@@ -46,7 +46,7 @@ class FileCallbackController extends AbstractApiControllerHelper
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        
+
         return $this->getSuccessResponseWithData($data, 200);
     }
 

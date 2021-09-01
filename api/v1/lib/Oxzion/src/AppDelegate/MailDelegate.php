@@ -60,14 +60,30 @@ abstract class MailDelegate extends CommunicationDelegate
             $count = $this->imapClient->countMessages($filters['flags']);
             if ($count) {
                 foreach ($this->imapClient as $mail) {
-                    if (!$filters['flags'] || !$mail->getFlags() || array_intersect($mail->getFlags(), $filters['flags'])) {
+                    if (
+                        !$filters['flags'] || !$mail->getFlags() || 
+                        array_intersect($mail->getFlags(), $filters['flags']) || 
+                        (
+                            array_search(Storage::FLAG_UNSEEN, $filters['flags']) !== false && 
+                            array_search(Storage::FLAG_SEEN, $mail->getFlags()) === false
+                        )
+                    ) {
                         if ($filters['limit'] === 0) { break; }
                         elseif ($filters['limit']) { $filters['limit']--; }
 
                         $from = $mail->getHeaders()->get('From')->getAddressList()->current();
+                        try {
+                            while (true) {
+                                $part = $mail->current();
+                                if ($part->isMultipart()) break;
+                                $mail->next();
+                            }
+                        } catch (\Exception $e) {
+                            $part = $mail;
+                        }
                         $mailBody = (new Mime\Message())::createFromMessage(
-                            $mail->getContent(),
-                            $mail->getHeader('Content-Type')->getParameter('boundary')
+                            $part->getContent(),
+                            $part->getHeader('Content-Type')->getParameter('boundary')
                         );
                         foreach ($mailBody->getParts() as $part) {
                             if ($part->getType() == $filters['bodyType']) break;
