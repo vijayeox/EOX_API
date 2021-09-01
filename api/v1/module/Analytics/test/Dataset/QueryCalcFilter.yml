@@ -179,3 +179,15 @@ ox_query:
     account_id: 1
     isdeleted: 0
     version: 1
+  -
+    id: 126
+    uuid: '51977f0a-f6cd-40e2-9154-87de247b9ce1'
+    name: 'queryWithParticipant'
+    datasource_id: 3
+    configuration: '{"app_name":"crmnew","list":"owner_username,industry,budget_amount","use_participants":1}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
