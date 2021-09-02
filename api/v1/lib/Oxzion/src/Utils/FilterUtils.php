@@ -73,6 +73,9 @@ class FilterUtils
             }
             $operator = $filterList[$x]['operator'];
             $field = $filterList[$x]['field'];
+            if(empty($field)){
+                continue;
+            }
             $field = isset($fieldMap[$field]) ? $fieldMap[$field] : $field;
             $value = $filterList[$x]['value'];
             $operatorp1 = '';
@@ -114,6 +117,7 @@ class FilterUtils
                 $operatorp2 = '%';
                 $operation = ' like ';
             }
+            print_r($value);
             if ($value == 'null' || $value == null || $value == '' && $operator) {
                 if ($operator == 'isnotnull' || $operator == 'isnotempty') {
                     $where .= strlen($where) == 0 ? $field . " is NOT NULL" : " " . $filterlogic . " " . $field . " is NOT NULL";
@@ -202,6 +206,9 @@ class FilterUtils
         foreach ($sort as $key => $value) {
             if ($value['dir'] == 'dsc') {
                 $value['dir'] = 'desc';
+            }
+            if(empty($value['field'])){
+                continue;
             }
             $value['field'] = isset($fieldMap[$value['field']]) ? $fieldMap[$value['field']] : $value['field'];
             $sSort .= strlen($sSort) == 0 ? $value['field'] . " " . $value['dir'] : " ," . $value['field'] . " " . $value['dir'];
