@@ -92,15 +92,21 @@ class EsignServiceTest extends AbstractServiceTest
 
     private function mockAuthToken($mockRestClient)
     {
-        $clientid = $this->config['esign']['clientid'];
-        $clientsecret = $this->config['esign']['clientsecret'];
-        $senderemail = $this->config['esign']['email'];
-        $username = $this->config['esign']['username'];
-        $password = $this->config['esign']['password'];
-        $post  = "grant_type=client_credentials&client_id=$clientid&client_secret=$clientsecret&username=$username&password=$password";
-        $headers = array('Content-Type' => 'application/x-www-form-urlencoded',
-        'Content-Length' => strlen($post));
-        $mockRestClient->expects('postWithHeaderAsBody')->with($this->config['esign']['url'], $post, $headers)->once()->andReturn(array("body" => '{"access_token": "'.$this->authToken.'","expires_in":3600,"token_type":"Bearer"}'));
+        $postData = array(
+            'grant_type' => 'client_credentials',
+            'username' => $this->config['esign']['username'],
+            'password' => $this->config['esign']['password'],
+            'client_id' => $this->config['esign']['clientid'],
+            'client_secret' => $this->config['esign']['clientsecret'],
+            'redirect_uri' => $this->config['esign']['callbackUrl']
+        );
+        $postData = http_build_query($postData);
+        $headers = array(
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Content-Length' => strlen($postData)
+        );
+        $mockRestClient->expects('postWithHeaderAsBody')->with($this->config['esign']['url'], $postData, $headers)
+        ->once()->andReturn(array("body" => '{"access_token": "'.$this->authToken.'","expires_in":3600,"token_type":"Bearer"}'));
     }
 
     public function testgetAuthToken()
@@ -125,7 +131,7 @@ class EsignServiceTest extends AbstractServiceTest
                             "fields"=> array(
                                 array(
                                 "name"=>"signature_field",
-                                "height"=>50,
+                                "height"=>2,
                                 "width"=>50,
                                 "x"=>10,
                                 "y"=>84,
@@ -141,45 +147,58 @@ class EsignServiceTest extends AbstractServiceTest
             $putData = array(
                     "callbackUrl" => $this->config['esign']['callbackUrl']
                     );
-            $mockRestClient->expects('put')->with($this->config['esign']['docurl']."integrations/VANTAGE", $putData, $putheader)->once()->andReturn();
+            $mockRestClient->expects('put')->with($this->config['esign']['docurl']."integrations/".$this->config['esign']['integrator'], $putData, $putheader)->once()->andReturn();
             $returnSub = array('lastEvaluatedKey' => '',
                                 'data' => array(
                                     array(
                                         'id'            => '940720aa-a691-4809-b9d3-0121b2f2b502',
                                         'eventType'     => 'SIGNED',
-                                        'integrationId' => 'VANTAGE'
+                                        'integrationId' => $this->config['esign']['integrator']
                                     )
 
                                 )
                             );
             $this->mockAuthToken($mockRestClient);
-            $mockRestClient->expects('get')->with($this->config['esign']['docurl']."integrations/VANTAGE/subscriptions", array(), $headers)->once()->andReturn(json_encode($returnSub));
+            $mockRestClient->expects('get')->with($this->config['esign']['docurl']."integrations/".$this->config['esign']['integrator']."/subscriptions", array(), $headers)->once()->andReturn(json_encode($returnSub));
             $this->mockAuthToken($mockRestClient);
-            $url = $this->config['esign']['docurl']."integrations/VANTAGE/subscriptions/".$returnSub['data'][0]['id'];
+            $url = $this->config['esign']['docurl']."integrations/".$this->config['esign']['integrator']."/subscriptions/".$returnSub['data'][0]['id'];
             $mockRestClient->expects('delete')->with($url, array(), $headers)->once()->andReturn();
             $this->mockAuthToken($mockRestClient);
             $url = $this->config['esign']['docurl']."subscriptions";
             $postData = array( "eventType" => "FINALIZED" );
-            $returnAddSub = array("id"=>"029b93e1-6b04-4a07-ab1f-2486467c2bee","integrationId"=>"VANTAGE","eventType"=>"SIGNED");
+            $returnAddSub = array("id"=>"029b93e1-6b04-4a07-ab1f-2486467c2bee","integrationId"=>$this->config['esign']['integrator'],"eventType"=>"SIGNED");
             $mockRestClient->expects('postWithHeader')->with($url, $postData, $headers)->once()->andReturn(json_encode($returnAddSub));
 
-            $data = ["name" => $signers['name'],
-                     "message" => $signers['message'],
-                     "action" => "send",
-                     'callback[url]' => $this->config['esign']['callbackUrl'],
-                     'callback.url' => $this->config['esign']['callbackUrl'],
-                     "fields[0][name]" => $signers['signers'][0]['fields'][0]['name'],
-                     "fields[0][height]" => $signers['signers'][0]['fields'][0]['height'],
-                     "fields[0][width]" => $signers['signers'][0]['fields'][0]['width'],
-                     "fields[0][pageNumber]" => $signers['signers'][0]['fields'][0]['pageNumber'],
-                     "fields[0][x]" => $signers['signers'][0]['fields'][0]['x'],
-                     "fields[0][y]" => $signers['signers'][0]['fields'][0]['y'],
-                     "fields[0][type]" => 'SIGNATURE',
-                     "fields[0][required]" => true,
-                     "fields[0][assignedTo]" => json_encode(["name" => $signers['signers'][0]['participant']['name'], "email" => $signers['signers'][0]['participant']['email']]),
-                     "participants[0][name]" => $signers['signers'][0]['participant']['name'],
-                     "participants[0][email]" => $signers['signers'][0]['participant']['email']
-                    ];
+            $data = [
+                "name" => $signers['name'],
+                "message" => $signers['message'],
+                "action" => "send",
+                'callback[url]' => $this->config['esign']['callbackUrl'],
+                "participants" => [[
+                    "name" => $signers['signers'][0]['participant']['name'],
+                    "email" => $signers['signers'][0]['participant']['email'],
+                    "phone" => '',
+                    "sms" => false
+                ]],
+                "fields" => [[
+                    "name" => $signers['signers'][0]['fields'][0]['name'],
+                    "required" => true,
+                    "pageNumber" => $signers['signers'][0]['fields'][0]['pageNumber'],
+                    "x" => $signers['signers'][0]['fields'][0]['x'],
+                    "y" => $signers['signers'][0]['fields'][0]['y'],
+                    "height" => $signers['signers'][0]['fields'][0]['height'],
+                    "width" => $signers['signers'][0]['fields'][0]['width'],
+                    "type" => 'SIGNATURE',
+                    "assignedTo" => json_encode([
+                        "name" => $signers['signers'][0]['participant']['name'],
+                        "email" => $signers['signers'][0]['participant']['email'],
+                        "phone" => '',
+                        "sms" => false
+                        ])
+                ]]
+            ];
+            $data['fields'] = json_encode(array_values($data['fields']));
+            $data['participants'] = json_encode(array_values($data['participants']));
             $fields = $signers['signers'][0]['fields'];
             $fields['type'] = 'SIGNATURE';
             $fields['required'] = true;
@@ -237,7 +256,7 @@ class EsignServiceTest extends AbstractServiceTest
                             "fields"=> array(
                                 array(
                                 "name"=>"signature_field",
-                                "height"=>50,
+                                "height"=>2,
                                 "width"=>50,
                                 "x"=>10,
                                 "y"=>84,

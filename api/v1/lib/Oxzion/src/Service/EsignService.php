@@ -151,7 +151,7 @@ class EsignService extends AbstractService
         $response = $this->restClient->postMultiPart(
             $this->config['esign']['docurl'].'documents',
             $this->assignData($signers),
-            [$docUrl],
+            [FileUtils::getFileName($docUrl) => $docUrl],
             array( 'Authorization' => 'Bearer '. $this->getAuthToken())
         );
         $returnDocId = json_decode($response, true);
@@ -213,10 +213,10 @@ class EsignService extends AbstractService
         $returnArray = array(
             'name' => $data['name'],
             'message' => !empty($data['message']) ? $data['message'] : 'Please review and sign the document.',
-            'participants' => array(),
-            'fields' => array(),
             'action' => 'send',
-            'callback[url]' => $callbackUrl
+            'callback[url]' => $callbackUrl,
+            'participants' => array(),
+            'fields' => array()
         );
 
         foreach ($data['signers'] as $signer) {
