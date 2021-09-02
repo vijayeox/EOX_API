@@ -1,4 +1,5 @@
 #!/bin/bash
+
 cd /workspace/app
 
 echo "${HOST}"
