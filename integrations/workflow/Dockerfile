@@ -3,6 +3,7 @@ FROM openjdk:8u181-jre-alpine3.8
 ARG DISTRO=tomcat
 ARG VERSION=7.9.0
 ARG TOMCAT_PORT=8090
+ARG CAMUNDA_REPO="https://camunda.org/release/camunda-bpm/tomcat/7.9/"
 
 RUN apk add --no-cache \
         bash \
@@ -20,8 +21,6 @@ COPY ./camunda-tomcat.sh /tmp/
 COPY ./IdentityService/dist/identity_plugin.jar /camunda/lib/
 
 COPY ./ProcessEngine/dist/processengine_plugin.jar /camunda/lib/
-
-ARG CAMUNDA_REPO="https://camunda.org/release/camunda-bpm/tomcat/7.9/"
 
 RUN wget --progress=bar:force:noscroll -O /tmp/camunda.tar.gz "${CAMUNDA_REPO}camunda-bpm-${DISTRO}-${VERSION}.tar.gz"
 

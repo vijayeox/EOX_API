@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ ! -e ./IdentityService/build ]; then
+if [ ! -d ./IdentityService/build ]; then
 
     echo "Building IdentityService..."
     cd ./IdentityService

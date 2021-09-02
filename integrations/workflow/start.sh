@@ -1,29 +1,34 @@
 #!/bin/bash
 
-if [ ! -e ./.env ]; then
+if [ ! -f ./.env ]; then
 	echo "Please set .env file up"
 	exit
 fi
 
 dirName="$(tr [A-Z] [a-z] <<< "${PWD##*/}")"
-echo "Stopping container if already running..."
-docker stop "${dirName//_}_wf_1"
+containerName=$dirName'_wf_1'
+containerStatus="$(docker container inspect --format="{{.State.Status}}" $containerName)"
+
+if [ $containerStatus != "exited" ]; then
+	echo "Stopping container if already running..."
+	docker stop $containerName
+fi
 
 IP=`hostname -I | awk '{ print $1 }'`
 
-while getopts "h:YyNn" options
+startOptions=""
+while getopts "h:YyNnIi" options
 do
 	case $options in
 			h ) IP=$OPTARG;;
-		[Yy]* ) startBash=y;;
-		[Nn]* ) startBash=n;;
+		[Yy]* ) startOptions="y";;
+		[Nn]* ) startOptions="n";;
+		[Ii]* ) startOptions="i";;
 	esac
 done
 
 sed -ri -e "s/([0-9]{1,3}\.){3}[0-9]{1,3}/$IP/" .env
-if [ -f .env ]; then
-  export $(cat .env | sed 's/#.*//g' | xargs)
-fi
+export $(cat .env | sed 's/#.*//g' | xargs)
 export $(cat ./ProcessEngine/src/main/resources/application.properties | sed 's/#.*//g' | xargs)
 
 if [ "http://$IP:8080" != "$applicationurl" ]; then
@@ -43,15 +48,17 @@ if [ "http://$IP:8080" != "$applicationurl" ]; then
 
 fi
 
-IP="$IP" docker-compose up --build
-# IP="$IP" docker-compose up -d --build
+if [ $startOptions == "i" ]; then
+	IP="$IP" docker-compose up --build
+else
+	IP="$IP" docker-compose up -d --build
+	echo "Camunda is being served in the background on port 8090/camunda";
+	while true; do
+		case $startOptions in
+			[Yy]* ) docker exec -it "${dirName//_}_wf_1" bash; break;;
+			[Nn]* ) break;;
+				* ) read -p "Do you wish to enter the container?(y/n)" startOptions;;
+		esac
+	done
 
-# echo "Camunda is being served in the background on port 8090/camunda"
-
-# while true; do
-# 	case $startBash in
-# 		[Yy]* ) docker exec -it "${dirName//_}_wf_1" bash; break;;
-# 		[Nn]* ) break;;
-# 			* ) read -p "Do you wish to enter the container?(y/n)" startBash;;
-# 	esac
-# done
+fi
