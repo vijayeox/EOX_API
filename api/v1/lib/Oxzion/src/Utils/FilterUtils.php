@@ -117,7 +117,6 @@ class FilterUtils
                 $operatorp2 = '%';
                 $operation = ' like ';
             }
-            print_r($value);
             if ($value == 'null' || $value == null || $value == '' && $operator) {
                 if ($operator == 'isnotnull' || $operator == 'isnotempty') {
                     $where .= strlen($where) == 0 ? $field . " is NOT NULL" : " " . $filterlogic . " " . $field . " is NOT NULL";
