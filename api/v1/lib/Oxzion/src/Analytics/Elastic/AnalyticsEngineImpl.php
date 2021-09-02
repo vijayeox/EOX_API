@@ -189,6 +189,9 @@ class AnalyticsEngineImpl extends AnalyticsAbstract
         if (isset($parameters['append_account_id'])) {
             $returnarray['append_account_id'] = $parameters['append_account_id'];
         }
+        if (isset($parameters['use_participants'])) {
+            $returnarray['use_participants'] = $parameters['use_participants'];
+        }
         if (isset($parameters['list'])) {
             if ($parameters['list']=="*") {
                 $returnarray['select'] = ['display_id', 'name', 'status', 'created_by', 'date_created','modified_by','date_modified'];

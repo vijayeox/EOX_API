@@ -77,7 +77,7 @@ class VisualizationService extends AbstractService
         $select = $sql->select();
         $select->from('ox_visualization')
             ->columns(array('uuid','name','is_owner' => (new Expression('IF(created_by = '.AuthContext::get(AuthConstants::USER_ID).', "true", "false")')),'account_id','version','isdeleted','renderer','type'))
-            ->where(array('ox_visualization.uuid' => $uuid,'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),'isdeleted' => 0));
+            ->where(array('ox_visualization.uuid' => $uuid,'isdeleted' => 0));
         $response = $this->executeQuery($select)->toArray();
         if (count($response) == 0) {
             return 0;

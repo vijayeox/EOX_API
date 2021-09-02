@@ -71,6 +71,7 @@ return [
         'authToken' => ''
     ],
     'esign' => [
+        'integrator' => 'VANTAGE',
         'clientid' => '6l3lpgsbrha13u8rdg9t5hq3au',
         'clientsecret' => '3uvdithse6p3qmjvv4s3k1mcjt33p06f9iiein5sbmka9prdcqj',
         'url' => 'https://lab-auth.insuresign.io/oauth2/token',
