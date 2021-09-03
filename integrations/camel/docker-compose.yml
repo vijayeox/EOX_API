@@ -9,8 +9,14 @@ services:
             DB_PASSWORD: ${DB_PASSWORD}
             DB_HOST: ${DB_HOST}
             QUARTZ_DB: ${QUARTZ_DB}
-            API_DB : ${API_DB}
-            ELASTIC_CLUSTER : ${ELASTIC_CLUSTER}
+            API_DB: ${API_DB}
+            ELASTIC_CLUSTER: ${ELASTIC_CLUSTER}
+            SMTP_HOST: ${SMTP_HOST}
+            SMTP_PORT: ${SMTP_PORT}
+            SMTP_USERNAME: ${SMTP_USERNAME}
+            SMTP_PASSWORD: ${SMTP_PASSWORD}
+            SMTP_EMAIL_FROM: ${SMTP_EMAIL_FROM}
+            SMTP_EMAIL_TO: ${SMTP_EMAIL_TO}
         ports:
             - "8161:8161"
             - "8085:8085"

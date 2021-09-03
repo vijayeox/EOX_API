@@ -4,7 +4,7 @@ flyway:
   baseline-on-migrate: true
 spring:
   activemq:
-    broker-url: tcp://127.0.0.1:61616
+    broker-url: tcp://localhost:61616
     user: root
     password: root
   quartz:
@@ -42,12 +42,10 @@ spring:
     open-in-view: false
     show-sql: true
 smtp:
-  host: localhost
-  port: 25
-  username: bharat
-  password: password
-  from:
-    email: support@eoxvantage.com
+  host: {{SMTP_HOST}}
+  port: {{SMTP_PORT}}
+  username: {{SMTP_USERNAME}}
+  password: {{SMTP_PASSWORD}}
 db:
   host: jdbc:mysql://127.0.0.1:3306/{{API_DB}}
   user: {{DB_USERNAME}}
