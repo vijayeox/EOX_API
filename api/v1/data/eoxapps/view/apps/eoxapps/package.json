@@ -22,18 +22,17 @@
     "@babel/register": "^7.9.0",
     "@babel/runtime": "^7.8.7",
     "babel-loader": "^8.1.0",
-    "css-loader": "^2.1.0",
-    "eslint": "^5.12.1",
-    "mini-css-extract-plugin": "^0.6.0",
-    "node-sass": "^4.13.1",
-    "optimize-css-assets-webpack-plugin": "^5.0.1",
-    "sass-loader": "^7.1.0",
-    "stylelint": "^10.0.1",
-    "stylelint-config-standard": "^18.2.0",
+    "css-loader": "^3.6.0",
+    "eslint": "^7.7.0",
+    "mini-css-extract-plugin": "^2.1.0",
+    "node-sass": "^6.0.1",
+    "sass-loader": "^12.1.0",
+    "stylelint": "^13.13.1",
+    "stylelint-config-standard": "^22.0.0",
     "stylelint-scss": "^3.14.2",
-    "webpack": "^4.42.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-node-externals": "^1.7.2"
+    "webpack": "^5.44.0",
+    "webpack-cli": "^4.8.0",
+    "webpack-node-externals": "^3.0.0"
   },
   "osjs": {
     "type": "package"
