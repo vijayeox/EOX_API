@@ -13,6 +13,23 @@ app:
     start_options: null
     title: AppBuilder
     app_properties: '{"chat_notification":"","appIdentifiers":""}'
+checkOrg: true 
+org:
+    name: 'EOX Vantage1'
+    uuid: b0923de7-0387-48ea-8f29-5d3704d96a46
+    email: helpdesk@vantageagora.com
+    address1: '23611 Chagrin Blvd, Ste 320'
+    address2: 'Beachwood, Ohio 44122'
+    city: Beachwood
+    state: Ohio
+    zip: 44122
+    contact:
+        username: supportadmin
+        firstname: Support
+        lastname: Admin
+        email: helpdesk@vantageagora.com
+    preferences: '{}'
+    country: 'United States of America'
 privilege:
     -
         name: MANAGE_APPLICATION

@@ -38,6 +38,7 @@ RUN pecl install -f xdebug \
 RUN rm -rf /var/lib/apt/lists/* && curl -sL https://deb.nodesource.com/setup_14.x | bash - \
  && apt-get update \
  && apt-get install -y nodejs
+RUN npm i -g npm
 RUN apt-get clean
 ADD https://www.phpdoc.org/phpDocumentor.phar /usr/local/bin/phpdoc
 RUN chmod 755 /usr/local/bin/phpdoc

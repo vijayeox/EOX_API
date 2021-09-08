@@ -1,5 +1,5 @@
 import osjs from "osjs";
-import { name as applicationName, icon_white, appId } from "./metadata.json";
+import { name, icon_white, appId } from "./metadata.json";
 import { React, ReactDOM, EOXApplication } from "oxziongui";
 
 // Our launcher
@@ -46,4 +46,4 @@ const register = (core, args, options, metadata) => {
 };
 
 // Creates the internal callback function when OS.js launches an application
-osjs.register(applicationName, register);
+osjs.register(name, register);

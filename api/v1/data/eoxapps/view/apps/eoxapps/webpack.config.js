@@ -1,19 +1,19 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+// const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const mode = process.env.NODE_ENV || "development";
 const minimize = mode === "production";
 const plugins = [];
 
 if (mode === "production") {
-  plugins.push(
-    new OptimizeCSSAssetsPlugin({
-      cssProcessorOptions: {
-        discardComments: true
-      }
-    })
-  );
+  // plugins.push(
+  //   new OptimizeCSSAssetsPlugin({
+  //     cssProcessorOptions: {
+  //       discardComments: true
+  //     }
+  //   })
+  // );
 }
 
 module.exports = {
@@ -32,9 +32,9 @@ module.exports = {
   },
   plugins: [
     new CopyWebpackPlugin([
-       {from:'public/img',to:'img'},
-       "icon.png",
-       "icon_white.png"
+      { from: 'public/img', to: 'img' },
+      "icon.svg",
+      "icon_white.svg"
     ]),
     new MiniCssExtractPlugin({
       filename: "[name].css",
@@ -45,10 +45,14 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(svg|png|jpe?g|gif|webp)$/,
+        test: /\.(svg|png|jpe?g|gif|webp|)$/,
         use: [
           {
-            loader: "file-loader"
+            loader: "file-loader",
+            options: {
+              name: "[name].[hash].[ext]",
+              outputPath: "images"
+            }
           }
         ]
       },
@@ -62,31 +66,21 @@ module.exports = {
         }
       },
       {
-        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: "url-loader?limit=10000&mimetype=application/font-woff"
-      },
-      {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: "file-loader"
+        test: /\.(woff(2)?|ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        loader: "file-loader",
+        options: {
+          name: "[name].[hash].[ext]",
+          outputPath: "font"
+        }
       },
       {
         test: /\.(sa|sc|c)ss$/,
         use: [
           MiniCssExtractPlugin.loader,
-          {
-            loader: "css-loader",
-            options: {
-              sourceMap: true
-            }
-          },
-          {
-            loader: "sass-loader",
-            options: {
-              minimize,
-              sourceMap: true
-            }
-          }
-        ]
+          'css-loader',
+          'sass-loader',
+        ],
+        sideEffects: true,
       },
       {
         test: /\.js$/,
