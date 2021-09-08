@@ -20,6 +20,7 @@ class MenuItemService extends AbstractService
         $this->table = $table;
         $this->teamService = $teamService;
     }
+
     public function saveMenuItem($appUuid, &$data)
     {
         $this->logger->info("In saveMenuItem params - $appUuid, ".json_encode($data));
@@ -46,13 +47,10 @@ class MenuItemService extends AbstractService
         $data['icon'] = isset($data['icon']) ? $data['icon'] : "fas fa-border-all";
         $data['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
         $data['date_modified'] = date('Y-m-d H:i:s');
-
         $MenuItem->exchangeArray($data);
-
         $MenuItem->validate();
         $this->beginTransaction();
         $count = 0;
-
         try {
             $count = $this->table->save($MenuItem);
             if ($count == 0) {
@@ -71,6 +69,7 @@ class MenuItemService extends AbstractService
         }
         return $count;
     }
+
     public function updateMenuItem($menuUuid, &$data)
     {
         $this->logger->info("In updateMenuItem params - $menuUuid, ".json_encode($data));
@@ -86,6 +85,7 @@ class MenuItemService extends AbstractService
         }
         $data['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
         $data['date_modified'] = date('Y-m-d H:i:s');
+        $data['date_modified'] = (isset($data['date_created'])) ? $data['date_created'] : date('Y-m-d H:i:s');
         $file = $obj->toArray();
         $changedArray = array_merge($obj->toArray(), $data);
         $MenuItem = new MenuItem();
@@ -107,7 +107,6 @@ class MenuItemService extends AbstractService
         }
         return $count;
     }
-
 
     public function deleteMenuItem($appUuid, $menuUuid)
     {
@@ -146,7 +145,6 @@ class MenuItemService extends AbstractService
             $menuList = $resultSet->toArray();
             $menuArray = array();
             $i = 0;
-
             foreach ($menuList as $key => $menuItem) {
                 if (isset($menuItem['privilege_name']) && $menuItem['privilege_name']!="") {
                     $privilegeList = json_decode($menuItem['privilege_name'], true);
@@ -160,7 +158,6 @@ class MenuItemService extends AbstractService
                 } else {
                     array_push($menuArray, $menuItem);
                 }
-
                 if (isset($menuItem['parent_id']) && $menuItem['parent_id'] != '' && $menuItem['parent_id'] != 0) {
                     $menuItem['parent_id'] = $this->getUuidFromId('ox_app_menu', $menuItem['parent_id']);
                     $parentKey = array_search($menuItem['parent_id'], array_column($menuArray, 'uuid'));
@@ -175,6 +172,7 @@ class MenuItemService extends AbstractService
         }
         return array_values($menuArray);
     }
+
     public function getMenuItem($appUuid, $menuUuid)
     {
         try {
