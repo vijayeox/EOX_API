@@ -1488,7 +1488,7 @@ class AppService extends AbstractService
                     $this->processEntity($childEntityData, $entity['id']);
                     $entityData['child'] = $childEntityData['entity'];
                 }
-                if (isset($entity['enable_view']) && $entity['enable_view'] && isset($entity['pageContent']) && !empty($entity['pageContent'])) {
+                if ((isset($entity['enable_view']) && $entity['enable_view'] && isset($entity['pageContent']) && !empty($entity['pageContent'])) || isset($entity['enable_documents']) && $entity['enable_documents']) {
                     $pageId = isset($entity['page_uuid']) ? $entity['page_uuid'] : UuidUtil::uuid();
                     $page = $entity['pageContent']['data'];
                     $page['name'] = $entity['name'];
