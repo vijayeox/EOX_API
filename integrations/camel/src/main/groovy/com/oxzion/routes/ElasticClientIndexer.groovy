@@ -76,7 +76,7 @@ class ElasticClientIndexer extends RouteBuilder {
                         new BasicCredentialsProvider();
                         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
                         def output = JsonOutput.toJson(object.body)
-                        RestClientBuilder builder = RestClient.builder(new HttpHost(HOST, PORT, "http")).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+                        RestClientBuilder builder = RestClient.builder(new HttpHost(HOST, PORT, "https")).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
                             @Override
                             public HttpAsyncClientBuilder customizeHttpClient(
                                 HttpAsyncClientBuilder httpClientBuilder) {
