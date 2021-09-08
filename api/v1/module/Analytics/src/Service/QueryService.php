@@ -95,12 +95,15 @@ class QueryService extends AbstractService
 
     public function getQuery($uuid, $params)
     {
-        $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';
-        $queryParams = [
-            'created_by' => AuthContext::get(AuthConstants::USER_ID),
-            'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'uuid' => $uuid,
-        ];
+        if (!isset($params['data'])) {
+            $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';    
+            $queryParams['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);    
+        } else {
+            $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';
+        }        
+        $queryParams['created_by']=AuthContext::get(AuthConstants::USER_ID);
+        $queryParams['uuid']=$uuid;
+
         try {
             $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
             if (count($resultSet) == 0) {
@@ -174,10 +177,9 @@ class QueryService extends AbstractService
 
     public function executeAnalyticsQuery($uuid, $overRides = null)
     {
-        $query = 'select q.uuid, q.name, q.configuration, q.ispublic, q.isdeleted, d.uuid as datasource_uuid from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid';
+        $query = 'select q.uuid, q.name, q.configuration, q.ispublic, q.isdeleted, d.uuid as datasource_uuid from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.uuid=:uuid';
         $queryParams = [
-            'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'uuid' => $uuid,
+            'uuid' => $uuid
         ];
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (count($resultSet) == 0) {

@@ -373,7 +373,13 @@ class ElasticService
     protected function getFilters($searchconfig, $accountId)
     {
         $mustquery = null;
-        $mustquery['must'][] = ['term' => ['account_id' => $accountId]];
+        if (isset($searchconfig['use_participants'])) {
+            $mustquery['must'][] = ['term' => ['participants' => $accountId]]; 
+        } else {
+            $mustquery['must'][] = ['term' => ['account_id' => $accountId]];
+        }
+        
+       
         if (!empty($searchconfig['aggregates'])) {
             $aggregates = $searchconfig['aggregates'];
             $mustquery['must'][] = array('exists' => array('field' => $aggregates[key($aggregates)]));

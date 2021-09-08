@@ -575,4 +575,18 @@ class WidgetCalcAndFilterTest extends ControllerTest
         $this->setDefaultAsserts();
     }
     
+    public function testParticipants()
+    {
+
+        if (enableElastic == 0) {
+            $this->markTestSkipped('Only Integration Test');
+        }
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/analytics/widget/66e44343-1009-44d8-9295-f2c3130bafbc?data=true', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals(count($content['data']['widget']['data']), 3);
+    }
 }

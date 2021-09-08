@@ -1,41 +1,39 @@
 <?php
 namespace Oxzion\Service;
 
-use Oxzion\Model\App;
-use Oxzion\Model\AppTable;
 use Exception;
 use FileSystemIterator;
+use Oxzion\App\AppArtifactNamingStrategy;
 use Oxzion\Auth\AuthConstants;
 use Oxzion\Auth\AuthContext;
 use Oxzion\Db\Migration\Migration;
+use Oxzion\Document\Parser\Form\FormRowMapper;
+use Oxzion\Document\Parser\Spreadsheet\SpreadsheetFilter;
+use Oxzion\Document\Parser\Spreadsheet\SpreadsheetParserImpl;
+use Oxzion\DuplicateEntityException;
+use Oxzion\EntityNotFoundException;
+use Oxzion\FileContentException;
+use Oxzion\FileNotFoundException;
+use Oxzion\InvalidParameterException;
+use Oxzion\Messaging\MessageProducer;
+use Oxzion\Model\App;
+use Oxzion\Model\AppTable;
 use Oxzion\ServiceException;
 use Oxzion\Service\AbstractService;
-use Oxzion\Service\JobService;
+use Oxzion\Service\AppRegistryService;
+use Oxzion\Service\BusinessRoleService;
 use Oxzion\Service\FieldService;
 use Oxzion\Service\FormService;
-use Oxzion\Service\WorkflowService;
-use Oxzion\Service\BusinessRoleService;
-use Oxzion\Service\AppRegistryService;
+use Oxzion\Service\JobService;
 use Oxzion\Service\UserService;
-use Oxzion\Utils\ExecUtils;
+use Oxzion\Service\WorkflowService;
+use Oxzion\Utils\ArrayUtils;
 use Oxzion\Utils\FileUtils;
 use Oxzion\Utils\FilterUtils;
-use Oxzion\Utils\UuidUtil;
 use Oxzion\Utils\RestClient;
-use Oxzion\EntityNotFoundException;
-use Oxzion\FileNotFoundException;
-use Oxzion\FileContentException;
-use Oxzion\DuplicateEntityException;
-use Symfony\Component\Yaml\Yaml;
-use Oxzion\Document\Parser\Spreadsheet\SpreadsheetParserImpl;
-use Oxzion\Document\Parser\Spreadsheet\SpreadsheetFilter;
-use Oxzion\Document\Parser\Form\FormRowMapper;
-use Oxzion\Utils\ArrayUtils;
-use Oxzion\InvalidParameterException;
-use Oxzion\App\AppArtifactNamingStrategy;
-use Oxzion\Model\Entity;
+use Oxzion\Utils\UuidUtil;
 use Oxzion\ValidationException;
-use Oxzion\Messaging\MessageProducer;
+use Symfony\Component\Yaml\Yaml;
 
 class AppService extends AbstractService
 {
@@ -104,15 +102,15 @@ class AppService extends AbstractService
      */
     public function getApps()
     {
-        $queryString = 'SELECT ap.name, ap.uuid, ap.description, ap.type, ap.logo, ap.category, ap.date_created, 
-        ap.date_modified, ap.created_by, ap.modified_by, ap.status, a.uuid as accountId, ar.start_options 
+        $queryString = 'SELECT ap.name, ap.uuid, ap.description, ap.type, ap.logo, ap.category, ap.date_created,
+        ap.date_modified, ap.created_by, ap.modified_by, ap.status, a.uuid as accountId, ar.start_options
         FROM ox_app AS ap
-        LEFT JOIN ox_app_registry AS ar ON ap.id = ar.app_id 
+        LEFT JOIN ox_app_registry AS ar ON ap.id = ar.app_id
         LEFT JOIN ox_account a on a.id = ar.account_id
         WHERE ar.account_id=:accountId AND ap.status <> :status AND ap.name <> \'' . AppService::EOX_RESERVED_APP_NAME . '\'';
         $queryParams = [
             'accountId' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'status' => App::DELETED
+            'status' => App::DELETED,
         ];
         $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
         if (empty($resultSet)) {
@@ -123,7 +121,7 @@ class AppService extends AbstractService
 
     public function getApp($uuid, $viewPath = null)
     {
-        $queryString = 'SELECT ap.name, ap.uuid 
+        $queryString = 'SELECT ap.name, ap.uuid
         FROM ox_app AS ap
         LEFT JOIN ox_app_registry AS ar ON ap.id = ar.app_id AND ar.account_id=:accountId
         LEFT JOIN ox_account a on a.id = ar.account_id
@@ -131,7 +129,7 @@ class AppService extends AbstractService
         $queryParams = [
             'accountId' => AuthContext::get(AuthConstants::ACCOUNT_ID),
             'statusDeleted' => App::DELETED,
-            'uuid' => $uuid
+            'uuid' => $uuid,
         ];
         $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
         if (is_null($resultSet) || empty($resultSet)) {
@@ -140,10 +138,10 @@ class AppService extends AbstractService
         $appData = $resultSet[0];
         $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $appData);
         if ($viewPath) {
-            if (file_exists($appSourceDir.'/view/apps/'.$appData['name'])) {
-                return $appSourceDir.'/view/apps/'.$appData['name'];
+            if (file_exists($appSourceDir . '/view/apps/' . $appData['name'])) {
+                return $appSourceDir . '/view/apps/' . $appData['name'];
             } else {
-                return $appSourceDir.'/view/apps/eoxapps';
+                return $appSourceDir . '/view/apps/eoxapps';
             }
         }
         return $this->loadAppDescriptor($appSourceDir);
@@ -157,7 +155,7 @@ class AppService extends AbstractService
             'type' => App::MY_APP,
             'isdefault' => false,
             'category' => 'Unassigned',
-            'status' => App::IN_DRAFT
+            'status' => App::IN_DRAFT,
         ]);
         //Assign user input values AFTER assigning default values.
         $appData = $data['app'];
@@ -178,7 +176,7 @@ class AppService extends AbstractService
                 $chatNotification = $appProperties['chat_notification'];
             }
             if ($chatNotification === true) {
-                $this->messageProducer->sendTopic(json_encode(array('appName' => $data['app']['name'],'displayName' => $data['app']['title'])), 'SAVE_CHAT_BOT');
+                $this->messageProducer->sendTopic(json_encode(array('appName' => $data['app']['name'], 'displayName' => $data['app']['title'])), 'SAVE_CHAT_BOT');
             }
             //Commit database transaction only after application setup is successful.
             $this->commit();
@@ -186,7 +184,7 @@ class AppService extends AbstractService
             $this->rollback();
             throw $e;
         }
-        $appData = array('app'=>$data['app']);
+        $appData = array('app' => $data['app']);
         return $appData;
     }
 
@@ -260,7 +258,7 @@ class AppService extends AbstractService
 
     public function deployApp($path, $params = null)
     {
-        $ymlData =  $this->cleanApplicationDescriptorData(self::loadAppDescriptor($path));
+        $ymlData = $this->cleanApplicationDescriptorData(self::loadAppDescriptor($path));
         $this->logger->info("\n Yaml Data " . print_r($ymlData, true));
         if (!isset($params)) {
             $params = $this->appDeployOptions;
@@ -273,48 +271,48 @@ class AppService extends AbstractService
                 $this->logger->info("\n App Data processing - " . print_r($value, true));
                 switch ($value) {
                     case 'initialize':
-                    $temp = $this->createOrUpdateApp($ymlData);
-                    if ($temp) {
-                        FileUtils::copyDir($path, $temp);
-                        $originalPath = $path;
-                        $path = $temp;
-                    }
-                    $this->processBusinessRoles($ymlData);
-                    $this->createAppPrivileges($ymlData);
-                    $this->createRole($ymlData);
-                    $this->performMigration($ymlData, $path);
-                    break;
+                        $temp = $this->createOrUpdateApp($ymlData);
+                        if ($temp) {
+                            FileUtils::copyDir($path, $temp);
+                            $originalPath = $path;
+                            $path = $temp;
+                        }
+                        $this->processBusinessRoles($ymlData);
+                        $this->createAppPrivileges($ymlData);
+                        $this->createRole($ymlData);
+                        $this->performMigration($ymlData, $path);
+                        break;
                     case 'entity':
-                    $this->processEntity($ymlData);
-                    break;
+                        $this->processEntity($ymlData);
+                        break;
                     case 'migration':
-                    $this->performMigration($ymlData, $path);
-                    break;
+                        $this->performMigration($ymlData, $path);
+                        break;
                     case 'workflow':
-                    $this->processWorkflow($ymlData, $path);
-                    break;
+                        $this->processWorkflow($ymlData, $path);
+                        break;
                     case 'form':
-                    $this->processForm($ymlData, $path);
-                    break;
+                        $this->processForm($ymlData, $path);
+                        break;
                     case 'page':
-                    $this->processPage($ymlData, $path);
-                    break;
+                        $this->processPage($ymlData, $path);
+                        break;
                     case 'menu':
-                    $this->processMenu($ymlData, $path);
-                    break;
+                        $this->processMenu($ymlData, $path);
+                        break;
                     case 'job':
-                    $this->processJob($ymlData);
-                    break;
+                        $this->processJob($ymlData);
+                        break;
                     case 'symlink':
-                    $this->processSymlinks($ymlData, $path);
-                    break;
+                        $this->processSymlinks($ymlData, $path);
+                        break;
                     case 'view':
-                    $this->saveAppCss($ymlData);
-                    $this->setupAppView($ymlData, $path);
-                    break;
+                        $this->saveAppCss($ymlData);
+                        $this->setupAppView($ymlData, $path);
+                        break;
                     default:
-                    $this->logger->error("Unhandled deploy option '${value}'");
-                    break;
+                        $this->logger->error("Unhandled deploy option '${value}'");
+                        break;
                 }
             }
 
@@ -340,28 +338,28 @@ class AppService extends AbstractService
     public function saveAppCss($ymlData)
     {
         $data = ['uuid' => $ymlData['app']['uuid'],
-                'name' => $ymlData['app']['name']];
+            'name' => $ymlData['app']['name']];
         $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data);
-        if (file_exists($appSourceDir.'/view/apps/'.$data['name'])) {
-            $res =  $appSourceDir.'/view/apps/'.$data['name'];
+        if (file_exists($appSourceDir . '/view/apps/' . $data['name'])) {
+            $res = $appSourceDir . '/view/apps/' . $data['name'];
         } else {
-            $res = $appSourceDir.'/view/apps/eoxapps';
+            $res = $appSourceDir . '/view/apps/eoxapps';
         }
-        if (file_exists($res.'/index.scss')) {
-            $path = pathinfo($res.'/index.scss');
-            FileUtils::copy($res.'/index.scss', $path['filename'].'_'.date("Y-m-d H:i:s").'.'.$path['extension'], $res);
+        if (file_exists($res . '/index.scss')) {
+            $path = pathinfo($res . '/index.scss');
+            FileUtils::copy($res . '/index.scss', $path['filename'] . '_' . date("Y-m-d H:i:s") . '.' . $path['extension'], $res);
         }
-        $this->logger->info("RED---".print_r($res, true));
+        $this->logger->info("RED---" . print_r($res, true));
         if (isset($ymlData['cssContent']) && !empty($ymlData['cssContent'])) {
             file_put_contents($res . '/index.scss', $ymlData['cssContent']);
             // unset($ymlData['cssContent']);
         }
     }
-    
+
     private function removeViewAppOnError($path)
     {
-        $targetPath = FileUtils::joinPath($path)."view/apps/eoxapps";
-        $this->logger->info("TARGET PATH---".print_r($targetPath, true));
+        $targetPath = FileUtils::joinPath($path) . "view/apps/eoxapps";
+        $this->logger->info("TARGET PATH---" . print_r($targetPath, true));
         if (file_exists($targetPath) && is_dir($targetPath)) {
             if (is_link($targetPath)) {
                 FileUtils::unlink($targetPath);
@@ -387,7 +385,7 @@ class AppService extends AbstractService
         try {
             $result = $this->deployApp($appDeployDir, $params);
         } finally {
-            FileUtils::copy($appDeployDir."application.yml", "application.yml", $appSourceDir);
+            FileUtils::copy($appDeployDir . "application.yml", "application.yml", $appSourceDir);
         }
         return $result;
     }
@@ -416,7 +414,7 @@ class AppService extends AbstractService
                 throw new ServiceException('Failed to create application deployment directory.', 'E_APP_DEPLOY_DIR_CREATE_FAIL', 0);
             }
         }
-        return array('sourceDir' => $appSourceDir,'deployDir' => $appDeployDir);
+        return array('sourceDir' => $appSourceDir, 'deployDir' => $appDeployDir);
     }
 
     public function processSymlinks($yamlData, $path)
@@ -429,11 +427,11 @@ class AppService extends AbstractService
         if (isset($yamlData['org'])) {
             $appId = $yamlData['app']['uuid'];
             $orgType = $this->checkSingleOrMultipleOrg($yamlData['org']);
-            if($orgType === 'Single') {
+            if ($orgType === 'Single') {
                 $data = $this->processOrg($yamlData['org'], $appId);
                 $orgId = $yamlData['org']['uuid'];
                 $this->installApp($orgId, $yamlData, $path);
-            } elseif($orgType === 'Multiple') {
+            } elseif ($orgType === 'Multiple') {
                 $ymlDataCopy = $yamlData;
                 foreach ($yamlData['org'] as $org) {
                     unset($ymlDataCopy['org']);
@@ -443,15 +441,16 @@ class AppService extends AbstractService
                     $this->installApp($orgId, $ymlDataCopy, $path);
                 }
             } else {
-                throw new ServiceException('Failed Installing Organisation','org.install.failed');
+                throw new ServiceException('Failed Installing Organisation', 'org.install.failed');
             }
         } elseif (isset($yamlData['app']['autoinstall']) && $yamlData['app']['autoinstall'] == true && App::PRE_BUILT == $yamlData['app']['type']) {
             $this->installApp(AuthContext::get(AuthConstants::ACCOUNT_UUID), $yamlData, $path);
         }
     }
 
-    private function checkSingleOrMultipleOrg($org) {
-        if(array_key_exists(0,$org)) {
+    private function checkSingleOrMultipleOrg($org)
+    {
+        if (array_key_exists(0, $org)) {
             return 'Multiple';
         } else {
             return 'Single';
@@ -481,7 +480,7 @@ class AppService extends AbstractService
             $this->beginTransaction();
             $appId = $yamlData['app']['uuid'];
             $bRoleResult = ((isset($yamlData['org']))) ? $this->accountService->setupBusinessOfferings($yamlData['org'], $accountId, $appId) : null;
-            $this->createRole($yamlData, false, $accountId, $bRoleResult);         
+            $this->createRole($yamlData, false, $accountId, $bRoleResult);
             $user = $this->accountService->getContactUserForAccount($accountId);
             $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
             $startOptions = $this->getAppStartOptions($appId, $yamlData['org']);
@@ -528,7 +527,7 @@ class AppService extends AbstractService
 
         return array_merge($startOptions, $ymlOrgStartOptions);
     }
-    
+
     public function processJobsForAccount($appId, $accountId)
     {
         $appId = is_numeric($appId) ? $appId : $this->getIdFromUuid('ox_app', $appId);
@@ -538,7 +537,7 @@ class AppService extends AbstractService
         $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
         foreach ($result as $jobData) {
             $config = json_decode($jobData['config'], true);
-            $this->logger->info("OOOO---\n".print_r($config, true));
+            $this->logger->info("OOOO---\n" . print_r($config, true));
             $this->jobService->scheduleNewJob($jobData['name'], $jobData['group_name'], $config, $config['schedule']['cron'], $appId, $accountId);
         }
     }
@@ -611,7 +610,7 @@ class AppService extends AbstractService
             $deleteParams['accountId'] = $accountId;
         }
         $deleteQuery = "DELETE FROM $tableName $where";
-        $this->logger->info("STATEMENT delq $deleteQuery".print_r($deleteParams, true));
+        $this->logger->info("STATEMENT delq $deleteQuery" . print_r($deleteParams, true));
         $this->executeUpdateWithBindParameters($deleteQuery, $deleteParams);
     }
 
@@ -686,12 +685,12 @@ class AppService extends AbstractService
     }
     private function processJobsForInstalledAccount($jobName, $jobTeam, $jobPayload, $cron, $appId)
     {
-        $this->logger->info("CROn---\n".print_r($cron, true));
+        $this->logger->info("CROn---\n" . print_r($cron, true));
         $appId = !is_numeric($appId) ? $this->getIdFromUuid('ox_app', $appId) : $appId;
         $select = "SELECT oxar.account_id from ox_app_registry oxar where oxar.app_id=:appId";
         $params = ['appId' => $appId];
         $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
-        $this->logger->info("DRF---".print_r($result, true));
+        $this->logger->info("DRF---" . print_r($result, true));
         foreach ($result as $account) {
             $this->jobService->scheduleNewJob($jobName, $jobTeam, $jobPayload, $cron, $appId, $account['account_id']);
         }
@@ -749,7 +748,7 @@ class AppService extends AbstractService
                     $page = $pageData;
                 }
                 $pageId = isset($pageData['uuid']) ? $pageData['uuid'] : UuidUtil::uuid();
-                $this->logger->info('the page data is: '.print_r($page, true));
+                $this->logger->info('the page data is: ' . print_r($page, true));
                 $routedata = array("appId" => $appUuid);
                 $result = $this->pageService->savePage($routedata, $page, $pageId);
                 $pageData['uuid'] = $page['uuid'];
@@ -800,7 +799,7 @@ class AppService extends AbstractService
         $filter = new SpreadsheetFilter();
         $filter->setRows(2);
         $fieldReference = $parser->parseDocument(array('rowMapper' => $rowMapper,
-           'filter' => $filter));
+            'filter' => $filter));
 
         $fieldReference = $fieldReference[$sheetNames[0]];
         return $fieldReference;
@@ -812,7 +811,7 @@ class AppService extends AbstractService
         if (isset($yamlData['entity']) && !empty($yamlData['entity'])) {
             foreach ($yamlData['entity'] as $entity) {
                 if (isset($entity['fieldReference'])) {
-                    $fileRefPath = $path . 'content/entity/'.$entity['fieldReference'];
+                    $fileRefPath = $path . 'content/entity/' . $entity['fieldReference'];
                     if (FileUtils::fileExists($fileRefPath)) {
                         $entityReferences[$entity['name']] = $fileRefPath;
                     }
@@ -830,11 +829,11 @@ class AppService extends AbstractService
         if (!is_dir($path . 'view/apps/')) {
             FileUtils::createDirectory($path . 'view/apps/');
         }
-        $this->logger->info("ppp--".print_r($path, true));
-        if (isset($yamlData['app']['oldAppName']) && !empty($yamlData['app']['oldAppName'])&& $yamlData['app']['name'] != $yamlData['app']['oldAppName']) {
-            $this->logger->info("OLDNME---".print_r($path . 'view/apps/'.$yamlData['app']['oldAppName'], true));
-            if (is_dir($path . 'view/apps/'.$yamlData['app']['oldAppName'])) {
-                FileUtils::rmDir($path .'view/apps/'.$yamlData['app']['oldAppName']);
+        $this->logger->info("ppp--" . print_r($path, true));
+        if (isset($yamlData['app']['oldAppName']) && !empty($yamlData['app']['oldAppName']) && $yamlData['app']['name'] != $yamlData['app']['oldAppName']) {
+            $this->logger->info("OLDNME---" . print_r($path . 'view/apps/' . $yamlData['app']['oldAppName'], true));
+            if (is_dir($path . 'view/apps/' . $yamlData['app']['oldAppName'])) {
+                FileUtils::rmDir($path . 'view/apps/' . $yamlData['app']['oldAppName']);
             }
             $this->removeAppAndExecutePackageDiscover($yamlData['app']['oldAppName']);
             if (isset($ymlData['app']['oldAppName'])) {
@@ -850,18 +849,18 @@ class AppService extends AbstractService
             if (is_dir($path . 'view/apps/eoxapps')) {
                 FileUtils::rmDir($path . 'view/apps/eoxapps');
             }
-            $srcIconPath = $path . '../../AppSource/'.$yamlData['app']['uuid'] .'/view/apps/eoxapps/';
+            $srcIconPath = $path . '../../AppSource/' . $yamlData['app']['uuid'] . '/view/apps/eoxapps/';
             if (is_dir($srcIconPath)) {
-                FileUtils::copy($srcIconPath.'icon.png', "icon.png", $appName);
-                FileUtils::copy($srcIconPath.'icon_white.png', "icon_white.png", $appName);
-                FileUtils::copy($srcIconPath.'index.scss', "index.scss", $appName); // Copy css from Source to Deploy directory
+                FileUtils::copy($srcIconPath . 'icon.png', "icon.png", $appName);
+                FileUtils::copy($srcIconPath . 'icon_white.png', "icon_white.png", $appName);
+                FileUtils::copy($srcIconPath . 'index.scss', "index.scss", $appName); // Copy css from Source to Deploy directory
             }
         }
         $jsonData = json_decode(file_get_contents($metadataPath), true);
         $jsonData['name'] = $yamlData['app']['name'];
         $jsonData['appId'] = $yamlData['app']['uuid'];
-        $jsonData['category'] = isset($yamlData['app']['category']) ? $yamlData['app']['category'] : null ;
-        $displayName = $jsonData['title']['en_EN'] = ($yamlData['app']['name'] == 'EOXAppBuilder') ? 'AppBuilder' : (isset($yamlData['app']['title']) ? $yamlData['app']['title']: $yamlData['app']['name']);
+        $jsonData['category'] = isset($yamlData['app']['category']) ? $yamlData['app']['category'] : null;
+        $displayName = $jsonData['title']['en_EN'] = ($yamlData['app']['name'] == 'EOXAppBuilder') ? 'AppBuilder' : (isset($yamlData['app']['title']) ? $yamlData['app']['title'] : $yamlData['app']['name']);
         if (isset($yamlData['app']['description'])) {
             $jsonData['description']['en_EN'] = $yamlData['app']['description'];
         }
@@ -886,14 +885,13 @@ class AppService extends AbstractService
             $chatNotification = $appProperties['chat_notification'];
         }
         if ($chatNotification === true) {
-            $imagePath = $path . '../../AppSource/'.$yamlData['app']['uuid'] .'/view/apps/eoxapps/';
-            $this->messageProducer->sendTopic(json_encode(array('appName' => $jsonData['name'], 'displayName' => $displayName ,"profileImage" => $imagePath.'icon.png')), 'SAVE_CHAT_BOT');
+            $imagePath = $path . '../../AppSource/' . $yamlData['app']['uuid'] . '/view/apps/eoxapps/';
+            $this->messageProducer->sendTopic(json_encode(array('appName' => $jsonData['name'], 'displayName' => $displayName, "profileImage" => $imagePath . 'icon.png')), 'SAVE_CHAT_BOT');
         }
         if ($chatNotification === false) {
             $this->messageProducer->sendTopic(json_encode(array('appName' => $jsonData['name'])), 'DISABLE_CHAT_BOT');
         }
     }
-
 
     public function processWorkflow(&$yamlData, $path)
     {
@@ -945,18 +943,18 @@ class AppService extends AbstractService
             [
                 "type" => "app",
                 "sourceFolder" => $appPath . "view/apps/",
-                "viewLink" => $this->config['APPS_FOLDER']
+                "viewLink" => $this->config['APPS_FOLDER'],
             ],
             [
                 "type" => "theme",
                 "sourceFolder" => $appPath . "view/themes/",
-                "viewLink" => $this->config['THEME_FOLDER']
+                "viewLink" => $this->config['THEME_FOLDER'],
             ],
             [
                 "type" => "gui",
                 "sourceFolder" => $appPath . "view/gui/",
-                "viewLink" => $this->config['GUI_FOLDER']
-            ]
+                "viewLink" => $this->config['GUI_FOLDER'],
+            ],
         );
         $buildFolders = [];
         foreach ($defaultFolders as $folderConfig) {
@@ -990,7 +988,7 @@ class AppService extends AbstractService
                             $this->setupLink($targetName, $linkName);
                             array_push($buildFolders, [
                                 "path" => $targetName,
-                                "type" => $folderConfig["type"]
+                                "type" => $folderConfig["type"],
                             ]);
                         }
                     }
@@ -1001,7 +999,7 @@ class AppService extends AbstractService
         if (count($buildFolders) > 0) {
             array_push($buildFolders, [
                 "path" => $this->config['APPS_FOLDER'] . "../bos/",
-                "type" => "bos"
+                "type" => "bos",
             ]);
             $restClient = $this->restClient;
             $output = json_decode($restClient->post(
@@ -1058,7 +1056,7 @@ class AppService extends AbstractService
     private function setupAccountFiles($path, $accountId, $appId, $update = false)
     {
         if ($accountId && $path) {
-            $link = $this->config['TEMPLATE_FOLDER'] . $accountId."/".$appId;
+            $link = $this->config['TEMPLATE_FOLDER'] . $accountId . "/" . $appId;
             $this->logger->info("linkkk---$link");
             $source = rtrim($path, "/") . "/data/template";
             if (!$update) {
@@ -1133,7 +1131,7 @@ class AppService extends AbstractService
                 $role['uuid'] = isset($role['uuid']) ? $role['uuid'] : UuidUtil::uuid();
                 if ((!empty($role['businessRole']['name']) && isset($role['businessRole']['name']) && $templateRole) ||
                     (!empty($role['businessRole']['name']) && isset($role['businessRole']['name']) && $bRole &&
-                    in_array($role['businessRole']['name'], $bRole['businessRole']))) {
+                        in_array($role['businessRole']['name'], $bRole['businessRole']))) {
                     $temp = $this->businessRoleService->getBusinessRoleByName($appId, $role['businessRole']['name']);
                     if (count($temp) > 0) {
                         $role['business_role_id'] = $temp[0]['id'];
@@ -1144,7 +1142,7 @@ class AppService extends AbstractService
                         $role['business_role_id'] = $temp[0]['id'];
                     }
                 }
-                $role['app_id'] = $params['app_id'] =  $this->getIdFromUuid('ox_app', $appId);
+                $role['app_id'] = $params['app_id'] = $this->getIdFromUuid('ox_app', $appId);
                 if ($templateRole) {
                     $role['uuid'] = isset($role['uuid']) ? $role['uuid'] : UuidUtil::uuid();
                     $result = $this->roleService->saveTemplateRole($role, $role['uuid']);
@@ -1200,13 +1198,13 @@ class AppService extends AbstractService
         if (!isset($appData['title'])) {
             $appData['title'] = $appData['name'];
         }
-        
+
         //Create the app if not found.
         if (0 == count($queryResult)) {
             $temp = ['app' => $appData];
             $createResult = $this->createApp($temp);
             ArrayUtils::merge($appData, $createResult['app']);
-            return AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $appData).DIRECTORY_SEPARATOR;
+            return AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $appData) . DIRECTORY_SEPARATOR;
         }
 
         //App is found. Update the app.
@@ -1250,8 +1248,8 @@ class AppService extends AbstractService
                 $defaultFilterList[] = $filterdefaultParams[0];
                 array_shift($filterdefaultParams);
                 if ($filterdefaultParams) {
-                    foreach ($filterdefaultParams as $filterindex=>$filterValues) {
-                        foreach ($filterValues as $key=>$value) {
+                    foreach ($filterdefaultParams as $filterindex => $filterValues) {
+                        foreach ($filterValues as $key => $value) {
                             if ($key == 'filters') {
                                 $filterList = array_merge($value, $defaultFilterList);
                             } else {
@@ -1262,7 +1260,7 @@ class AppService extends AbstractService
                 } else {
                     $filterList = $filterArray[0]['filter']['filters'];
                 }
-                $filter = FilterUtils::filterArray($filterList, $filterlogic, array('name'=>'ox_app.name','date_modified'=>'DATE(ox_app.date_modified)','modified_user'=>'om.name','created_user'=>'oc.name'));
+                $filter = FilterUtils::filterArray($filterList, $filterlogic, array('name' => 'ox_app.name', 'date_modified' => 'DATE(ox_app.date_modified)', 'modified_user' => 'om.name', 'created_user' => 'oc.name'));
                 $where .= " AND " . $filter;
             }
             if (isset($filterArray[0]['sort']) && count($filterArray[0]['sort']) > 0) {
@@ -1294,7 +1292,7 @@ class AppService extends AbstractService
     public function updateApp($uuid, &$data)
     {
         $appData = $data['app'];
-        $appData['app_properties'] = json_encode(array("chat_notification" => isset($appData['chat_notification']) ? $appData['chat_notification'] : "" , "appIdentifiers" => isset($appData['appIdentifiers']) ? $appData['appIdentifiers'] : ""));
+        $appData['app_properties'] = json_encode(array("chat_notification" => isset($appData['chat_notification']) ? $appData['chat_notification'] : "", "appIdentifiers" => isset($appData['appIdentifiers']) ? $appData['appIdentifiers'] : ""));
         if (array_key_exists('uuid', $appData) && ($uuid != $appData['uuid'])) {
             throw new InvalidParameterException('UUID in URL and UUID in data set are not matching.');
         }
@@ -1340,8 +1338,8 @@ class AppService extends AbstractService
         $app->loadByUuid($uuid);
         $app->assign([
             'status' => App::DELETED,
-            'name' => $app->toArray()['id'] .'_'.$app->toArray()['name'],
-            'uuid' => UuidUtil::uuid()
+            'name' => $app->toArray()['id'] . '_' . $app->toArray()['name'],
+            'uuid' => UuidUtil::uuid(),
         ]);
         try {
             $this->beginTransaction();
@@ -1407,7 +1405,7 @@ class AppService extends AbstractService
                     $appObj->assign([
                         'start_options' => isset($app['options']) ? json_encode($app['options']) : null,
                         'status' => App::PUBLISHED,
-                        'type' => App::PRE_BUILT
+                        'type' => App::PRE_BUILT,
                     ]);
                     $appObj->setCreatedBy(1);
                     $appObj->setCreatedDate(date('Y-m-d H:i:s'));
@@ -1440,7 +1438,7 @@ class AppService extends AbstractService
 
     private function updateAppStatus($appSingleArray, $appType, $appStatus)
     {
-        $update = "UPDATE ox_app SET status = $appStatus where ox_app.name NOT IN ('" . implode("','", $appSingleArray) . "') and ox_app.type=".$appType;
+        $update = "UPDATE ox_app SET status = $appStatus where ox_app.name NOT IN ('" . implode("','", $appSingleArray) . "') and ox_app.type=" . $appType;
         $this->runGenericQuery($update);
     }
     public function addToAppRegistry($data)
@@ -1517,7 +1515,7 @@ class AppService extends AbstractService
                 }
                 $individualEntry = array(
                     'workflow_id' => $workflowId,
-                    'entity_id' => $entityData['id']
+                    'entity_id' => $entityData['id'],
                 );
                 array_push($data, $individualEntry);
             }
@@ -1538,7 +1536,7 @@ class AppService extends AbstractService
                 if (isset($value["formFieldsValidationExcel"]) && empty($value['formFieldsValidationExcel'])) {
                     unset($value["formFieldsValidationExcel"]);
                 }
-                if (isset($value['field']) && array_key_exists('name', $value['field'][0])&& empty($value['field'][0]['name'])) {
+                if (isset($value['field']) && array_key_exists('name', $value['field'][0]) && empty($value['field'][0]['name'])) {
                     unset($value['field']);
                 }
 
@@ -1559,7 +1557,7 @@ class AppService extends AbstractService
                 return $menu;
             }, $descriptorData["menu"]);
         }
-        
+
         if (isset($descriptorData["form"]) && empty($descriptorData['form'][0]['name'])) {
             unset($descriptorData["form"]);
         }
@@ -1568,14 +1566,14 @@ class AppService extends AbstractService
         }
         if (isset($descriptorData["org"])) {
             //Handle single and multiple org definitions
-            if(array_key_exists(0,$descriptorData["org"])){
+            if (array_key_exists(0, $descriptorData["org"])) {
                 foreach ($descriptorData["org"] as $key => $value) {
-                    if(empty($descriptorData["org"][$key]["name"])){
+                    if (empty($descriptorData["org"][$key]["name"])) {
                         unset($descriptorData["org"][$key]);
                     }
                 }
             } else {
-                if(empty($descriptorData["org"]["name"])) {
+                if (empty($descriptorData["org"]["name"])) {
                     unset($descriptorData["org"]);
                 }
             }
@@ -1615,12 +1613,12 @@ class AppService extends AbstractService
             if (count($entityRes) > 0) {
                 $this->workflowService->deleteWorkflowLinkedToApp($appId);
                 $this->entityService->removeEntityLinkedToApps($appId);
-                $deleteQuery = "DELETE oei FROM ox_entity_identifier oei 
+                $deleteQuery = "DELETE oei FROM ox_entity_identifier oei
                                 right outer join ox_app_entity oxe on oei.entity_id = oxe.id
-                                inner join ox_app oxa on oxa.id = oxe.app_id 
+                                inner join ox_app oxa on oxa.id = oxe.app_id
                                 where oxa.uuid = :appId";
                 $deleteParams = array('appId' => $appId);
-                $this->logger->info("STATEMENT DELETE $deleteQuery".print_r($deleteParams, true));
+                $this->logger->info("STATEMENT DELETE $deleteQuery" . print_r($deleteParams, true));
                 $this->executeUpdateWithBindParameters($deleteQuery, $deleteParams);
             }
             $this->businessRoleService->deleteBusinessRoleBasedOnAppId($appId);
@@ -1644,9 +1642,9 @@ class AppService extends AbstractService
             FileUtils::unlink($link);
         }
         $request = array();
-        array_push($request,[
+        array_push($request, [
             "path" => $this->config['APPS_FOLDER'] . "../bos/",
-            "type" => "bos"
+            "type" => "bos",
         ]);
         $restClient = $this->restClient;
         $output = json_decode($restClient->post(

@@ -17,9 +17,10 @@ use Oxzion\Utils\FileUtils;
 class EsignService extends AbstractService
 {
     private $table;
-    private $signerTable;
-    private $messageProducer;
     private $restClient;
+    private $signerTable;
+    private $authToken;
+    private $messageProducer;
     /**
      * @ignore __construct
      */
@@ -150,7 +151,7 @@ class EsignService extends AbstractService
         $response = $this->restClient->postMultiPart(
             $this->config['esign']['docurl'].'documents',
             $this->assignData($signers),
-            [$docUrl],
+            [FileUtils::getFileName($docUrl) => $docUrl],
             array( 'Authorization' => 'Bearer '. $this->getAuthToken())
         );
         $returnDocId = json_decode($response, true);
@@ -168,27 +169,35 @@ class EsignService extends AbstractService
 
     public function getAuthToken()
     {
-        $clientid = $this->config['esign']['clientid'];
-        $clientsecret = $this->config['esign']['clientsecret'];
-        $senderemail = $this->config['esign']['email'];
-        $username = $this->config['esign']['username'];
-        $password = $this->config['esign']['password'];
-        $post  = "grant_type=client_credentials&client_id=$clientid&client_secret=$clientsecret&username=$username&password=$password";
-        $headers = array('Content-Type' => 'application/x-www-form-urlencoded',
-            'Content-Length' => strlen($post));
-        $response = $this->restClient->postWithHeaderAsBody($this->config['esign']['url'], $post, $headers);
+        if ($this->authToken) {
+            return $this->authToken;
+        }
+        $postData = array(
+            'grant_type' => 'client_credentials',
+            'username' => $this->config['esign']['username'],
+            'password' => $this->config['esign']['password'],
+            'client_id' => $this->config['esign']['clientid'],
+            'client_secret' => $this->config['esign']['clientsecret'],
+            'redirect_uri' => $this->config['esign']['callbackUrl']
+        );
+        $postData = http_build_query($postData);
+        $headers = array(
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'Content-Length' => strlen($postData)
+        );
+        $response = $this->restClient->postWithHeaderAsBody($this->config['esign']['url'], $postData, $headers);
         $authToken = json_decode($response['body'], true);
-        return $authToken['access_token'];
+        $this->authToken = $authToken['access_token'];
+        return $this->authToken;
     }
 
     public function getDocumentStatus($docId)
     {
         $this->logger->info("status for doc -".$docId);
-        $auth = $this->getAuthToken();
         $response = $this->restClient->get(
             $this->config['esign']['docurl'].'documents/'.$docId,
             array(),
-            array( 'Authorization'=> 'Bearer '. $auth )
+            array( 'Authorization'=> 'Bearer ' . $this->getAuthToken() )
         );
         $data = json_decode($response, true);
         $this->logger->info("response doc -".$docId." is\n".print_r($data, true));
@@ -204,16 +213,19 @@ class EsignService extends AbstractService
         $returnArray = array(
             'name' => $data['name'],
             'message' => !empty($data['message']) ? $data['message'] : 'Please review and sign the document.',
-            'participants' => array(),
-            'fields' => array(),
             'action' => 'send',
-            'callback[url]' => $callbackUrl
+            'callback[url]' => $callbackUrl,
+            'participants' => array(),
+            'fields' => array()
         );
 
         foreach ($data['signers'] as $signer) {
             $returnArray['participants'][$signer['participant']['email']] = [
                 'name' => $signer['participant']['name'],
-                'email' => $signer['participant']['email']
+                'email' => $signer['participant']['email'],
+                'phone' => empty($signer['participant']['phone']) ? '' : $signer['participant']['phone'],
+                'sms' => empty($signer['participant']['phone']) ? false : (isset($signer['participant']['sms']) ? $signer['participant']['sms'] : true)
+
             ];
             foreach ($signer['fields'] as $key => $field) {
                 $returnArray['fields'][$signer['participant']['email'].$key] = [
@@ -250,7 +262,7 @@ class EsignService extends AbstractService
     {
         $this->setCallbackUrl();
         $return = $this->restClient->get(
-            $this->config['esign']['docurl']."integrations/VANTAGE/subscriptions",
+            $this->config['esign']['docurl']."integrations/".$this->config['esign']['integrator']."/subscriptions",
             array(),
             array( 'Authorization'=> 'Bearer '. $this->getAuthToken() )
         );
@@ -279,11 +291,8 @@ class EsignService extends AbstractService
 
     private function addSubcription($hook)
     {
-        $header = array( "Authorization"=>"Bearer ". $this->getAuthToken()
-    );
-        $post = array(
-            "eventType" => $hook
-        );
+        $header = array( "Authorization" => "Bearer ". $this->getAuthToken() );
+        $post = array( "eventType" => $hook );
         $response = $this->restClient->postWithHeader($this->config['esign']['docurl']."subscriptions", $post, $header);
         // $result = json_decode($response,true);
         $this->logger->info("Add subscription Response -".json_encode($response));
@@ -296,29 +305,28 @@ class EsignService extends AbstractService
 
     private function deleteSubscription($subscriptionId)
     {
-        $header = array( "Authorization"=>"Bearer ". $this->getAuthToken());
-        $url = $this->config['esign']['docurl']."integrations/VANTAGE/subscriptions/".$subscriptionId;
+        $header = array( "Authorization" => "Bearer ". $this->getAuthToken());
+        $url = $this->config['esign']['docurl']."integrations/".$this->config['esign']['integrator']."/subscriptions/".$subscriptionId;
         $response = $this->restClient->delete($url, array(), $header);
         $this->logger->info("remove subscription Response -".$response);
     }
 
     private function setCallbackUrl()
     {
-        $header = array( "Authorization"=>" Bearer ". $this->getAuthToken(),
-            "content-type"=>" application/json"
+        $header = array( "Authorization" => " Bearer ". $this->getAuthToken(),
+            "content-type" => " application/json"
         );
         $putData = array(
             "callbackUrl" => $this->config['esign']['callbackUrl']
         );
-        $return = $this->restClient->put($this->config['esign']['docurl']."integrations/VANTAGE", $putData, $header);
+        $return = $this->restClient->put($this->config['esign']['docurl']."integrations/".$this->config['esign']['integrator'], $putData, $header);
     }
     
 
     public function getDocumentSigningLink($docId)
     {
-        $authToken = $this->getAuthToken();
         $this->logger->info("signing link for doc -".$docId);
-        $response = $this->restClient->get($this->config['esign']['docurl'].'documents/'.$docId.'/signinglink', array(), array( 'Authorization'=> 'Bearer '. $authToken    ));
+        $response = $this->restClient->get($this->config['esign']['docurl'].'documents/'.$docId.'/signinglink', array(), array( 'Authorization'=> 'Bearer '. $this->getAuthToken() ));
         $response = json_decode($response, true);
         return $response['signingLink'];
     }
@@ -377,7 +385,11 @@ class EsignService extends AbstractService
 
     private function downloadFile($docId, $uuid=null)
     {
-        $response = $this->restClient->get($this->config['esign']['docurl'].'documents/'.$docId.'/pdf', array(), array( 'Authorization'=> 'Bearer '. $this->getAuthToken()));
+        $response = $this->restClient->get(
+            $this->config['esign']['docurl'].'documents/'.$docId.'/pdf',
+            array(),
+            array( 'Authorization'=> 'Bearer '. $this->getAuthToken())
+        );
         $this->logger->info("Download Doc info -".$response);
         $returnData = json_decode($response, true);
         $destination = $this->config['APP_ESIGN_FOLDER'];

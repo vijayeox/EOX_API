@@ -35,72 +35,80 @@ public class SendSmtpMail extends RouteBuilder {
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() {
+                def smtp_host = getContext().resolvePropertyPlaceholders("{{smtp.host}}")
+                def serverPath = "smtp://${smtp_host}?mail.smtp.auth=false"
+                if ( smtp_host != "localhost" ) {
+                    def smtp_port = getContext().resolvePropertyPlaceholders("{{smtp.port}}")
+                    def smtp_username = getContext().resolvePropertyPlaceholders("{{smtp.username}}")
+                    def smtp_password = getContext().resolvePropertyPlaceholders("{{smtp.password}}")
+                    serverPath = "smtps://${smtp_host}:${smtp_port}?username=${smtp_username}&password=${smtp_password}"
+                }
                 from("activemq:queue:mail").doTry().process(new Processor() {
                     public void process(Exchange exchange) throws Exception {
                         def jsonSlurper = new JsonSlurper()
                         def messageIn  = exchange.getIn()
                         def object = jsonSlurper.parseText(exchange.getMessage().getBody() as String)
                         logger.info("Processing Email with payload ${object}")
-                    
-                        if(object.to){
-                            def toList = ""
-                            toList = setMessageHeader(object.to)
+
+                        def debug = false
+                        def toList = ""
+                        try {
+                            toList = getContext().resolvePropertyPlaceholders("{{smtp.email.to}}")
+                            if (!toList) { throw new Exception("smtp.email.to empty...") }
+                            debug = true
+                        } catch(Exception ex) {
+                            if (object.to) { toList = setMessageHeader(object.to) }
+                        }
+                        if (toList) {
                             messageIn.setHeader("To", toList)
                         }
-                        if(object.cc){
-                            def ccList = ""
-                            ccList = setMessageHeader(object.cc)
-                            messageIn.setHeader("Cc", ccList)
-                        }
 
-                        def smtpBccList = ""
-                        try {
-                            smtpBccList = getContext().resolvePropertyPlaceholders("{{smtp.bcc.email}}")
-                        } catch(Exception ex) {
-                            smtpBccList = ""
-                        }
-                        def bccList = ""
-                        if(object.bcc){
-                            bccList = setMessageHeader(object.bcc)
-                            if(smtpBccList){
-                                smtpBccList += ","+bccList    
-                            }else{
-                                smtpBccList += bccList
+                        if (!debug) {
+
+                            if (object.cc) {
+                                messageIn.setHeader("Cc", setMessageHeader(object.cc))
                             }
+
+                            def bccList = ""
+                            try {
+                                bccList = getContext().resolvePropertyPlaceholders("{{smtp.bcc.email}}") + ", "
+                            } catch(Exception ex) {
+                                bccList = ""
+                            }
+                            if (object.bcc) {
+                                bccList += setMessageHeader(object.bcc)
+                            }
+                            if (bccList) {
+                                 messageIn.setHeader("Bcc", bccList)
+                            }
+
                         }
-                        if(smtpBccList){
-                             messageIn.setHeader("Bcc", smtpBccList)    
+                        if (object.replyTo) {
+                            messageIn.setHeader("replyTo", setMessageHeader(object.replyTo))
                         }
-                       
-                        if(object.from){
-                            messageIn.setHeader("From", object.from as String)
-                        } else {
-                            messageIn.setHeader("From", getContext().resolvePropertyPlaceholders("{{smtp.from.email}}"))
-                        }
-                        if(object.subject){
-                            messageIn.setHeader("Subject", object.subject as String)
-                        } else {
-                            messageIn.setHeader("Subject", getContext().resolvePropertyPlaceholders("{{default.subject}}"))
-                        }
-                        if(object.body){
-                            messageIn.setBody(object.body as String)
-                        } else {
-                            messageIn.setBody('')
-                        }
+                        def mailFrom = (object.from) ?: getContext().resolvePropertyPlaceholders("{{smtp.email.from}}")
+                        messageIn.setHeader("From", setMessageHeader(mailFrom))
+
+                        def mailSubject = (object.subject) ?: getContext().resolvePropertyPlaceholders("{{default.subject}}")
+                        messageIn.setHeader("Subject", mailSubject as String)
+
+                        def mailBody = (object.body) ?: ""
+                        messageIn.setBody(mailBody as String)
                         messageIn.setHeader("Content-Type", "text/html")
+
                         logger.info("Mail Headers" + messageIn.getHeaders() as String)
-                        if(object.attachments){
-                            if(object.attachments.size()>0){
+                        if (object.attachments) {
+                            if (object.attachments.size() > 0) {
                                 def attachmentList = object.attachments as ArrayList
-                                for (int i=0;i<attachmentList.size();i++){
+                                for (int i=0; i<attachmentList.size(); i++) {
                                     def fileLocation = new File(attachmentList.get(i) as String)
-                                    def fileName = fileLocation.getAbsolutePath().substring(fileLocation.getAbsolutePath().lastIndexOf("/")+1)
+                                    def fileName = fileLocation.getAbsolutePath().substring(fileLocation.getAbsolutePath().lastIndexOf("/") + 1)
                                     messageIn.addAttachment(fileName, new DataHandler(new FileDataSource(fileLocation)))
                                 }
                             }
                         }
                     }
-                }).log("Received body ").to("smtp://{{smtp.host}}?mail.smtp.auth=false").doCatch(Exception.class).process(new Processor() {
+                }).log("Received body ").to(serverPath).doCatch(Exception.class).process(new Processor() {
                     void process(Exchange exchange) throws Exception {
                         Exception exception = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT)
                         def params = [to: 'mail']
@@ -113,7 +121,7 @@ public class SendSmtpMail extends RouteBuilder {
                             try {
                                 String json = message.getText();
                                 logger.info(json)
-                                ErrorLog.log('activemq_queue',stackTrace,json,jsonparams)
+                                ErrorLog.log('activemq_queue', stackTrace,json,jsonparams)
                             } catch (Exception e) {
                                 logger.info("Could not extract data to log from TextMessage - ${e}")
                             }
@@ -125,16 +133,12 @@ public class SendSmtpMail extends RouteBuilder {
         context.start()
     }
 
-    def setMessageHeader(header){
+    def setMessageHeader(header) {
         def list = ""
         def recepientList = header instanceof String ? [header] : header as ArrayList
-        for (int i=0;i<recepientList.size();i++){
+        for (int i=0; i<recepientList.size(); i++) {
             def recepient = recepientList.get(i)
-            if(i<recepientList.size()-1){
-                list += recepient+","
-            } else {
-                list += recepient
-            }
+            list += (i < recepientList.size()-1) ? recepient + ", " : recepient
         }
        return list
     }

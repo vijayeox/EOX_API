@@ -41,6 +41,7 @@ ox_elastic:
     status_name: 'New'
     budget_amount: 1000
     actual_amount: 500
+    participants: [1, 34, 44]
   -
     app_name: 'crmnew'
     entity_name: 'Lead'
@@ -83,6 +84,7 @@ ox_elastic:
     status_name: 'New'
     budget_amount: 2000
     actual_amount: 2300
+    participants: [11, 32, 42]
   -
     app_name: 'crmnew'
     entity_name: 'Lead'
@@ -125,6 +127,7 @@ ox_elastic:
     status_name: 'Closed'
     budget_amount: 3000
     actual_amount: 2800
+    participants: [1]
   -
     app_name: 'crmnew'
     entity_name: 'Lead'
@@ -167,6 +170,7 @@ ox_elastic:
     status_name: 'New'
     budget_amount: 3000
     actual_amount: 2800
+    participants: [14,15]
   -
     app_name: 'crmnew'
     entity_name: 'Lead'
@@ -209,3 +213,4 @@ ox_elastic:
     status_name: 'Closed'
     budget_amount: 5000
     actual_amount: 5000
+    participants: [14,15,1]
