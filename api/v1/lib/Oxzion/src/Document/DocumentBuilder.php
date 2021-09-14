@@ -59,6 +59,7 @@ class DocumentBuilder
         if ($options && isset($options['prepend'])) {
             $prepend = $options['prepend'];
         }
+        $options['encoding'] = "utf-8";
 
         if ($options && isset($options['generateOptions'])) {
             $generateOptions = $options['generateOptions'];
