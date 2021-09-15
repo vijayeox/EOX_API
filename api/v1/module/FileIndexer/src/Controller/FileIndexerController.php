@@ -3,9 +3,7 @@ namespace FileIndexer\Controller;
 
     use Zend\Log\Logger;
     use Oxzion\Controller\AbstractApiControllerHelper;
-    use Oxzion\ValidationException;
-    use Zend\Db\Adapter\AdapterInterface;
-    use Oxzion\Utils\RestClient;
+    use Oxzion\ServiceException;
     use FileIndexer\Service\FileIndexerService;
 
     class FileIndexerController extends AbstractApiControllerHelper
@@ -63,7 +61,11 @@ namespace FileIndexer\Controller;
                 $response = $this->fileIndexerService->indexFile($uuid);
                 $this->log->info(FileIndexerController::class.":File has been Indexed");
                 return $this->getSuccessResponseWithData($response);
-            } catch (Exception $e) {
+            }
+            catch (ServiceException $e) {
+                return $this->getErrorResponse("Failure to Index File as incorrect uuid is specified", 404);
+            } 
+            catch (Exception $e) {
                 return $this->getErrorResponse("Failure to Index File ", 400);
             }
         }
