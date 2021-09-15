@@ -365,7 +365,7 @@ class AccountService extends AbstractService
                     INNER JOIN ox_account_user au on au.user_id = ou.id and au.account_id = acct.id
                     WHERE acct.uuid=:accountId";
         $selectParams = array("accountId" => $accountId);
-        $result = $this->executeQuerywithBindParameters($select, $selectParams)->toArray();
+        $result = $this->executeQueryWithBindParameters($select, $selectParams)->toArray();
         if (count($result) > 0) {
             return $result[0];
         } else {
@@ -393,9 +393,9 @@ class AccountService extends AbstractService
                     throw $e;
                 }
             }
+        } else {
+            $this->createAccount($accountData, null);
         }
-        
-        $this->createAccount($accountData, null);
     }
 
     /**
