@@ -1158,7 +1158,12 @@ class AppService extends AbstractService
     private function processOrg(&$orgData, $appId)
     {
         if (!isset($orgData['uuid'])) {
-            $orgData['uuid'] = UuidUtil::uuid();
+            if (!empty($orgData['name'])) {
+                $accountUuid = $this->accountService->getAccountByName($orgData['name']);
+                $orgData['uuid'] = $accountUuid;
+            } else {
+                $orgData['uuid'] = UuidUtil::uuid();
+            }
         }
         if (!isset($orgData['contact'])) {
             $orgData['contact'] = array();
