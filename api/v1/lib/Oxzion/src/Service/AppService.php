@@ -1495,7 +1495,7 @@ class AppService extends AbstractService
                 }
                 if ((isset($entity['enable_view']) && $entity['enable_view'] && isset($entity['pageContent']) && !empty($entity['pageContent'])) || isset($entity['enable_documents']) && $entity['enable_documents']) {
                     $pageId = isset($entity['page_uuid']) ? $entity['page_uuid'] : UuidUtil::uuid();
-                    $page = $entity['pageContent']['data'];
+                    $page = (isset($entity['pageContent']) && !empty($entity['pageContent'])) ? $entity['pageContent']['data'] : [];
                     $page['name'] = $entity['name'];
                     $routedata = array("appId" => $appId);
                     $result = $this->pageService->savePage($routedata, $page, $pageId);
