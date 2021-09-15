@@ -2631,88 +2631,88 @@ class FileService extends AbstractService
         $fromQuery = "FROM ox_workflow
             INNER JOIN ox_app on ox_app.id = ox_workflow.app_id
             INNER JOIN ox_workflow_deployment on ox_workflow_deployment.workflow_id = ox_workflow.id
-            INNER JOIN ox_workflow_instance on ox_workflow_instance.workflow_deployment_id = ox_workflow_deployment.id AND ox_workflow_instance.account_id =" . AuthContext::get(AuthConstants::ACCOUNT_ID) . "
-            INNER JOIN ox_file as of on of.id = ox_workflow_instance.file_id
-            INNER JOIN ox_app_entity as en on en.id = of.entity_id
+            INNER JOIN ox_workflow_instance on ox_workflow_instance.workflow_deployment_id = ox_workflow_deployment.id AND ox_workflow_instance.account_id =" . AuthContext::get(AuthConstants::ACCOUNT_ID)."
+            INNER JOIN ox_file as `of` on `of`.id = ox_workflow_instance.file_id
+            INNER JOIN ox_app_entity on ox_app_entity.id = `of`.entity_id
             INNER JOIN ox_activity on ox_activity.workflow_deployment_id = ox_workflow_deployment.id
             INNER JOIN ox_activity_instance ON ox_activity_instance.workflow_instance_id = ox_workflow_instance.id and ox_activity.id = ox_activity_instance.activity_id AND ox_activity_instance.status = 'In Progress'
             LEFT JOIN (SELECT oxi.id,oxi.activity_instance_id,oxi.file_id,oxi.user_id,ox2.assignee,CASE WHEN ox2.assignee = 1 THEN ox2.role_id ELSE oxi.role_id END as role_id,CASE WHEN ox2.assignee = 1 THEN ox2.team_id ELSE oxi.team_id END as team_id FROM  ox_file_assignee as oxi INNER JOIN (SELECT activity_instance_id,max(assignee) as assignee,max(role_id) as role_id,max(team_id) as team_id From ox_file_assignee WHERE activity_instance_id is not null GROUP BY activity_instance_id) as ox2 on oxi.activity_instance_id = ox2.activity_instance_id AND oxi.assignee = ox2.assignee) as ox_file_assignee ON ox_file_assignee.activity_instance_id = ox_activity_instance.id
             LEFT JOIN ox_user_team ON ox_file_assignee.team_id = ox_user_team.team_id
-            LEFT JOIN ox_file as oxf ON oxf.id = ox_file_assignee.file_id
+            LEFT JOIN ox_file as `oxf` ON `oxf`.id = ox_file_assignee.file_id
             LEFT JOIN ox_user_role ON ox_file_assignee.role_id = ox_user_role.role_id 
             LEFT JOIN ox_account_user au on au.id = ox_user_role.account_user_id
-            inner join ox_user as oxuc on of.created_by = oxuc.id
+            inner join ox_user as oxuc on `of`.created_by = `oxuc`.id
             LEFT JOIN ox_user ON ox_file_assignee.user_id = ox_user.id";
 
-    $fileQuery = "FROM ox_file as `of` 
-        INNER JOIN ox_app_entity as en on en.id = `of`.entity_id
-        INNER JOIN ox_app on ox_app.id = en.app_id
-        LEFT JOIN (SELECT oxi.id,oxi.file_id,oxi.user_id,oxi.assignee,CASE WHEN ox3.assignee = 1 THEN ox3.role_id ELSE oxi.role_id END as role_id,CASE WHEN ox3.assignee = 1 THEN ox3.team_id ELSE oxi.team_id END as team_id FROM ox_file_assignee as oxi INNER JOIN (SELECT file_id,max(assignee) as assignee,max(role_id) as role_id,max(team_id) as team_id From ox_file_assignee WHERE file_id is not null GROUP BY file_id) as ox3 on (oxi.file_id = ox3.file_id AND oxi.assignee = ox3.assignee)) as ox_file_assignee ON (ox_file_assignee.file_id = `of`.id)
-        LEFT JOIN ox_user_team ON ox_file_assignee.team_id = ox_user_team.team_id
-        LEFT JOIN ox_user_role ON ox_file_assignee.role_id = ox_user_role.role_id 
-        LEFT JOIN ox_account_user au on au.id = ox_user_role.account_user_id
-        inner join ox_user as oxuc on `of`.created_by = `oxuc`.id
-        LEFT JOIN ox_user ON ox_file_assignee.user_id = ox_user.id";
-    if (!empty($filterParams)) {
-        $cacheQuery = '';
-    } else {
-        $cacheQuery = " UNION
-        SELECT ow.name as workflow_name,ofile.uuid,ofile.start_date,ofile.end_date,ofile.status as fileStatus,ouc.content as data,oai.activity_instance_id as activityInstanceId,owi.process_instance_id as workflowInstanceId,
-        oai.start_date,oae.name as entity_name,NULL as id,
-        oa.name as activityName,ouc.date_created,'in_draft' as to_be_claimed,ou.name as assigned_user
-        FROM ox_user_cache as ouc
-        LEFT JOIN ox_workflow_instance as owi ON ouc.workflow_instance_id = owi.id
-        LEFT JOIN ox_workflow_deployment as owd on owi.workflow_deployment_id = owd.id
-        LEFT JOIN ox_workflow as ow on owd.workflow_id = ow.id
-        LEFT JOIN ox_file as ofile ON ofile.id = owi.file_id
-        INNER JOIN ox_form as oxf on ouc.form_id = oxf.id
-        INNER JOIN ox_app_entity as en on en.app_id = oxf.app_id and oxf.entity_id = en.id
-        INNER JOIN ox_app on ox_app.id = en.app_id
-        LEFT JOIN ox_activity_instance as oai on ouc.activity_instance_id = oai.activity_instance_id
-        LEFT JOIN ox_activity as oa on oai.activity_id = oa.id
-        LEFT JOIN ox_user as ou on ouc.user_id = ou.id
-        WHERE ouc.user_id =$userId and ouc.deleted = 0 and ouc.activity_instance_id IS NULL and $appFilter";
-    }
-
-    if (strlen($whereQuery) > 0) {
-        $whereQuery .= " " . $where . " AND ";
-    } else {
-        $whereQuery = "WHERE ";
-    }
-    $whereQuery .= 'of.is_active = 1  AND COALESCE(of.is_snoozed,0) !=1 ';
-    $pageSize = "LIMIT " . (isset($filterParamsArray[0]['take']) ? $filterParamsArray[0]['take'] : 20);
-    $offset = "OFFSET " . (isset($filterParamsArray[0]['skip']) ? $filterParamsArray[0]['skip'] : 0);
-    $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status as fileStatus,oxuc.name as created_by,`of`.rygStatus,`of`.version,
-    NULL as activityInstanceId,NULL as workflowInstanceId, `of`.date_created as created_date,en.name as entity_name,
-    NULL as activityName, `of`.date_created,
-    CASE WHEN ox_file_assignee.assignee = 0 then 1
-    WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
-    end as to_be_claimed,ox_user.name as assigned_user $field";
-    $countQuery = "SELECT count(id) as `count` 
-                    from ((SELECT distinct ox_file_assignee.id $fromQuery $filterFromQuery $whereQuery) UNION all (SELECT distinct ox_file_assignee.id $fileQuery $filterFromQuery $whereQuery)) as t1";
-    $countResultSet = $this->executeQuerywithParams($countQuery)->toArray();
-    $fieldList = "distinct ox_app.name as appName,`of`.id as myId,ox_workflow.name as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status,oxuc.name as created_by,`of`.rygStatus,`of`.version,
-    ox_activity_instance.activity_instance_id as activityInstanceId,ox_workflow_instance.process_instance_id as workflowInstanceId, ox_activity_instance.start_date as created_date,en.name as entity_name,
-    ox_activity.name as activityName, `of`.date_created,
-    CASE WHEN ox_file_assignee.assignee = 0 then 1
-    WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
-    end as to_be_claimed,ox_user.name as assigned_user $field";
-    $querySet = "select * from ((SELECT $fieldList $fromQuery $filterFromQuery $whereQuery) UNION (SELECT $fieldList2 $fileQuery $filterFromQuery $whereQuery)) as assigneeList $sort $pageSize $offset";
-    $this->logger->info("Executing Assignment listing query - $querySet");
-    $resultSet = $this->executeQuerywithParams($querySet)->toArray();
-    $result = array();
-    foreach ($resultSet as $key => $value) {
-        $data = json_decode($value['data'], true);
-        unset($value['data']);
-        if ($value['to_be_claimed']  == 'in_draft') {
-            //TODO this is hardcoding for hub NEED to be REMOVED and changed to STATUS field
-            $data['policyStatus'] = 'In Draft';
+        $fileQuery = "FROM ox_file as `of` 
+            INNER JOIN ox_app_entity on ox_app_entity.id = `of`.entity_id
+            INNER JOIN ox_app on ox_app.id = ox_app_entity.app_id
+            LEFT JOIN (SELECT oxi.id,oxi.file_id,oxi.user_id,oxi.assignee,CASE WHEN ox3.assignee = 1 THEN ox3.role_id ELSE oxi.role_id END as role_id,CASE WHEN ox3.assignee = 1 THEN ox3.team_id ELSE oxi.team_id END as team_id FROM ox_file_assignee as oxi INNER JOIN (SELECT file_id,max(assignee) as assignee,max(role_id) as role_id,max(team_id) as team_id From ox_file_assignee WHERE file_id is not null GROUP BY file_id) as ox3 on (oxi.file_id = ox3.file_id AND oxi.assignee = ox3.assignee)) as ox_file_assignee ON (ox_file_assignee.file_id = `of`.id)
+            LEFT JOIN ox_user_team ON ox_file_assignee.team_id = ox_user_team.team_id
+            LEFT JOIN ox_user_role ON ox_file_assignee.role_id = ox_user_role.role_id 
+            LEFT JOIN ox_account_user au on au.id = ox_user_role.account_user_id
+            inner join ox_user as oxuc on `of`.created_by = `oxuc`.id
+            LEFT JOIN ox_user ON ox_file_assignee.user_id = ox_user.id";
+        if (!empty($filterParams)) {
+            $cacheQuery = '';
+        } else {
+            $cacheQuery =" UNION
+            SELECT ow.name as workflow_name,ofile.uuid,ofile.start_date,ofile.end_date,ofile.status as fileStatus,ouc.content as data,oai.activity_instance_id as activityInstanceId,owi.process_instance_id as workflowInstanceId,
+            oai.start_date,oae.name as entity_name,NULL as id,
+            oa.name as activityName,ouc.date_created,'in_draft' as to_be_claimed,ou.name as assigned_user
+            FROM ox_user_cache as ouc
+            LEFT JOIN ox_workflow_instance as owi ON ouc.workflow_instance_id = owi.id
+            LEFT JOIN ox_workflow_deployment as owd on owi.workflow_deployment_id = owd.id
+            LEFT JOIN ox_workflow as ow on owd.workflow_id = ow.id
+            LEFT JOIN ox_file as ofile ON ofile.id = owi.file_id
+            INNER JOIN ox_form as oxf on ouc.form_id = oxf.id
+            INNER JOIN ox_app_entity as oae on oae.app_id = oxf.app_id and oxf.entity_id = oae.id
+            INNER JOIN ox_app on ox_app.id = oae.app_id
+            LEFT JOIN ox_activity_instance as oai on ouc.activity_instance_id = oai.activity_instance_id
+            LEFT JOIN ox_activity as oa on oai.activity_id = oa.id
+            LEFT JOIN ox_user as ou on ouc.user_id = ou.id
+            WHERE ouc.user_id =$userId and ouc.deleted = 0 and ouc.activity_instance_id IS NULL and $appFilter";
         }
-        $result[] = array_merge($value, $data);
+
+        if (strlen($whereQuery) > 0) {
+            $whereQuery .= " " . $where . " AND ";
+        } else {
+            $whereQuery = "WHERE ";
+        }
+        $whereQuery .= 'of.is_active = 1  AND COALESCE(of.is_snoozed,0) !=1 ';
+        $pageSize = "LIMIT " . (isset($filterParamsArray[0]['take']) ? $filterParamsArray[0]['take'] : 20);
+        $offset = "OFFSET " . (isset($filterParamsArray[0]['skip']) ? $filterParamsArray[0]['skip'] : 0);
+        $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status as fileStatus,oxuc.name as created_by,`of`.rygStatus,`of`.version,
+        NULL as activityInstanceId,NULL as workflowInstanceId, `of`.date_created as created_date,ox_app_entity.name as entity_name,
+        NULL as activityName, `of`.date_created,
+        CASE WHEN ox_file_assignee.assignee = 0 then 1
+        WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
+        end as to_be_claimed,ox_user.name as assigned_user $field";
+        $countQuery = "SELECT count(id) as `count` 
+                        from ((SELECT distinct ox_file_assignee.id $fromQuery $filterFromQuery $whereQuery) UNION all (SELECT distinct ox_file_assignee.id $fileQuery $filterFromQuery $whereQuery)) as t1";
+        $countResultSet = $this->executeQuerywithParams($countQuery)->toArray();
+        $fieldList = "distinct ox_app.name as appName,`of`.id as myId,ox_workflow.name as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status,oxuc.name as created_by,`of`.rygStatus,`of`.version,
+        ox_activity_instance.activity_instance_id as activityInstanceId,ox_workflow_instance.process_instance_id as workflowInstanceId, ox_activity_instance.start_date as created_date,ox_app_entity.name as entity_name,
+        ox_activity.name as activityName, `of`.date_created,
+        CASE WHEN ox_file_assignee.assignee = 0 then 1
+        WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
+        end as to_be_claimed,ox_user.name as assigned_user $field";
+        $querySet = "select * from ((SELECT $fieldList $fromQuery $filterFromQuery $whereQuery) UNION (SELECT $fieldList2 $fileQuery $filterFromQuery $whereQuery)) as assigneeList $sort $pageSize $offset";
+        $this->logger->info("Executing Assignment listing query - $querySet");
+        $resultSet = $this->executeQuerywithParams($querySet)->toArray();
+        $result = array();
+        foreach ($resultSet as $key => $value) {
+            $data = json_decode($value['data'], true);
+            unset($value['data']);
+            if ($value['to_be_claimed']  == 'in_draft') {
+                //TODO this is hardcoding for hub NEED to be REMOVED and changed to STATUS field
+                $data['policyStatus'] = 'In Draft';
+            }
+            $result[] = array_merge($value, $data);
+        }
+        $this->logger->info("ASSIGNMENT RESULT -- ".print_r($result, true));
+        return array('data' => $result, 'total' => $countResultSet[0]['count']);
     }
-    $this->logger->info("ASSIGNMENT RESULT -- " . print_r($result, true));
-    return array('data' => $result, 'total' => $countResultSet[0]['count']);
-}
 
     public function deleteFilesLinkedToApp($appId)
     {
