@@ -35,3 +35,6 @@ view/node_modules/*
 /clients/EOXAppBuilder/view/apps/EOXAppBuilder/dist/
 /clients/EOXAppBuilder/view/apps/EOXAppBuilder/node_modules/
 *.DS_Store
+/view
+/clients/skydrive
+/clients/skyward

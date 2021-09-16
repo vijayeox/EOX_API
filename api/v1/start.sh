@@ -27,7 +27,7 @@ sed -ri -e "s/([0-9]{1,3}\.){3}[0-9]{1,3}/${IP}/" .env
 # 	-ri -e "s/^DB_HOST=.*/DB_HOST=$IP/" \
 # 	.env
 
-if [ $startOptions == "i" ]; then
+if [ "$startOptions" == "i" ]; then
 	docker-compose up --build
 else
 	docker-compose up -d --build

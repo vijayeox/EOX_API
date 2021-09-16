@@ -746,14 +746,16 @@ class UserService extends AbstractService
                 if (isset($filterArray[0]['filter'])) {
                     $filterlogic = isset($filterArray[0]['filter']['logic']) ? $filterArray[0]['filter']['logic'] : "AND";
                     $filterList = $filterArray[0]['filter']['filters'];
-                    $where = " WHERE " . FilterUtils::filterArray($filterList, $filterlogic, self::$userField);
+                    $clause = FilterUtils::filterArray($filterList, $filterlogic, self::$userField);
+                    if(!empty($clause)){
+                        $where = " WHERE " . $clause;
+                    }
                 }
                 if (isset($filterArray[0]['sort']) && count($filterArray[0]['sort']) > 0) {
                     $sort = $filterArray[0]['sort'];
                     $sort = FilterUtils::sortArray($sort, self::$userField);
                 }
                 $pageSize = $filterArray[0]['take'];
-                $offset = $filterArray[0]['skip'];
             }
             if (isset($filterParams['exclude'])) {
                 $where .= (strlen($where) > 0 ? " AND " : " WHERE "). "ou.uuid NOT in ('" . implode("','", $filterParams['exclude']) . "') ";
@@ -761,7 +763,9 @@ class UserService extends AbstractService
         }
 
         $where .= (strlen($where) > 0 ? " AND " : " WHERE ") . "ou.status = 'Active' AND ou.account_id = " . $accountId;
-        $sort = " ORDER BY " . $sort;
+        if(!empty($sort)){
+            $sort = " ORDER BY " . $sort;
+        }
         $limit = " LIMIT " . $pageSize . " offset " . $offset;
         $resultSet = $this->executeQuerywithParams($cntQuery . $where);
         $count = $resultSet->toArray()[0]['count'];
