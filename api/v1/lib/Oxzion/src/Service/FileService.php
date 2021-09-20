@@ -697,7 +697,7 @@ class FileService extends AbstractService
             if (!empty($result)) {
                 if ($result[0]['created_by'] != AuthContext::get(AuthConstants::USER_ID)) {
                     $this->logger->info("Only user who created task can delete the record");
-                    throw new Exception("Delete operation cannot be performed");
+                    throw new ServiceException("Delete operation cannot be performed", "access.denied", OxServiceException::ERR_CODE_UNAUTHORIZED);
                 }
             }
             $this->beginTransaction();
