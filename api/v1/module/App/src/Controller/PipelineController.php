@@ -2,24 +2,21 @@
 namespace App\Controller;
 
 /**
-* Pipleline Api
-*/
-use Oxzion\Service\CommandService;
-use Zend\Db\Adapter\AdapterInterface;
-use Oxzion\Controller\AbstractApiController;
-use Oxzion\ValidationException;
-use Oxzion\Workflow\Camunda\WorkflowException;
-use Oxzion\DelegateException;
-use Zend\Http\Request as HttpRequest;
+ * Pipleline Api
+ */
 use Exception;
+use Oxzion\Controller\AbstractApiController;
+use Oxzion\DelegateException;
+use Oxzion\Service\CommandService;
+use Oxzion\Workflow\Camunda\WorkflowException;
 
 class PipelineController extends AbstractApiController
 {
     private $commandService;
     protected $log;
     /**
-    * @ignore __construct
-    */
+     * @ignore __construct
+     */
     public function __construct(CommandService $commandService)
     {
         $this->commandService = $commandService;
@@ -59,8 +56,7 @@ class PipelineController extends AbstractApiController
             return $this->getErrorResponse($e->getMessage(), 409);
         } catch (DelegateException $e) {
             return $this->getErrorResponse($e->getMessage(), 409);
-        } 
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
