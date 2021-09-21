@@ -9,6 +9,7 @@ use Oxzion\Messaging\MessageProducer;
 use Oxzion\Model\File;
 use Oxzion\Model\FileTable;
 use Oxzion\ServiceException;
+use Oxzion\OxServiceException;
 use Oxzion\Service\FieldService;
 use Oxzion\Service\EntityService;
 use Oxzion\Utils\UuidUtil;
@@ -697,7 +698,7 @@ class FileService extends AbstractService
             if (!empty($result)) {
                 if ($result[0]['created_by'] != AuthContext::get(AuthConstants::USER_ID)) {
                     $this->logger->info("Only user who created task can delete the record");
-                    throw new Exception("Delete operation cannot be performed");
+                    throw new ServiceException("Delete operation cannot be performed", "access.denied", OxServiceException::ERR_CODE_UNAUTHORIZED);
                 }
             }
             $this->beginTransaction();
