@@ -91,7 +91,7 @@ class SOAPUtils extends \SoapClient
             if (!isset($data[$key])) {
                 if (!$value['required']) continue;
                 $errors[$key] = 'Required Field';
-            } elseif (isset($value['nillable']) && !$value['nillable'] && !$data[$key]) {
+            } elseif (isset($value['nillable']) && !$value['nillable'] && (!$data[$key] && !is_bool($data[$key]))) {
                 $errors[$key] = 'Value cannot be Nill';
             } else {
                 if (!empty($value['type'])) {
