@@ -49,9 +49,9 @@ class CommentService extends AbstractService
         $data['file_id'] = $this->getIdFromUuid('ox_file', $fileId);
         $data['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
         $data['uuid'] = UuidUtil::uuid();
-        $data['created_by'] = AuthContext::get(AuthConstants::USER_ID);
+        $data['created_by'] = isset($data['created_by']) ? $data['created_by'] : AuthContext::get(AuthConstants::USER_ID);
         $data['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
-        $data['date_created'] = date('Y-m-d H:i:s');
+        $data['date_created'] = isset($data['date_created']) ? $data['date_created'] : date('Y-m-d H:i:s');
         $data['date_modified'] = date('Y-m-d H:i:s');
         if (isset($data['parent'])) {
             $ret = $this->getParentId($data, $fileId);
