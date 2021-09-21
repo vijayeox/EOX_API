@@ -87,8 +87,8 @@ public class SendSmtpMail extends RouteBuilder {
                             messageIn.setHeader("replyTo", setMessageHeader(object.replyTo))
                         }
                         logger.info("Processing Email with from address"+  object.from)
-                        logger.info("Processing Email with from address2"+  getContext().resolvePropertyPlaceholders("{{smtp.email.from}}"))
-                        def mailFrom = (object.from) ?: getContext().resolvePropertyPlaceholders("{{smtp.email.from}}")
+                        logger.info("Processing Email with from address2"+  getContext().resolvePropertyPlaceholders("{{smtp.from.email}}"))
+                        def mailFrom = (object.from) ?: getContext().resolvePropertyPlaceholders("{{smtp.from.email}}")
                         messageIn.setHeader("From", setMessageHeader(mailFrom))
                         
                         def mailSubject = (object.subject) ?: getContext().resolvePropertyPlaceholders("{{default.subject}}")
