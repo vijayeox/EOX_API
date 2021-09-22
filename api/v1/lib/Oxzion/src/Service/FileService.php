@@ -582,6 +582,13 @@ class FileService extends AbstractService
         if (isset($data['version'])) {
             $fileObject['version'] = $data['version'];
         }
+        if (!empty($dataArray['assocId'])) {
+            if (UuidUtil::isValidUuid($dataArray['assocId'])) {
+                $fileObject['assoc_id'] = $this->getIdFromUuid('ox_file', $dataArray['assocId']);
+            } else {
+                $fileObject['assoc_id'] = $dataArray['assocId'];
+            }
+        }
         $fileObject['data'] = json_encode($dataArray);
         $entityConfig = $this->setupEntityFields($entityId, $dataArray);
         $titleConfig = $entityConfig['title'];
@@ -1876,16 +1883,16 @@ class FileService extends AbstractService
                                 if(array_key_exists($v,$fileSubscribers)){
                                     $initialData .= $fileSubscribers[$v] . ', ';
                                 }
+                            } else {
+                                if (!is_array($v)) {
+                                    $initialData .= $v . ', ';
+                                } else {
+                                //Need to  handle
+                                }
                             }
-                            else{
-                                $initialData .= $v . ', ';
-                            }
-                            
-                            
                         }
-                        $initialData = substr($initialData,0,strlen($initialData)-2);
-                    }
-                    else {
+                        $initialData = substr($initialData, 0, strlen($initialData) - 2);
+                    } else {
                         $initialData = "";
                     }
                     // }
