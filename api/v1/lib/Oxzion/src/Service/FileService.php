@@ -120,7 +120,7 @@ class FileService extends AbstractService
         $data['fileTitle'] = $this->evaluateFileTitle($titleConfig, $data, $entityName);
         $data['rygStatus'] = $this->evaluateRyg($data, json_decode($rygRule, true));
         $data = array_merge($data, $entityConfig);
-        $data['assoc_id'] = isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null;
+        $data['assoc_id'] = isset($assocId) ? $assocId : (isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null);
         $data['last_workflow_instance_id'] = isset($oldData['last_workflow_instance_id']) ? $oldData['last_workflow_instance_id'] : null;
         $file = new File($this->table);
         if (isset($data['id'])) {
