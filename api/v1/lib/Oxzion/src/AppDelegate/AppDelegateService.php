@@ -11,6 +11,7 @@ use Oxzion\Document\DocumentBuilder;
 use Oxzion\Messaging\MessageProducer;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\FileService;
+use Team\Service\TeamService;
 use Oxzion\Service\FieldService;
 use Oxzion\Service\WorkflowInstanceService;
 use Oxzion\Service\ActivityInstanceService;
@@ -51,7 +52,8 @@ class AppDelegateService extends AbstractService
         AccountService $accountService,
         BusinessParticipantService $businessParticipantService,
         QueryService $queryService,
-        InsuranceService $insuranceService
+        InsuranceService $insuranceService,
+        TeamService $teamService
     )
     {
         $this->templateService = $templateService;
@@ -62,6 +64,7 @@ class AppDelegateService extends AbstractService
         $this->messageProducer = $messageProducer;
         $this->userService = $userService;
         $this->commentService = $commentService;
+        $this->teamService = $teamService;
         $this->esignService = $esignService;
         parent::__construct($config, $dbAdapter);
         $this->documentBuilder = $documentBuilder;
@@ -97,7 +100,7 @@ class AppDelegateService extends AbstractService
 
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService );
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService );
         return $appDelegateService;
     }
 
@@ -165,6 +168,9 @@ class AppDelegateService extends AbstractService
                 }
                 if (method_exists($obj, "setCommentService")) {
                     $obj->setCommentService($this->commentService);
+                }
+                if (method_exists($obj, "setTeamService")) {
+                    $obj->setTeamService($this->teamService);
                 }
                 if (method_exists($obj, "setEsignService")) {
                     $obj->setEsignService($this->esignService);

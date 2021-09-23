@@ -9,6 +9,7 @@ use Oxzion\Messaging\MessageProducer;
 use Oxzion\Model\File;
 use Oxzion\Model\FileTable;
 use Oxzion\ServiceException;
+use Oxzion\OxServiceException;
 use Oxzion\Service\FieldService;
 use Oxzion\Service\EntityService;
 use Oxzion\Utils\UuidUtil;
@@ -119,7 +120,7 @@ class FileService extends AbstractService
         $data['fileTitle'] = $this->evaluateFileTitle($titleConfig, $data, $entityName);
         $data['rygStatus'] = $this->evaluateRyg($data, json_decode($rygRule, true));
         $data = array_merge($data, $entityConfig);
-        $data['assoc_id'] = isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null;
+        $data['assoc_id'] = isset($assocId) ? $assocId : (isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null);
         $data['last_workflow_instance_id'] = isset($oldData['last_workflow_instance_id']) ? $oldData['last_workflow_instance_id'] : null;
         $file = new File($this->table);
         if (isset($data['id'])) {
@@ -345,7 +346,7 @@ class FileService extends AbstractService
                 return;
             }
         } elseif ($user == 'manager') {
-            $manager = $this->executeQuerywithParams("SELECT manager_id FROM `ox_user_manager` inner join ox_user on ox_user_manager.user_id=ox_user.id inner join ox_file on ox_user.id=ox_file.modified_by WHERE `file`.`id` = " . $fileId . ";")->toArray();
+            $manager = $this->executeQuerywithParams("SELECT manager_id FROM `ox_employee_manager` inner join ox_user on ox_employee_manager.employee_id=ox_user.id inner join ox_file on ox_user.id=ox_file.created_by WHERE `ox_file`.`id` = " . $fileId . ";")->toArray();
             if (isset($manager) && count($manager) > 0) {
                 $userId = $manager[0]['manager_id'];
             } else {
@@ -582,6 +583,13 @@ class FileService extends AbstractService
         if (isset($data['version'])) {
             $fileObject['version'] = $data['version'];
         }
+        if (!empty($dataArray['assocId'])) {
+            if (UuidUtil::isValidUuid($dataArray['assocId'])) {
+                $fileObject['assoc_id'] = $this->getIdFromUuid('ox_file', $dataArray['assocId']);
+            } else {
+                $fileObject['assoc_id'] = $dataArray['assocId'];
+            }
+        }
         $fileObject['data'] = json_encode($dataArray);
         $entityConfig = $this->setupEntityFields($entityId, $dataArray);
         $titleConfig = $entityConfig['title'];
@@ -698,7 +706,7 @@ class FileService extends AbstractService
             if (!empty($result)) {
                 if ($result[0]['created_by'] != AuthContext::get(AuthConstants::USER_ID)) {
                     $this->logger->info("Only user who created task can delete the record");
-                    throw new Exception("Delete operation cannot be performed");
+                    throw new ServiceException("Delete operation cannot be performed", "access.denied", OxServiceException::ERR_CODE_UNAUTHORIZED);
                 }
             }
             $this->beginTransaction();
@@ -1876,16 +1884,16 @@ class FileService extends AbstractService
                                 if(array_key_exists($v,$fileSubscribers)){
                                     $initialData .= $fileSubscribers[$v] . ', ';
                                 }
+                            } else {
+                                if (!is_array($v)) {
+                                    $initialData .= $v . ', ';
+                                } else {
+                                //Need to  handle
+                                }
                             }
-                            else{
-                                $initialData .= $v . ', ';
-                            }
-                            
-                            
                         }
-                        $initialData = substr($initialData,0,strlen($initialData)-2);
-                    }
-                    else {
+                        $initialData = substr($initialData, 0, strlen($initialData) - 2);
+                    } else {
                         $initialData = "";
                     }
                     // }
