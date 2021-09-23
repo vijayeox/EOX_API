@@ -20,8 +20,8 @@ smtp.host={{SMTP_HOST}}
 smtp.port={{SMTP_PORT}}
 smtp.username={{SMTP_USERNAME}}
 smtp.password={{SMTP_PASSWORD}}
-smtp.email.from={{SMTP_EMAIL_FROM}}
-smtp.email.to={{SMTP_EMAIL_TO}}
+smtp.from.email={{SMTP_EMAIL_FROM}}
+smtp.to.email={{SMTP_EMAIL_TO}}
 
 pop3.host=localhost
 pop3.port=110

@@ -53,8 +53,8 @@ public class SendSmtpMail extends RouteBuilder {
                         def debug = false
                         def toList = ""
                         try {
-                            toList = getContext().resolvePropertyPlaceholders("{{smtp.email.to}}")
-                            if (!toList) { throw new Exception("smtp.email.to empty...") }
+                            toList = getContext().resolvePropertyPlaceholders("{{smtp.to.email}}")
+                            if (!toList) { throw new Exception("smtp.to.email empty...") }
                             debug = true
                         } catch(Exception ex) {
                             if (object.to) { toList = setMessageHeader(object.to) }
@@ -86,11 +86,12 @@ public class SendSmtpMail extends RouteBuilder {
                         if (object.replyTo) {
                             messageIn.setHeader("replyTo", setMessageHeader(object.replyTo))
                         }
-                        logger.info("Processing Email with from address"+  object.from)
-                        logger.info("Processing Email with from address2"+  getContext().resolvePropertyPlaceholders("{{smtp.from.email}}"))
+
+                        logger.info("Processing Email with from address" + object.from)
+                        logger.info("Processing Email with default from address" + getContext().resolvePropertyPlaceholders("{{smtp.from.email}}"))
                         def mailFrom = (object.from) ?: getContext().resolvePropertyPlaceholders("{{smtp.from.email}}")
                         messageIn.setHeader("From", setMessageHeader(mailFrom))
-                        
+
                         def mailSubject = (object.subject) ?: getContext().resolvePropertyPlaceholders("{{default.subject}}")
                         messageIn.setHeader("Subject", mailSubject as String)
 
