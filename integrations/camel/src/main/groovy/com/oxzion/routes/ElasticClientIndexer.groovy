@@ -143,6 +143,8 @@ class ElasticClientIndexer extends RouteBuilder {
                                 throw new Exception("Incorrect operation specified :" + operation)
                             }
                         }
+                        client.close();
+                        builder.close();
                         catch(ElasticsearchException ex)
                         {
                             println("the exception is -"+ex)
