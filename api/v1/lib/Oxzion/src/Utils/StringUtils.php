@@ -32,4 +32,16 @@ class StringUtils
         $sourceStr = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         return substr(str_shuffle($sourceStr), 0, $stringLength);
     }
+
+    public static function formatString($type, $value)
+    {
+        switch ($type) {
+            case 'USD':
+                $value = (empty($value)) ? 0 : $value;
+                $value = numfmt_format_currency(numfmt_create('en_US', \NumberFormatter::CURRENCY), $value, 'USD');
+                break;
+        }
+        return $value;
+    }
+
 }
