@@ -133,7 +133,6 @@ class FileService extends AbstractService
             $file->assign($data);
             $file->save();
             $result = $file->getGenerated(true);
-            $uuid = $id;
             $data['version'] = $result['version'];
             $data['uuid'] = $result['uuid'];
             $this->logger->info("COUNT  FILE DATA----" . $count);
@@ -576,6 +575,7 @@ class FileService extends AbstractService
         $file = new File($this->table);
         $file->loadByUuid($id);
         $result = $file->getGenerated(true);
+        $uuid = $id;
         $id = $result['id'];
         $validFields = $this->checkFields($entityId, $fields, $id, false);
         $dataArray = $this->processMergeData($entityId, $fileObject, $fields);
