@@ -166,7 +166,6 @@ class FileService extends AbstractService
             if (isset($result['id'])) {
                 $this->logger->info("THE FILE ID TO BE INDEXED IS ".$result['uuid']);
                 $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED');
-                $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
             }
         } catch (Exception $e) {
             $this->rollback();
@@ -651,6 +650,7 @@ class FileService extends AbstractService
             } else {
                 if (isset($id)) {
                     $this->messageProducer->sendQueue(json_encode(array('id' => $id)), 'FILE_UPDATED');
+                    $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
                 }
             }
         } catch (Exception $e) {
