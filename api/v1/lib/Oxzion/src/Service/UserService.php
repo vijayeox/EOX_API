@@ -730,7 +730,7 @@ class UserService extends AbstractService
         	au.uuid as accountId, per.firstname, per.lastname, per.email, per.date_of_birth, per.phone, per.gender,
         	oxemp.designation, oxemp.website, oxemp.about, oxemp.id as employee_id, oxemp.date_of_join, oxemp.interest,
         	oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip,
-        	manager_user.uuid as managerId";
+        	manager_user.uuid as managerId,manager_user.name as manager_name";
         $from = " FROM `ox_user` as ou 
                   inner join ox_account au on au.id = ou.account_id
                   join ox_person per on per.id = ou.person_id 
@@ -947,7 +947,8 @@ class UserService extends AbstractService
                         per.firstname,per.lastname,ou.name,per.email,oxemp.designation,
                         au.uuid as accountId, per.phone, per.date_of_birth, oxemp.date_of_join,
                         oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip, 
-                        oxemp.website, oxemp.about, per.gender, manager_user.uuid as managerId,
+                        oxemp.website, oxemp.about, per.gender,
+                        manager_user.uuid as managerId,manager_user.name as manager_name
                         oxemp.interest,ou.icon,ou.preferences 
                     from ox_user as ou 
                     inner join ox_account_user oau on oau.user_id = ou.id

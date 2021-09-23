@@ -574,6 +574,7 @@ class FileService extends AbstractService
         $file = new File($this->table);
         $file->loadByUuid($id);
         $result = $file->getGenerated(true);
+        $uuid = $id;
         $id = $result['id'];
         $validFields = $this->checkFields($entityId, $fields, $id, false);
         $dataArray = $this->processMergeData($entityId, $fileObject, $fields);
@@ -649,6 +650,7 @@ class FileService extends AbstractService
             } else {
                 if (isset($id)) {
                     $this->messageProducer->sendQueue(json_encode(array('id' => $id)), 'FILE_UPDATED');
+                    $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
                 }
             }
         } catch (Exception $e) {
