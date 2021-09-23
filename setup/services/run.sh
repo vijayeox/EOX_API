@@ -113,7 +113,7 @@ fi
 cp ./build/libs/camel-0.0.1-SNAPSHOT.jar ./camel.jar
 
 #view setup
-ls /app/view/view_built >> /dev/null 2>&1 && echo "Starting view" || (echo "Building view" && cd /app/view && dos2unix * && ./build.sh gui && ./build.sh iconpacks && ./build.sh themes && ./build.sh apps Admin,Announcements,Chat,Mail,Preferences && ./build.sh bos && touch /app/view/view_built)
+ls /app/view/view_built >> /dev/null 2>&1 && echo "Starting view" || (echo "Building view" && cd /app/view && dos2unix * && chown root:root gui/ -R && ./build.sh gui && ./build.sh iconpacks && ./build.sh themes && ./build.sh apps Admin,Announcements,Chat,Mail,Preferences && ./build.sh bos && touch /app/view/view_built)
 
 su - root /app/activemq/bin/activemq console &
 su - root /camunda/bin/catalina.sh start &
