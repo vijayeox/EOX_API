@@ -46,6 +46,10 @@ smtp:
   port: {{SMTP_PORT}}
   username: {{SMTP_USERNAME}}
   password: {{SMTP_PASSWORD}}
+  from:
+    email: {{SMTP_EMAIL_FROM}}
+  to:
+    email: {{SMTP_EMAIL_TO}}
 db:
   host: jdbc:mysql://127.0.0.1:3306/{{API_DB}}
   user: {{DB_USERNAME}}
