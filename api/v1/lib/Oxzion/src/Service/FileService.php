@@ -133,6 +133,7 @@ class FileService extends AbstractService
             $file->assign($data);
             $file->save();
             $result = $file->getGenerated(true);
+            $uuid = $id;
             $data['version'] = $result['version'];
             $data['uuid'] = $result['uuid'];
             $this->logger->info("COUNT  FILE DATA----" . $count);
@@ -166,6 +167,7 @@ class FileService extends AbstractService
             if (isset($result['id'])) {
                 $this->logger->info("THE FILE ID TO BE INDEXED IS ".$result['uuid']);
                 $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED');
+                $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
             }
         } catch (Exception $e) {
             $this->rollback();
