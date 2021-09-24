@@ -1939,6 +1939,8 @@ class FileService extends AbstractService
             }
         } elseif ($value['data_type'] == 'datetime') {
             $initialData = date("Y-m-d", strtotime($initialData));
+        }elseif ($value['data_type'] == 'longtext') {
+            $initialData = str_replace("&nbsp;", '', $initialData);
         }
         if ((isset($value['type']) && $value['type'] =='radio')|| (isset($value['data_type']) && $value['data_type'] =='radio')) {
             $radioFields =json_decode($value['template'], true);
