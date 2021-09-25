@@ -749,7 +749,8 @@ class FileService extends AbstractService
             // AuthContext::get(AuthConstants::ACCOUNT_ID);
             $params = array('id' => $id);
             // 
-            $select = "SELECT oxf.id, oxf.uuid, oxf.data, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf 
+            $select = "SELECT oxf.id, oxf.uuid, oxf.data, ou.uuid as ownerId, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf 
+            inner join ox_user as ou on `oxf`.created_by = `ou`.id
                         inner join ox_app_entity oae on oae.id = oxf.entity_id";
             $where = " where oxf.uuid = :id ";
             $result = $this->executeQueryWithBindParameters($select.$where, $params)->toArray();
@@ -1936,6 +1937,10 @@ class FileService extends AbstractService
                     }
                 }
             }
+        } elseif ($value['data_type'] == 'datetime') {
+            $initialData = date("Y-m-d", strtotime($initialData));
+        }elseif ($value['data_type'] == 'longtext') {
+            $initialData = str_replace("&nbsp;", '', $initialData);
         }
         if ((isset($value['type']) && $value['type'] =='radio')|| (isset($value['data_type']) && $value['data_type'] =='radio')) {
             $radioFields =json_decode($value['template'], true);
