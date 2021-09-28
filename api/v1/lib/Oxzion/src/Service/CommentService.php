@@ -186,7 +186,7 @@ class CommentService extends AbstractService
                     from ox_comment 
                     inner join ox_user ou on ou.id = ox_comment.created_by 
                     inner join ox_file of on of.id = ox_comment.file_id 
-                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause order by ox_comment.date_created desc";
+                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause order by ox_comment.date_created asc";
         $this->logger->info("Executing Query $query with params - ".print_r($queryParams, true));
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (count($resultSet) >0) {

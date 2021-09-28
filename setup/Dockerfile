@@ -224,5 +224,6 @@ RUN mkdir -p /var/run/mysqld \
     && chown -R www-data:staff /var/lib/mysql \
     && chown -R www-data:staff /var/run/mysqld \
     && chown -R www-data:staff /var/log/mysql
+RUN npm install -g npm    
 
 CMD ["/services/run.sh"]
