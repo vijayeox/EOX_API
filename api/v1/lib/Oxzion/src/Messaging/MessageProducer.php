@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\Messaging;
 
 use Logger;
@@ -25,11 +26,13 @@ class MessageProducer
 
     public function sendTopic($message, $topic)
     {
-        $this->logger->info("Topic is ---".$topic." with payload ".$message);
+        $this->logger->info("Topic is ---" . $topic . " with payload " . $message);
         try {
             $result = $this->client->sendMessage('/topic/' . $topic, $message);
+            $this->logger->info("The result data : " . print_r($result, true));
         } catch (Exception $e) {
-            $this->errorLogService->saveError('amqp', $e->getTraceAsString(), $message, json_encode(array('topic'=>$topic)));
+            $this->logger->info("Inside exception : ");
+            $this->errorLogService->saveError('amqp', $e->getTraceAsString(), $message, json_encode(array('topic' => $topic)));
             $this->logger->error($e->getMessage(), $e);
             return false;
         }
@@ -37,11 +40,11 @@ class MessageProducer
     }
     public function sendQueue($message, $queue)
     {
-        $this->logger->info("Queue is ---".$queue." with payload ".$message);
+        $this->logger->info("Queue is ---" . $queue . " with payload " . $message);
         try {
             $result = $this->client->sendMessage('/queue/' . $queue, $message);
         } catch (Exception $e) {
-            $this->errorLogService->saveError('amqp', $e->getTraceAsString(), $message, json_encode(array('queue'=>$queue)));
+            $this->errorLogService->saveError('amqp', $e->getTraceAsString(), $message, json_encode(array('queue' => $queue)));
             $this->logger->error($e->getMessage(), $e);
             return false;
         }
