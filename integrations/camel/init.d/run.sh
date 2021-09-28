@@ -1,3 +1,3 @@
 #!/bin/sh
 #to start camel.jar
-/usr/bin/java -Xmx1024m -jar camel.jar
+/usr/bin/java -Xms1024m  -Xmx2048m -jar camel.jar
