@@ -126,7 +126,7 @@ class ImsEngineImpl implements InsuranceEngine
                 $InsuredList = $this->makeCall($searchMethod, $data + ['xmlToArray' => 'ClearInsuredAsXmlResult']);
                 $insureds = array_map(function($insured){
                     return ['InsuredGuid' => $insured['InsuredGuid'], 'Clearance' => $insured];
-                }, (isset($InsuredList['Clearance']['Insured']) ? $InsuredList['Clearance']['Insured'] : []));
+                }, (isset($InsuredList['Clearance']['Insured']) ? ((is_array(current($InsuredList['Clearance']['Insured']))) ? $InsuredList['Clearance']['Insured'] : $InsuredList['Clearance']) : []));
                 unset($InsuredList);
                 break;
         }
