@@ -1480,6 +1480,8 @@ class FileService extends AbstractService
         $where = " $workflowFilter $entityFilter $createdFilter";
         $fromQuery = " from ox_file as `of`
         inner join ox_user as ou on `of`.created_by = `ou`.id
+        left join ox_file_assignee as oxfa on oxfa.file_id = `of`.id
+        left join ox_user as oxu on oxu.id = oxfa.user_id
         inner join ox_app_entity as en on en.id = `of`.entity_id $appQuery ";
         if (!$this->processParticipantFiltering($accountId, $fromQuery, $whereQuery, $queryParams)) {
             if ($whereQuery != "") {
@@ -1511,7 +1513,7 @@ class FileService extends AbstractService
         $this->getFileFilterClause($whereQuery, $where);
         $where .= $snooze == false ? " AND COALESCE(is_snoozed,0) !=1 " : " AND COALESCE(is_snoozed,0) !=0 ";
         try {
-            $select = "SELECT DISTINCT SQL_CALC_FOUND_ROWS of.data,of.start_date,of.end_date,of.status, of.id as myId, of.account_id,of.rygStatus as rygStatus,of.uuid,of.version as version,  wi.status as workflowStatus, wi.process_instance_id as workflowInstanceId,of.date_created,of.date_modified,ou.name as created_by,en.name as entity_name,en.uuid as entity_id,oa.name as appName $field $fromQuery $where $sort $pageSize $offset";
+            $select = "SELECT DISTINCT SQL_CALC_FOUND_ROWS of.data,of.start_date,of.end_date,of.status, of.id as myId, of.account_id,of.rygStatus as rygStatus,of.uuid,of.version as version,  wi.status as workflowStatus, wi.process_instance_id as workflowInstanceId,of.date_created,oxu.name as assignedUser,of.date_modified,ou.name as created_by,en.name as entity_name,en.uuid as entity_id,oa.name as appName $field $fromQuery $where $sort $pageSize $offset";
             $this->logger->info("Executing query - $select with params - " . json_encode($queryParams));
             $resultSet = $this->executeQueryWithBindParameters($select, $queryParams)->toArray();
             $countQuery = "SELECT FOUND_ROWS();";
