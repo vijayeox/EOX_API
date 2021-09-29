@@ -113,6 +113,6 @@ return [
     'jwtAlgo' => 'HS512',
     'authRequiredText' => 'Authentication Required',
     'refreshTokenPeriod' => '7',
-    'paymentGatewayType'=>'DEMO'
-
+    'paymentGatewayType'=>'DEMO',
+    'googleApi' => 'AIzaSyDKTTBIKbunORXBEY-ThE5iynoUvjU3-Cc'
 ];

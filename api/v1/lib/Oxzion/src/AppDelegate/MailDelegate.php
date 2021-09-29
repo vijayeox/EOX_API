@@ -83,17 +83,33 @@ abstract class MailDelegate extends CommunicationDelegate
                         }
                         $mailBody = (new Mime\Message())::createFromMessage(
                             $part->getContent(),
-                            $part->getHeader('Content-Type')->getParameter('boundary')
+                            $part->getHeaderField('content-type', 'boundary')
                         );
                         foreach ($mailBody->getParts() as $part) {
+                            try {
+                                foreach (Mime\Decode::splitContentType($part->getType()) as $key => $value) {
+                                    $part->$key = $value;
+                                }
+                            } catch (\Exception $e) {
+                                echo "<pre>";print_r($part->gettype());exit;
+                            }
                             if ($part->getType() == $filters['bodyType']) break;
+                        }
+                        $mailContent = $part->getRawContent();
+                        if ($charset = $part->getCharset()) {
+                            switch (strtoupper($charset)) {
+                                case 'UTF-8':
+                                    $mailContent = utf8_decode($mailContent);
+                                    $mailContent = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $mailContent);
+                                    break;
+                            }
                         }
                         $data[] = [
                             'messageid' => $mail->messageid,
                             'fromName' => $from->getName(),
                             'fromEmail' => $from->getEmail(),
                             'subject' => $mail->subject,
-                            'body' => $part->getRawContent()
+                            'body' => $mailContent
                         ];
                         // $this->updateMailFlag($mail->messageid, 'flags', [Storage::FLAG_UNSEEN]);
                     }

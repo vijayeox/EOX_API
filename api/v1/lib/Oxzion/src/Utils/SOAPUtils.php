@@ -8,11 +8,13 @@ class SOAPUtils extends \SoapClient
 {
     private $xml;
     private $options;
+    public static $logger;
 
     public function __construct(String $wsdl, Array $options = [])
     {
         parent::__construct($wsdl, $options);
         $this->processXml($wsdl, $options);
+        self::$logger = \Logger::getLogger(__CLASS__);
     }
 
     public function setHeader(string $namespace, string $name, $data, bool $mustUnderstand = false)
@@ -41,8 +43,11 @@ class SOAPUtils extends \SoapClient
             throw new ServiceException(json_encode($errors), 'validation.errors', OxServiceException::ERR_CODE_NOT_ACCEPTABLE);
         }
         try {
+            self::$logger->info(get_class()." SOAPCall ".$function." - " . print_r($data, true));
             $response = $this->{$function}($data);
+            self::$logger->info(get_class()." SOAPCall response ".$function." - " . print_r($response, true));
         } catch (\Exception $e) {
+            self::$logger->info(get_class()." SOAPCall Exception ".$function." - " . print_r($e->getMessage(), true));
             throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
         }
         if ($clean) {
