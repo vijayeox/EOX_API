@@ -101,11 +101,13 @@ public class SendSmtpMail extends RouteBuilder {
 
                         logger.info("Mail Headers" + messageIn.getHeaders() as String)
                         if (object.attachments) {
+                            logger.info("Has attachments:")
                             if (object.attachments.size() > 0) {
                                 def attachmentList = object.attachments as ArrayList
                                 for (int i=0; i<attachmentList.size(); i++) {
                                     def fileLocation = new File(attachmentList.get(i) as String)
                                     def fileName = fileLocation.getAbsolutePath().substring(fileLocation.getAbsolutePath().lastIndexOf("/") + 1)
+                                    logger.info("fileName: " + fileName)
                                     messageIn.addAttachment(fileName, new DataHandler(new FileDataSource(fileLocation)))
                                 }
                             }
