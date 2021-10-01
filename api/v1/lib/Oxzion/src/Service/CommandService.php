@@ -78,10 +78,8 @@ class CommandService extends AbstractService
     public function runCommand(&$data, $request)
     {
         $this->logger->info("RUN COMMAND  ------" . json_encode($data));
-        $this->logger->info("RUN COMMAND appId  ------" . $data['appId']);
         //TODO Execute Command Service Methods
         if (isset($data['appId'])) {
-            // $appId = $data['appId'];
             $appId = $this->getIdFromUuid('ox_app', $data['appId']);
             $this->logger->info("RUN COMMAND appid form query" . $appId);
             $accountId = isset($data['accountId']) && !empty($data['accountId']) ? $this->getIdFromUuid('ox_account', $data['accountId']) : AuthContext::get(AuthConstants::ACCOUNT_ID);
