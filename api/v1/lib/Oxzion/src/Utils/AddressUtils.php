@@ -1,8 +1,12 @@
 <?php
 namespace Oxzion\Utils;
 
+use Logger;
+AddressUtils::$logger  = Logger::getLogger(__CLASS__);
+
 class AddressUtils
 {
+    public static $logger;
 
     public static function search(string $address, array $list = [])
     {
@@ -65,13 +69,14 @@ class AddressUtils
             $list = array_keys($returnArray);
         }
         $returnArray = array_intersect_key($returnArray, array_combine($list, $list));
-        // echo "<pre>";print_r($returnArray);exit;
+		self::$logger->info(get_class()." input data - " . print_r($address, true));
+		self::$logger->info(get_class()." output data - " . print_r($returnArray, true));
         return $returnArray;
     }
 
     public static function getCountryDetails(string $country)
     {
-        $country = self::search(['address' => 'country ' . $country], ['country', 'country_name']);
+        $country = self::search('country ' . $country, ['country', 'country_name']);
         if (empty($country)) {
             throw new \Exception("INCORRECT_COUNTRY", 400);
         }
