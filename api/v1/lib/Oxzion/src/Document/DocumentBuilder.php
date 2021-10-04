@@ -66,11 +66,11 @@ class DocumentBuilder
         return $this->documentGenerator->generatePdfDocumentFromHtml($content, $destination, $header, $footer, $data, $append, $prepend, $generateOptions);
     }
 
-    public function fillPDFForm($template, $data, $destination)
+    public function fillPDFForm($template, $data, $destination, bool $flattenFields = false)
     {
         $templatePath =$this->templateService->getTemplatePath($template, $data);
         $this->logger->info("fillPDFForm Full Template Path \n" . $templatePath . "/" . $template);
-        return $this->documentGenerator->fillPDFForm($templatePath."/".$template, $data, $destination);
+        return $this->documentGenerator->fillPDFForm($templatePath."/".$template, $data, $destination, $flattenFields);
     }
 
     /**
@@ -100,9 +100,13 @@ class DocumentBuilder
         return;
     }
 
-    public function mergePDF(array $sourceArray, $destination)
+    public function mergePDF(array $sourceArray, $destination, $hasFields = false)
     {
         $this->logger->info("Merge documents");
-        return $this->documentGenerator->mergeDocuments($sourceArray, $destination);
+        if ($hasFields) {
+            return $this->documentGenerator->mergePdf($sourceArray, $destination);
+        } else {
+            return $this->documentGenerator->mergeDocuments($sourceArray, $destination);
+        }
     }
 }
