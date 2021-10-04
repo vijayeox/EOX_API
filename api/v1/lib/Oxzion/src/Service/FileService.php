@@ -121,7 +121,7 @@ class FileService extends AbstractService
         $data['fileTitle'] = $this->evaluateFileTitle($titleConfig, $data, $entityName);
         $data['rygStatus'] = $this->evaluateRyg($data, json_decode($rygRule, true));
         $data = array_merge($data, $entityConfig);
-        $data['assoc_id'] = isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null;
+        $data['assoc_id'] = isset($assocId) ? $assocId : (isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null);
         $data['last_workflow_instance_id'] = isset($oldData['last_workflow_instance_id']) ? $oldData['last_workflow_instance_id'] : null;
         $file = new File($this->table);
         if (isset($data['id'])) {
@@ -583,6 +583,13 @@ class FileService extends AbstractService
         $dataArray = $this->cleanData($dataArray);
         if (isset($data['version'])) {
             $fileObject['version'] = $data['version'];
+        }
+        if (!empty($dataArray['assocId'])) {
+            if (UuidUtil::isValidUuid($dataArray['assocId'])) {
+                $fileObject['assoc_id'] = $this->getIdFromUuid('ox_file', $dataArray['assocId']);
+            } else {
+                $fileObject['assoc_id'] = $dataArray['assocId'];
+            }
         }
         $fileObject['data'] = json_encode($dataArray);
         $entityConfig = $this->setupEntityFields($entityId, $dataArray);
@@ -1480,7 +1487,7 @@ class FileService extends AbstractService
         $where = " $workflowFilter $entityFilter $createdFilter";
         $fromQuery = " from ox_file as `of`
         inner join ox_user as ou on `of`.created_by = `ou`.id
-        left join ox_file_assignee as oxfa on oxfa.file_id = `of`.id
+        left join ox_file_assignee as oxfa on oxfa.file_id = `of`.id and oxfa.assignee = 1
         left join ox_user as oxu on oxu.id = oxfa.user_id
         inner join ox_app_entity as en on en.id = `of`.entity_id $appQuery ";
         if (!$this->processParticipantFiltering($accountId, $fromQuery, $whereQuery, $queryParams)) {
