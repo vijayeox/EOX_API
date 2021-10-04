@@ -41,12 +41,12 @@ routes {
 		// ['from':'activemq:topic:USER_ADDED', 			'to':["${callback.URL}"]],
 		// ['from':'activemq:topic:USER_DELETED', 			'to':["${callback.URL}"]],
 
-		['from':'activemq:queue:FILE_ADDED', 			'to':["${callback.URL}/callback/file/update"]],
+		['from':'activemq:queue:FILE_ADDED', 			'to':["${callback.URL}/callback/file/update",
+															  "${callback.URL}/fileindexer/file"]],
 		['from':'activemq:queue:FILE_UPDATED', 			'to':["${callback.URL}/callback/file/update"]],
 		['from':'activemq:queue:FILE_UPDATED_WITH_UUID','to':[ "${callback.URL}/fileindexer/file"]],													  
 		['from':'activemq:queue:FILE_DELETED', 			'to':["${callback.URL}/fileindexer"]],
 		['from':'activemq:topic:PROCESS_BATCH_INDEX',	'to':["${callback.URL}/fileindexer/batch"]],
-		['from':'activemq:topic:FILE_INDEX',			'to':["${callback.URL}/fileindexer/file"]],
 
 		['from':'activemq:topic:COMMANDS', 				'to':["${callback.URL}/callback/workflow/servicetask"]],
 
