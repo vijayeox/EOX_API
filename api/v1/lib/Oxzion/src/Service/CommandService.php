@@ -78,10 +78,8 @@ class CommandService extends AbstractService
     public function runCommand(&$data, $request)
     {
         $this->logger->info("RUN COMMAND  ------" . json_encode($data));
-        $this->logger->info("RUN COMMAND appId  ------" . $data['appId']);
         //TODO Execute Command Service Methods
         if (isset($data['appId'])) {
-            // $appId = $data['appId'];
             $appId = $this->getIdFromUuid('ox_app', $data['appId']);
             $this->logger->info("RUN COMMAND appid form query" . $appId);
             $accountId = isset($data['accountId']) && !empty($data['accountId']) ? $this->getIdFromUuid('ox_account', $data['accountId']) : AuthContext::get(AuthConstants::ACCOUNT_ID);
@@ -104,7 +102,6 @@ class CommandService extends AbstractService
                 throw new ServiceException("You are not authorized to use this command", "app.for.register account");
             }
             $data['app_id'] = $appId;
-            // $this->logger->info("RUN COMMAND appid after query" . $data['app_id']);
         }
         if (isset($data['command'])) {
             $this->logger->info("COMMAND  ------" . print_r($data['command'], true));
@@ -364,7 +361,6 @@ class CommandService extends AbstractService
     protected function getRouteData(&$data, $request)
     {
         $this->logger->info("EXECUTE DELEGATE inside route data ---- " . print_r($data, true));
-        $this->logger->info("EXECUTE DELEGATE appID---- " . print_r($data['app_id'], true));
         if (isset($data['app_id']) && isset($data['route'])) {
             $app_id = $data['app_id'];
         } else {
@@ -494,12 +490,9 @@ class CommandService extends AbstractService
     protected function executeDelegate(&$data)
     {
         $this->logger->info("EXECUTE DELEGATE inside execute delegate ---- " . print_r($data, true));
-        $this->logger->info("EXECUTE DELEGATE inside execute delegate appid---- " . print_r($data['app_id'], true));
-        if (isset($data['appId']) && isset($data['delegate'])) {
+        $data['appId'] = !empty($data['appId']) ? $data['appId'] : $data['app_id'];
+        if (!empty($data['appId']) && isset($data['delegate'])) {
             $app_id = $data['appId'];
-            if (isset($data['appId'])) {
-                $app_id = $data['appId'];
-            }
             $delegate = $data['delegate'];
             unset($data['delegate']);
         } else {
