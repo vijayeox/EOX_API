@@ -13,12 +13,12 @@ use Exception;
 class DocumentGeneratorImpl implements DocumentGenerator
 {
     private $logger;
-    
+
     public function __construct()
     {
         $this->logger = Logger::getLogger(__CLASS__);
     }
-    
+
     public function generateDocument($htmlContent, $destination, array $options, $signatureCerticate=null)
     {
         // if (!$options) {
@@ -26,20 +26,20 @@ class DocumentGeneratorImpl implements DocumentGenerator
         //     $json = file_get_contents($file);
         //     $options = json_decode($json, true);
         // }
-        
+
         // create new PDF document
         $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-       
+
         // set default header data
         if (!empty($options)) {
             $pdf->SetHeaderData($options['pdf_header_logo'], $options['pdf_header_logo_width'], $options['initial_title'], $options['second_title'], $options['header_text_color'], $options['header_line_color']);
-        
+
             $pdf->setFooterData($options['footer_text_color'], $options['footer_line_color']);
         } else {
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
         }
-       
+
         // set margins
         $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
         $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
@@ -56,7 +56,7 @@ class DocumentGeneratorImpl implements DocumentGenerator
         // Add a page
         // This method has several options, check the source code documentation for more information.
         $pdf->AddPage();
-        
+
         $pdf->writeHTMLCell(0, 0, '', '', $htmlContent, 0, 1, 0, true, '', true);
         // $pdf->writeHTML($htmlContent);
         // TO DO DIGITAL SIGNATURE CERTIFICATE
@@ -132,11 +132,11 @@ class DocumentGeneratorImpl implements DocumentGenerator
             }
             array_push($finalpdf, $prependOptions);
         }
-        
+
 
         array_push($finalpdf, $dest);
 
-       
+
         if (isset($append) && count($append) > 0) {
             foreach ($append as $key => $value) {
                 $appendOptions = $value;
@@ -148,7 +148,7 @@ class DocumentGeneratorImpl implements DocumentGenerator
         return $destination;
     }
     // public function generateDocumentFromFile($filePath,$destination){
-        
+
     // }
 
     public function mergeDocuments($sourceArray, $destination)
@@ -183,23 +183,30 @@ class DocumentGeneratorImpl implements DocumentGenerator
         return $destination;
     }
 
-
-    public function fillPDFForm($form, $data, $destination)
+    public function fillPDFForm($form, $data, $destination, bool $flattenFields = false)
     {
-       
         // create new PDF document
-        $pdf = new  PDFTK($form);
+        $pdf = new PDFTK($form);
         $result = $pdf->fillForm($data)
-            ->needAppearances()
-            ->saveAs($destination);
+                    ->{($flattenFields) ? 'flatten' : 'needAppearances'}()
+                    ->saveAs($destination);
         if (!$result) {
             throw new Exception($pdf->getError());
         }
         return $result;
     }
 
-   
-    // public function generateDocumentWithData($sourcePdf,$destination,$data){
-        
-    // }
+    public function mergePdf(array $pdfs, string $destination)
+    {
+        $pdfObj = new PDFTK();
+        foreach ($pdfs as $pdf) {
+            if (!is_file($pdf)) throw new Exception("File does not exist at ".$pdf, 404);
+            $pdfObj->addFile($pdf);
+        }
+        $result = $pdfObj->needAppearances()
+                        ->saveAs($destination);
+        if (!$result) throw new Exception($pdfObj->getError());
+        return $result;
+    }
+
 }
