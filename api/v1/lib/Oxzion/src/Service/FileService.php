@@ -441,6 +441,10 @@ class FileService extends AbstractService
         $this->updateFileUserContext($obj);
         $fields = json_decode($obj['data'], true);
         $this->updateFileAttributesInternal($obj['entity_id'], $fields, $fileId);
+        //$this->messageProducer->sendQueue($fileId,'FILE_INDEX');
+        $this->logger->info("justbefore FILE_UPDATED_WITH_UUID---".$obj['uuid']);
+        $this->messageProducer->sendQueue(json_encode(array('uuid' => $obj['uuid'])), 'FILE_UPDATED_WITH_UUID');
+        $this->logger->info("justafter FILE_UPDATED_WITH_UUID---");
     }
 
     private function updateFileUserContext($obj)
@@ -651,7 +655,7 @@ class FileService extends AbstractService
             } else {
                 if (isset($id)) {
                     $this->messageProducer->sendQueue(json_encode(array('id' => $id)), 'FILE_UPDATED');
-                    $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
+                    //$this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
                 }
             }
         } catch (Exception $e) {
