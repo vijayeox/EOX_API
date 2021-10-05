@@ -1890,7 +1890,11 @@ class FileService extends AbstractService
                                     $initialData .= $fileSubscribers[$v] . ', ';
                                 }
                             } else {
-                                $initialData .= $v . ', ';
+                                if (!is_array($v)) {
+                                    $initialData .= $v . ', ';
+                                } else {
+                                //Need to  handle
+                                }
                             }
                         }
                         $initialData = substr($initialData, 0, strlen($initialData) - 2);
