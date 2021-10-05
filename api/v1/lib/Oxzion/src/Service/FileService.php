@@ -121,7 +121,7 @@ class FileService extends AbstractService
         $data['fileTitle'] = $this->evaluateFileTitle($titleConfig, $data, $entityName);
         $data['rygStatus'] = $this->evaluateRyg($data, json_decode($rygRule, true));
         $data = array_merge($data, $entityConfig);
-        $data['assoc_id'] = isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null;
+        $data['assoc_id'] = isset($assocId) ? $assocId : (isset($oldData['bos']['assoc_id']) ? $oldData['bos']['assoc_id'] : null);
         $data['last_workflow_instance_id'] = isset($oldData['last_workflow_instance_id']) ? $oldData['last_workflow_instance_id'] : null;
         $file = new File($this->table);
         if (isset($data['id'])) {
@@ -442,6 +442,10 @@ class FileService extends AbstractService
         $this->updateFileUserContext($obj);
         $fields = json_decode($obj['data'], true);
         $this->updateFileAttributesInternal($obj['entity_id'], $fields, $fileId);
+        //$this->messageProducer->sendQueue($fileId,'FILE_INDEX');
+        $this->logger->info("justbefore FILE_UPDATED_WITH_UUID---".$obj['uuid']);
+        $this->messageProducer->sendQueue(json_encode(array('uuid' => $obj['uuid'])), 'FILE_UPDATED_WITH_UUID');
+        $this->logger->info("justafter FILE_UPDATED_WITH_UUID---");
     }
 
     private function updateFileUserContext($obj)
@@ -585,6 +589,13 @@ class FileService extends AbstractService
         if (isset($data['version'])) {
             $fileObject['version'] = $data['version'];
         }
+        if (!empty($dataArray['assocId'])) {
+            if (UuidUtil::isValidUuid($dataArray['assocId'])) {
+                $fileObject['assoc_id'] = $this->getIdFromUuid('ox_file', $dataArray['assocId']);
+            } else {
+                $fileObject['assoc_id'] = $dataArray['assocId'];
+            }
+        }
         $fileObject['data'] = json_encode($dataArray);
         $entityConfig = $this->setupEntityFields($entityId, $dataArray);
         $titleConfig = $entityConfig['title'];
@@ -645,7 +656,7 @@ class FileService extends AbstractService
             } else {
                 if (isset($id)) {
                     $this->messageProducer->sendQueue(json_encode(array('id' => $id)), 'FILE_UPDATED');
-                    $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
+                    //$this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
                 }
             }
         } catch (Exception $e) {
@@ -1481,7 +1492,7 @@ class FileService extends AbstractService
         $where = " $workflowFilter $entityFilter $createdFilter";
         $fromQuery = " from ox_file as `of`
         inner join ox_user as ou on `of`.created_by = `ou`.id
-        left join ox_file_assignee as oxfa on oxfa.file_id = `of`.id
+        left join ox_file_assignee as oxfa on oxfa.file_id = `of`.id and oxfa.assignee = 1
         left join ox_user as oxu on oxu.id = oxfa.user_id
         inner join ox_app_entity as en on en.id = `of`.entity_id $appQuery ";
         if (!$this->processParticipantFiltering($accountId, $fromQuery, $whereQuery, $queryParams)) {
