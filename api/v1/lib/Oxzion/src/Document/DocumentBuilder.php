@@ -69,7 +69,12 @@ class DocumentBuilder
 
     public function fillPDFForm($template, $data, $destination, bool $flattenFields = false)
     {
-        $templatePath =$this->templateService->getTemplatePath($template, $data);
+        if (strpos($template, DIRECTORY_SEPARATOR) !== false && file_exists($template)) {
+            $templatePath = pathinfo($template, PATHINFO_DIRNAME);
+            $template = basename($template);
+        } else {
+            $templatePath = $this->templateService->getTemplatePath($template, $data);
+        }
         $this->logger->info("fillPDFForm Full Template Path \n" . $templatePath . "/" . $template);
         return $this->documentGenerator->fillPDFForm($templatePath."/".$template, $data, $destination, $flattenFields);
     }
