@@ -1,9 +1,7 @@
 <?php
-
 /**
  * ServiceTask Callback Api
  */
-
 namespace Oxzion\Service;
 
 use Exception;
@@ -81,24 +79,24 @@ class CommandService extends AbstractService
         //TODO Execute Command Service Methods
         if (isset($data['appId'])) {
             $appId = $this->getIdFromUuid('ox_app', $data['appId']);
-            $this->logger->info("RUN COMMAND appid form query" . $appId);
             $accountId = isset($data['accountId']) && !empty($data['accountId']) ? $this->getIdFromUuid('ox_account', $data['accountId']) : AuthContext::get(AuthConstants::ACCOUNT_ID);
-            if (empty($accountId) && isset($data['accountName'])) {
+            if(empty($accountId) && isset($data['accountName'])) {
                 $select = "SELECT id from ox_account where `name` = :accountName";
                 $selectQuery = array("accountName" => $data['accountName']);
-                $this->logger->info("Executing query $select with params - " . json_encode($selectQuery));
+                $this->logger->info("Executing query $select with params - ".json_encode($selectQuery));
                 $result = $this->executeQuerywithBindParameters($select, $selectQuery)->toArray();
                 $accountId = !empty($result) ? $result[0]['id'] : null;
             }
             if ($accountId) {
                 $select = "SELECT * from ox_app_registry where account_id = :accountId AND app_id = :appId";
                 $selectQuery = array("accountId" => $accountId, "appId" => $appId);
-                $this->logger->info("Executing query $select with params - " . json_encode($selectQuery));
+                $this->logger->info("Executing query $select with params - ".json_encode($selectQuery));
                 $result = $this->executeQuerywithBindParameters($select, $selectQuery)->toArray();
                 if (count($result) == 0) {
                     throw new ServiceException("App Does not belong to the account", "app.for.account.not.found");
                 }
-            } elseif ((isset($data['command']) && $data['command'] != 'register_account') || (isset($data['commands']) && $data['commands'][0] != 'register_account')) {
+            } elseif ((isset($data['command']) && $data['command'] != 'register_account') || (isset($data['commands']) && $data['commands'][0] != 'register_account')
+            ) {
                 throw new ServiceException("You are not authorized to use this command", "app.for.register account");
             }
             $data['app_id'] = $appId;
@@ -147,7 +145,7 @@ class CommandService extends AbstractService
                 $this->logger->info(CommandService::class . print_r($inputData, true));
             }
             if (isset($outputData)) {
-                $this->logger->info("Process Command Data" . print_r($outputData, true));
+                $this->logger->info("Process Command Data".print_r($outputData, true));
                 unset($outputData['app_id']);
                 return $outputData;
             }
@@ -263,16 +261,15 @@ class CommandService extends AbstractService
         };
     }
 
-    private function setupBusinessRelationship($data)
-    {
+    private function setupBusinessRelationship($data){
         if (isset($data['sellerAccountName'])) {
-            $response =  $this->getDataByParams('ox_account', array('uuid'), array('name' => $data['sellerAccountName']))->toArray();
-            if (count($response) > 0) {
+            $response =  $this->getDataByParams('ox_account',array('uuid'), array('name' => $data['sellerAccountName']))->toArray();
+            if (count($response) > 0) {                
                 $sellerAccountId = $response[0]['uuid'];
             } else {
-                throw new ServiceException("Seller Account Not Found", "seller.account.notfound", OxServiceException::ERR_CODE_NOT_FOUND);
+                throw new ServiceException("Seller Account Not Found", "seller.account.notfound", OxServiceException::ERR_CODE_NOT_FOUND );                
             }
-        } else if (isset($data['sellerAccountId'])) {
+        } else if(isset($data['sellerAccountId'])){
             $sellerAccountId = $data['sellerAccountId'];
         } else {
             $sellerAccountId = AuthContext::get(AuthConstants::ACCOUNT_UUID);
@@ -281,21 +278,24 @@ class CommandService extends AbstractService
         $buyerBusinessRole  = $data['businessRole'];
         $sellerBusinessRole = $data['sellerBusinessRole'];
         $appId = $data['appId'];
-        return $this->businessParticipantService->setupBusinessRelationship($buyerAccountId, $sellerAccountId, $buyerBusinessRole, $sellerBusinessRole, $appId);
+        return $this->businessParticipantService->setupBusinessRelationship($buyerAccountId, $sellerAccountId, $buyerBusinessRole, $sellerBusinessRole,$appId);
     }
 
     private function snoozeFile($data)
     {
-        if (isset($data['fileId']) && isset($data['snoozePipeline'])) {
+        if(isset($data['fileId']) && isset($data['snoozePipeline']))
+        {   
             $result = $this->fileService->snoozeFile([
-                'fileId' => $data['fileId'],
+                'fileId'=>$data['fileId'],
                 'snooze' => $data['snoozePipeline']
             ]);
             unset($data['snoozePipeline']);
             return $data;
-        } else {
+        }
+        else{
             throw new EntityNotFoundException("fileId or snoozePipeline not specified");
         }
+
     }
 
     private function registerAccount($data)
@@ -360,7 +360,7 @@ class CommandService extends AbstractService
 
     protected function getRouteData(&$data, $request)
     {
-        $this->logger->info("EXECUTE DELEGATE inside route data ---- " . print_r($data, true));
+        $this->logger->info("EXECUTE DELEGATE ---- " . print_r($data, true));
         if (isset($data['app_id']) && isset($data['route'])) {
             $app_id = $data['app_id'];
         } else {
@@ -388,7 +388,7 @@ class CommandService extends AbstractService
             $this->logger->info("jobUrl/Cron/JobName Not Specified");
             throw new EntityNotFoundException("JobUrl or Cron Expression or JobName Not Specified");
         }
-
+        
         $jobUrl = $data['jobUrl'];
         $cron = $data['cron'];
         $jobGroup = $data['jobName'];
@@ -397,11 +397,11 @@ class CommandService extends AbstractService
         } else {
             $jobName = $data['uuid'];
         }
-        $appId = isset($data['app_id']) ? $data['app_id'] : null;
+        $appId = isset($data['app_id']) ? $data['app_id'] : null ;
         if (!$appId) {
             throw new InvalidParameterException("App Id not provided");
         }
-
+        
         $accountId = isset($data['account_id']) ? $data['account_id'] : AuthContext::get(AuthConstants::ACCOUNT_ID);
         unset($data['jobUrl'], $data['cron'], $data['command'], $data['url']);
         $this->logger->info("JOB DATA ------" . json_encode($data));
@@ -431,29 +431,36 @@ class CommandService extends AbstractService
         }
         $JobData = (is_array($data[$jobName]) ? $data[$jobName] : json_decode($data[$jobName], true));
 
-        if ((isset($JobData['jobId']) && isset($JobData['jobGroup'])) || (isset($JobData['jobName']) && isset($JobData['jobGroup']))) {
+        if((isset($JobData['jobId']) && isset($JobData['jobGroup'])) || (isset($JobData['jobName'])&& isset($JobData['jobGroup'])))
+        {
 
             $appId = isset($data['appId']) ? $data['appId'] : null;
             if (!$appId) {
                 throw new InvalidParameterException("App Id not provided");
             }
-
+    
             $groupName = $JobData['jobGroup'];
             $data[$jobName] = array();
 
-            if (isset($JobData['jobId'])) {
+            if(isset($JobData['jobId']))
+            {
                 $this->jobService->cancelJobId($JobData['jobId'], $appId, $groupName);
-            } else if (isset($JobData['jobName'])) {
-                $accountId = isset($data['account_id']) ? $data['account_id'] : AuthContext::get(AuthConstants::ACCOUNT_ID);
-                $this->jobService->cancelJob($JobData['jobName'], $groupName, $appId, $accountId);
             }
-
+            else if(isset($JobData['jobName']))
+            {
+                $accountId = isset($data['account_id']) ? $data['account_id'] : AuthContext::get(AuthConstants::ACCOUNT_ID);
+                $this->jobService->cancelJob($JobData['jobName'],$groupName,$appId,$accountId);
+            }
+            
             $this->logger->info("Cancel Job Data - " . print_r($data, true));
             return $data;
-        } else {
+        }
+        else
+        {
             $this->logger->warn("Invalid set of parameters specified, so job not cancelled");
             return $data;
         }
+
     }
 
     protected function fileSave(&$data)
@@ -461,15 +468,13 @@ class CommandService extends AbstractService
         $this->logger->info("File Save Service Start" . print_r($data, true));
         $fileId = isset($data['fileId']) ? $data['fileId'] : (isset($data['uuid']) ? $data['uuid'] : null);
         if ($fileId) {
-            $this->logger->info("File id" . print_r($fileId, true));
             $file = $this->fileService->updateFile($data, $fileId);
-            $this->logger->info("File id" . print_r($file, true));
         } elseif (isset($data['workflow_instance_id'])) {
             $select = "SELECT ox_file.uuid from ox_file 
                         join ox_workflow_instance on ox_workflow_instance.file_id = ox_file.id 
                         where ox_workflow_instance.id=:workflowInstanceId;";
             $selectParams = array("workflowInstanceId" => $data['workflow_instance_id']);
-            $this->logger->info("Executing query $select using params - " . json_encode($selectParams));
+            $this->logger->info("Executing query $select using params - ".json_encode($selectParams));
             $result = $this->executeQueryWithBindParameters($select, $selectParams)->toArray();
             if (count($result) == 0) {
                 $this->logger->info("File Save ---- Workflow Instance Id Not Found");
@@ -481,18 +486,19 @@ class CommandService extends AbstractService
             $file = $this->fileService->createFile($filedata);
             $data['fileId'] = $filedata['uuid'];
             $data['uuid'] = $filedata['uuid'];
-            $this->logger->info("File data" . print_r($data, true));
         }
-        $this->logger->info("File Save Service end" . print_r($data, true));
         return $data;
     }
 
     protected function executeDelegate(&$data)
     {
-        $this->logger->info("EXECUTE DELEGATE inside execute delegate ---- " . print_r($data, true));
-        $data['appId'] = !empty($data['appId']) ? $data['appId'] : $data['app_id'];
-        if (!empty($data['appId']) && isset($data['delegate'])) {
-            $app_id = $data['appId'];
+        $this->logger->info("EXECUTE DELEGATE ---- " . print_r($data, true));
+        if (isset($data['app_id']) && isset($data['delegate'])) {
+            $app_id = $data['app_id'];
+            if (isset($data['appId'])) {
+                $app_id = $data['appId'];
+            }
+            $app_id = UuidUtil::isValidUuid($app_id)? $app_id : $this->getUuidFromId('ox_app', $app_id);
             $delegate = $data['delegate'];
             unset($data['delegate']);
         } else {
@@ -671,7 +677,7 @@ class CommandService extends AbstractService
     {
         // TODO IF IDENTIFIER FIELD IS NOT SET GET IT FROM ox_entity_user_relation LIKE IN setupIdentityField METHOD
         if (isset($data['identifier_field']) && isset($data['appId']) && isset($data[$data['identifier_field']])) {
-            $appId = UuidUtil::isValidUuid($data['appId']) ? $this->getIdFromUuid('ox_app', $data['appId']) : $data['appId'];
+            $appId = UuidUtil::isValidUuid($data['appId'])?$this->getIdFromUuid('ox_app', $data['appId']):$data['appId'];
             $select = "SELECT * from ox_wf_user_identifier where identifier_name = :identityField AND app_id = :appId AND identifier = :identifier";
             $selectQuery = array("identityField" => $data['identifier_field'], "appId" => $appId, "identifier" => $data[$data['identifier_field']]);
             $result = $this->executeQuerywithBindParameters($select, $selectQuery)->toArray();
@@ -775,7 +781,7 @@ class CommandService extends AbstractService
             }
             unset($data['data']);
             $processedData = array_merge($data, $fileData);
-            $this->logger->info("Processed Data" . print_r($processedData, true));
+            $this->logger->info("Processed Data".print_r($processedData, true));
             foreach ($processedData as $key => $value) {
                 if (is_array($value)) {
                     $processedData[$key] = json_encode($value);

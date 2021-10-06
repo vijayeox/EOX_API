@@ -1,5 +1,4 @@
 <?php
-
 namespace Oxzion\AppDelegate;
 
 use Oxzion\Db\Persistence\Persistence;
@@ -24,10 +23,6 @@ trait UserContextTrait
     {
         return $this->userId;
     }
-    public function getUserByUuid($uuid)
-    {
-        return $this->userService->getUserByUuid($uuid);
-    }
     public function getusername()
     {
         return $this->username;
@@ -44,14 +39,6 @@ trait UserContextTrait
     {
         return $this->userService->getUser($userId, $getAllFields);
     }
-    public function getUsers($filterParams = null, $baseUrl = '', $params = null)
-    {
-        return $this->userService->getUsers($filterParams = null, $baseUrl = '', $params = null);
-    }
-    public function getUserIdList($uuidList)
-    {
-        return $this->userService->getUserIdList($uuidList);
-    }
     public function setUserService(UserService $userService)
     {
         $this->logger->info("SET User SERVICE");
@@ -62,8 +49,7 @@ trait UserContextTrait
         return $this->userService->getUserDetailsByIdentifier($identifier, $identifierName);
     }
 
-    public function getUserDataByIdentifier($appId, $identifier, $identifierField)
-    {
+    public function getUserDataByIdentifier($appId, $identifier, $identifierField){
         return $this->userService->getUserDataByIdentifier($appId, $identifier, $identifierField);
     }
 
