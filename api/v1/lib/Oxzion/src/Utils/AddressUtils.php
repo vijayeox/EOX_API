@@ -71,7 +71,7 @@ class AddressUtils
         $returnArray = array_intersect_key($returnArray, array_combine($list, $list));
 		self::$logger->info(get_class()." input data - " . print_r($address, true));
 		self::$logger->info(get_class()." output data - " . print_r($returnArray, true));
-        return $returnArray;
+        return (count($returnArray) === 1 && isset($returnArray['address'])) ? [] : $returnArray;
     }
 
     public static function getCountryDetails(string $country)
