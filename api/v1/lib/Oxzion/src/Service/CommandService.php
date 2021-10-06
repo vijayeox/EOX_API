@@ -498,6 +498,7 @@ class CommandService extends AbstractService
             if (isset($data['appId'])) {
                 $app_id = $data['appId'];
             }
+            $app_id = UuidUtil::isValidUuid($app_id)? $app_id : $this->getUuidFromId('ox_app', $app_id);
             $delegate = $data['delegate'];
             unset($data['delegate']);
         } else {
