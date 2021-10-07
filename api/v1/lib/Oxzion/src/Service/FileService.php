@@ -78,7 +78,9 @@ class FileService extends AbstractService
 
         if (isset($data['assocId'])) {
             $assocId = $this->getIdFromUuid('ox_file', $data['assocId']);
-        } else {
+        } else if(isset($data['bos']['assoc_id']) && UuidUtil::isValidUuid($data['bos']['assoc_id'])){
+            $assocId = $this->getIdFromUuid('ox_file', $data['bos']['assoc_id']);
+        }else {
             $assocId = null;
         }
 
