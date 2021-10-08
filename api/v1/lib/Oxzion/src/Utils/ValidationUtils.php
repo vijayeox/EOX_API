@@ -31,7 +31,7 @@ class ValidationUtils
                     break;
                 case 'boolean':
                     if (!validate::BoolVal()->validate($value)) {
-                        throw new \Exception("Expected a boolean", 1);
+                        throw new \InvalidArgumentException("Expected a boolean");
                     }
                     $value = (bool) $value;
                     break;
@@ -41,11 +41,11 @@ class ValidationUtils
                 case 'date':
                     if ($value) {
                         if ((strlen($value) != 10) || !checkdate(date('m', strtotime($value)), date('d', strtotime($value)), date('Y', strtotime($value))))
-                            throw new \Exception('Invalid Date', 1);
+                            throw new \InvalidArgumentException('Invalid Date');
                     }
                 case 'datetime':
                     if (!validate::dateTime()->validate($value)) {
-                        throw new \Exception("Invalid DateTime", 1);
+                        throw new \InvalidArgumentException("Invalid DateTime");
                     }
                     break;
                 case 'uuid':
@@ -53,29 +53,29 @@ class ValidationUtils
                     break;
                 case 'uuidstrict':
                     if (!validate::uuid()->validate($value)) {
-                        throw new \Exception("Invalid uuid", 1);
+                        throw new \InvalidArgumentException("Invalid uuid");
                     }
                     break;
                 case 'json':
                     if (!validate::json()->validate($value)) {
-                        throw new \Exception("Invalid Json", 1);
+                        throw new \InvalidArgumentException("Invalid Json");
                     }
                     break;
                 case 'url':
                     if (!validate::url()->validate($value)) {
-                        throw new \Exception("Invalid Url", 1);
+                        throw new \InvalidArgumentException("Invalid Url");
                     }
                     break;
                 case 'xml':
                     $xmlErr = XMLUtils::isValid($value, ($getMessage == self::MESSAGE));
                     if ($xmlErr !== true) {
-                        throw new \Exception($xmlErr, 1);
+                        throw new \InvalidArgumentException($xmlErr);
                     }
                     break;
                 case 'base64':
                 case 'base64binary':
-                    if (!validate::base64()->validate($value)) {
-                        throw new \Exception("Invalid Base64String", 1);
+                    if (!validate::base64()->validate($value) || base64_decode($value) === false) {
+                        throw new \InvalidArgumentException("Invalid Base64String");
                     }
                     break;
                 case 'inarray':
@@ -104,7 +104,7 @@ class ValidationUtils
                     break;
                 case SELF::EXCEPTION:
                 default:
-                    throw new \Exception($message, 1);
+                    throw new \InvalidArgumentException($message);
                     break;
             }
         }

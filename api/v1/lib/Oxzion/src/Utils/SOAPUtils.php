@@ -43,9 +43,9 @@ class SOAPUtils extends \SoapClient
             throw new ServiceException(json_encode($errors), 'validation.errors', OxServiceException::ERR_CODE_NOT_ACCEPTABLE);
         }
         try {
-            self::$logger->info(get_class()." SOAPCall ".$function." - " . print_r($data, true));
+            self::$logger->info(get_class()." SOAPCall ".$function." - " . json_encode($data));
             $response = $this->{$function}($data);
-            self::$logger->info(get_class()." SOAPCall response ".$function." - " . print_r($response, true));
+            self::$logger->info(get_class()." SOAPCall response ".$function." - " . json_encode($response));
         } catch (\Exception $e) {
             self::$logger->info(get_class()." SOAPCall Exception ".$function." - " . print_r($e->getMessage(), true));
             throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
@@ -100,7 +100,7 @@ class SOAPUtils extends \SoapClient
                 $errors[$key] = 'Value cannot be Nill';
             } else {
                 if (!empty($value['type'])) {
-                    switch ($value['type']) {
+                    switch (strtolower($value['type'])) {
                         case 'enumeration':
                             $tempData = ['data' => $data[$key], 'options' => $value['enumeration']];
                             $valid = ValidationUtils::isValid('inArray', $tempData, true);
@@ -108,6 +108,8 @@ class SOAPUtils extends \SoapClient
                         case 'pattern':
                             $tempData = ['data' => $data[$key], 'regex' => '/'.$value['pattern'].'/m'];
                             $valid = ValidationUtils::isValid('regex', $tempData, true);
+                            break;
+                        case 'base64binary':
                             break;
                         default:
                             $valid = ValidationUtils::isValid($value['type'], $data[$key], true);
