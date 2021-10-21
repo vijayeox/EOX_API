@@ -2660,7 +2660,7 @@ class FileService extends AbstractService
             LEFT JOIN ox_file as oxf ON oxf.id = ox_file_assignee.file_id
             LEFT JOIN ox_user_role ON ox_file_assignee.role_id = ox_user_role.role_id 
             LEFT JOIN ox_account_user au on au.id = ox_user_role.account_user_id
-            inner join ox_user as oxuc on of.created_by = oxuc.id
+            inner join ox_user as ou on of.created_by = ou.id
             LEFT JOIN ox_user ON ox_file_assignee.user_id = ox_user.id";
 
     $fileQuery = "FROM ox_file as `of` 
@@ -2670,7 +2670,7 @@ class FileService extends AbstractService
         LEFT JOIN ox_user_team ON ox_file_assignee.team_id = ox_user_team.team_id
         LEFT JOIN ox_user_role ON ox_file_assignee.role_id = ox_user_role.role_id 
         LEFT JOIN ox_account_user au on au.id = ox_user_role.account_user_id
-        inner join ox_user as oxuc on `of`.created_by = `oxuc`.id
+        inner join ox_user as ou on `of`.created_by = `ou`.id
         LEFT JOIN ox_user ON ox_file_assignee.user_id = ox_user.id";
     if (!empty($filterParams)) {
         $cacheQuery = '';
@@ -2701,7 +2701,7 @@ class FileService extends AbstractService
     $whereQuery .= 'of.is_active = 1  AND COALESCE(of.is_snoozed,0) !=1 ';
     $pageSize = "LIMIT " . (isset($filterParamsArray[0]['take']) ? $filterParamsArray[0]['take'] : 20);
     $offset = "OFFSET " . (isset($filterParamsArray[0]['skip']) ? $filterParamsArray[0]['skip'] : 0);
-    $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status as fileStatus,oxuc.name as created_by,`of`.rygStatus,`of`.version,
+    $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date as startDate,`of`.end_date as endDate,`of`.status as fileStatus,ou.name as created_by,`of`.rygStatus,`of`.version,
     NULL as activityInstanceId,NULL as workflowInstanceId, `of`.date_created as created_date,en.name as entity_name,
     NULL as activityName, `of`.date_created,
     CASE WHEN ox_file_assignee.assignee = 0 then 1
@@ -2710,7 +2710,7 @@ class FileService extends AbstractService
     $countQuery = "SELECT count(id) as `count` 
                     from ((SELECT distinct ox_file_assignee.id $fromQuery $filterFromQuery $whereQuery) UNION all (SELECT distinct ox_file_assignee.id $fileQuery $filterFromQuery $whereQuery)) as t1";
     $countResultSet = $this->executeQuerywithParams($countQuery)->toArray();
-    $fieldList = "distinct ox_app.name as appName,`of`.id as myId,ox_workflow.name as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status,oxuc.name as created_by,`of`.rygStatus,`of`.version,
+    $fieldList = "distinct ox_app.name as appName,`of`.id as myId,ox_workflow.name as workflow_name, `of`.uuid,`of`.data,`of`.start_date as startDate,`of`.end_date as endDate,`of`.status as fileStatus,ou.name as created_by,`of`.rygStatus,`of`.version,
     ox_activity_instance.activity_instance_id as activityInstanceId,ox_workflow_instance.process_instance_id as workflowInstanceId, ox_activity_instance.start_date as created_date,en.name as entity_name,
     ox_activity.name as activityName, `of`.date_created,
     CASE WHEN ox_file_assignee.assignee = 0 then 1
