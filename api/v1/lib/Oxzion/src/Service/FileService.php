@@ -1958,7 +1958,11 @@ class FileService extends AbstractService
             }
         }
         if ($labelMapping && !empty($initialData) && isset($labelMapping[$initialData])) {
+          if ($value['data_type'] == 'numeric') {
+            $initialData = $initialData;
+          }else {
             $initialData = $labelMapping[$initialData];
+          }
         }
         return $initialData;
     }
