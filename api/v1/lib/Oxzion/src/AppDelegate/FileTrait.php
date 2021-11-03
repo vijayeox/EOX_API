@@ -43,6 +43,12 @@ trait FileTrait
         return $this->fileService->updateFile($params, $fileId);
     }
 
+    protected function deleteFile($id, $version)
+    {
+        $this->logger->info("delete FILE");
+        return $this->fileService->deleteFile($id, $version);
+    }
+
     protected function getWorkflowInstanceByFileId($fileId)
     {
         $this->logger->info("GET FILE BY WORKFLOW INSTANCE ID");

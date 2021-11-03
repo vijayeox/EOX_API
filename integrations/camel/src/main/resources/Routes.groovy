@@ -45,7 +45,7 @@ routes {
 															  "${callback.URL}/fileindexer/file"]],
 		['from':'activemq:queue:FILE_UPDATED', 			'to':["${callback.URL}/callback/file/update"]],
 		['from':'activemq:queue:FILE_UPDATED_WITH_UUID','to':[ "${callback.URL}/fileindexer/file"]],													  
-		['from':'activemq:queue:FILE_DELETED', 			'to':["${callback.URL}/fileindexer"]],
+		['from':'activemq:queue:FILE_DELETED', 			'to':["${callback.URL}/fileindexer/remove"]],
 		['from':'activemq:topic:PROCESS_BATCH_INDEX',	'to':["${callback.URL}/fileindexer/batch"]],
 
 		['from':'activemq:topic:COMMANDS', 				'to':["${callback.URL}/callback/workflow/servicetask"]],

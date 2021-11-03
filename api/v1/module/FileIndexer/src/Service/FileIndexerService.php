@@ -98,19 +98,24 @@ class FileIndexerService extends AbstractService
         }
     }
 
-    public function deleteDocument($fileId)
+    public function deleteDocument($fileUUId)
     {
-        $sql = $this->getSqlObject();
-        $select = $sql->select();
-        $select->from('ox_app')
-        ->columns(array('name'))->join('ox_form', 'ox_form.app_id = ox_app.id', array(), 'inner')->join('ox_file', 'ox_file.form_id = ox_form.id', array(), 'inner')
-        ->where(array('ox_file.id' => $fileId));
-        $response = $this->executeQuery($select)->toArray();
+        $this->logger->info("In FileIndexer Delete. Id:".$fileUUId);
+        $select = "SELECT file.id as id,app.name as name
+        from ox_file as file
+        INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
+        INNER JOIN ox_app as app on entity.app_id = app.id
+        where file.uuid = :uuid";
+        $params = array('uuid' => $fileUUId);
+        $response = $this->executeQuerywithBindParameters($select, $params)->toArray();
+        
         if (count($response) == 0) {
             return 0;
         }
         $app_name = $response[0]['name'];
         if (isset($app_name)) {
+            $fileId = $response[0]['id'];
+            $this->logger->info("Sennding Elastic Delete Message for fileid:".$fileId);
             $this->messageProducer->sendQueue(json_encode(array('index'=>  $app_name.'_index','id' => $fileId, 'operation' => 'Delete', 'type' => '_doc')), 'elastic');
             return array('fileId' => $fileId);
         }
