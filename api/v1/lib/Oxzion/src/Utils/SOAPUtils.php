@@ -37,16 +37,31 @@ class SOAPUtils extends \SoapClient
         $this->setHeader('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'Security', $soapVar, true);
     }
 
-    public function makeCall(string $function, array $data = [], bool $clean = true)
+    public function makeCall(string $function, array $data = [], bool $clean = true, bool $validate = true)
     {
-        if ($errors = $this->getValidData($function, $data)) {
+        // $orgData = $data;
+        if ($validate && ($errors = $this->getValidData($function, $data))) {
             throw new ServiceException(json_encode($errors), 'validation.errors', OxServiceException::ERR_CODE_NOT_ACCEPTABLE);
         }
         try {
             self::$logger->info(get_class()." SOAPCall ".$function." - " . json_encode($data));
             $response = $this->{$function}($data);
             self::$logger->info(get_class()." SOAPCall response ".$function." - " . json_encode($response));
+            // if ($function == "AddQuoteWithAutocalculateDetails") {
+            //     echo "<pre>";print_r([
+            //         "function" => $function,
+            //         "data" => $data,
+            //         // "orgData" => $orgData,
+            //         // 'functionStruct' => $this->getFunctionStruct($function),
+            //         "client" => $this,
+            //         // "response" => $this->{$function}($data)
+            //     ]);
+            //     exit;
+            // } else {
+            //     $response = $this->{$function}($data);
+            // }
         } catch (\Exception $e) {
+            // echo "<pre>";print_r(["function" => $function,"data" => $data]);exit;
             self::$logger->info(get_class()." SOAPCall Exception ".$function." - " . print_r($e->getMessage(), true));
             throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
         }

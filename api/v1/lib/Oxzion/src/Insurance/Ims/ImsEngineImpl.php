@@ -51,7 +51,8 @@ class ImsEngineImpl implements InsuranceEngine
     {
         $this->checkHandle($method);
         try {
-            $response = $this->soapClient->makeCall($method, $data);
+            $bypassValidation = ['SaveRatingSheet'];
+            $response = $this->soapClient->makeCall($method, $data, true, !in_array($method, $bypassValidation));
         } catch (\Exception $e) {
             if (!$suppressError) throw $e;
             $response = [];

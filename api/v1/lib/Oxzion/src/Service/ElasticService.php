@@ -153,7 +153,7 @@ class ElasticService
 
     public function filterData($accountId, $app_name, $searchconfig)
     {
-        $boolfilter = array();
+        $boolfilterquery = array();
         $tmpfilter = $this->getFilters($searchconfig, $accountId);
 
         if ($tmpfilter) {
@@ -248,12 +248,12 @@ class ElasticService
         } else {
             if (!in_array($column, $this->filterFields) && !($type == 'inline' && in_array($column, $this->excludes))) {
                 $value = AnalyticsUtils::checkSessionValue($value);
-                if ($condition == "==" || $condition == "eq") {
+                if ($condition == "===" || $condition == "==" || $condition == "eq") {
                     if (!is_array($value)) {
                         if (strtolower(substr($value, 0, 5)) == "date:") {
                             $value = date("Y-m-d", strtotime(substr($value, 5)));
                             $subQuery['range'] = array($column => array('gte' => $value, 'lte' => $value, "format" => "yyyy-MM-dd"));
-                        } elseif (!is_numeric($value)) {
+                        } elseif ($condition !== "===" && !is_numeric($value)) {
                             $subQuery['match'] = array($column . ".keyword" => array('query' => $value, 'operator' => 'and'));
                         } else {
                             $subQuery['match'] = array($column => array('query' => $value, 'operator' => 'and'));
@@ -486,7 +486,7 @@ class ElasticService
         }
     }
 
-    public function getBoostFields($entity)
+    public function getBoostFields(string $entity, array $fields)
     {
         switch ($entity) {
             case 'files':
@@ -508,7 +508,7 @@ class ElasticService
                 return array('id^6', 'attachment.content^4', 'filename^2');
                 break;
             default:
-                return;
+                return $fields;
                 break;
         }
     }
