@@ -2565,8 +2565,8 @@ class FileService extends AbstractService
             $this->logger->info("getFileVersionChangeLog----$select".print_r($params, true));
             $resultSet = $this->executeQuerywithBindParameters($select, $params)->toArray();
             // echo "-----\n";print_r($resultSet);
-            $selectQuery = " SELECT ofal.entity_id,ofal.data,ofal.created_by,ofal.modified_by,ofal.date_modified,ofal.date_created FROM ox_file_audit_log ofal WHERE (ofal.id = :fileId or ofal.uuid = :uuid) and ofal.version =:version";
-            $paramsQuery = array('fileId' => $fileId,'uuid' => $fileId,'version'=>$previousFileVersion);
+            $selectQuery = " SELECT ofal.entity_id,ofal.data,ofal.created_by,ofal.modified_by,ofal.date_modified,ofal.date_created FROM ox_file_audit_log ofal WHERE ofal.uuid = :uuid and ofal.version =:version";
+            $paramsQuery = array('uuid' => $fileId,'version'=>$previousFileVersion);
             $resultQuery = $this->executeQuerywithBindParameters($selectQuery, $paramsQuery)->toArray();
             if (count($resultSet) > 0) {
                 $entityId = $resultSet[0]['entity_id'];
