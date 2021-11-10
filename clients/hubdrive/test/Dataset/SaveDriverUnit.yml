@@ -1,0 +1,18 @@
+ox_app:
+  - id: 97
+    name: "ox_client_app"
+    uuid: "5060e4d5-006a-4054-85c0-bbf78579412d"
+    description: "Hubdrive Online Client Application"
+    category: "OTHERS"
+    date_created: "2019-06-26 00:00:00"
+    type: 2
+    status: 1
+    created_by: 1
+
+ox_app_entity:
+  - id: 1
+    name: "On Trac Compliance"
+    app_id: 97
+    date_created: "2019-06-26 00:00:00"
+    uuid: "d23d0c68-98c9-11e9-adc5-308d99c9145b"
+    created_by: 1

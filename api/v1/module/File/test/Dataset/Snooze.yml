@@ -1,0 +1,36 @@
+ox_app:
+  - id: 100
+    name: "SnoozeTestApp"
+    uuid: "454a1ec4-eeab-4dc2-8a3f-6a4255ffaee1"
+    category: "OTHERS"
+    date_created: "2019-06-26 00:00:00"
+    type: 2
+    status: 1
+    created_by: 1
+ox_app_entity:
+  - id: 1
+    name: "SnoozeEntity"
+    app_id: 100
+    date_created: "2019-06-26 00:00:00"
+    uuid: "634ac8e7-e429-46eb-a581-e89f3cd7772e"
+    created_by: 1
+ox_file:
+  - id: 1
+    account_id: 1
+    data: '{"firstname" : "Neha","policy_period" : "1year","card_expiry_date" : "10/24","city" : "Bangalore","orgUuid" : "53012471-2863-4949-afb1-e69b0891c98a","isequipmentliability" : "1","card_no" : "1234","state" : "karnataka","app_id" : "ec8942b7-aa93-4bc6-9e8c-e1371988a5d4","zip" : "560030","coverage" : "100000","product" : "Individual Professional Liability","address2" : "dhgdhdh","address1" : "hjfjhfjfjfhfg","expiry_date" : "2020-06-30","form_id" : "0","entity_id" : "1","created_by" : "1","expiry_year" : "2019","lastname" : "Rai","isexcessliability" : "1","workflow_instance_id" : "1","credit_card_type" : "credit","workflowId" : "a01a6776-431a-401e-9288-6acf3b2f3925","email" : "bharat@gmail.com"}'
+    uuid: "870caa5b-695a-4ee6-bdd6-9564f1d7e366"
+    date_created: "2019-06-25 00:00:00"
+    entity_id: 1
+    is_active: 1
+    form_id: 1
+    is_snoozed: 0
+
+  - id: 2
+    account_id: 1
+    data: '{"firstname" : "Neha","policy_period" : "1year","card_expiry_date" : "10/24","city" : "Bangalore","orgUuid" : "53012471-2863-4949-afb1-e69b0891c98a","isequipmentliability" : "1","card_no" : "1234","state" : "karnataka","app_id" : "ec8942b7-aa93-4bc6-9e8c-e1371988a5d4","zip" : "560030","coverage" : "100000","product" : "Individual Professional Liability","address2" : "dhgdhdh","address1" : "hjfjhfjfjfhfg","expiry_date" : "2020-06-30","form_id" : "0","entity_id" : "1","created_by" : "1","expiry_year" : "2019","lastname" : "Rai","isexcessliability" : "1","workflow_instance_id" : "1","credit_card_type" : "credit","workflowId" : "a01a6776-431a-401e-9288-6acf3b2f3925","email" : "bharat@gmail.com"}'
+    uuid: "6a5521c3-dcf3-4854-b2d0-dc430eb48a75"
+    date_created: "2019-06-25 00:00:00"
+    entity_id: 1
+    is_active: 1
+    form_id: 1
+    is_snoozed: 1

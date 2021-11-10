@@ -62,7 +62,7 @@ class BusinessRoleServiceTest extends AbstractServiceTest
         $queryResult = $this->executeQueryTest($query);
         $this->assertEquals(1, count($queryResult));
         $this->assertEquals(1, $queryResult[0]['created_by']);
-        $this->assertNotEquals($roleId, $queryResult[0]['uuid']);
+        $this->assertEquals($roleId, $queryResult[0]['uuid']);
         $this->assertEquals(null, $queryResult[0]['modified_by']);
         $this->assertEquals(null, $queryResult[0]['date_modified']);
         $this->assertEquals(date('Y-m-d'), date_create($queryResult[0]['date_created'])->format('Y-m-d'));
@@ -131,5 +131,22 @@ class BusinessRoleServiceTest extends AbstractServiceTest
         $this->assertEquals(null, $data['date_modified']);
         $this->assertEquals($dataset['ox_business_role'][0]['name'], $data['name']);
         $this->assertEquals($dataset['ox_business_role'][0]['version'], $data['version']);
+    }
+
+    public function testPreventionOfDuplicateBusinessRole() {
+        $dataset = $this->parseYaml();
+        $data['name'] = $dataset['ox_business_role'][0]['name'];
+        $appId = $dataset['ox_app'][0]['uuid'];
+        $resultData = $this->businessRoleService->saveBusinessRole($appId, $data);
+        $this->assertEquals(true, isset($data['uuid']));
+        $query = "select * from ox_business_role where uuid = '".$data['uuid']."'";
+        $queryResult = $this->executeQueryTest($query);
+        $this->assertEquals($dataset['ox_business_role'][0]['id'], $queryResult[0]['id']);
+        $this->assertEquals($dataset['ox_business_role'][0]['uuid'], $queryResult[0]['uuid']);
+        $this->assertEquals($dataset['ox_business_role'][0]['created_by'], $queryResult[0]['created_by']);
+        $this->assertEquals(null, $queryResult[0]['modified_by']);
+        $this->assertEquals($dataset['ox_business_role'][0]['date_created'], $queryResult[0]['date_created']);
+        $this->assertEquals(null, $queryResult[0]['date_modified']);
+        $this->assertEquals($dataset['ox_business_role'][0]['name'], $queryResult[0]['name']);
     }
 }

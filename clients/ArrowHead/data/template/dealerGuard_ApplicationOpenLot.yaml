@@ -288,115 +288,115 @@
 -
    Source Worksheet: 'False Pretense Limit:'
    pageName: APPLICATION
-   key: falsePretenseNumber
+   key: dealerguardOpenLot*checkfalsePretenseNumber
    cell: 'Y22'
 -
    Source Worksheet: New - Comp
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_newComp
+   key: requestedCoverage_new1_comp
    cell: F15
 -
    Source Worksheet: New - Coll
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_newCollision
+   key: requestedCoverage_new1_collision
    cell: F15
 -
    Source Worksheet: New - False Pretense
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_newFalsePretense
+   key: requestedCoverage_new1_falsePretense
    cell: T15
 -
    Source Worksheet: 'Used - Comp '
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_usedComp
+   key: requestedCoverage_used1_comp
    cell: F16
 -
    Source Worksheet: 'Used - Coll'
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_usedCollision
+   key: requestedCoverage_used1_collision
    cell: F16
 -
    Source Worksheet: Used - False Pretense
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_usedFalsePretense
+   key: requestedCoverage_used1_falsePretense
    cell: T16
 -
    Source Worksheet: Demo Furnished - Comp
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_demosFurnishedAutosComp
+   key: requestedCoverage_demos_comp
    cell: F17
 -
    Source Worksheet: Demo Furnished - Coll
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_demosFurnishedAutosCollision
+   key: requestedCoverage_demos_collision
    cell: F17
 -
    Source Worksheet: Demo Furnished - False Pretense
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_demosFurnishedAutosFalsePretense
+   key: requestedCoverage_demos_falsePretense
    cell: T17
 -
    Source Worksheet: Service Loaners - Comp
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_serviceLoanersComp
+   key: requestedCoverage_service_comp
    cell: F18
 -
    Source Worksheet: Service Loaners - Coll
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_serviceLoanersCollision
+   key: requestedCoverage_service_collision
    cell: F18
 -
    Source Worksheet: Service Loaners - False Pretense
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_serviceLoanersFalsePretense
+   key: requestedCoverage_service_falsePretense
    cell: T18
 -
    Source Worksheet: Other - Owned - Comp
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_otherOwnedComp
+   key: requestedCoverage_otherOwned_comp
    cell: F19
 -
    Source Worksheet: Other - Owned - Coll
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_otherOwnedCollision
+   key: requestedCoverage_otherOwned_collision
    cell: F19
 -
    Source Worksheet: Other - Owned - False Pretense
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_otherOwnedFalsePretense
+   key: requestedCoverage_otherOwned_falsePretense
    cell: T19
 -
    Source Worksheet: Other - Non-Owned - Comp
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_otherNonOwnedComp
+   key: requestedCoverage_otherNonOwned_comp
    cell: F20
 -
    Source Worksheet: Other - Non-Owned - Coll
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_otherNonOwnedCollision
+   key: requestedCoverage_otherNonOwned_collision
    cell: F20
 -
    Source Worksheet: Other - Non-Owned - False Pretense
    pageName: APPLICATION
    method : "checkbox_X"
-   key: requestedCoverageQuestions_otherNonOwnedFalsePretense
+   key: requestedCoverage_otherNonOwned_falsePretense
    cell: T20
 -
    Source Worksheet: 'Total number of demos/furnished auto provided: '
@@ -437,20 +437,9 @@
 -
    pageName: SOV
    skip: "25_3"
-   key: dealerguardOpenLot*SOVFranchise_franchise
-   method: simpleDatagrid
-   type: DataGrid
-   cell: C5
--
-   pageName: SOV
-   skip: "25_3"
    key: dealerguardOpenLot*SOVGrid
    type: DataGrid
-   cell: D5
--
-   pageName: APPLICATION
-   key: dealerguardOpenLot*checkemployees
-   cell: O46
+   cell: C5
 -
    pageName: ADDITIONAL INTEREST
    skip: "1_8"

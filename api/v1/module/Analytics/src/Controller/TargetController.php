@@ -5,6 +5,7 @@ namespace Analytics\Controller;
 use Analytics\Model\Target;
 use Exception;
 use Oxzion\Controller\AbstractApiController;
+use Analytics\Service\TargetService;
 
 class TargetController extends AbstractApiController
 {
@@ -13,8 +14,9 @@ class TargetController extends AbstractApiController
     /**
      * @ignore __construct
      */
-    public function __construct($targetService)
+    public function __construct(TargetService $targetService)
     {
+        
         parent::__construct(null, __class__, Target::class);
         $this->setIdentifierName('targetUuid');
         $this->targetService = $targetService;

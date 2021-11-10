@@ -43,7 +43,7 @@ ox_privilege:
     app_id: 240
 ox_role_privilege:
 -
-    id: 235
+    id: 1238
     role_id: 1
     privilege_name: "MANAGE_POLICY_APPROVAL"
     permission: 3

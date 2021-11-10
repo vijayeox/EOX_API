@@ -8,25 +8,22 @@ use Oxzion\Auth\AuthContext;
 use Oxzion\ServiceException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\AccountService;
-use Oxzion\Service\AppService;
+use Oxzion\Service\AppRegistryService;
 
 class RegistrationService extends AbstractService
 {
     private $accountService;
-    private $appService;
+    private $appRegistryService;
 
-    public function __construct($config, $dbAdapter, AccountService $accountService, AppService $appService)
+    public function __construct($config, $dbAdapter, AccountService $accountService, AppRegistryService $appRegistryService)
     {
         parent::__construct($config, $dbAdapter);
         $this->accountService = $accountService;
-        $this->appService = $appService;
+        $this->appRegistryService = $appRegistryService;
     }
 
     public function registerAccount(&$data)
     {
         $this->accountService->registerAccount($data);
-        if (isset($data['app_id'])) {
-            $this->appService->createAppRegistry($data['app_id'], $data['accountId']);
-        }
     }
 }

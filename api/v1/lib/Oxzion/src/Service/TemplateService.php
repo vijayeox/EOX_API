@@ -1,15 +1,11 @@
 <?php
 namespace Oxzion\Service;
 
-use Smarty;
 use Exception;
-use Oxzion\Service\AbstractService;
-use Oxzion\Utils\BosUtils;
-use Oxzion\Auth\AuthContext;
-use Oxzion\Auth\AuthConstants;
-use Oxzion\Utils\ArtifactUtils;
-use Oxzion\Document\Template\Smarty\SmartyTemplateProcessorImpl;
 use Oxzion\Document\Template\Excel\ExcelTemplateProcessorImpl;
+use Oxzion\Document\Template\Smarty\SmartyTemplateProcessorImpl;
+use Oxzion\Service\AbstractService;
+use Oxzion\Utils\ArtifactUtils;
 
 class TemplateService extends AbstractService
 {
@@ -30,27 +26,33 @@ class TemplateService extends AbstractService
 
     public function init()
     {
-        $dataFolder = $this->config['DATA_FOLDER'];
         $templateDir = $this->config['TEMPLATE_FOLDER'];
-        if (!file_exists($templateDir)) {
-            mkdir($templateDir, 0777, true);
-        }
-        if (!file_exists($cacheDir = $templateDir.'/cache/')) {
-            mkdir($cacheDir, 0777);
-        }
-        if (!file_exists($configsDir = $templateDir.'/configs/')) {
-            mkdir($configsDir, 0777);
-        }
-        if (!file_exists($templatescDir = $templateDir.'/templates_c/')) {
-            mkdir($templatescDir, 0777);
-        }
-
         $this->templateDir = $templateDir;
         $this->client = new SmartyTemplateProcessorImpl();
-        $params = array('cacheDir' => $cacheDir, 'configsDir' => $configsDir, 'templateDir' => $templateDir, 'compileDir' => $templatescDir);
+        $params = $this->getTemplateFolderList($templateDir);
         $this->client->init($params);
         $this->excelClient = new ExcelTemplateProcessorImpl();
         $this->excelClient->init();
+    }
+
+    public function getTemplateFolderList($templateDir)
+    {
+        if (!file_exists($templateDir)) {
+            mkdir($templateDir, 0777, true);
+        }
+        if (!file_exists($cacheDir = $templateDir . '/cache/')) {
+            mkdir($cacheDir, 0777);
+        }
+        if (!file_exists($configsDir = $templateDir . '/configs/')) {
+            mkdir($configsDir, 0777);
+        }
+        if (!file_exists($templatescDir = $templateDir . '/templates_c/')) {
+            mkdir($templatescDir, 0777);
+        }
+        if (!file_exists($OITemplateDir = $templateDir . '/OITemplate/')) {
+            mkdir($OITemplateDir, 0777);
+        }
+        return array('cacheDir' => $cacheDir, 'configsDir' => $configsDir, 'templateDir' => $templateDir, 'compileDir' => $templatescDir, 'OITemplateDir' => $OITemplateDir);
     }
 
     /**
@@ -66,12 +68,12 @@ class TemplateService extends AbstractService
      */
     public function getContent($templateName, $data = array(), $options = array())
     {
-        $this->logger->info("Template Name:".$templateName);
-        $this->logger->info("Data context".print_r($data, true));
+        $this->logger->info("Template Name:" . $templateName);
+        $this->logger->info("Data context" . print_r($data, true));
 
         $template = $this->getTemplateDir($templateName, $data, $options);
-        $this->logger->info("Template Directory:".print_r($template['templatePath'], true));
-        $this->logger->info("Template Directory:".print_r($template['templateNameWithExt'], true));
+        $this->logger->info("Template Directory:" . print_r($template['templatePath'], true));
+        $this->logger->info("Template Name with Extension:" . print_r($template['templateNameWithExt'], true));
         if (!$template) {
             throw new Exception("Template not found!");
         }
@@ -84,9 +86,9 @@ class TemplateService extends AbstractService
         }
         try {
             $content = $client->getContent($template, $data, $options);
-            $this->logger->info("TEMPLATE CONTENT".print_r($content, true));
+            $this->logger->info("TEMPLATE CONTENT" . print_r($content, true));
         } catch (Exception $e) {
-            print("Error - ".$e->getMessage()."\n");
+            print("Error - " . $e->getMessage() . "\n");
             throw $e;
         }
         return $content;
@@ -106,7 +108,7 @@ class TemplateService extends AbstractService
 
     public function getTemplatePath($template, $params = array())
     {
-        $this->logger->info("Params - ".print_r($params, true));
+        $this->logger->info("Params - " . print_r($params, true));
         $this->logger->debug("In getTemplatePath");
         return ArtifactUtils::getTemplatePath($this->config, $template, $params);
     }

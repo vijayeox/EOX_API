@@ -11,6 +11,7 @@ use Oxzion\Document\DocumentBuilder;
 use Oxzion\Messaging\MessageProducer;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\FileService;
+use Team\Service\TeamService;
 use Oxzion\Service\FieldService;
 use Oxzion\Service\WorkflowInstanceService;
 use Oxzion\Service\ActivityInstanceService;
@@ -19,7 +20,11 @@ use Oxzion\Utils\FileUtils;
 use Oxzion\Service\UserService;
 use Oxzion\Service\CommentService;
 use Oxzion\Service\EsignService;
+use Oxzion\Service\AccountService;
 use Oxzion\EntityNotFoundException;
+use Oxzion\Service\BusinessParticipantService;
+use \Analytics\Service\QueryService;
+use oxzion\Insurance\InsuranceService;
 
 class AppDelegateService extends AbstractService
 {
@@ -43,7 +48,12 @@ class AppDelegateService extends AbstractService
         UserService $userService,
         CommentService $commentService,
         EsignService $esignService,
-        FieldService $fieldService
+        FieldService $fieldService,
+        AccountService $accountService,
+        BusinessParticipantService $businessParticipantService,
+        QueryService $queryService,
+        InsuranceService $insuranceService,
+        TeamService $teamService
     )
     {
         $this->templateService = $templateService;
@@ -54,6 +64,7 @@ class AppDelegateService extends AbstractService
         $this->messageProducer = $messageProducer;
         $this->userService = $userService;
         $this->commentService = $commentService;
+        $this->teamService = $teamService;
         $this->esignService = $esignService;
         parent::__construct($config, $dbAdapter);
         $this->documentBuilder = $documentBuilder;
@@ -61,6 +72,10 @@ class AppDelegateService extends AbstractService
         if (!is_dir($this->delegateDir)) {
             mkdir($this->delegateDir, 0777, true);
         }
+        $this->accountService = $accountService;
+        $this->businessParticipantService = $businessParticipantService;
+        $this->queryService = $queryService;
+        $this->insuranceService = $insuranceService;
     }
 
     public function setPersistence($appId, $persistence)
@@ -78,9 +93,14 @@ class AppDelegateService extends AbstractService
         $this->fileService = $fileService;
     }
 
+    public function setInsuranceService($insuranceService)
+    {
+        $this->insuranceService = $insuranceService;
+    }
+
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService);
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService );
         return $appDelegateService;
     }
 
@@ -99,6 +119,7 @@ class AppDelegateService extends AbstractService
                     }
                     $this->logger->info("Document template location - $destination");
                     $obj->setDocumentPath($destination);
+                    $obj->setBaseUrl($this->config['internalBaseUrl']);
                 } elseif (is_a($obj, CommunicationDelegate::class)) {
                     $this->logger->info(AppDelegateService::class . "MAIL DELEGATE ---");
                     $destination = $this->config['APP_DOCUMENT_FOLDER'];
@@ -148,8 +169,23 @@ class AppDelegateService extends AbstractService
                 if (method_exists($obj, "setCommentService")) {
                     $obj->setCommentService($this->commentService);
                 }
+                if (method_exists($obj, "setTeamService")) {
+                    $obj->setTeamService($this->teamService);
+                }
                 if (method_exists($obj, "setEsignService")) {
                     $obj->setEsignService($this->esignService);
+                }
+                if (method_exists($obj, "setAccountService")) {
+                    $obj->setAccountService($this->accountService);
+                }
+                if (method_exists($obj, "setBusinessParticipantService")) {
+                    $obj->setBusinessParticipantService($this->businessParticipantService);
+                }
+                if (method_exists($obj, "setQueryService")) {
+                    $obj->setQueryService($this->queryService);
+                }
+                if (method_exists($obj, "setInsuranceService")) {
+                    $obj->setInsuranceService($this->insuranceService);
                 }
                 if (method_exists($obj, "setAppDelegateService")) {
                     $obj->setAppDelegateService($this->setAppDelegateService());

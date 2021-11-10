@@ -207,14 +207,8 @@ class TeamService extends AbstractService
         if (isset($file)) {
             $image = FileUtils::convetImageTypetoPNG($file);
             if ($image) {
-                if (FileUtils::fileExists($destFile)) {
-                    imagepng($image, $destFile . '/logo.png');
-                    $image = null;
-                } else {
-                    mkdir($destFile);
-                    imagepng($image, $destFile . '/logo.png');
-                    $image = null;
-                }
+                imagepng($image, $this->getTeamLogoPath($accountId, $id, true) . '/logo.png');
+                $image = null;
             }
         }
     }
@@ -399,11 +393,12 @@ class TeamService extends AbstractService
         $where = "";
         try {
             $sort = "ox_user.name";
-            $query = "SELECT ox_user.uuid,ox_user.name,case when (ox_team.manager_id = ox_user.id)
+            $query = "SELECT ox_user.uuid,ox_user.name,oxp.email,case when (ox_team.manager_id = ox_user.id)
                 then 1
                 end as is_manager";
-            $from = " FROM ox_user left join ox_user_team on ox_user.id = ox_user_team.avatar_id left join ox_team on ox_team.id = ox_user_team.team_id";
+            $from = " FROM ox_user left join ox_user_team on ox_user.id = ox_user_team.avatar_id left join ox_team on ox_team.id = ox_user_team.team_id left join ox_person oxp on oxp.id=ox_user.person_id";
             $cntQuery = "SELECT count(ox_user.id)" . $from;
+            if (isset($filterParams)) {
             if (count($filterParams) > 0 || sizeof($filterParams) > 0) {
                 $filterArray = json_decode($filterParams['filter'], true);
                 if (isset($filterArray[0]['filter'])) {
@@ -418,12 +413,15 @@ class TeamService extends AbstractService
                 $pageSize = $filterArray[0]['take'];
                 $offset = $filterArray[0]['skip'];
             }
+        }
             $where .= strlen($where) > 0 ? " AND ox_team.uuid = '" . $params['teamId'] . "' AND ox_team.status = 'Active' AND ox_team.account_id = " . $accountId : " WHERE ox_team.uuid = '" . $params['teamId'] . "' AND ox_team.status = 'Active' AND ox_team.account_id = " . $accountId;
+            // $group = " GROUP BY ox_user.uuid";
             $sort = " ORDER BY " . $sort;
             $limit = " LIMIT " . $pageSize . " offset " . $offset;
+            // $this->logger->info("Print query......" . print_r($cntQuery . $where));
             $resultSet = $this->executeQuerywithParams($cntQuery . $where);
             $count = $resultSet->toArray()[0]['count(ox_user.id)'];
-            $query = $query . " " . $from . " " . $where . " " . $sort . " " . $limit;
+            $query = $query . " " . $from . " " . $where . " " .$sort . " " . $limit;
             $resultSet = $this->executeQuerywithParams($query);
         } catch (Exception $e) {
             throw $e;

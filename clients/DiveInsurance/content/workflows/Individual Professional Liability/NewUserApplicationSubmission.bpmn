@@ -36,9 +36,6 @@
       <bpmn:outgoing>SequenceFlow_19lqizm</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_19lqizm" sourceRef="Task_1mka1rj" targetRef="EndEvent_19debzw" />
-    <bpmn:sequenceFlow id="SequenceFlow_0d6flow" name="Approved" sourceRef="Task_1s7qzh3" targetRef="ExclusiveGateway_06iy274">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved == "accepted"}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:userTask id="Task_1s7qzh3" name="CSR Review" camunda:asyncAfter="true" camunda:candidateUsers="{{role:CSR}}">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -48,14 +45,14 @@
           <camunda:property name="template" value="csrInitiatesIpl" />
         </camunda:properties>
         <camunda:executionListener event="start">
-          <camunda:script scriptFormat="groovy">execution.setVariable('CSRReviewRequired', false)</camunda:script>
+          <camunda:script scriptFormat="groovy">execution.setVariable('CSRReviewRequired', false)
+</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_0gvf8c9</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_0m69sz4</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_1r1a5vu</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0d6flow</bpmn:outgoing>
-      <bpmn:outgoing>SequenceFlow_199pho8</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:exclusiveGateway id="ExclusiveGateway_1a80v3g" camunda:asyncAfter="true">
       <bpmn:extensionElements>
@@ -185,9 +182,6 @@ if ((initiatedByCsr == true || initiatedByCsr == "true") &amp;&amp; (approved ==
     <bpmn:sequenceFlow id="SequenceFlow_1maipgq" name="Bypass CSR Approval" sourceRef="ExclusiveGateway_1a80v3g" targetRef="ExclusiveGateway_06iy274">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${CSRReviewRequired==false and RejectedPolicy != true and transaction_status != "Action Not Permitted"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="SequenceFlow_199pho8" name="Rejected/Onhold" sourceRef="Task_1s7qzh3" targetRef="Task_1g3m6bq">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved == "rejected" or approved== "onHold"}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:serviceTask id="Task_1g3m6bq" name="CSR Rejection or OnHold" camunda:expression="0">
       <bpmn:extensionElements>
         <camunda:inputOutput>
@@ -207,8 +201,8 @@ if(status == "onHold"){
 }</camunda:script>
         </camunda:executionListener>
       </bpmn:extensionElements>
-      <bpmn:incoming>SequenceFlow_199pho8</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_022khxp</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_199pho8</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0gvf8c9</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_177n7jz</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -223,9 +217,7 @@ if(status == "onHold"){
 
 execution.setVariable('policyStatus', 'Pending Approval')
 
-execution.setVariable('csrPolicyPeriod', start_date)
-
-</camunda:script>
+execution.setVariable('csrPolicyPeriod', start_date)</camunda:script>
         </camunda:executionListener>
         <camunda:inputOutput>
           <camunda:inputParameter name="command">fileSave</camunda:inputParameter>
@@ -238,8 +230,8 @@ execution.setVariable('csrPolicyPeriod', start_date)
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${RejectedPolicy == true}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:exclusiveGateway id="ExclusiveGateway_06iy274">
-      <bpmn:incoming>SequenceFlow_0d6flow</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_1maipgq</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_0cknkrc</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_16ob5w0</bpmn:outgoing>
       <bpmn:outgoing>SequenceFlow_1b31ud4</bpmn:outgoing>
     </bpmn:exclusiveGateway>
@@ -286,6 +278,22 @@ execution.setVariable('csrPolicyPeriod', start_date)
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="SequenceFlow_1i8eylg" sourceRef="ExclusiveGateway_17ldnvw" targetRef="Task_03fwvvy" />
     <bpmn:sequenceFlow id="SequenceFlow_1r1a5vu" sourceRef="Task_03fwvvy" targetRef="Task_1s7qzh3" />
+    <bpmn:sequenceFlow id="SequenceFlow_0cknkrc" name="Approved" sourceRef="Task_1prw6hr" targetRef="ExclusiveGateway_06iy274">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved == "accepted"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_199pho8" name="Rejected/Onhold" sourceRef="Task_1prw6hr" targetRef="Task_1g3m6bq">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved == "rejected" or approved== "onHold"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_0d6flow" sourceRef="Task_1s7qzh3" targetRef="Task_1prw6hr" />
+    <bpmn:scriptTask id="Task_1prw6hr" name="Empty Approval handler" scriptFormat="groovy">
+      <bpmn:incoming>SequenceFlow_0d6flow</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0cknkrc</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_199pho8</bpmn:outgoing>
+      <bpmn:script>def status = execution.getVariable('approved')
+if(status == null){
+execution.setVariable('approved',"onHold")
+}</bpmn:script>
+    </bpmn:scriptTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="IPLNewPolicy">
@@ -328,16 +336,8 @@ execution.setVariable('csrPolicyPeriod', start_date)
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0gvf8c9_di" bpmnElement="SequenceFlow_0gvf8c9">
         <di:waypoint x="793" y="396" />
-        <di:waypoint x="701" y="396" />
-        <di:waypoint x="701" y="291" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_199pho8_di" bpmnElement="SequenceFlow_199pho8">
-        <di:waypoint x="751" y="270" />
-        <di:waypoint x="843" y="270" />
-        <di:waypoint x="843" y="356" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="759" y="283" width="82" height="14" />
-        </bpmndi:BPMNLabel>
+        <di:waypoint x="680" y="396" />
+        <di:waypoint x="680" y="291" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1maipgq_di" bpmnElement="SequenceFlow_1maipgq">
         <di:waypoint x="354" y="226" />
@@ -353,13 +353,6 @@ execution.setVariable('csrPolicyPeriod', start_date)
         <di:waypoint x="455" y="251" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="408" y="233" width="18" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_0d6flow_di" bpmnElement="SequenceFlow_0d6flow">
-        <di:waypoint x="751" y="251" />
-        <di:waypoint x="1045" y="251" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="921" y="233" width="47" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_19lqizm_di" bpmnElement="SequenceFlow_19lqizm">
@@ -408,6 +401,32 @@ execution.setVariable('csrPolicyPeriod', start_date)
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ExclusiveGateway_17ldnvw_di" bpmnElement="ExclusiveGateway_17ldnvw" isMarkerVisible="true">
         <dc:Bounds x="935" y="371" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0cknkrc_di" bpmnElement="SequenceFlow_0cknkrc">
+        <di:waypoint x="893" y="251" />
+        <di:waypoint x="1045" y="251" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="946" y="233" width="47" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_199pho8_di" bpmnElement="SequenceFlow_199pho8">
+        <di:waypoint x="820" y="291" />
+        <di:waypoint x="820" y="320" />
+        <di:waypoint x="843" y="320" />
+        <di:waypoint x="843" y="356" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="782" y="310" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0d6flow_di" bpmnElement="SequenceFlow_0d6flow">
+        <di:waypoint x="751" y="251" />
+        <di:waypoint x="793" y="251" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="936" y="233" width="47" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ScriptTask_0dap0q2_di" bpmnElement="Task_1prw6hr">
+        <dc:Bounds x="793" y="211" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

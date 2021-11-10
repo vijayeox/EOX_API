@@ -1,0 +1,30 @@
+name: 'List IC'
+description: 'Shows a list of ICs'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Independent Contractor Application Details'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of ICs</h5>'
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName
+               

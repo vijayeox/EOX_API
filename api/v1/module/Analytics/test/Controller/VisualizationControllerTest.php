@@ -37,7 +37,7 @@ class VisualizationControllerTest extends ControllerTest
     {
         $this->initAuthToken($this->adminUser);
         $data = ['name' => 'Line','configuration' => '{"data":"config"}','renderer' => 'chart','type' => 'chart'];
-        $this->assertEquals(5, $this->getConnection()->getRowCount('ox_visualization'));
+        $this->assertEquals(6, $this->getConnection()->getRowCount('ox_visualization'));
         $this->setJsonContent(json_encode($data));
         $this->dispatch('/analytics/visualization', 'POST', $data);
         $content = (array)json_decode($this->getResponse()->getContent(), true);
@@ -47,14 +47,14 @@ class VisualizationControllerTest extends ControllerTest
         $content = (array)json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data']['name'], $data['name']);
-        $this->assertEquals(6, $this->getConnection()->getRowCount('ox_visualization'));
+        $this->assertEquals(7, $this->getConnection()->getRowCount('ox_visualization'));
     }
 
     public function testCreateWithoutRequiredField()
     {
         $this->initAuthToken($this->adminUser);
         $data = ['name' => ''];
-        $this->assertEquals(5, $this->getConnection()->getRowCount('ox_visualization'));
+        $this->assertEquals(6, $this->getConnection()->getRowCount('ox_visualization'));
         $this->setJsonContent(json_encode($data));
         $this->dispatch('/analytics/visualization', 'POST', $data);
         $this->assertResponseStatusCode(406);
@@ -136,12 +136,12 @@ class VisualizationControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array)json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']['data']), 5);
+        $this->assertEquals(count($content['data']['data']), 6);
         $this->assertEquals($content['data']['data'][3]['uuid'], '44f22a46-26d2-48df-96b9-c58520005817');
         $this->assertEquals($content['data']['data'][3]['name'], 'Bar');
         $this->assertEquals($content['data']['data'][4]['name'], 'Aggregate');
         $this->assertEquals($content['data']['data'][4]['uuid'], '101b3d1e-175b-43d8-ac38-485e80e6b2f3');
-        $this->assertEquals($content['data']['total'], 5);
+        $this->assertEquals($content['data']['total'], 6);
     }
 
     public function testGetListWithDeleted()
@@ -152,13 +152,13 @@ class VisualizationControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array)json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']['data']), 5);
+        $this->assertEquals(count($content['data']['data']), 6);
         $this->assertEquals($content['data']['data'][3]['uuid'], '44f22a46-26d2-48df-96b9-c58520005817');
         $this->assertEquals($content['data']['data'][3]['name'], 'Bar');
         $this->assertEquals($content['data']['data'][3]['isdeleted'], 0);
         $this->assertEquals($content['data']['data'][4]['name'], 'Aggregate');
         $this->assertEquals($content['data']['data'][4]['uuid'], '101b3d1e-175b-43d8-ac38-485e80e6b2f3');
-        $this->assertEquals($content['data']['total'], 5);
+        $this->assertEquals($content['data']['total'], 6);
     }
 
     public function testGetListWithSort()
@@ -169,12 +169,12 @@ class VisualizationControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array)json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']['data']), 5);
+        $this->assertEquals(count($content['data']['data']), 6);
         $this->assertEquals($content['data']['data'][0]['uuid'], '101b3d1e-175b-43d8-ac38-485e80e6b2f3');
         $this->assertEquals($content['data']['data'][0]['name'], 'Aggregate');
         $this->assertEquals($content['data']['data'][1]['name'], 'Aggregate value');
         $this->assertEquals($content['data']['data'][1]['uuid'], '153f4f96-9b6c-47db-95b2-104af23e7522');
-        $this->assertEquals($content['data']['total'], 5);
+        $this->assertEquals($content['data']['total'], 6);
     }
 
     public function testGetListSortWithPageSize()
@@ -185,11 +185,11 @@ class VisualizationControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array)json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']['data']), 4);
+        $this->assertEquals(count($content['data']['data']), 5);
         $this->assertEquals($content['data']['data'][1]['uuid'], '44f22a46-26d2-48df-96b9-c58520005817');
         $this->assertEquals($content['data']['data'][1]['name'], 'Bar');
         $this->assertEquals($content['data']['data'][1]['is_owner'], 'true');
-        $this->assertEquals($content['data']['total'], 5);
+        $this->assertEquals($content['data']['total'], 6);
     }
 
     public function testGetListwithQueryParameters()

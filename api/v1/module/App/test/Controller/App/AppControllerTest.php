@@ -4,6 +4,8 @@ namespace App;
 use App\Controller\AppController;
 use App\Controller\AppRegisterController;
 use Oxzion\Service\AppService;
+use Oxzion\Service\RegistrationService;
+use Oxzion\Service\FileService;
 use Mockery;
 use Oxzion\Test\ControllerTest;
 use Oxzion\Utils\FileUtils;
@@ -94,6 +96,15 @@ class AppControllerTest extends ControllerTest
         $appService->setRestClient($mockRestClient);
         return $mockRestClient;
     }
+    
+    public function getRegistrationService(){
+        return $this->getApplicationServiceLocator()->get(RegistrationService::class);
+    }
+
+    public function getFileService(){
+        return $this->getApplicationServiceLocator()->get(FileService::class);
+    }
+
 
     private function cleanFile()
     {
@@ -110,6 +121,50 @@ class AppControllerTest extends ControllerTest
         $contentTypeHeader = $this->getResponseHeader('content-type')->toString();
         $contentTypeRegex = '/application\/json(;? *?charset=utf-8)?/i';
         $this->assertTrue(preg_match($contentTypeRegex, $contentTypeHeader) ? true : false);
+    }
+
+        public function testDeployAppWithCreateFile()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhdowithforms.yml');
+        $this->initAuthToken($this->adminUser);
+        if (enableCamundaForDeployApp == 0) {
+            $mockProcessManager = $this->getMockProcessManager();
+            $mockProcessManager->expects('deploy')->withAnyArgs()->once()->andReturn(array('Process_1dx3jli:1eca438b-007f-11ea-a6a0-bef32963d9ff'));
+            $mockProcessManager->expects('parseBPMN')->withAnyArgs()->once()->andReturn(null);
+        }
+        if (enableExecUtils == 0) {
+            $mockRestClient = $this->getMockRestClientForAppService();
+            $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
+        }
+        if (enableCamel == 0) {
+            $mockRestClient = $this->getMockRestClientForScheduleService();
+            $mockRestClient->expects('postWithHeader')->with("setupjob", Mockery::any())->once()->andReturn(array('body' => '{"Success":true,"Message":"Job Scheduled Successfully!","JobId":"3a289705-763d-489a-b501-0755b9d4b64b","JobGroup":"autoRenewalJob"}'));
+        }
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res1 = $this->executeQueryTest($sel);
+        $data = '{"IcLastName":"Gordon","autoInsuranceCompany":"","autoInsuranceExpirationDate":"","autoLiability":false,"autoPolicy":"","cargoInsurance":false,"cargoInsuranceCompany":"","cargoInsuranceExpirationDate":"","cargoInsurancePolicy":"","city1IC":"Quae eos alias obcaecati dignissimos unde vero con","companyName":"","dataGrid":[{"nameDriverUnit":"Nehru","driverLastName":"Gordon","street1DriverUnitInfo":"87 Green Oak Lane","city1DriverUnitInfo":"d","stateDriverUnitInfo":{"name":"Alabama","abbreviation":"AL"},"driverEmail":"tazocaj@mailinator.com","pleaseSelectDriverType":{"":false,"rsp":false,"rspEmployee":false},"rspContactInformation":"","fmcsaMc":"","dot":"","zipCode1DriverUnitInfo":10906}],"dataGrid1":[{"vinDriverInfo":"","makeVin":"","modelVin":""}],"documents":[],"driverEmailWarning":"Please Note : Driver email must be unique","effectiveDate":"2021-05-20T00:00:00+05:30","iCEmail":"vitufunaj@mailinator.com","iCFirstName":"Nehru","identifier_field":"iCEmail","name":"Nehru Gordon","nonOwnedAndHiredAutoInsuranceCompany":"","nonOwnedAndHiredAutoInsuranceExpirationDate":"","pleaseSelectTheFacility":"","state":{"name":"California","abbreviation":"CA"},"stateJsonList":[{"name":"Alabama","abbreviation":"AL"},{"name":"Arizona","abbreviation":"AZ"},{"name":"Arkansas","abbreviation":"AR"},{"name":"California","abbreviation":"CA"},{"name":"Colorado","abbreviation":"CO"},{"name":"Connecticut","abbreviation":"CT"},{"name":"Delaware","abbreviation":"DE"},{"name":"District Of Columbia","abbreviation":"DC"},{"name":"Florida","abbreviation":"FL"},{"name":"Georgia","abbreviation":"GA"},{"name":"Hawaii","abbreviation":"HI"},{"name":"Idaho","abbreviation":"ID"},{"name":"Illinois","abbreviation":"IL"},{"name":"Indiana","abbreviation":"IN"},{"name":"Iowa","abbreviation":"IA"},{"name":"Kansas","abbreviation":"KS"},{"name":"Kentucky","abbreviation":"KY"},{"name":"Louisiana","abbreviation":"LA"},{"name":"Maine","abbreviation":"ME"},{"name":"Maryland","abbreviation":"MD"},{"name":"Massachusetts","abbreviation":"MA"},{"name":"Michigan","abbreviation":"MI"},{"name":"Minnesota","abbreviation":"MN"},{"name":"Mississippi","abbreviation":"MS"},{"name":"Missouri","abbreviation":"MO"},{"name":"Montana","abbreviation":"MT"},{"name":"Nebraska","abbreviation":"NE"},{"name":"Nevada","abbreviation":"NV"},{"name":"New Hampshire","abbreviation":"NH"},{"name":"New Jersey","abbreviation":"NJ"},{"name":"New Mexico","abbreviation":"NM"},{"name":"New York","abbreviation":"NY"},{"name":"North Carolina","abbreviation":"NC"},{"name":"North Dakota","abbreviation":"ND"},{"name":"Ohio","abbreviation":"OH"},{"name":"Oklahoma","abbreviation":"OK"},{"name":"Oregon","abbreviation":"OR"},{"name":"Pennsylvania","abbreviation":"PA"},{"name":"Rhode Island","abbreviation":"RI"},{"name":"South Carolina","abbreviation":"SC"},{"name":"South Dakota","abbreviation":"SD"},{"name":"Tennessee","abbreviation":"TN"},{"name":"Texas","abbreviation":"TX"},{"name":"Utah","abbreviation":"UT"},{"name":"Vermont","abbreviation":"VT"},{"name":"Virginia","abbreviation":"VA"},{"name":"Washington","abbreviation":"WA"},{"name":"West Virginia","abbreviation":"WV"},{"name":"Wisconsin","abbreviation":"WI"},{"name":"Wyoming","abbreviation":"WY"}],"status":"Non-Compliant","street1IC":"87 Green Oak Lane","textFieldNonOwnedAndHiredAutoInsurancePolicy":"","zipCode1IC":10906,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","app_id":"'.$res1[0]['id'].'","entity_name":"Compliance","accountId":null,"workFlowId":null,"filterParams":{"filter":[{"filter":{"filters":[{"field":"iCEmail","operator":"eq","value":"vitufunaj@mailinator.com"}]}}]},"entityName":"Compliance"}';
+        $data = json_decode($data, true);
+        $fileService = $this->getFileService();
+        $fileService->createFile($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $sel = "select * from ox_file order by id desc";
+        $resFile = $this->executeQueryTest($sel);
+        $sel = "select * from ox_file_participant";
+        $resFileParticipant = $this->executeQueryTest($sel);
+        $this->assertEquals(1, count($resFileParticipant));       
+        $this->assertEquals($resFileParticipant[0]['file_id'], $resFile[0]['id']); 
+        $this->assertEquals(1, $resFileParticipant[0]['account_id']); 
+        $entityId = $resFile[0]['entity_id'];
+        $accountId = $resFileParticipant[0]['account_id'];
+        $sel = "SELECT obr.account_id 
+                   from ox_account_offering oof 
+                   inner join ox_account_business_role obr on obr.id = oof.account_business_role_id
+                   where oof.entity_id = $entityId and obr.account_id = $accountId";
+        $resEntitySellerAccount = $this->executeQueryTest($sel);
+        $this->assertEquals(1, count($resEntitySellerAccount)); 
     }
 
 
@@ -248,7 +303,7 @@ class AppControllerTest extends ControllerTest
     {
         $this->initAuthToken($this->adminUser);
         $this->dispatch('/app?filter=[{"filter":{"logic":"and","filters":[{"field":"name","operator":"startswith","value":"a"},{"field":"category","operator":"contains","value":"utilities"}]},"sort":[{"field":"id","dir":"asc"}],"skip":0,"take":1}]', 'GET');
-        
+
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertResponseStatusCode(200);
         $this->setDefaultAsserts();
@@ -1057,7 +1112,7 @@ class AppControllerTest extends ControllerTest
         $this->assertEquals(2, count($businessRole));
         $this->assertEquals($yaml['businessRole'][0]['name'], $businessRole[0]['name']);
         $this->assertEquals($yaml['businessRole'][1]['name'], $businessRole[1]['name']);
-        $query = "SELECT * from ox_role 
+        $query = "SELECT * from ox_role
                     WHERE business_role_id is not null OR account_id = $accountId ORDER BY name";
         $role = $this->executeQueryTest($query);
         $this->assertEquals(7, count($role));
@@ -1070,8 +1125,8 @@ class AppControllerTest extends ControllerTest
         $this->assertEquals($yaml['role'][1]['name'], $role[5]['name']);
         $this->assertEquals(null, $role[5]['account_id']);
         $this->assertEquals($businessRole[1]['id'], $role[5]['business_role_id']);
-        
-        $query = "SELECT rp.*,r.name from ox_role_privilege rp 
+
+        $query = "SELECT rp.*,r.name from ox_role_privilege rp
                     inner join ox_role r on r.id = rp.role_id WHERE r.business_role_id is not null order by r.name";
         $rolePrivilege = $this->executeQueryTest($query);
 
@@ -1091,7 +1146,6 @@ class AppControllerTest extends ControllerTest
         $this->assertEquals($role[5]['id'], $rolePrivilege[2]['role_id']);
         $this->assertEquals(null, $rolePrivilege[2]['account_id']);
         $this->assertEquals($appId, $rolePrivilege[2]['app_id']);
-        
         $this->assertEquals($yaml['role'][1]['privileges'][1]['privilege_name'], $rolePrivilege[3]['privilege_name']);
         $this->assertEquals($yaml['role'][1]['privileges'][1]['permission'], $rolePrivilege[3]['permission']);
         $this->assertEquals($role[5]['id'], $rolePrivilege[3]['role_id']);
@@ -1102,7 +1156,7 @@ class AppControllerTest extends ControllerTest
         $accountBusinessRole = $this->executeQueryTest($query);
         $this->assertEquals(1, count($accountBusinessRole));
         $this->assertEquals($businessRole[0]['id'], $accountBusinessRole[0]['business_role_id']);
-        
+
         $query = "select * from ox_app_entity where app_id = $appId order by name";
         $entity = $this->executeQueryTest($query);
         $this->assertEquals(2, count($entity));
@@ -1118,8 +1172,8 @@ class AppControllerTest extends ControllerTest
             $this->assertEquals(null, $value['date_modified']);
             $this->assertEquals(0, $value['override_data']);
         }
-        $query = "SELECT ei.* from ox_entity_identifier ei 
-                    inner join ox_app_entity e on e.id = ei.entity_id 
+        $query = "SELECT ei.* from ox_entity_identifier ei
+                    inner join ox_app_entity e on e.id = ei.entity_id
                     where e.app_id = $appId order by e.name";
         $entityIdentifier = $this->executeQueryTest($query);
         $this->assertEquals(2, count($entityIdentifier));
@@ -1127,8 +1181,8 @@ class AppControllerTest extends ControllerTest
             $this->assertEquals($entity[$key]['id'], $value['entity_id']);
             $this->assertEquals($yaml['entity'][$key]['identifiers'][0]['identifier'], $value['identifier']);
         }
-        $query = "SELECT ei.* from ox_entity_participant_role ei 
-                    inner join ox_app_entity e on e.id = ei.entity_id 
+        $query = "SELECT ei.* from ox_entity_participant_role ei
+                    inner join ox_app_entity e on e.id = ei.entity_id
                      order by e.name";
         $participantRoles = $this->executeQueryTest($query);
         $this->assertEquals(2, count($participantRoles));
@@ -1136,7 +1190,7 @@ class AppControllerTest extends ControllerTest
             $this->assertEquals($entity[$key]['id'], $value['entity_id']);
             $this->assertEquals($businessRole[1]['id'], $value['business_role_id']);
         }
-        $query = "SELECT * from ox_account_offering oo 
+        $query = "SELECT * from ox_account_offering oo
                     inner join ox_app_entity ae on ae.id = oo.entity_id order by ae.name";
         $acctOffering = $this->executeQueryTest($query);
         $this->assertEquals(2, count($acctOffering));
@@ -1438,7 +1492,7 @@ class AppControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $entityRecordSetAfterDeletion = $this->executeQueryTest("SELECT name,uuid FROM ox_app WHERE id=99");
+        $entityRecordSetAfterDeletion = $this->executeQueryTest("SELECT name,uuid FROM ox_app WHERE id=199");
         $this->assertEquals($entityRecordSetAfterDeletion[0]['name'], $entityRecordSetBeforeDeletion[0]['id'].'_'.$entityRecordSetBeforeDeletion[0]['name']);
         $this->assertNotEquals($entityRecordSetAfterDeletion[0]['uuid'], '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4');
     }
@@ -1499,6 +1553,101 @@ class AppControllerTest extends ControllerTest
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data'][0]['product'], $product);
         $this->assertEquals($content['total'], 1);
+    }
+
+    public function testDeployAppWithRegisterUser()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        if (enableCamundaForDeployApp == 0) {
+            $mockProcessManager = $this->getMockProcessManager();
+            $mockProcessManager->expects('deploy')->withAnyArgs()->once()->andReturn(array('Process_1dx3jli:1eca438b-007f-11ea-a6a0-bef32963d9ff'));
+            $mockProcessManager->expects('parseBPMN')->withAnyArgs()->once()->andReturn(null);
+        }
+        if (enableExecUtils == 0) {
+            $mockRestClient = $this->getMockRestClientForAppService();
+            $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
+        }
+        if (enableCamel == 0) {
+            $mockRestClient = $this->getMockRestClientForScheduleService();
+            $mockRestClient->expects('postWithHeader')->with("setupjob", Mockery::any())->once()->andReturn(array('body' => '{"Success":true,"Message":"Job Scheduled Successfully!","JobId":"3a289705-763d-489a-b501-0755b9d4b64b","JobGroup":"autoRenewalJob"}'));
+        }
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Independent Contractor","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","dataGrid":"[{\"nameDriverUnit\":\"Cain\",\"driverLastName\":\"Rosario\",\"street1DriverUnitInfo\":\"Dolores quidem non q\",\"city1DriverUnitInfo\":\"Dolorum ut excepturi\",\"stateDriverUnitInfo\":{\"name\":\"California\",\"abbreviation\":\"CA\"},\"driverEmail\":\"xonu@mailinator.com\",\"zipCode1DriverUnitInfo\":23990}]","dataGrid1":"[{\"vinDriverInfo\":\"Temporibus aliquam i\",\"makeVin\":\"Rem voluptas et itaq\",\"modelVin\":\"Praesentium obcaecat\",\"yearVin\":1974}]","dataGridtwo":"[{\"documents\":[]}]","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->performAssertions($data);
+        
+    }
+
+
+    private function performAssertions($data)
+    {
+        // Role privilege check
+        $sqlQuery = 'SELECT u.id, up.firstname, up.lastname, up.email, u.account_id FROM ox_user u inner join ox_person up on up.id = u.person_id order by u.id DESC LIMIT 1';
+        $newQueryResult = $this->executeQueryTest($sqlQuery);
+        $accountId = $newQueryResult[0]['account_id'];
+        $sqlQuery = 'SELECT * FROM ox_account where id = '.$accountId;
+        $acctResult = $this->executeQueryTest($sqlQuery);
+        $sqlQuery = 'SELECT br.* FROM ox_account_business_role obr inner join ox_business_role br on obr.business_role_id = br.id where obr.account_id = '.$accountId;
+        $bussRoleResult = $this->executeQueryTest($sqlQuery);
+        $sqlQuery = 'SELECT * FROM ox_role where account_id = '.$accountId;
+        $roleResult = $this->executeQueryTest($sqlQuery);
+        $this->assertEquals(4, count($roleResult));
+        $this->assertEquals($roleResult[0]['name'], 'ADMIN');
+        $this->assertEquals($roleResult[1]['name'], 'MANAGER');
+        $this->assertEquals($roleResult[2]['name'], 'EMPLOYEE');
+        $this->assertEquals($roleResult[3]['name'], 'Manage Drivers');
+        $sqlQuery = 'SELECT * FROM ox_role_privilege where account_id = '.$accountId.' AND role_id = '.$roleResult[3]['id']; 
+        $rolePriviResult = $this->executeQueryTest($sqlQuery);
+        $this->assertEquals(1, count($rolePriviResult));
+        $this->assertEquals($rolePriviResult[0]['privilege_name'], 'MANAGE_EMPLOYEE');
+        $this->assertEquals($rolePriviResult[0]['role_id'], $roleResult[3]['id']);
+        $sqlQuery = "SELECT ur.*,oxr.name as roleName FROM ox_user_role ur 
+                        INNER JOIN ox_account_user au on au.id = ur.account_user_id
+                        INNER JOIN ox_user u on u.id = au.user_id
+                        inner join ox_role oxr on oxr.id = ur.role_id
+                    where u.id = ".$newQueryResult[0]['id'];
+        $urResult = $this->executeQueryTest($sqlQuery);
+        $this->assertEquals($data['iCFirstName'], $newQueryResult[0]['firstname']);
+        $this->assertEquals($data['IcLastName'], $newQueryResult[0]['lastname']);
+        $this->assertEquals($data['iCEmail'], $newQueryResult[0]['email']);
+        if ($data['type'] == 'INDIVIDUAL') {
+            $this->assertEquals($data['iCFirstName']." ".$data['IcLastName'], $acctResult[0]['name']);
+        } else {
+            $this->assertEquals($data['name'], $acctResult[0]['name']);
+        }
+        $this->assertEquals($data['type'], $acctResult[0]['type']);
+        $this->assertEquals($newQueryResult[0]['id'], $acctResult[0]['contactid']);
+        if (isset($data['identifier_field'])) {
+            $sqlQuery = "SELECT * FROM ox_wf_user_identifier where identifier_name = '".$data['identifier_field']."' AND identifier = '".$data[$data['identifier_field']]."'";
+            $identifierResult = $this->executeQueryTest($sqlQuery);
+            $this->assertEquals(1, count($identifierResult));
+            $this->assertEquals($acctResult[0]['id'], $identifierResult[0]['account_id']);
+            $this->assertEquals($newQueryResult[0]['id'], $identifierResult[0]['user_id']);
+        }
+        if (isset($data['businessRole'])) {
+            $this->assertEquals($data['businessRole'], $bussRoleResult[0]['name']);
+            $this->assertEquals("ADMIN", $roleResult[0]['name']);            
+            $this->assertEquals(2, count($urResult));
+            $this->assertEquals($urResult[1]['role_id'], $roleResult[3]['id']);
+            $this->assertEquals($urResult[1]['roleName'], 'Manage Drivers');
+        } else {
+            $this->assertEquals(3, count($roleResult));
+            $this->assertEquals(1, count($urResult));
+        }
+        $sqlQuery = "SELECT ar.* from ox_app_registry ar inner join ox_app a on a.id = ar.app_id 
+                        where a.uuid = '".$data['appId']."' AND account_id = $accountId";
+
+        $result = $this->executeQueryTest($sqlQuery);
+        $this->assertEquals(1, count($result));
+        $this->assertEquals(date('Y-m-d'), date_create($result[0]['date_created'])->format('Y-m-d'));
     }
     // NEED TO ADD INSTALL/UNINSTALL TESTS -SADHITHA
 

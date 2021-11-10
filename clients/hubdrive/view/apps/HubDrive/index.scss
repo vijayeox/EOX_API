@@ -1,0 +1,199 @@
+ .osjs-window[data-id=HubDrive_Window] {
+
+   // Changing the Icon cursor from Pointer to Auto
+   .osjs-window-icon>div {
+     cursor: auto !important;
+   }
+ }
+
+ .osjs-system-context-menu {
+   display: none;
+ }
+ 
+// ---SweetAlert2 Fixes (Start)---
+
+body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
+  height: 100% !important;
+  overflow-y: visible !important;
+}
+
+.swal2-shown {
+  overflow: visible !important;
+}
+
+.swal2-icon.swal2-warning::before {
+  content: unset;
+}
+// ---SweetAlert2 Fixes (End)---
+
+.k-list-scroller {
+  font-size: 14px;
+}
+
+.k-popup {
+  padding: 0px;
+}
+
+.Window_HUB {
+  $primary-color: #1e1246;
+  $secondary: #55b089;
+  $secondary-dark: #282b2d;
+  $secondary-light-grey: #7b7878;
+
+  .formContent {
+    height: 100%;
+    overflow: scroll;
+    font-size: xx-small;
+
+    padding: 10px;
+  }
+  .pagination > .active > a,
+  .pagination > .active > a:focus,
+  .pagination > .active > a:hover,
+  .pagination > .active > span,
+  .pagination > .active > span:focus,
+  .pagination > .active > span:hover {
+    background-color: $primary-color;
+  }
+  .btn-primary {
+    color: #fff;
+    background-color: $primary-color;
+    border-color: $primary-color;
+  }
+  .btn-secondary {
+    color: #ffffff;
+    background-color: $secondary;
+    border-color: $secondary;
+  }
+
+  .btn-secondary.formio-button-remove-row {
+    background-color: #f04124;
+    border-color: #f04124;
+  }
+
+  .formio-component-multiple {
+    .btn-secondary {
+      background-color: #f04124;
+      border-color: #f04124;
+    }
+  }
+
+  .bg-primary {
+    background-color: $primary-color !important;
+  }
+
+  .k-button.k-primary {
+    /*border-color: $primary-color;*/
+    color: #fff;
+    /*background-color: $primary-color;*/
+  }
+  .panel-primary > .panel-heading {
+    color: #fff;
+    background-color: $primary-color;
+    border-color: $primary-color;
+  }
+  .form-control:focus {
+    border-color: $primary-color;
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px #275362b8;
+  }
+
+  .page-link {
+    color: $primary-color;
+  }
+
+  .inlineCheckboxes {
+    .form-radio.radio {
+      .form-check-inline {
+        padding-bottom: 12px;
+        padding-left: 1px;
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  .table.datagrid-table.table-bordered {
+    th {
+      background-color: $primary-color;
+      color: #ffffff;
+    }
+  }
+  .formio-dialog-buttons button.formio-dialog-button {
+    background-color: $secondary;
+  }
+
+  .formio-component-modal-wrapper.formio-component-modal-wrapper-panel {
+    .formio-dialog-close.float-right.btn.btn-secondary {
+      background-color: $primary-color;
+      border: solid 4px lightgray;
+    }
+    .formio-dialog-close:before {
+      font-size: 25px;
+      font-weight: bolder;
+      color: white;
+    }
+    .formio-dialog {
+      .formio-dialog-buttons {
+        .btn-success.formio-dialog-button {
+          float: left;
+        }
+      }
+    }
+  }
+
+  #floater {
+    position: fixed;
+    background-color: #f8f9fa;
+    bottom: 15px;
+    right: 30px;
+    pointer-events: none;
+    img {
+      height: 40px;
+      width: auto;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+    .helpText {
+      position: absolute;
+      display: flex;
+      top: 28px;
+      width: max-content;
+      text-align: center;
+      left: -200px;
+      p {
+        border-radius: 30px;
+        pointer-events: all;
+        background-color: #f0f8ff94;
+        padding: 3px;
+        font-size: 15px;
+        a {
+          padding-left: 5px;
+        }
+      }
+    }
+  }
+
+  .policyStatusReview {
+    background-color: #faaa2c;
+    color: $secondary-dark;
+  }
+
+  .policyStatusFailed {
+    background-color: #ec5b4f;
+    color: white;
+  }
+
+  .formLoader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary-color;
+    font-size: xx-large;
+
+    .fa-spin {
+      font-size: xxx-large;
+    }
+    div {
+      padding-left: 15px;
+    }
+  }
+}

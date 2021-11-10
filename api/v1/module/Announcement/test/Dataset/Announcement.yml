@@ -64,7 +64,7 @@ ox_announcement:
     account_id: 1
     created_date: "2019-06-26 00:00:00"
     start_date: "1996-12-26 00:00:00"
-    end_date: "2021-06-26 00:00:00"
+    end_date: "2025-12-26 00:00:00"
     created_id: 1
     status: 1
     type: "HOMESCREEN"
@@ -75,7 +75,7 @@ ox_announcement:
     account_id: 1
     created_date: "2019-06-26 00:00:00"
     start_date: "1996-12-26 00:00:00"
-    end_date: "2021-06-26 00:00:00"
+    end_date: "2025-12-26 00:00:00"
     created_id: 1
     status: 1
     type: "HOMESCREEN"
@@ -110,3 +110,14 @@ ox_announcement_team_mapper:
     id: 2
     announcement_id: 2
     team_id: 1
+ox_user_announcement_mapper:
+  -
+    id: 1
+    user_id: 1
+    announcement_id: 2
+    view: 0
+  -
+    id: 2
+    user_id: 2
+    announcement_id: 2
+    view: 1

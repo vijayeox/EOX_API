@@ -110,6 +110,7 @@ class FormioField
             case 'editgrid':
             case 'survey':
             case 'datamap':
+            case 'tree':
                 $this->data['data_type'] = 'json';
                 break;
             default:
@@ -176,7 +177,8 @@ class FormioField
     {
         if (isset($field['parent']) && ($field['parent']['type'] == 'datagrid' ||
                                         $field['parent']['type'] == 'editgrid' ||
-                                        $field['parent']['type'] == 'survey')) {
+                                        $field['parent']['type'] == 'survey' ||
+                                        $field['parent']['type'] == 'tree')) {
             if (!isset($fieldReference[$field['parent']['name']])) {
                 $this->error[] = "Field ".$field['name']." - Unexpected Parent Field '".$field['parent']['name']."'";
                 return;
@@ -207,7 +209,7 @@ class FormioField
             } else {
                 $fieldProp = isset($prop[$type]) ? $prop[$type] : (isset($prop["default"]) ? $prop["default"] : "");
             }
-            
+
             if ($refKey == 'MASK') {
                 if ($field['type'] == 'phoneNumber' && !isset($fieldObj[$fieldProp])) {
                     if (isset($fieldObj['inputMasks'])) {
@@ -334,7 +336,7 @@ class FormioField
                     continue;
                 }
             }
-            
+
             $this->validateFieldProperty($name, $fieldRef, $fieldObj, $refKey, $fieldProp);
         }
     }
@@ -342,7 +344,7 @@ class FormioField
     {
         $fieldProp = $this->checkPropertyValue($field, $fieldKey);
         $reference = $this->checkPropertyValue($fieldRef, $refKey);
-        
+
         if ($reference != $fieldProp) {
             $this->error[] = $this->getErrorMessage($fieldKey, $fieldName, $reference, $fieldProp);
         }

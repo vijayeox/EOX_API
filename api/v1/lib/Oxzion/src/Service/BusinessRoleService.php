@@ -26,29 +26,40 @@ class BusinessRoleService extends AbstractService
         $data = $businessRole;
         $data['app_id'] = $this->getIdFromUuid('ox_app', $appId);
         $bRole = new BusinessRole($this->table);
-        if (isset($data['uuid'])) {
-            try {
-                $bRole->loadByUuid($data['uuid']);
-                if (!isset($data['version'])) {
-                    $data['version'] = $bRole->getProperty('version');
+        $name = isset($data['name']) ? $data['name'] : null;
+
+        $existingBusinessRole = $this->getBusinessRoleByName($appId,$name);
+        if(!empty($existingBusinessRole)) {
+            //Prevent creation of duplicate record
+            $businessRole['uuid'] = $existingBusinessRole[0]['uuid'];
+            $businessRole['version'] = $existingBusinessRole[0]['version'];
+        } 
+        else { 
+            if (isset($data['uuid'])) {
+                try {
+                    //update using uuid
+                    $bRole->loadByUuid($data['uuid']);
+                    if (!isset($data['version'])) {
+                        $data['version'] = $bRole->getProperty('version');
+                    }
+                } catch (EntityNotFoundException $e) {
+                    //Needs to create with uuid. If block is not specified the exception is not skipped
                 }
-            } catch (EntityNotFoundException $e) {
-                unset($data['uuid']);
             }
+            $bRole->assign($data);
+            try {
+                $this->beginTransaction();
+                $bRole->save();
+                $this->commit();
+            } catch (Exception $e) {
+                $this->logger->error($e->getMessage(), $e);
+                $this->rollback();
+                throw $e;
+            }
+            $data = $bRole->getGenerated();
+            $businessRole['uuid'] = $data['uuid'];
+            $businessRole['version'] = $data['version'];
         }
-        $bRole->assign($data);
-        try {
-            $this->beginTransaction();
-            $bRole->save();
-            $this->commit();
-        } catch (Exception $e) {
-            $this->logger->error($e->getMessage(), $e);
-            $this->rollback();
-            throw $e;
-        }
-        $data = $bRole->getGenerated();
-        $businessRole['uuid'] = $data['uuid'];
-        $businessRole['version'] = $data['version'];
     }
 
     public function getBusinessRole($id)

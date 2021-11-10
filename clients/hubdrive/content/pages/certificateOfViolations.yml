@@ -1,0 +1,39 @@
+name: 'List Certificate Of Violations'
+description: 'Shows a list of Certificate Of Violations'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Certificate Of Violations'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of Certificate Of Violations</h5>'
+            operations:
+                title: "Report New Violation"
+                actions:
+                    -
+                        name: Report New Violation
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 72ba695b-73e4-439f-8a78-20e8a8628a50      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

@@ -19,9 +19,12 @@ trait FieldTrait
         $this->fieldService = $fieldService;
     }
 
-    protected function getFields($appId, $filterArray)
-    {
+    protected function getFields($appId,$filterArray){
         $this->logger->info("GET FIELD LIST");
-        return $this->fieldService->getFields($appId, $filterArray);
+        return $this->fieldService->getFields($appId,$filterArray);
+    }
+
+    protected function getFieldByName($entityId, $fieldName){
+        return $this->fieldService->getFieldByName($entityId, $fieldName);
     }
 }

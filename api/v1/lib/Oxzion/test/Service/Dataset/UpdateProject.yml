@@ -1,0 +1,22 @@
+ox_project:
+  -
+    id: 5
+    uuid: 3e93ab92-b8a9-11eb-8529-0242ac130003
+    name: 'Project 1'
+    account_id: 1
+    manager_id: 1
+    description: 'test project 1'
+    date_created: '2021-05-17 10:26:50'
+    date_modified: '2021-05-17 10:26:50'
+    parent_id: NULL
+  -
+    id: 6
+    uuid: 0bd9d096-b8a9-11eb-8529-0242ac130003
+    name: 'Project 2'
+    account_id: 1
+    manager_id: 1
+    description: 'test project 2'
+    date_created: '2021-05-17 10:27:18'
+    date_modified: '2021-05-18 13:17:10'
+    parent_id: 5
+

@@ -213,7 +213,20 @@ class AnnouncementController extends AbstractApiController
         $params = $this->params()->fromRoute();
         $data = $this->extractPostData();
         try {
+           // echo "< pre >  "; print_r([$data, $params]); exit();
             $count = $this->announcementService->saveTeam($params, $data);
+            return $this->getSuccessResponseWithData($data, 200);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+    }
+
+    public function markAsReadAction()
+    {
+        $data = $this->extractPostData();
+        try {
+            $this->announcementService->markAsRead($data['announcementId']);
             return $this->getSuccessResponseWithData($data, 200);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);

@@ -2,124 +2,115 @@ ox_account:
   - id: 100
     name: Test
     status: Active
-    type: 'INDIVIDUAL'
-    uuid: 'fa371de7-0387-48ea-8f29-5d3704d96ac5'  
+    type: "INDIVIDUAL"
+    uuid: "fa371de7-0387-48ea-8f29-5d3704d96ac5"
   - id: 101
     name: Test2
     status: Active
-    type: 'INDIVIDUAL'
-    uuid: '1b371de7-0387-48ea-8f29-5d3704d96ad6'  
+    type: "INDIVIDUAL"
+    uuid: "1b371de7-0387-48ea-8f29-5d3704d96ad6"
   - id: 102
     name: Test3
     status: Active
-    type: 'INDIVIDUAL'
-    uuid: '2c371de7-0387-48ea-8f29-5d3704d96ae7'
+    type: "INDIVIDUAL"
+    uuid: "2c371de7-0387-48ea-8f29-5d3704d96ae7"
 ox_address:
-  -
-    id: 50
-    address1: 'Address1-50'
-    address2: 'Address2-50'
-    city: 'Bangalore'
-    state: 'KARNATAKA'
-    country: 'India'
+  - id: 50
+    address1: "Address1-50"
+    address2: "Address2-50"
+    city: "Bangalore"
+    state: "KARNATAKA"
+    country: "India"
     zip: 560050
-  -
-    id: 51
-    address1: 'Address1-51'
-    address2: 'Address2-51'
-    city: 'Bangalore'
-    state: 'KARNATAKA'
-    country: 'India'
+  - id: 51
+    address1: "Address1-51"
+    address2: "Address2-51"
+    city: "Bangalore"
+    state: "KARNATAKA"
+    country: "India"
     zip: 560051
-  -
-    id: 52
-    address1: 'Address1-52'
-    address2: 'Address2-52'
-    city: 'Bangalore'
-    state: 'KARNATAKA'
-    country: 'India'
+  - id: 52
+    address1: "Address1-52"
+    address2: "Address2-52"
+    city: "Bangalore"
+    state: "KARNATAKA"
+    country: "India"
     zip: 560052
 ox_person:
-  - 
-    id: 150
+  - id: 150
     uuid: a9fe8447-3b29-410d-8b22-95d337d3fbc2
     firstname: Individual
     lastname: Admin
-    email: 'admintestindividual@eoxvantage.in'
-    date_of_birth: '1991-02-28'
-    phone: '1212121212'
-    gender: 'Male'
+    email: "admintestindividual@eoxvantage.in"
+    date_of_birth: "1991-02-28"
+    phone: "1212121212"
+    gender: "Male"
     address_id: 50
     created_by: 1
-    date_created: '2020-08-24 00:00:00'  
-  - 
-    id: 151
+    date_created: "2020-08-24 00:00:00"
+  - id: 151
     uuid: bafe8447-3b29-410d-8b22-95d337d3fbd3
     firstname: Individual2
     lastname: Admin
-    email: 'admintestindividual2@eoxvantage.in'
-    date_of_birth: '1991-02-28'
-    phone: '1212121212'
-    gender: 'Male'
+    email: "admintestindividual2@eoxvantage.in"
+    date_of_birth: "1991-02-28"
+    phone: "1212121212"
+    gender: "Male"
     address_id: 51
     created_by: 1
-    date_created: '2020-08-24 00:00:00'  
-  - 
-    id: 152
+    date_created: "2020-08-24 00:00:00"
+  - id: 152
     uuid: cbfe8447-3b29-410d-8b22-95d337d3fbe54
     firstname: Individual3
     lastname: Admin
-    email: 'admintestindividual3@eoxvantage.in'
-    date_of_birth: '1991-02-28'
-    phone: '1212121212'
-    gender: 'Male'
+    email: "admintestindividual3@eoxvantage.in"
+    date_of_birth: "1991-02-28"
+    phone: "1212121212"
+    gender: "Male"
     address_id: 52
     created_by: 1
-    date_created: '2020-08-24 00:00:00'  
-ox_user:  
-  - 
-    id: 100
+    date_created: "2020-08-24 00:00:00"
+ox_user:
+  - id: 100
     uuid: 754bc48a-3c69-4f7a-af8b-019fc984ee76
     username: individualadmin
-    name: 'Individual Admin'
-    password: 'testpasswd'
+    name: "Individual Admin"
+    password: "testpasswd"
     account_id: 100
     person_id: 150
-    status: 'Active'
+    status: "Active"
     created_by: 1
-    date_created: '2020-08-24 00:00:00'
-  - 
-    id: 101
+    date_created: "2020-08-24 00:00:00"
+  - id: 101
     uuid: 864bc48a-3c69-4f7a-af8b-019fc984ee87
     username: individualadmin1
-    password: 'testpasswd'
-    name: 'Individual1 Admin'
+    password: "testpasswd"
+    name: "Individual1 Admin"
     account_id: 101
     person_id: 151
-    status: 'Active'
+    status: "Active"
     created_by: 1
-    date_created: '2020-08-24 00:00:00'
-  - 
-    id: 102
+    date_created: "2020-08-24 00:00:00"
+  - id: 102
     uuid: 974bc48a-3c69-4f7a-af8b-019fc984ee98
     username: individualadmin2
-    password: 'testpasswd'
-    name: 'Individual2 Admin'
+    password: "testpasswd"
+    name: "Individual2 Admin"
     account_id: 102
     person_id: 152
-    status: 'Active'
+    status: "Active"
     created_by: 1
-    date_created: '2020-08-24 00:00:00'        
+    date_created: "2020-08-24 00:00:00"
 ox_account_user:
-  - id : 100
+  - id: 100
     user_id: 100
     account_id: 100
-  - id : 101
+  - id: 101
     user_id: 101
     account_id: 101
-  - id : 102
+  - id: 102
     user_id: 102
-    account_id: 102        
+    account_id: 102
 
 ox_app:
   - id: 99
@@ -185,11 +176,11 @@ ox_app_registry:
   - account_id: 1
     app_id: 99
   - account_id: 100
-    app_id: 99 
+    app_id: 99
   - account_id: 101
-    app_id: 99 
+    app_id: 99
   - account_id: 102
-    app_id: 99  
+    app_id: 99
 ox_field:
   - id: 1
     name: "field1"
@@ -261,7 +252,7 @@ ox_field:
     text: "Policy Period"
     app_id: 99
     data_type: "text"
-    template: '1year'
+    template: "1year"
     required: 1
     sequence: 7
     entity_id: 1
@@ -271,7 +262,7 @@ ox_field:
     text: "Coverage"
     app_id: 99
     data_type: "numeric"
-    template: '100000'
+    template: "100000"
     required: 1
     sequence: 7
     entity_id: 1
@@ -280,7 +271,7 @@ ox_field:
     name: "datagrid"
     app_id: 99
     data_type: "json"
-    type: 'datagrid'
+    type: "datagrid"
     template: '{"persistent" : "true"}'
     required: 1
     sequence: 1
@@ -335,7 +326,7 @@ ox_field:
     required: 1
     sequence: 1
     entity_id: 1
-    index: 0  
+    index: 0
   - id: 16
     name: "observers"
     app_id: 99
@@ -344,7 +335,7 @@ ox_field:
     required: 1
     sequence: 1
     entity_id: 1
-    index: 1    
+    index: 1
 ox_form:
   - id: 1
     app_id: 99
@@ -367,10 +358,10 @@ ox_form_field:
     field_id: 2
   - id: 3
     form_id: 2
-    field_id: 15 
+    field_id: 15
   - id: 4
     form_id: 1
-    field_id: 16   
+    field_id: 16
 ox_workflow:
   - id: 1
     app_id: 99
@@ -616,7 +607,7 @@ ox_activity_instance:
     activity_instance_id: "126622fd-0124-11ea-a8a0-22e8105c0744"
     workflow_instance_id: 4
     status: "In Progress"
-    account_id: 1  
+    account_id: 1
   - id: 6
     activity_id: 1
     activity_instance_id: "236622fd-0124-11ea-a8a0-22e8105c0755"
@@ -652,7 +643,7 @@ ox_activity_instance:
     activity_instance_id: "786622fd-0124-11ea-a8a0-22e8105c07aa"
     workflow_instance_id: 10
     status: "Completed"
-    account_id: 1    
+    account_id: 1
   - id: 12
     activity_id: 1
     activity_instance_id: "896622fd-0124-11ea-a8a0-22e8105c07bb"
@@ -667,7 +658,7 @@ ox_team:
     manager_id: 1
     created_id: 1
     date_created: "2019-06-26 00:00:00"
-  - id: 2 
+  - id: 2
     uuid: "0712a5e1-265d-421b-8014-aebd3a4a6059"
     name: New group
     account_id: 1
@@ -791,7 +782,27 @@ ox_file:
     date_created: "2019-06-28 00:00:00"
     created_by: 1
     entity_id: 2
-    rygStatus: "GREEN"  
+    rygStatus: "GREEN"
+  - id: 23
+    account_id: 1
+    data: '{"taskName" : "TEST1"}'
+    uuid: "f21672f8-30b0-4fe8-9abf-69e322b0340e"
+    date_created: "2019-06-28 00:00:00"
+    created_by: 1
+    entity_id: 1
+    rygStatus: "GREEN"
+    status: "Completed"
+    is_snoozed: 1
+  - id: 24
+    account_id: 1
+    data: '{"taskName : "TEST2"}'
+    uuid: "6a5521c3-dcf3-4854-b2d0-dc430eb48a75"
+    date_created: "2019-06-28 00:00:00"
+    created_by: 1
+    entity_id: 1
+    rygStatus: "RED"
+    status: "Delayed"
+    is_snoozed: 1
 ox_file_attribute:
   - id: 1
     file_id: 11
@@ -1015,7 +1026,7 @@ ox_file_attribute:
     field_value_type: "TEXT"
     field_value_text: "Test"
     field_id: 15
-    sequence: 1  
+    sequence: 1
 ox_file_document:
   - id: 1
     file_id: 20
@@ -1028,7 +1039,7 @@ ox_file_document:
     account_id: 1
     field_value: "[{}]"
     field_id: 14
-    sequence: 1  
+    sequence: 1
   - id: 3
     file_id: 11
     account_id: 1
@@ -1058,7 +1069,7 @@ ox_wf_user_identifier:
     app_id: 99
     account_id: 100
     user_id: 100
-    identifier_name: 'field1'
+    identifier_name: "field1"
     identifier: 32325
 ox_indexed_file_attribute:
   - id: 1
@@ -1132,36 +1143,36 @@ ox_indexed_file_attribute:
     account_id: 1
     field_value_type: "TEXT"
     field_value_text: "karnataka"
-    field_id: 15 
+    field_id: 15
   - id: 16
     file_id: 11
     account_id: 1
     field_value_type: "TEXT"
     field_value_text: "754bc48a-3c69-4f7a-af8b-019fc984ee76"
-    field_id: 16  
+    field_id: 16
 ox_entity_identifier:
   - entity_id: 1
     identifier: "field1"
 ox_file_attachment:
   - id: 1
-    uuid: '9af76901-9490-4fdd-b1ca-ac544d59d942'
-    name: 'sample.txt'
-    originalName: 'sample.txt'
-    extension: '.txt'
-    type: 'text/plain'
-    path: '/app/api/v1/data/file_docs/53012471-2863-4949-afb1-e69b0891c98a/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/sample.txt'
-    url: 'http://localhost:8080/53012471-2863-4949-afb1-e69b0891c98a/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/sample.txt'
+    uuid: "9af76901-9490-4fdd-b1ca-ac544d59d942"
+    name: "sample.txt"
+    originalName: "sample.txt"
+    extension: ".txt"
+    type: "text/plain"
+    path: "/app/api/v1/data/file_docs/53012471-2863-4949-afb1-e69b0891c98a/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/sample.txt"
+    url: "http://localhost:8080/53012471-2863-4949-afb1-e69b0891c98a/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/sample.txt"
     created_id: 1
     account_id: 1
-    created_date: '2020-09-14 12:17:01'
+    created_date: "2020-09-14 12:17:01"
 ox_role:
   - id: 10
     name: "TASKUSER"
     uuid: "e116dab7-ab62-4292-a9f9-06d095a86fed"
-    description: 'Role to Manage Task'
+    description: "Role to Manage Task"
     business_role_id: null
   - id: 11
     name: "TASKUSER"
     uuid: "d968f67c-174a-4416-8e06-df87f2c7ed68"
-    description: 'Role to Manage Task'
+    description: "Role to Manage Task"
     business_role_id: null

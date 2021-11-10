@@ -63,6 +63,11 @@ class Module implements ConfigProviderInterface
                         $container->get(\Oxzion\Service\FileService::class)
                     );
                 },
+                Controller\SnoozeController::class => function ($container) {
+                    return new Controller\SnoozeController(
+                        $container->get(\Oxzion\Service\FileService::class)
+                    );
+                },
             ],
         ];
     }

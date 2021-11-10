@@ -6,6 +6,7 @@
  * This should be an array of module namespaces used in the application.
  */
 return [
+    'Zend\Hydrator',
     'Zend\InputFilter',
     'Zend\Filter',
     'Zend\Serializer',
@@ -40,5 +41,7 @@ return [
     'ErrorLog',
     'Esign',
     'Import',
-    'Ims'
+    'Ims',
+    'Kra',
+    'Profile'
 ];

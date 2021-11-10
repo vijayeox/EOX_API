@@ -48,4 +48,13 @@ trait UserContextTrait
     {
         return $this->userService->getUserDetailsByIdentifier($identifier, $identifierName);
     }
+
+    public function getUserDataByIdentifier($appId, $identifier, $identifierField){
+        return $this->userService->getUserDataByIdentifier($appId, $identifier, $identifierField);
+    }
+
+    public function getUserWithMinimumDetails($id, $accountId = null)
+    {
+        return $this->userService->getUserWithMinimumDetails($id, $accountId = null);
+    }
 }

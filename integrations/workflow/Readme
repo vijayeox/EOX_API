@@ -13,7 +13,7 @@ Build all the child projects first
 
 Update integrations/workflow/ProcessEngine/src/main/resources/application.properties file with the ip address of your local machine
 
-$ docker build -t workflow_build docker_build
+$ docker build -t workflow_build docker
 
 $ sudo docker run --network="host" -it -v ${PWD}:/camunda --entrypoint=bash workflow_build
 
@@ -35,7 +35,8 @@ To exclude test cases while building if test cases fail
 $ ./gradlew build --stacktrace -x test
 
 $ mkdir -p dist
-$ cp build/libs/processengine_plugin-1.0.jar dist/processengine_plugin.jar 
+$ cp build/libs/processengine_plugin-1.0.jar dist/processengine_plugin.jar
+$ exit
 
 To build the docker container
 $ docker build -t workflow .

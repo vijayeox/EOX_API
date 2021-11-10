@@ -38,8 +38,5 @@ class EsignController extends AbstractApiController
             return $this->exceptionToResponse($e);
         }
     }
-
-    // public function getSubscription(){
-
-    // }
+    
 }

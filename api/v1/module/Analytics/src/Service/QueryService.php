@@ -19,7 +19,7 @@ class QueryService extends AbstractService
     private $total_count;
     public static $queryFields = array('uuid' => 'q.uuid', 'name' => 'q.name', 'datasource_uuid' => 'd.uuid', 'configuration' => 'q.configuration', 'ispublic' => 'q.ispublic', 'created_by' => 'q.created_by', 'version' => 'q.version', 'account_id' => 'q.account_id');
 
-    public function __construct($config, $dbAdapter, QueryTable $table, $datasourceService)
+    public function __construct($config, $dbAdapter, QueryTable $table, DataSourceService $datasourceService)
     {
         parent::__construct($config, $dbAdapter);
         $this->table = $table;
@@ -95,12 +95,15 @@ class QueryService extends AbstractService
 
     public function getQuery($uuid, $params)
     {
-        $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';
-        $queryParams = [
-            'created_by' => AuthContext::get(AuthConstants::USER_ID),
-            'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'uuid' => $uuid,
-        ];
+        if (!isset($params['data'])) {
+            $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';    
+            $queryParams['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);    
+        } else {
+            $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';
+        }        
+        $queryParams['created_by']=AuthContext::get(AuthConstants::USER_ID);
+        $queryParams['uuid']=$uuid;
+
         try {
             $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
             if (count($resultSet) == 0) {
@@ -174,10 +177,9 @@ class QueryService extends AbstractService
 
     public function executeAnalyticsQuery($uuid, $overRides = null)
     {
-        $query = 'select q.uuid, q.name, q.configuration, q.ispublic, q.isdeleted, d.uuid as datasource_uuid from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid';
+        $query = 'select q.uuid, q.name, q.configuration, q.ispublic, q.isdeleted, d.uuid as datasource_uuid from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.uuid=:uuid';
         $queryParams = [
-            'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'uuid' => $uuid,
+            'uuid' => $uuid
         ];
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (count($resultSet) == 0) {
@@ -242,7 +244,7 @@ class QueryService extends AbstractService
     private function runQuery($configuration, $datasource_uuid, $overRides = null)
     {
         $analyticsEngine = $this->datasourceService->getAnalyticsEngine($datasource_uuid);
-        $parameters = json_decode($configuration, 1);
+        $parameters = (!is_array($configuration)) ? json_decode($configuration, 1) : $configuration;
 
         // if (isset($parameters['filter']) && is_string($parameters['filter'])) {
         //     $exp_config = json_decode($parameters['filter'], 1);
@@ -407,6 +409,21 @@ class QueryService extends AbstractService
                 }
             }
             $index++;
+        }
+        return $data;
+    }
+
+    public function runMultipleQueriesWithoutCombine($uuidList, $overRides = null)
+    {
+        $aggCheck = 0;
+        $data = array();
+        $resultCount = count($uuidList);
+        $index = 1;
+        foreach ($uuidList as $key => $value) {
+            $this->logger->info("Executing AnalyticsQuery with input -" . $value);
+            $queryData = $this->executeAnalyticsQuery($value, $overRides);
+            $this->logger->info("Executing AnalyticsQuery returned -" . print_r($queryData, true));
+            $data[]=$queryData['data'];
         }
         return $data;
     }

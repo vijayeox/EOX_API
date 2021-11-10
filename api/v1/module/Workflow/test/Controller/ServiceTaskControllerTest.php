@@ -169,13 +169,13 @@ class ServiceTaskControllerTest extends ControllerTest
         $this->assertEquals(true, isset($content['data']['autoRenewalJob']));
         $job = json_decode($content['data']['autoRenewalJob'], true);
         $this->assertEquals($job['jobId'], $jobId);
-        $this->assertEquals($job['jobTeam'], $data['variables']['jobName']);
+        $this->assertEquals($job['jobGroup'], $data['variables']['jobName']);
         $query = "SELECT * from ox_job where job_id = '$jobId'";
         $result = $this->executeQueryTest($query);
         $this->assertEquals(1, count($result));
         $this->assertEquals(99, $result[0]['app_id']);
         $this->assertEquals(1, $result[0]['account_id']);
-        $this->assertEquals($job['jobTeam'], $result[0]['group_name']);
+        $this->assertEquals($job['jobGroup'], $result[0]['group_name']);
         $config = json_decode($result[0]['config'], true);
         $this->assertEquals(true, StringUtils::endsWith($config['job']['url'], $data['variables']['jobUrl']));
     }
@@ -254,7 +254,7 @@ class ServiceTaskControllerTest extends ControllerTest
                                         "url" => "canceljob",
                                         "command" => "cancelJob",
                                         "jobName" => "autoRenewalJob",
-                                        "autoRenewalJob" => '{"jobId":"'.$jobId.'","jobTeam":"Job"}',
+                                        "autoRenewalJob" => '{"jobId":"'.$jobId.'","jobGroup":"Job"}',
                                         "expiry_year" => "2019",
                                         "accountId" => "53012471-2863-4949-afb1-e69b0891c98a",
                                         "lastname" => "Rai",

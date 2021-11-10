@@ -6,23 +6,23 @@ ox_organization:
 -
     id: 101
     uuid: "6f32e510-1827-11eb-adc1-0242ac120002"
-    created_by: 1    
+    created_by: 1
 -
     id: 102
     uuid: "6f32e60a-1827-11eb-adc1-0242ac120002"
-    created_by: 1    
+    created_by: 1
 ox_account:
   - id: 100
     name: Test
     status: Active
     type: 'INDIVIDUAL'
-    uuid: '354427e8-1826-11eb-adc1-0242ac120002' 
-    organization_id: 100 
+    uuid: '354427e8-1826-11eb-adc1-0242ac120002'
+    organization_id: 100
   - id: 101
     name: Test2
     status: Active
     type: 'INDIVIDUAL'
-    uuid: '35442a2c-1826-11eb-adc1-0242ac120002'  
+    uuid: '35442a2c-1826-11eb-adc1-0242ac120002'
     organization_id: 101
   - id: 102
     name: Test3
@@ -56,7 +56,7 @@ ox_address:
     country: 'India'
     zip: 560052
 ox_person:
-  - 
+  -
     id: 150
     uuid: 35442bf8-1826-11eb-adc1-0242ac120002
     firstname: Individual
@@ -67,8 +67,8 @@ ox_person:
     gender: 'Male'
     address_id: 50
     created_by: 1
-    date_created: '2020-08-24 00:00:00'  
-  - 
+    date_created: '2020-08-24 00:00:00'
+  -
     id: 151
     uuid: 35442cca-1826-11eb-adc1-0242ac120002
     firstname: Individual2
@@ -79,8 +79,8 @@ ox_person:
     gender: 'Male'
     address_id: 51
     created_by: 1
-    date_created: '2020-08-24 00:00:00'  
-  - 
+    date_created: '2020-08-24 00:00:00'
+  -
     id: 152
     uuid: 35442d92-1826-11eb-adc1-0242ac120002
     firstname: Individual3
@@ -91,9 +91,9 @@ ox_person:
     gender: 'Male'
     address_id: 52
     created_by: 1
-    date_created: '2020-08-24 00:00:00'  
-ox_user:  
-  - 
+    date_created: '2020-08-24 00:00:00'
+ox_user:
+  -
     id: 100
     uuid: 3544309e-1826-11eb-adc1-0242ac120002
     username: individualadmin
@@ -104,7 +104,7 @@ ox_user:
     status: 'Active'
     created_by: 1
     date_created: '2020-08-24 00:00:00'
-  - 
+  -
     id: 101
     uuid: 35443184-1826-11eb-adc1-0242ac120002
     username: individualadmin1
@@ -115,7 +115,7 @@ ox_user:
     status: 'Active'
     created_by: 1
     date_created: '2020-08-24 00:00:00'
-  - 
+  -
     id: 102
     uuid: 3544324c-1826-11eb-adc1-0242ac120002
     username: individualadmin2
@@ -125,7 +125,7 @@ ox_user:
     person_id: 152
     status: 'Active'
     created_by: 1
-    date_created: '2020-08-24 00:00:00'        
+    date_created: '2020-08-24 00:00:00'
 ox_account_user:
   -
     user_id: 100
@@ -135,7 +135,7 @@ ox_account_user:
     account_id: 101
   -
     user_id: 102
-    account_id: 102        
+    account_id: 102
 
 ox_app:
   - id: 99
@@ -202,11 +202,11 @@ ox_app_registry:
   - account_id: 1
     app_id: 99
   - account_id: 100
-    app_id: 99 
+    app_id: 99
   - account_id: 101
-    app_id: 99 
+    app_id: 99
   - account_id: 102
-    app_id: 99 
+    app_id: 99
 ox_privilege:
 -
     id: 300
@@ -233,14 +233,14 @@ ox_role:
     account_id: 100
     name: "ADMIN"
     uuid: "99d91b61-ff95-11e9-be5f-485f99be1ba7"
-    default_role: 0  
+    default_role: 0
 ox_role_privilege:
 -
-    id: 235
+    id: 1238
     role_id: 30
     privilege_name: "MANAGE_POLICY_APPROVAL"
     permission: 3
-    app_id: 99   
+    app_id: 99
 ox_field:
   - id: 1
     name: "field1"
@@ -665,8 +665,8 @@ ox_activity_instance:
     activity_instance_id: "126622fd-0124-11ea-a8a0-22e8105c0744"
     workflow_instance_id: 4
     status: "In Progress"
-    account_id: 1 
-    isdeleted: 0 
+    account_id: 1
+    isdeleted: 0
   - id: 6
     activity_id: 1
     activity_instance_id: "236622fd-0124-11ea-a8a0-22e8105c0755"
@@ -707,8 +707,8 @@ ox_activity_instance:
     activity_instance_id: "786622fd-0124-11ea-a8a0-22e8105c07aa"
     workflow_instance_id: 10
     status: "Completed"
-    account_id: 1  
-    isdeleted: 0  
+    account_id: 1
+    isdeleted: 0
   - id: 12
     activity_id: 1
     activity_instance_id: "896622fd-0124-11ea-a8a0-22e8105c07bb"
@@ -1062,7 +1062,7 @@ ox_file_document:
     account_id: 1
     field_value: "[{}]"
     field_id: 14
-    sequence: 1  
+    sequence: 1
   - id: 3
     file_id: 11
     account_id: 1
@@ -1199,20 +1199,20 @@ ox_account_business_role:
     business_role_id: 100
   - id: 3
     account_id: 101
-    business_role_id: 100  
+    business_role_id: 100
   - id: 4
     account_id: 102
     business_role_id: 100
 ox_account_offering:
   - entity_id: 1
-    account_business_role_id: 1  
+    account_business_role_id: 1
 ox_file_participant:
   - id: 1
-    file_id: 11 
+    file_id: 11
     business_role_id: 100
     account_id: 101
   - id: 2
-    file_id: 11 
+    file_id: 11
     business_role_id: 101
     account_id: 1
   - id: 3
@@ -1220,7 +1220,7 @@ ox_file_participant:
     business_role_id: 100
     account_id: 101
   - id: 4
-    file_id: 12 
+    file_id: 12
     business_role_id: 101
     account_id: 1
   - id: 5
@@ -1228,7 +1228,7 @@ ox_file_participant:
     business_role_id: 100
     account_id: 101
   - id: 6
-    file_id: 13 
+    file_id: 13
     business_role_id: 101
     account_id: 1
   - id: 7
@@ -1240,23 +1240,23 @@ ox_file_participant:
     business_role_id: 101
     account_id: 1
   - id: 9
-    file_id: 15 
+    file_id: 15
     business_role_id: 100
     account_id: 102
   - id: 10
-    file_id: 15 
+    file_id: 15
     business_role_id: 101
     account_id: 1
   - id: 11
-    file_id: 16 
+    file_id: 16
     business_role_id: 100
     account_id: 102
   - id: 12
-    file_id: 16 
+    file_id: 16
     business_role_id: 101
     account_id: 1
   - id: 14
-    file_id: 17 
+    file_id: 17
     business_role_id: 101
     account_id: 1
   - id: 15
@@ -1264,7 +1264,7 @@ ox_file_participant:
     business_role_id: 100
     account_id: 102
   - id: 16
-    file_id: 18 
+    file_id: 18
     business_role_id: 101
     account_id: 1
   - id: 18
@@ -1272,6 +1272,6 @@ ox_file_participant:
     business_role_id: 101
     account_id: 1
   - id: 20
-    file_id: 20 
+    file_id: 20
     business_role_id: 101
     account_id: 1

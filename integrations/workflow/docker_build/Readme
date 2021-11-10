@@ -1,9 +1,0 @@
-This Dockerfile is just for setting environment for building workflow.
-
-1)To build the Dockerfile run this command from docker_build directory
-
-sudo docker build -t workflow_build .
-
-2) To enter into bash shell of the container run this from integrations/workflow directory
-
-docker run -it -v ${PWD}:/camunda --entrypoint bash workflow_build

@@ -562,7 +562,7 @@ class UserController extends AbstractApiController
             try {
                 $count = $this->userService->updateLoggedInStatus();
             } catch (Exception $e) {
-                return $this->getErrorResponse("Update Failure", 404, array("message" -> $e->getMessage()));
+                return $this->getErrorResponse("Update Failure", 404, array("message" => $e->getMessage()));
             }
             return $this->getSuccessResponse();
         } else {

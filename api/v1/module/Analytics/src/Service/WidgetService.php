@@ -3,12 +3,15 @@ namespace Analytics\Service;
 
 use Analytics\Model\Widget;
 use Analytics\Model\WidgetTable;
+use Analytics\Service\TemplateService as OITemplateService;
 use Exception;
 use Oxzion\Auth\AuthConstants;
 use Oxzion\Auth\AuthContext;
+use Oxzion\Document\Template\Smarty\SmartyTemplateProcessorImpl;
 use Oxzion\EntityNotFoundException;
 use Oxzion\InsertFailedException;
 use Oxzion\Service\AbstractService;
+use Oxzion\Service\TemplateService;
 use Oxzion\Utils\EvalMath;
 use Oxzion\Utils\FilterUtils;
 use Oxzion\ValidationException;
@@ -241,12 +244,14 @@ class WidgetService extends AbstractService
     public function getWidget($uuid, $params)
     {
         $overRides = [];
-        $query = 'SELECT w.uuid, w.ispublic, w.date_created, w.name, w.configuration, w.expression, w.exclude_overrides, IF(w.created_by=:created_by, true, false) AS is_owner, w.version,v.renderer, v.type, q.uuid AS query_uuid, wq.sequence AS query_sequence, wq.configuration AS query_configuration FROM ox_widget w JOIN ox_visualization v on w.visualization_id=v.id JOIN ox_widget_query wq ON w.id=wq.ox_widget_id JOIN ox_query q ON wq.ox_query_id=q.id WHERE w.isdeleted=false and w.account_id=:account_id and w.uuid=:uuid AND (w.ispublic=true OR w.created_by=:created_by) ORDER BY wq.sequence ASC';
-        $queryParams = [
-            'created_by' => AuthContext::get(AuthConstants::USER_ID),
-            'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'uuid' => $uuid,
-        ];
+        if (!isset($params['data'])) {
+            $query = 'SELECT w.uuid, w.ispublic, w.date_created, w.name, w.configuration, w.expression, w.exclude_overrides, IF(w.created_by=:created_by, true, false) AS is_owner, w.version,v.renderer, v.type, q.uuid AS query_uuid, wq.sequence AS query_sequence, wq.configuration AS query_configuration FROM ox_widget w JOIN ox_visualization v on w.visualization_id=v.id JOIN ox_widget_query wq ON w.id=wq.ox_widget_id JOIN ox_query q ON wq.ox_query_id=q.id WHERE w.isdeleted=false and w.account_id=:account_id and w.uuid=:uuid AND (w.ispublic=true OR w.created_by=:created_by) ORDER BY wq.sequence ASC';    
+            $queryParams['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
+        } else {
+            $query = 'SELECT w.uuid, w.ispublic, w.date_created, w.name, w.configuration, w.expression, w.exclude_overrides, IF(w.created_by=:created_by, true, false) AS is_owner, w.version,v.renderer, v.type, q.uuid AS query_uuid, wq.sequence AS query_sequence, wq.configuration AS query_configuration FROM ox_widget w JOIN ox_visualization v on w.visualization_id=v.id JOIN ox_widget_query wq ON w.id=wq.ox_widget_id JOIN ox_query q ON wq.ox_query_id=q.id WHERE w.isdeleted=false and w.uuid=:uuid AND (w.ispublic=true OR w.created_by=:created_by) ORDER BY wq.sequence ASC';
+        }
+        $queryParams['created_by'] = AuthContext::get(AuthConstants::USER_ID);
+        $queryParams['uuid'] = $uuid;
         try {
             $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
             if (count($resultSet) == 0) {
@@ -300,7 +305,7 @@ class WidgetService extends AbstractService
         $data = array();
         $uuidList = array_column($resultSet, 'query_uuid');
         $filter = null;
-        $overRidesAllowed = ['group', 'sort', 'field', 'date-period', 'date-range', 'filter', 'expression', 'round', 'pivot','skip','top','filter_grid','orderby'];
+        $overRidesAllowed = ['group', 'sort', 'field', 'date-period', 'date-range', 'filter', 'expression', 'round', 'pivot', 'skip', 'top', 'filter_grid', 'orderby','use_participants'];
         if (!empty($firstRow['exclude_overrides'])) {
             if (strtolower($firstRow['exclude_overrides'] == 'all')) {
                 unset($overRidesAllowed[array_search('filter', $overRidesAllowed)]);
@@ -310,33 +315,50 @@ class WidgetService extends AbstractService
         }
 
         if (isset($params['data'])) {
+            if ($firstRow['renderer'] == 'jsGrid') {
+                $config = json_decode($firstRow['configuration'], 1);
+                if (isset($config['pageSize'])) {
+                    $overRides['pagesize'] = $config['pageSize'];
+                }
+                if (isset($config['column'])) {
+                    $columns = array();
+                    foreach ($config['column'] as $column) {
+                        if (isset($column['type'])) {
+                            $columns[$column['field']] = $column['type'];
+                        } else {
+                            $columns[$column['field']] = 'string';
+                        }
+
+                    }
+                    $overRides['columns'] = $columns;
+                }
+                if (isset($config['sort'])) {
+                    $overRides['orderby'] = $config['sort'][0]['field'] . ' ' . $config['sort'][0]['dir'];
+                }
+            }
             foreach ($overRidesAllowed as $overRidesKey) {
                 if (isset($params[$overRidesKey])) {
                     $overRides[$overRidesKey] = $params[$overRidesKey];
                 }
             }
-            if ($firstRow['renderer']=='jsGrid') {
+            $donotcombine = 0;
+            $template = null;
+            if (strtoupper(($firstRow['type'])) == 'HTML') {
                 $config = json_decode($firstRow['configuration'], 1);
-                if (isset($config['pageSize'])) {
-                    $overRides['pagesize']=$config['pageSize'];
-                }
-                if (isset($config['column'])) {
-                    $columns = array();
-                    foreach($config['column'] as $column) {
-                        if (isset($column['type'])) {
-                            $columns[$column['field']]=$column['type'];
-                        } else
-                            $columns[$column['field']]='string';
+                if (isset($config['template'])) {
+                    if (!empty($config['donotcombine'])) {
+                        $donotcombine = 1;
+                        $data = $this->queryService->runMultipleQueriesWithoutCombine($uuidList, $overRides);
                     }
-                    $overRides['columns'] = $columns;
+                    $template = $config['template'];
                 }
             }
-        
-            $data = $this->queryService->runMultipleQueries($uuidList, $overRides);
-            if ($this->queryService->getTotalCount()) {
-                $response['widget']['total_count']=$this->queryService->getTotalCount();
+            if (!$donotcombine) {
+                $data = $this->queryService->runMultipleQueries($uuidList, $overRides);
             }
-            // print_r($overRides);exit;
+            if ($this->queryService->getTotalCount()) {
+                $response['widget']['total_count'] = $this->queryService->getTotalCount();
+            }
             if (isset($response['widget']['expression']['expression'])) {
                 $expressions = $response['widget']['expression']['expression'];
                 if (!is_array($expressions)) {
@@ -360,8 +382,20 @@ class WidgetService extends AbstractService
                 }
             }
             $response['widget']['data'] = $data;
+            if ($template) {
+                $response['widget']['data'] = $this->applyOITemplate($response['widget'], $template);
+            }
         }
         return $response;
+    }
+
+    public function applyTemplate($resultData, $templateName)
+    {
+        $templateEngine = new TemplateService($this->config, $this->dbAdapter);
+        $templateEngine->init();
+        $result = $templateEngine->getContent($templateName, $resultData);
+        $result = str_replace(array("\r\n", "\r", "\n", "\t"), '', $result);
+        return $result;
     }
 
     public function getWidgetTableData($uuid)
@@ -558,5 +592,71 @@ class WidgetService extends AbstractService
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    public function previewWidget($params)
+    {
+        $uuidList = array();
+        if (isset($params['queries'])) {
+            $queries = json_decode($params['queries'], 1);
+            if (!is_array($queries['queries'])) {
+                $uuidList = array($queries['queries']);
+            } else {
+                $uuidList = $queries['queries'];
+            }
+        }
+        $donotcombine = 0;
+        $template = null;
+        if (isset($params['configuration'])) {
+            $config = json_decode($params['configuration'], 1);
+        }
+        if (isset($config['template'])) {
+            if (!empty($config['donotcombine'])) {
+                $donotcombine = 1;
+                $data = $this->queryService->runMultipleQueriesWithoutCombine($uuidList, null);
+            }
+            $template = $config['template'];
+        }
+        if (!$donotcombine) {
+            $data = $this->queryService->runMultipleQueries($uuidList, null);
+        }
+        if ($this->queryService->getTotalCount()) {
+            $response['widget']['total_count'] = $this->queryService->getTotalCount();
+        }
+        if (isset($params['expression'])) {
+            $expressionTmp = json_decode($params['expression'], 1);
+            $expression = $expressionTmp['expression'];
+            if (!is_array($expression)) {
+                $expressions = array($expression);
+            }
+            foreach ($expressions as $expression) {
+                $data = $this->evaluteExpression($data, $expression);
+            }
+        }
+
+        if (isset($data[0]['calculated']) && count($data) == 1) {
+            //Send only the calculated value if left oprand not specified and aggregate values
+            $data = $data[0]['calculated'];
+        }
+        $response['widget']['data'] = $data;
+        if ($template) {
+            $response['widget']['data'] = $this->applyOITemplate($response['widget'], $template);
+        }
+        return $response;
+    }
+
+    public function applyOITemplate($resultData, $templateName)
+    {
+        $client = new SmartyTemplateProcessorImpl();
+        $OITemplateService = new OITemplateService($this->config, $this->dbAdapter); //OI template class declaration
+        $TemplateService = new TemplateService($this->config, $this->dbAdapter); //OXZion relate template class declaration to get the list of all the template related folder
+        $templateDir = $this->config['TEMPLATE_FOLDER']; // Setting up the default template folder
+        $template = $OITemplateService->getTemplatePath($templateName . ".tpl"); // function call to get the OITemplate directory and the template name
+        $templateParams = $TemplateService->getTemplateFolderList($templateDir); // Get the list of all the template folders and initialize them
+        //TODO We need to refactor this, we dont have to initialize all the folders at once to initialize a single type of template
+        $client->init($templateParams);
+        $content = $client->getContent($template, $resultData, null);
+        $result = str_replace(array("\r\n", "\r", "\n", "\t"), '', $content);
+        return $result;
     }
 }

@@ -2,11 +2,12 @@
 
 namespace Oxzion\Workflow\Camunda;
 use Oxzion\OxServiceException;
+use Throwable;
 
 class WorkflowException extends OxServiceException{
     private $reason;
 
-    public function __construct($message, $reason, $contextData = NULL
+    public function __construct($message, $reason, $contextData = NULL,
             int $errorCode = parent::ERR_CODE_INTERNAL_SERVER_ERROR, 
             string $errorType = parent::ERR_TYPE_ERROR, 
             Throwable $rootCause = NULL){

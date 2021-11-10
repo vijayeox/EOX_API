@@ -55,6 +55,17 @@ return [
                     ],
                 ],
             ],
+            'markAsRead' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/announcement/markasread',
+                    'defaults' => [
+                        'controller' => Controller\AnnouncementController::class,
+                        'method' => 'POST',
+                        'action' => 'markAsRead'
+                    ],
+                ],
+            ],
             'announcementTeams' => [
                 'type' => Segment::class,
                 'options' => [

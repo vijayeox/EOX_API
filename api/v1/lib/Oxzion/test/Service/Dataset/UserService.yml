@@ -1,0 +1,83 @@
+ox_address:
+  -
+    id: 8
+    address1: 'HSR'
+    address2: 'HSR'
+    city: 'Bangalore'
+    state: 'KARNATAKA'
+    country: 'India'
+    zip: 560080
+  -
+    id: 9
+    address1: 'Ariyalur'
+    address2: 'Coimbatore'
+    city: 'Chennai'
+    state: 'Tamil Nadu'
+    country: 'India'
+    zip: 560079
+ox_person:
+  -
+    id: 50
+    uuid: '49283a2c-b112-11ea-b3de-0242ac130004'
+    firstname: 'Rajesh'
+    lastname: 'S'
+    email: 'abcd@gmail.com'
+    date_of_birth: '1991-02-28'
+    phone: '+91-123456789'
+    gender: 'Male'
+    address_id: 8
+    created_by: 1
+    date_created: '2020-08-24 00:00:00'
+  -
+    id: 112
+    uuid: '49283d42-b112-11ea-b3de-0242ac130004'
+    firstname: 'Deepak'
+    lastname: 'S'
+    email: 'deepak@gmail.com'
+    date_of_birth: '1991-02-28'
+    phone: '+91-123456789'
+    gender: 'Male'
+    address_id: 9
+    created_by: 1
+    date_created: '2020-08-24 00:00:00'
+ox_user:
+  -
+    id: 50
+    uuid: 'd9890624-8f42-4201-bbf9-675ec5dc8933'
+    username: 'rajesh'
+    password: '1619d7adc23f4f633f11014d2f22b7d8'
+    name: 'Rajesh S'
+    account_id: 1
+    status: 'Active'
+    date_created: '2018-11-11 07:25:06'
+    created_by: 1
+    person_id: 50
+  -
+    id: 51
+    uuid: 'd9890624-8f42-4201-bbf9-675ec5dc8400'
+    username: 'deepak'
+    password: '1619d7adc23f4f633f11014d2f22b7d8'
+    name: 'Deepak S'
+    account_id: 1
+    status: 'Active'
+    date_created: '2018-11-11 07:25:06'
+    created_by: 1
+    person_id: 112
+ox_employee:
+  -
+    id: 34
+    uuid: '0f18e4f6-b988-11eb-8529-0242ac130003'
+    designation: 'IT Analyst'
+    date_of_join: '2018-11-11'
+    org_id: 1
+    manager_id: 51
+    created_by: 1
+ox_account_user:
+  -
+    id : 50
+    user_id: 50
+    account_id: 2
+  -
+    id : 51
+    user_id: 50
+    account_id: 1

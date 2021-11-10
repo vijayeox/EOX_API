@@ -49,9 +49,9 @@ class CommentService extends AbstractService
         $data['file_id'] = $this->getIdFromUuid('ox_file', $fileId);
         $data['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
         $data['uuid'] = UuidUtil::uuid();
-        $data['created_by'] = AuthContext::get(AuthConstants::USER_ID);
+        $data['created_by'] = isset($data['created_by']) ? $data['created_by'] : AuthContext::get(AuthConstants::USER_ID);
         $data['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
-        $data['date_created'] = date('Y-m-d H:i:s');
+        $data['date_created'] = isset($data['date_created']) ? $data['date_created'] : date('Y-m-d H:i:s');
         $data['date_modified'] = date('Y-m-d H:i:s');
         if (isset($data['parent'])) {
             $ret = $this->getParentId($data, $fileId);
@@ -72,13 +72,15 @@ class CommentService extends AbstractService
             }
             $id = $this->table->getLastInsertValue();
             $data['id'] = $id;
-            $this->messageProducer->sendTopic(json_encode(array('message' => $data['text'], 'fileId' => $fileId, 'from' => AuthContext::get(AuthConstants::USERNAME))), 'CHAT_APPBOT_NOTIFICATION');
+            $postId = isset($data['postId']) ? $data['postId'] : '';
+            $this->logger->info("Comments Data from CS---".print_r(array('message' => $data['text'], 'fileId' => $fileId, 'commentId' =>$data['uuid'], 'fileIds' => $postId ,'from' => AuthContext::get(AuthConstants::USERNAME)),true));
+            $this->messageProducer->sendTopic(json_encode(array('message' => $data['text'], 'fileId' => $fileId, 'commentId' =>$data['uuid'], 'fileIds' => $postId ,'from' => AuthContext::get(AuthConstants::USERNAME))), 'CHAT_APPBOT_NOTIFICATION');
             $this->commit();
         } catch (Exception $e) {
             $this->rollback();
             throw $e;
         }
-        return $count;
+        return $data;
     }
 
     private function getParentId(&$data, $fileId)
@@ -94,7 +96,8 @@ class CommentService extends AbstractService
     public function updateComment($id, $fileId, $data)
     {
         $fId = $this->getIdFromUuid("ox_file", $fileId);
-        $obj = $this->table->getByUuid($id, array("file_id" => $fId, "account_id" => AuthContext::get(AuthConstants::ACCOUNT_ID)));
+        $accountId = isset($data['accountId']) && !is_numeric($data['accountId']) ? $this->getIdFromUuid("ox_account", $data['accountId']) :AuthContext::get(AuthConstants::ACCOUNT_ID);
+        $obj = $this->table->getByUuid($id, array("file_id" => $fId, "account_id" => $accountId));
         if (!$obj) {
             return 0;
         }
@@ -111,6 +114,7 @@ class CommentService extends AbstractService
         $data['date_modified'] = date('Y-m-d H:i:s');
         $form->exchangeArray($data);
         $form->validate();
+        $this->beginTransaction();
         $count = 0;
         try {
             $count = $this->table->save($form);
@@ -118,11 +122,12 @@ class CommentService extends AbstractService
                 $this->rollback();
                 return 0;
             }
+            $this->commit();
         } catch (Exception $e) {
             $this->rollback();
             throw $e;
         }
-        return $count;
+        return $data;
     }
 
     public function deleteComment($id, $fileId)
@@ -177,13 +182,19 @@ class CommentService extends AbstractService
             $fileClause = "AND ox_comment.uuid = :commentId";
             $queryParams['commentId'] = $id;
         }
-        $query = "select text,ou.name as name,ou.icon as icon,ou.uuid as userId,ox_comment.date_created as time, ox_comment.uuid as commentId 
+        $query = "select text,ou.name as name,ou.icon as icon,ou.uuid as userId,ox_comment.date_created as time, ox_comment.uuid as commentId, ox_comment.attachments 
                     from ox_comment 
                     inner join ox_user ou on ou.id = ox_comment.created_by 
                     inner join ox_file of on of.id = ox_comment.file_id 
-                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause order by ox_comment.date_created desc";
+                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause order by ox_comment.date_created asc";
         $this->logger->info("Executing Query $query with params - ".print_r($queryParams, true));
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
+        if (count($resultSet) >0) {
+            for ($i=0; $i < count($resultSet); $i++) {                 
+                $attachment = json_decode($resultSet[$i]['attachments'],true);
+                $resultSet[$i]['attachments'] = $attachment['attachments'];
+            }
+        }
         return $resultSet;
     }
 

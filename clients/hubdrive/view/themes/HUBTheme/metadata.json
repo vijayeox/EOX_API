@@ -1,0 +1,16 @@
+{
+  "type": "theme",
+  "name": "HUBTheme",
+  "internal": true,
+  "category": null,
+  "title": {
+    "en_EN": "HUBTheme"
+  },
+  "description": {
+    "en_EN": "HUBTheme"
+  },
+  "files": [
+    "main.js",
+    "main.css"
+  ]
+}

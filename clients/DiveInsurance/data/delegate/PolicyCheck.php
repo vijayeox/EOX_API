@@ -13,7 +13,15 @@ class PolicyCheck extends FileDelegate
     public function execute(array $data, Persistence $persistenceService)
     {
         $this->logger->info("Policy Check".print_r($data,true));
-        if(!isset($data['padi']) || (isset($data['padi']) && trim($data['padi']) == '')){
+        if(isset($data['product']) && $data['product'] == 'Dive Store' || $data['product'] == 'Group Professional Liability'){
+            $padi = $data['business_padi'];
+            $field = 'business_padi';                    
+        }else{
+            $padi = $data['padi'];
+            $field = 'padi';
+        }
+
+        if(!isset($padi) || (isset($padi) && trim($padi) == '')){
             return $data;
         }
         $params = array();
@@ -22,7 +30,7 @@ class PolicyCheck extends FileDelegate
         $params['status'] = 'Completed';
         $params['entityName'] = $data['product'];
         $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'end_date','operator'=>'gt','value'=>$today);
-        $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'padi','operator'=>'eq','value'=>$data['padi']);
+        $filterParams['filter'][0]['filter']['filters'][] = array('field'=>$field,'operator'=>'eq','value'=>$padi);
         // $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'policyStatus','operator'=>'neq','value'=> 'Cancelled');
         $policyList = $this->getFileList($params,$filterParams);
         if(count($policyList['data']) > 0){

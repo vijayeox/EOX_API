@@ -60,6 +60,7 @@ class CommentControllerTest extends ControllerTest
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals("3ff78f56-5748-406b-9ce9-426242c5afc5", $content['data']['commentId']);
         $this->assertEquals('Comment 1', $content['data']['text']);
+        $this->assertNull($content['data']['attachments']);
     }
     public function testGetNotFound()
     {
@@ -197,5 +198,31 @@ class CommentControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'error');
+    }
+
+     public function testUpdateWithAccountIdInData()
+    {
+        $data = ['text' => 'Updated Comment', 'accountId' =>'53012471-2863-4949-afb1-e69b0891c98a'];
+        $this->initAuthToken($this->adminUser);
+        $this->setJsonContent(json_encode($data));
+        $this->dispatch('/file/d13d0c68-98c9-11e9-adc5-308d99c9145b/comment/3ff78f56-5748-406b-9ce9-426242c5afc5', 'PUT', null);
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data']['text'], $data['text']);
+    }
+
+     public function testGetCommentAttachmentDetails()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/file/e23d0c68-98c9-11e9-adc5-308d99c9146c/comment/c1c5828f-2424-4e80-a09b-d752d004a6c8', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals("c1c5828f-2424-4e80-a09b-d752d004a6c8", $content['data']['commentId']);
+        $this->assertEquals('Comment New', $content['data']['text']);
+        $this->assertNotNull($content['data']['attachments']);
     }
 }

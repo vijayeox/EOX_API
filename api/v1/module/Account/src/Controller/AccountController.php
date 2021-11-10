@@ -166,10 +166,9 @@ class AccountController extends AbstractApiController
     public function addUsersToAccountAction()
     {
         $params = $this->params()->fromRoute();
-        $id = $params['accountId'];
         $data = $this->extractPostData();
         try {
-            $this->accountService->saveUser($id, $data);
+            $this->accountService->saveUser($params['accountId'], $data);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);

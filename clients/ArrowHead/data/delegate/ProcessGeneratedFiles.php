@@ -69,11 +69,13 @@ class ProcessGeneratedFiles extends MailDelegate
         }
 
         $fileData = $this->getFile($data['fileId'],  true, $data['orgId'])['data'];
+        $this->logger->info("Check Count and Time - ". $fileData['documentsToBeGenerated'] . " -- " . date('Y-m-d H:i:s'));
         // if ($fileData == 0) {
         //     throw new Exception("Cannot update unknown file. Please check the fileId", 1);
         // }
         if (isset($fileData['documentsToBeGenerated'])) {
             if ($fileData['documentsToBeGenerated'] == 1) {
+                $this->logger->info("Documents Generation Completed");
                 $fileData['documentsToBeGenerated'] = 0;
 
                 if ($fileData["workflowInitiatedBy"] == "accountExecutive") {

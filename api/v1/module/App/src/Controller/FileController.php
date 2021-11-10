@@ -107,6 +107,9 @@ class FileController extends AbstractApiController
                 $response = $this->fileService->deleteFile($id, $params['version']);
             } catch (VersionMismatchException $e) {
                 return $this->getErrorResponse('Version changed', 404, ['reason' => 'Version changed', 'reasonCode' => 'VERSION_CHANGED', 'new record' => $e->getReturnObject()]);
+            } catch (Exception $e) {
+                $this->log->error($e->getMessage(), $e);
+                return $this->exceptionToResponse($e);
             }
             return $this->getSuccessResponse("File has been deleted!");
         } else {
@@ -279,9 +282,11 @@ class FileController extends AbstractApiController
     public function auditAction()
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
+        $filterParams = $this->params()->fromQuery();
+
         try {
             if ($params['fileId']) {
-                $result = $this->fileService->getAuditLog($params['fileId']);
+                $result = $this->fileService->getAuditLog($params['fileId'], $filterParams);
             } else {
                 return $this->getErrorResponse("Validation Errors", 404, "FileNotFound");
             }

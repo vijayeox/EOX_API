@@ -1,0 +1,73 @@
+name: 'Claims'
+description: 'Shows a list of claims realated to a workbook'
+content:
+    - 
+        type: Page
+        content:
+            -
+                type: List
+                content:
+                    route: 'file/search/entity/Policy Claims/assoc/{{parentFileId}}'
+                    gridToolbar: '<p className="namedInsuredtext"> {data.namedInsured} - Claims Summary</p>'
+                    filterable: false 
+                    defaultFilters:
+                        skip: 0
+                        take: 10000
+                        sort:
+                            -
+                                field: date_created
+                                dir: desc          
+                    resizable: false
+                    sortable: false
+                    className: claimsMiniListView
+                    wrapStyle:
+                        height: "50%"
+                    columnConfig:
+                        -
+                            title: Value Date
+                            field: valueDate
+                            cell: '<td>{formatDate(item.valueDate)}</td>'
+                            filter: date
+                            filterFormat: YYYY-MM-DD
+                        -
+                            title: Loss Date
+                            field: lossDate
+                            cell: '<td>{formatDate(item.lossDate)}</td>'
+                            filter: date
+                            filterFormat: YYYY-MM-DD
+                        -
+                            title: "Paid Amount"
+                            field: paid
+                            cell: '<td>{item.paid.toLocaleString("en-US", {style: "currency", currency: "USD",})}</td>'
+                            filter: numeric
+                        - 
+                            title: "Reserve Amount"
+                            field: reserve
+                            cell: '<td>{item.reserve.toLocaleString("en-US", {style: "currency", currency: "USD",})}</td>'
+                            filter: numeric
+                        - 
+                            title: Total Amount
+                            field: total
+                            cell: '<td>{item.total.toLocaleString("en-US", {style: "currency", currency: "USD",})}</td>'
+                            filter: numeric
+                        - 
+                            title: Level 1
+                            field: claimlevel1
+                            cell: '<td>{(item.claimlevel1 != [] && item.claimlevel1 != "[]") ? item.claimlevel1 : ""}</td>'
+                        - 
+                            title: Carrier
+                            field: carrier
+            -
+                type: Document
+                content:
+                    jsx: '<h5 className="totalClaimsAmountMini">
+                        Total Claims Amount {sumTotal}
+                        </h5>'
+                    params:
+                        sumTotal: 'parseFloat(data.sumTotal).toLocaleString("en-US", {style: "currency", currency: "USD",})'
+                    url: 'delegate/ClaimsSummation?assocId={{parentFileId}}'
+            -
+                type: Form
+                form_id: 055cdece-c75c-4d33-b32c-800e05421406
+                parentFileId: '{{parentFileId}}'
+                      

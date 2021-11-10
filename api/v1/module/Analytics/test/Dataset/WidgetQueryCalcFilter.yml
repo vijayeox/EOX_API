@@ -149,3 +149,13 @@ ox_widget_query:
     ox_widget_id: 129
     sequence: 1
     configuration: "Sample"  
+  -
+    ox_query_id: 125
+    ox_widget_id: 130
+    sequence: 1
+    configuration: "Sample"
+  -
+    ox_query_id: 126
+    ox_widget_id: 131
+    sequence: 1
+    configuration: "Sample"

@@ -61,7 +61,6 @@ class PageService extends AbstractService
                 }
                 $count = $this->table->save($page);
                 if ($count == 0) {
-                    $this->rollback();
                     throw new ServiceException("Page save failed", "page.save.failed");
                 }
                 if (!isset($data['id'])) {

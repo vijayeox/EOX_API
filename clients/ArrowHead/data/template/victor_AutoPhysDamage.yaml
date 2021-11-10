@@ -365,7 +365,7 @@
    note: If this question is filled out the system needs to map "Yes" to
       Sheet!Underwriting Survey D77
 -
-   key: dolkeycntrlsameallloc
+   key: victorAutoPhysicalDamage*dolkeycontrol
    Source Worksheet: Are key  controls the same for all locations?
    pageName: Underwriting Survey
    cell: D48
@@ -400,7 +400,7 @@
    cell: D57
    returnBoolean: "Yes|No"
 -
-   key: dolareanyvehiparked
+   key: victorAutoPhysicalDamage*chkParkGarageOrRoof
    Source Worksheet: 'Are any vehicles parked in Parking Garages '
    pageName: Underwriting Survey
    cell: D58
@@ -450,7 +450,7 @@
       '25000125000' : '10000'
       '50000250000' : '10000'
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_checkAvgExposure
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_total
    Source Worksheet: Average Exposure to be insured
    pageName: Exposures and Deductibles
    cell: H69
@@ -458,7 +458,7 @@
    method: simpleDatagrid
    note: Sheet!Valuation Survey Column G + Column J + Column M + Column P = Sheet!Exposure and Deductibles H69
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_checkAvgExposure
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_total
    Source Worksheet: Average Exposure to be insured
    pageName: Exposures and Deductibles
    cell: K69
@@ -587,14 +587,14 @@
    pageName: Underwriting Survey
    cell: D63
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_monthAvgNew
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_new
    method: simpleDatagrid
    Source Worksheet: 12 Month Avg  New
    pageName: Valuation Survey
    cell: G5
    type: DataGrid
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_insuredThroughFloorPlanNew
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_floorNew
    method: simpleDatagrid
    Source Worksheet: 12 Month Avg  New
    pageName: Valuation Survey
@@ -602,7 +602,7 @@
    type: DataGrid
    Note: "Flag for discussion:\r\n1. All the locations and buildings from the property need to map over and allow the user to enter in the following SOV fields.\r\n2. Producer can remove any locations that they don’t need.\r\n3. For each unique location the data would need to add everything together.For Example:\r\n12 Month Average New:\r\n-Location 1 Bld 1 =  12 Month Avg New $15,500,000\r\n-Location 1 Bld 2 = 12 Month Avg New $500,000\r\n-Location 1 Bld 3 = 12 Month Avg New $1,000,0000Step 1. SUM the 12 Month Average New value from each of the locations = $17,000,000Insured Through Floor Plan:\r\n-Location 1 Bld 1 =  Insured Through Floor Plan - New $2,000,000\r\n-Location 1 Bld 2 = Insured Through Floor Plan - New $200,000\r\n-Location 1 Bld 3 = Insured Through Floor Plan - New $500,000Step 2. SUM the Insured Through Floor Plan values listed  at each of the locations = $2,700,000Step 3. Calculate the total location difference between  the 12 month average new and the Insured Through Floor Plan.$17,000,000-$2,700,000= $14,300,000 needs to map to Sheet!SOVH5"
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_monthAvgUsed
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_used
    method: simpleDatagrid
    Source Worksheet: 12 Month Avg  Used
    pageName: Valuation Survey
@@ -610,7 +610,7 @@
    type: DataGrid
    Note: "Flag for discussion:\r\n1. All the locations and buildings from the property need to map over and allow the user to enter in the following SOV fields.\r\n2. Producer can remove any locations that they don’t need.\r\n3. For each unique location the data would need to aFor Example:\r\n12 Month Average Used:\r\n-Location 1 Bld 1 =  12 Month Avg Used $12,000,000\r\n-Location 1 Bld 2 = 12 Month Avg Used $500,000\r\n-Location 1 Bld 3 = 12 Month Avg Used $1,000,0000Step 1. SUM the value from each of the locations = $13,500,000Insured Through Floor Plan - Used \r\n-Location 1 Bld 1 = Insured Through Floor Plan - Used $5,000,000\r\n-Location 1 Bld 2 = Insured Through Floor Plan - Used $100,000\r\n-Location 1 Bld 3 = Insured Through Floor Plan - Used $500,000Step 2. SUM the value from each of the locations = $5,600,000Step 3: Calculate the difference of the total Location 12 Month Average used and the total location Insured Through Floor Plan Used:  $7,900,000"
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_insuredThroughFloorPlanUsed
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_floorUsed
    method: simpleDatagrid
    Source Worksheet: Insured Through Floor Plan - Used
    pageName: Valuation Survey
@@ -618,7 +618,7 @@
    type: DataGrid
    Note: "Flag for Discussion:\r\nThe Insured through floor plan limits should never be greater than the 12 Month Average limits. If a producer enters an Insured to Floor Plan limit that is greater than the 12 Month Average an error message will trigger."
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_monthAvgRoadDemosFurnishedAutos
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_demosFurnishedAutos
    method: simpleDatagrid
    Source Worksheet: '12 Month Avg  Road/Demos / Furnished Autos '
    pageName: Valuation Survey
@@ -626,27 +626,28 @@
    type: DataGrid
    Note: "Flag for discussion:\r\n1. All the locations and buildings from the property need to map over and allow the user to enter in the following SOV fields.\r\n2. Producer can remove any locations that they don’t need.\r\n3. For each unique location the data would need to aFor Example:\r\n12 Month Average Road (Demos/Furnished Auto)\r\n-Location 1 Bld 1 =  12 Month Avg Road - Demos/Furnished Autos - $5,000,000\r\n-Location 1 Bld 2 = 12 Month Avg Road - Demos/Furnished Autos - $3,000.000\r\n-Location 1 Bld 3 = 12 Month Avg Road - Demos/Furnished Autos - $1,000,000Step 1: Sum the total 12 month Avg Road (Demos/furnished  Auto) at Location 1 =$9,000,000Insured Through Floor Plan - Road\r\n-Location 1 Bld 1 =  Insured Through Floor Plan - Road  - $2,000,000\r\n-Location 1 Bld 2 = Insured Through Floor Plan - Road - $1,000,000\r\n-Location 1 Bld 3 = Insured Through Floor Plan - Road - $0Step 2: Sum the total Insured Through Floor Plan - Road at location 1 = $3,000,00012 Month Average Road (Loaners/Shop/Service)\r\n-Location 1 Bld 1 =  12 Month Avg Road - (Loaners/Shops/Service) - $4,000,000\r\n-Location 1 Bld 2 = 12 Month Avg Road - (Loaners/Shops/Service) - $700,000\r\n-Location 1 Bld 3 = 12 Month Avg Road - (Loaners/Shops/Service) - $200,000Step 3: Sum the total 12 Month Average Road (Loaners/Shop/Service) at Location 1 = $4,900,000Insured Through Floor Plan - Road\r\n-Location 1 Bld 1 =  12 Month Avg Road - Demos/Furnished Autos - $2,000,000\r\n-Location 1 Bld 2 = 12 Month Avg Road - Demos/Furnished Autos - $500,000\r\n-Location 1 Bld 3 = 12 Month Avg Road - Demos/Furnished Autos - $0Step 4: Sum the total Insured Through Floor Plan - Road at Location 1 = $2,500,000Step 5: Add AL16 (12 Month Average Road - Demos/Furnished Autos) - AO16 (Insured Through Floor Plan - Road) + AR16 (12 Month Average Road Loaners/Shop/Service) - AS16 (Insured Through Floor Plan -Road) = $8,400,000\r\n"
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_insuredThroughFloorPlanRoad
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_floorDemosFurnishedAutos
    method: simpleDatagrid
    Source Worksheet: Insured Through Floor Plan - Road
    pageName: Valuation Survey
    cell: N5
    type: DataGrid
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_monthAvgRoadLoanersShopService
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_loanersShopService
    method: simpleDatagrid
    Source Worksheet: 12 Month Avg  Road/ Loaners / Shop / Service
    pageName: Valuation Survey
    cell: P5
    type: DataGrid
 -
-   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_insuredThroughFloorPlan
+   key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_floorLoanersShopService
    method: simpleDatagrid
    Source Worksheet: Insured Through Floor Plan - Road
    pageName: Valuation Survey
    cell: Q5
    type: DataGrid
 -
+# check which prmarty OEM
    key: victorAutoPhysicalDamage*DealershipStorageLocationsArray_primaryOEM
    method: simpleDatagrid
    Source Worksheet: Primary OEM
@@ -661,7 +662,7 @@
    cell: B2
 -
    pageName: Underwriting Survey
-   key: dolalllocdoesnotincld_none
+   key: victorAutoPhysicalDamage*dolalllocdoesnotincld_none
    method: checkInArray
    type: Checkbox
    cell: Check Box 211
@@ -672,40 +673,40 @@
    cell: Check Box 211
 -
    pageName: Underwriting Survey
-   key: dolalllocdoesnotincld_computerizedKeyVault
+   key: victorAutoPhysicalDamage*dolalllocdoesnotincld_computerizedKeyVault
    method: checkInArray
    type: Checkbox
    cell: Check Box 215
 -
    pageName: Underwriting Survey
-   key: victorAutoPhysicalDamage*checkkeycontrolscomputerizedKeyVault
+   key: victorAutoPhysicalDamage*checkkeycontrols_computerizedKeyVault
    type: Checkbox
    cell: Check Box 215
 -
    pageName: Underwriting Survey
-   key: dolalllocdoesnotincld_lockedKeyCabinet
+   key: victorAutoPhysicalDamage*dolalllocdoesnotincld_lockedKeyCabinet
    method: checkInArray
    type: Checkbox
    cell: Check Box 216
 -
    pageName: Underwriting Survey
-   key: dolalllocdoesnotincld_lockedNightlyInManagersOffice
+   key: victorAutoPhysicalDamage*dolalllocdoesnotincld_lockedNightlyInManagersOffice
    method: checkInArray
    type: Checkbox
    cell: Check Box 216
 -
    pageName: Underwriting Survey
-   key: victorAutoPhysicalDamage*checkkeycontrolslockingKeyCabinet
+   key: victorAutoPhysicalDamage*checkkeycontrols_lockingKeyCabinet
    type: Checkbox
    cell: Check Box 216
 -
    pageName: Underwriting Survey
-   key: victorAutoPhysicalDamage*checkkeycontrolslockedInManagersOffice
+   key: victorAutoPhysicalDamage*checkkeycontrols_lockedInManagersOffice
    type: Checkbox
    cell: Check Box 216
 -
    pageName: Underwriting Survey
-   key: dolalllocdoesnotincld_lockBoxes
+   key: victorAutoPhysicalDamage*dolalllocdoesnotincld_lockBoxes
    method: checkInArray
    type: Checkbox
    cell: Check Box 217
@@ -715,8 +716,9 @@
    type: Checkbox
    cell: Check Box 217
 -
+# check for issue
    pageName: Underwriting Survey
-   key: dolalllocdoesnotincld_keysInCars
+   key: victorAutoPhysicalDamage*dolalllocdoesnotincld_keysInCars
    method: checkInArray
    type: Checkbox
    cell: Check Box 218
@@ -728,133 +730,140 @@
 -
    pageName: Underwriting Survey
    Source Worksheet: Comprehensive
-   key: pleaseSelectForOther_newComp
+   key: victorAutoPhysicalDamage*reqCoverage_newComp
    method: pulloutChild
    type: Checkbox
    cell: Check Box 257
 -
    pageName: Underwriting Survey
    Source Worksheet: Comprehensive
-   key: pleaseSelectForOther_usedComp
+   key: victorAutoPhysicalDamage*reqCoverage_usedComp
    method: pulloutChild
    type: Checkbox
    cell: Check Box 257
 -
    pageName: Underwriting Survey
    Source Worksheet: Comprehensive
-   key: pleaseSelectForOther_demoFurnishedComp
+   key: victorAutoPhysicalDamage*reqCoverage_demosComp
    method: pulloutChild
    type: Checkbox
    cell: Check Box 257
 -
    pageName: Underwriting Survey
    Source Worksheet: Comprehensive
-   key: pleaseSelectForOther_serviceLoanersComp
+   key: victorAutoPhysicalDamage*reqCoverage_serviceComp
+   method: pulloutChild
+   type: Checkbox
+   cell: Check Box 257
+-
+   pageName: Underwriting Survey
+   Source Worksheet: Comprehensive.
+   key: victorAutoPhysicalDamage*reqCoverage_otherOwnedComp
    method: pulloutChild
    type: Checkbox
    cell: Check Box 257
 -
    pageName: Underwriting Survey
    Source Worksheet: Comprehensive
-   key: pleaseSelectForOther_otherOwnedComp
-   method: pulloutChild
-   type: Checkbox
-   cell: Check Box 257
--
-   pageName: Underwriting Survey
-   Source Worksheet: Comprehensive
-   key: pleaseSelectForOther_otherNonOwnedComp
+   key: victorAutoPhysicalDamage*reqCoverage_otherNonOwnedComp
    method: pulloutChild
    type: Checkbox
    cell: Check Box 257
 -
    pageName: Underwriting Survey
    Source Worksheet: Collision
-   key: pleaseSelectForOther_newCollision
+   key: victorAutoPhysicalDamage*reqCoverage_newCollision
    method: pulloutChild
    type: Checkbox
    cell: Check Box 241
 -
    pageName: Underwriting Survey
    Source Worksheet: Collision
-   key: pleaseSelectForOther_usedCollision
+   key: victorAutoPhysicalDamage*reqCoverage_usedCollision
    method: pulloutChild
    type: Checkbox
    cell: Check Box 241
 -
    pageName: Underwriting Survey
    Source Worksheet: Collision
-   key: pleaseSelectForOther_demoFurnishedCollision
+   key: victorAutoPhysicalDamage*reqCoverage_demosCollision
    method: pulloutChild
    type: Checkbox
    cell: Check Box 241
 -
    pageName: Underwriting Survey
    Source Worksheet: Collision
-   key: pleaseSelectForOther_serviceLoanersCollision
+   key: victorAutoPhysicalDamage*reqCoverage_serviceCollision
    method: pulloutChild
    type: Checkbox
    cell: Check Box 241
 -
    pageName: Underwriting Survey
    Source Worksheet: Collision
-   key: pleaseSelectForOther_otherOwnedCollision
+   key: victorAutoPhysicalDamage*reqCoverage_otherOwnedCollision
    method: pulloutChild
    type: Checkbox
    cell: Check Box 241
 -
    pageName: Underwriting Survey
    Source Worksheet: Collision
-   key: pleaseSelectForOther_otherNonOwnedCollision
+   key: victorAutoPhysicalDamage*reqCoverage_otherNonOwnedCollision
    method: pulloutChild
    type: Checkbox
    cell: Check Box 241
 -
    pageName: Underwriting Survey
    Source Worksheet: False pretense
-   key: pleaseSelectForOther_newFalsePretense
+   key: victorAutoPhysicalDamage*reqCoverage_newFalsePretense
    method: pulloutChild
    type: Checkbox
    cell: Check Box 244
 -
    pageName: Underwriting Survey
    Source Worksheet: False pretense
-   key: pleaseSelectForOther_usedFalsePretense
+   key: victorAutoPhysicalDamage*reqCoverage_usedFalsePretense
    method: pulloutChild
    type: Checkbox
    cell: Check Box 244
 -
    pageName: Underwriting Survey
    Source Worksheet: False pretense
-   key: pleaseSelectForOther_demoFurnishedFalsePretense
+   key: victorAutoPhysicalDamage*reqCoverage_demosFalsePretense
    method: pulloutChild
    type: Checkbox
    cell: Check Box 244
 -
    pageName: Underwriting Survey
    Source Worksheet: False pretense
-   key: pleaseSelectForOther_serviceLoanersFalsePretense
+   key: victorAutoPhysicalDamage*reqCoverage_serviceFalsePretense
    method: pulloutChild
    type: Checkbox
    cell: Check Box 244
 -
    pageName: Underwriting Survey
    Source Worksheet: False pretense
-   key: pleaseSelectForOther_otherOwnedFalsePretense
+   key: victorAutoPhysicalDamage*reqCoverage_otherOwnedFalsePretense
    method: pulloutChild
    type: Checkbox
    cell: Check Box 244
 -
    pageName: Underwriting Survey
    Source Worksheet: False pretense
-   key: pleaseSelectForOther_otherNonOwnedFalsePretense
+   key: victorAutoPhysicalDamage*reqCoverage_otherNonOwnedFalsePretense
    method: pulloutChild
    type: Checkbox
    cell: Check Box 244
+-
+   pageName: Underwriting Survey
+   Source Worksheet: False pretense
+   key: victorAutoPhysicalDamage*reqCoverage_noneselected
+   method: pulloutChild
+   type: Checkbox
+   cell: Check Box 234
 -
    pageName: Underwriting Survey
    Source Worksheet: garagekeeper Underwriting Lot Protection
-   key: allLotProtectionIncludes_none
+   key: victorAutoPhysicalDamage*allLotProtection_none
    method: checkInArray
    type: Checkbox
    cell: Check Box 214
@@ -867,7 +876,7 @@
 -
    pageName: Underwriting Survey
    Source Worksheet: garagekeeper Underwriting Lot Protection
-   key: allLotProtectionIncludes_fenced
+   key: victorAutoPhysicalDamage*allLotProtection_fenced
    method: checkInArray
    type: Checkbox
    cell: Check Box 219
@@ -880,7 +889,7 @@
 -
    pageName: Underwriting Survey
    Source Worksheet: garagekeeper Underwriting Lot Protection
-   key: allLotProtectionIncludes_postAndChain
+   key: victorAutoPhysicalDamage*allLotProtection_postAndChain
    method: checkInArray
    type: Checkbox
    cell: Check Box 220
@@ -893,7 +902,7 @@
 -
    pageName: Underwriting Survey
    Source Worksheet: garagekeeper Underwriting Lot Protection
-   key: allLotProtectionIncludes_securityLighting
+   key: victorAutoPhysicalDamage*allLotProtection_securityLighting
    method: checkInArray
    type: Checkbox
    cell: Check Box 221
@@ -906,7 +915,7 @@
 -
    pageName: Underwriting Survey
    Source Worksheet: garagekeeper Underwriting Lot Protection
-   key: allLotProtectionIncludes_videoSurveillance
+   key: victorAutoPhysicalDamage*allLotProtection_videoSurveillance
    method: checkInArray
    type: Checkbox
    cell: Check Box 222
@@ -919,7 +928,7 @@
 -
    pageName: Underwriting Survey
    Source Worksheet: garagekeeper Underwriting Lot Protection
-   key: allLotProtectionIncludes_nightWatchman
+   key: victorAutoPhysicalDamage*allLotProtection_nightWatchman
    method: checkInArray
    type: Checkbox
    cell: Check Box 223
@@ -932,6 +941,6 @@
 -
    pageName: Underwriting Survey
    Source Worksheet: garagekeeper Underwriting Lot Protection
-   key: dollotprotection
+   key: victorAutoPhysicalDamage*dollotprotection
    cell: D55
    returnBoolean: 'Yes|No'

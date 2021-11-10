@@ -64,6 +64,10 @@ class CleanUpDelegate extends AbstractAppDelegate
     		if(isset($data['business_website'])){
     			unset($data['business_website']);	
     		}
+            if(isset($data['CSRReviewRequired']) && empty($data['approved'])){
+                $data['approved'] = "onHold";
+                $data['emptyapprove'] = true;
+            }
     }
 
     private function cleanUpDiveStoreData(&$data){
@@ -75,10 +79,13 @@ class CleanUpDelegate extends AbstractAppDelegate
         }
         if(isset($data['paymentOptions'])){
             $data['paymentOptions'] = "";
-        }
-        if(isset($data['endorsement_options']) && isset($data['endoAdditionalLocation'])){
-            $data['additionalLocations'] = $data['endoAdditionalLocation'];
-            unset($data['endoAdditionalLocation']);
-        }
+		}
+		
+		if(isset($data['endorsement_options']) && isset($data['endoAdditionalLocation'])){
+            if($data['policyStatus'] != "In Force"){
+    			$data['additionalLocations'] = $data['endoAdditionalLocation'];
+    			unset($data['endoAdditionalLocation']);
+            }
+		}
     }
  }

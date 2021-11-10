@@ -114,7 +114,7 @@ class WorkflowControllerTest extends ControllerTest
     public function testUpdate()
     {
         $this->initAuthToken($this->adminUser);
-        $data = ['id'=>1,'name' => 'workflow23','entity_id'=>1,'app_id'=>99,'required'=> 0, 'sequence' => 2,'type'=>'Page'];
+        $data = ['id'=>1,'name' => 'workflow23','entity_id'=>1,'app_id'=>199,'required'=> 0, 'sequence' => 2,'type'=>'Page'];
         $this->setJsonContent(json_encode($data));
         $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/workflow/1141cd2e-cb14-11e9-a32f-2a2ae2dbcce4', 'PUT', null);
         $this->assertResponseStatusCode(200);

@@ -115,6 +115,10 @@ entity:
                 name: transaction_reference_number
                 data_type: text
                 index: true
+            -
+                name: automatic_renewal
+                data_type: boolean
+                index: true
     -
         name: 'Dive Store'
         uuid: 161a3f0f-c384-4f2d-a3da-a8a7ae51622e
@@ -323,6 +327,10 @@ entity:
             -
                 name: transaction_reference_number
                 data_type: text
+                index: true
+            -
+                name: automatic_renewal
+                data_type: boolean
                 index: true
     -
         name: 'Pocket Card Job'
@@ -625,11 +633,6 @@ workflow:
         uuid: 7d302209-667d-46e4-80f0-3dd1a4079509
         bpmn_file: 'Individual Professional Liability/IPLEndorsement.bpmn'
         entity: 'Individual Professional Liability'
-    -
-        name: 'Auto Renewal'
-        uuid: 91cb9e10-5845-4379-97c9-f9486b702bd6
-        bpmn_file: 'Individual Professional Liability/IPLAutoRenewal.bpmn'
-        entity: 'Auto Renewal'
     -
         name: 'Emergency First Response'
         uuid: cb74d176-225a-11ea-978f-2e728ce88125

@@ -6,36 +6,45 @@ import { React, ReactDOM, EOXApplication } from "oxziongui";
 const register = (core, args, options, metadata) => {
   // Create a new Application instance
   const proc = core.make("osjs/application", { args, options, metadata });
-  let session = core.make('osjs/settings').get('osjs/session');
+  let session = core.make("osjs/settings").get("osjs/session");
   let sessions = Object.entries(session);
-  var i, finalposition, finalDimension,finalMaximised,finalMinimised;
+  var i, finalposition, finalDimension, finalMaximised, finalMinimised;
   for (i = 0; i < sessions.length; i++) {
-    if (Object.keys(session[i].windows).length && session[i].name == metadata.name){
+    if (
+      Object.keys(session[i].windows).length &&
+      session[i].name == metadata.name
+    ) {
       finalposition = session[i].windows[0].position;
       finalDimension = session[i].windows[0].dimension;
       finalMaximised = session[i].windows[0].maximized;
       finalMinimised = session[i].windows[0].minimized;
     }
   }
-  var win = proc.createWindow({
+  var win = proc
+    .createWindow({
       id: metadata.name + "_Window",
       title: metadata.title.en_EN,
-      icon: proc.resource(icon_white),
+      // icon: proc.resource(icon_white),
+      icon: metadata.fontIcon,
       attributes: {
         classNames: ["Window_" + metadata.name],
-        dimension: finalDimension ? finalDimension : {
-          width: 900,
-          height: 570
-        },
+        dimension: finalDimension
+          ? finalDimension
+          : {
+              width: 900,
+              height: 570,
+            },
         minDimension: {
           width: 900,
-          height: 570
+          height: 570,
         },
-        position: finalposition ? finalposition : {
-          left: 150,
-          top: 50
-        }
-      }
+        position: finalposition
+          ? finalposition
+          : {
+              left: 150,
+              top: 50,
+            },
+      },
     })
     .on("destroy", () => proc.destroy())
     .render(($content) =>
@@ -49,12 +58,12 @@ const register = (core, args, options, metadata) => {
         $content
       )
     );
-    if(finalMinimised){
-      win.minimize();
-    }
-    if(finalMaximised){
-      win.maximize();
-    }
+  if (finalMinimised) {
+    win.minimize();
+  }
+  if (finalMaximised) {
+    win.maximize();
+  }
   return proc;
 };
 

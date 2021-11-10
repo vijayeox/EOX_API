@@ -35,6 +35,7 @@ content:
                           -
                                 name: 'Upgrade To IPL'
                                 rule: '''{{policyStatus}}'' == ''In Force'''
+                                icon: 'fa fa-arrow-circle-up'
                                 details:
                                     -
                                         type: Form

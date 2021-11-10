@@ -481,10 +481,9 @@ class ChatService extends AbstractService
         try {
             $headers = $this->getAuthHeader();
             $appDetails = $this->fileService->getAppDetailsBasedOnFileId($params['fileId']);
-            $appProperties = json_decode($appDetails['app_properties'], true);
-            $fileDetails = $this->fileService->getFile($params['fileId'], false, $appDetails['account_id']);
+            $fileDetails = $this->fileService->getFile($params['fileId'], false,$appDetails['account_id']);
             $title = $fileDetails['title'];
-            $this->logger->info("APP Title--".print_r($title, true));
+            $this->logger->info("APP Title--".print_r($title,true));
             $url = "<a eoxapplication=" .'"'.$appDetails['appName']. '"'. " "."file-id=" .'"'.$params['fileId'] . '"'. "></a>";
             $this->logger->info("APP URL--".print_r($url, true));
             $subscribers =  $this->subscriberService->getSubscribers($params['fileId']);
@@ -492,8 +491,8 @@ class ChatService extends AbstractService
             $subscribersList = implode(',', $subscribersToList);
             $this->logger->info("appBotUrl---".print_r($this->appBotUrl, true));
             $botName = $this->sanitizeName($appDetails['appName']);
-            $payLoad = array('botName' => $botName, 'message' => $params['message'],'from' => $params['from'],'toList' => $subscribersList, 'identifier' =>$params['fileId'] , 'title' => rtrim($title, "-"), 'url' => $url);
-            $this->logger->info("Payload---".print_r($payLoad, true));
+            $payLoad = array('botName' => $botName, 'message' => $params['message'],'from' => $params['from'],'toList' => $subscribersList, 'identifier' =>$params['fileId'] , 'title' => rtrim($title,"-"), 'url' => $url, 'commentId' => $params['commentId'], 'fileIds' => $params['fileIds']);
+            $this->logger->info("Payload---".print_r($payLoad,true));
             $response = $this->restClient->postWithHeader($this->appBotUrl. 'appbot', $payLoad, $headers);
             $this->logger->info("App Bot response---".print_r($response, true));
         } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -501,30 +500,8 @@ class ChatService extends AbstractService
             throw $e;
         }
     }
-    // partipnts based on fileId
 
-    public function postFileComment($data)
-    {
-        try {
-            $this->logger->info("postFileComment---".print_r($data, true));
-            $userInfo = $this->getUser($data['senderId']);
-            $this->logger->info("Userinfo---".print_r($userInfo, true));
-            $userDetails = $this->userService->getUserContextDetails($userInfo['username']);
-            $this->logger->info("userDetails---".print_r($userDetails, true));
-            $subscribers =  $this->subscriberService->getUserSubscriber($data['FileId'], null, $userDetails['id']);
-            $this->logger->info("subscribers---".print_r($subscribers, true));
-            // TODO CHECK IF COMMENT SENDER HAVING ACCESS TO THE FILE - Subscriber or one of the partcipants
-            $context = ['accountId' => isset($subscribers[0]['account_id']) ? $subscribers[0]['account_id']: $userDetails['accountId'], 'userId' => $userDetails['userId']];
-            $this->logger->info("Contexttt---".print_r($context, true));
-            $this->updateAccountContext($context);
-            $this->commentService->createComment($data, $data['FileId']);
-        } catch (Exception $e) {
-            throw $e;
-        }
-    }
-
-    private function getUser($userId)
-    {
+    public function getUser($userId){
         try {
             $headers = $this->getAuthHeader();
             $userData = $this->restClient->get('api/v4/users/' . $userId, array(), $headers);
@@ -533,4 +510,5 @@ class ChatService extends AbstractService
             return $e->getCode();
         }
     }
+
 }

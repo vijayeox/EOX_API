@@ -25,9 +25,13 @@ final class Version20210301132101 extends AbstractMigration
         $this->addSql("ALTER TABLE ox_user_group RENAME TO ox_user_team;");
         $this->addSql("ALTER TABLE `ox_user_team` CHANGE COLUMN `group_id` `team_id` int(64) null DEFAULT NULL;");
         $this->addSql("ALTER TABLE `ox_announcement_team_mapper` CHANGE COLUMN `group_id` `team_id` int(64) null DEFAULT NULL;");
-        $this->addSql("ALTER TABLE `ox_file_assignee` CHANGE COLUMN `group_id` `team_id` INT(32) NULL null DEFAULT NULL;");
-        
-        
+        $this->addSql("ALTER TABLE `ox_file_assignee` 
+        DROP FOREIGN KEY `ox_file_assignee_ibfk_2`;
+        ALTER TABLE `ox_file_assignee` CHANGE COLUMN `group_id` `team_id` INT(32) NULL null DEFAULT NULL;
+        ALTER TABLE `ox_file_assignee` 
+        ADD CONSTRAINT `ox_file_assignee_ibfk_2`
+        FOREIGN KEY (`team_id`)
+        REFERENCES `ox_team` (`id`);");
     }
 
     public function down(Schema $schema) : void
@@ -38,6 +42,12 @@ final class Version20210301132101 extends AbstractMigration
         $this->addSql("ALTER TABLE ox_user_team RENAME TO ox_user_group;");
         $this->addSql("ALTER TABLE `ox_user_group` CHANGE COLUMN `team_id` `group_id` int(64) null DEFAULT NULL;");
         $this->addSql("ALTER TABLE `ox_announcement_team_mapper` CHANGE COLUMN `team_id` `group_id` int(64) null DEFAULT NULL;");
-        $this->addSql("ALTER TABLE `ox_file_assignee` CHANGE COLUMN `team_id` `group_id` INT(32) NULL null DEFAULT NULL;");
+        $this->addSql("ALTER TABLE `ox_file_assignee` 
+        DROP FOREIGN KEY `ox_file_assignee_ibfk_2`;
+        ALTER TABLE `ox_file_assignee` CHANGE COLUMN `team_id` `group_id` INT(32) NULL null DEFAULT NULL;
+        ALTER TABLE `ox_file_assignee` 
+        ADD CONSTRAINT `ox_file_assignee_ibfk_2`
+        FOREIGN KEY (`group_id`)
+        REFERENCES `ox_team` (`id`);");
     }
 }

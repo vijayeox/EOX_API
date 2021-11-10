@@ -537,13 +537,12 @@ class UserControllerTest extends ControllerTest
         $this->assertResponseStatusCode(200);
         $this->setDefaultAsserts();
         $content = (array)json_decode($this->getResponse()->getContent(), true);
-
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals(count($content['data']), 2);
-        $this->assertEquals($content['data'][0]['uuid'], 'd9890624-8f42-4201-bbf9-675ec5dc8400');
-        $this->assertEquals($content['data'][0]['name'], 'Deepak S');
-        $this->assertEquals($content['data'][1]['uuid'], '4fd9f04d-758f-11e9-b2d5-68ecc57cde45');
-        $this->assertEquals($content['data'][1]['name'], 'Employee Test');
+        $this->assertEquals($content['data'][0]['uuid'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
+        $this->assertEquals($content['data'][0]['name'], 'Admin Test');
+        $this->assertEquals($content['data'][1]['uuid'], '768d1fb9-de9c-46c3-8d5c-23e0e484ce2e');
+        $this->assertEquals($content['data'][1]['name'], 'Cleveland Test');
         $this->assertEquals(5, $content['total']);
     }
 
@@ -599,10 +598,10 @@ class UserControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array)json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], '768d1fb9-de9c-46c3-8d5c-23e0e484ce2e');
-        $this->assertEquals($content['data'][0]['name'], 'Cleveland Test');
-        $this->assertEquals($content['data'][1]['uuid'], 'd9890624-8f42-4201-bbf9-675ec5dc8400');
-        $this->assertEquals($content['data'][1]['name'], 'Deepak S');
+        $this->assertEquals($content['data'][0]['uuid'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
+        $this->assertEquals($content['data'][0]['name'], 'Admin Test');
+        $this->assertEquals($content['data'][1]['uuid'], '768d1fb9-de9c-46c3-8d5c-23e0e484ce2e');
+        $this->assertEquals($content['data'][1]['name'], 'Cleveland Test');
     }
 
 

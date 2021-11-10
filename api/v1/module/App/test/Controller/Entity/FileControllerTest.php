@@ -664,5 +664,21 @@ class FileControllerTest extends ControllerTest
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['total'], 3);
     }
+
+    public function testGetSnoozedFiles()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('http://localhost:8080/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/file?filter=[{"snooze":"1","take":"50","sort":[{"field":"date_created","dir":"desc"}]}]', 'GET');
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->assertModuleName('App');
+        $this->assertControllerName(FileController::class);
+        $this->assertControllerClass('FileController');
+        $this->assertMatchedRouteName('filelisting');
+        $this->assertResponseHeaderContains('content-type', 'application/json; charset=utf-8');
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['total'], 2);
+    }
+
     // TODO WITH WORKFLOWINSTANCEID/ NO WORKFLOWINSTANCEID - CREATEFILE/UPDATEFILE
 }

@@ -2,6 +2,15 @@ name: 'Agent Workbooks'
 description: 'Shows a list of users policies'
 content:
     -
+        type: Document
+        content:
+            jsx: '<h5 className="producerCode">
+                  Producer Code: {producerCode}
+                </h5>'
+            params:
+                producerCode: 'data.producerCode'
+            url: 'command/delegate/GetProducerCode'
+    -
         type: List
         content:
             route: 'file/user/me'
@@ -31,9 +40,21 @@ content:
                     details:
                         -
                             type: Form
-                            form_id: 280dbc6d-638e-4fba-9095-8430c226ec7b
+                            form_id: dea1187f-62d7-4e4b-963f-7bc5a8f589c8
                             fileId: '{{uuid}}'
                     icon: 'far fa-pencil-alt'
+                -
+                    name: Comments
+                    rule: 'true'
+                    details:
+                        -
+                            type: Document
+                            content: '<h5>Producer Name: {data.producername} | Insured Name: {data.namedInsured}</h5>'
+                            useRowData: true
+                        -
+                            type: Comment
+                            content: '{{uuid}}'
+                    icon: 'far fa-comment'
                 -
                     name: 'Export'
                     rule: '''{{status}}'' == ''Generated'''
@@ -60,7 +81,7 @@ content:
                         details:
                             -
                                 type: Form
-                                form_id: 280dbc6d-638e-4fba-9095-8430c226ec7b      
+                                form_id: dea1187f-62d7-4e4b-963f-7bc5a8f589c8      
             columnConfig:
                 -
                     title: Insured

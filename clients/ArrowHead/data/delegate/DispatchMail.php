@@ -1,11 +1,15 @@
 <?php
 
 use Oxzion\Db\Persistence\Persistence;
+use Oxzion\AppDelegate\FieldTrait;
+use Oxzion\Utils\FileUtils;
+use Oxzion\Utils\ZipUtils;
 
 use Oxzion\AppDelegate\MailDelegate;
 
 class DispatchMail extends MailDelegate
 {
+    use FieldTrait;
 
     public function __construct()
     {
@@ -32,6 +36,47 @@ class DispatchMail extends MailDelegate
                 }
             }
         }
+        $attachmentFieldsArray = include(__DIR__ . "/fieldMappingAttachments.php");
+        $fileDocs =  $this->destination . $data["orgId"] . DIRECTORY_SEPARATOR . $data["fileId"] . DIRECTORY_SEPARATOR;
+        $mailDocumentsDir = $fileDocs . "mailDocuments";
+
+        $attachmentsAvailable = false;
+        foreach ($attachmentFieldsArray as $attachmentField) {
+            if (
+                isset($data[$attachmentField])
+            ) {
+                if (count($this->checkJSON($data[$attachmentField])) > 0) {
+                    $attachmentsAvailable = true;
+                    $fieldConfig = $this->getFieldByName("Dealer Policy", $attachmentField);
+                    $folderPath = $mailDocumentsDir . DIRECTORY_SEPARATOR . $fieldConfig["text"];
+                    foreach ($this->checkJSON($data[$attachmentField]) as $fileIndex => $attachmentFile) {
+                        if (FileUtils::fileExists($attachmentFile["path"])) {
+                            FileUtils::copy(
+                                $attachmentFile["path"],
+                                $attachmentFile["originalName"],
+                                $folderPath
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        $mailTemplateFlag = 0;
+        if ($attachmentsAvailable) {
+            FileUtils::fileExists($mailDocumentsDir . ".zip") ?
+                FileUtils::deleteFile("mailDocuments.zip", $fileDocs) : null;
+            ZipUtils::zipDir($mailDocumentsDir, $mailDocumentsDir . ".zip");
+            $size = FileUtils::fileExists($mailDocumentsDir . ".zip") ? filesize($mailDocumentsDir . ".zip") : 0;
+            if($size > 10000000) {
+                $mailTemplateFlag = 1;
+                FileUtils::rmDir($mailDocumentsDir);
+            } else {
+                array_push($emailAttachments,  $mailDocumentsDir . ".zip");
+            }
+        }
+
+
         $mailOptions = array();
         $mailOptions['to'] = $submissionEmail;
         $mailOptions['subject'] = "New business – " . $data['namedInsured'] . " - " . $this->formatDate($data['effectiveDate']) . " - " . $data['producername'];
@@ -39,8 +84,19 @@ class DispatchMail extends MailDelegate
         $this->logger->info("Arrowhead Policy Mail " . print_r($mailOptions, true));
         $data['orgUuid'] = "34bf01ab-79ca-42df-8284-965d8dbf290e";
         // $data['orgUuid'] = isset($data['orgId']) ? $data['orgId'] : AuthContext::get(AuthConstants::ORG_UUID);
-        $response = $this->sendMail($data, "finalSubmissionMail", $mailOptions);
-        $this->logger->info("Mail has " . $response ? "been sent." : "not been sent.");
+        $response = array();
+        $responseMail1 = $this->sendMail($data, "finalSubmissionMail", $mailOptions);
+        $response['Mail1'] = $responseMail1;
+        $this->logger->info("Mail 1 has " . ($responseMail1 ? "been sent." : "not been sent."));
+
+        if($mailTemplateFlag == 1) {
+            $mailOptions['subject'] = "Attachment failed for new business – " . $data['namedInsured'] . " - " . $this->formatDate($data['effectiveDate']) . " - " . $data['producername'];
+            $mailOptions['attachments'] = [];
+            $data['mailTemplateFlag'] = $mailTemplateFlag;
+            $responseMail2 = $this->sendMail($data, "finalSubmissionMail", $mailOptions);
+            $response['Mail2'] = $responseMail2;
+            $this->logger->info("Mail 2 has " . ($responseMail2 ? "been sent." : "not been sent."));
+        }
         return $response;
     }
 

@@ -137,7 +137,7 @@ class FieldService extends AbstractService
                 where ox_app_entity.name = :entityName";
                 $queryParams = array('entityName' => $filterArray['entityName']);
                 $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
-                if (count($resultSet) > 0) {
+                if(count($resultSet) > 0) {
                     $filterArray['entity_id'] = $resultSet[0]['id'];
                 }
                 unset($filterArray['entityName']);

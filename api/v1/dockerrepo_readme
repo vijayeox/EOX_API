@@ -1,0 +1,9 @@
+For API:
+
+step1: docker login repo.eoxvantage.com
+       provide credentials and login
+step2: docker pull repo.eoxvantage.com/eox_3.x_api_appbuilder
+step3: copy the .env.example to .env and update the required parameters in the .env file
+step4: docker run -v $(pwd)/../..:/app -v /tmp:/tmp -p 8080:80  --env-file .env  -it repo.eoxvantage.com/eox_3.x_api_appbuilder
+
+

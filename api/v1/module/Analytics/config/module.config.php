@@ -97,21 +97,6 @@ return [
                     ],
                 ],
             ],
-            'createWidgetTarget' => [
-                'type' => Segment::class,
-                'options' => [
-                    'route' => '/analytics/target/createwidgettarget',
-                    'defaults' => [
-                        'controller' => Controller\TargetController::class,
-                        'method' => 'POST',
-                        'action' => 'createWidgetTarget',
-                        'access' => [
-                            // SET ACCESS CONTROL
-                            // 'getKRAResult' => 'MANAGE_TARGET_READ'
-                        ],
-                    ],
-                ],
-            ],
             'getKRAResult' => [
                 'type' => Segment::class,
                 'options' => [
@@ -174,6 +159,20 @@ return [
                     ],
                 ],
             ],
+            'previewWidget' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/analytics/widget/preview',
+                    'defaults' => [
+                        'controller' => Controller\WidgetController::class,
+                        'method' => 'POST',
+                        'action' => 'previewWidget',
+                        // 'access' => [
+                            // 'previewWidget' => 'MANAGE_ANALYTICS_WIDGET_WRITE',
+                        // ],
+                    ],
+                ],
+            ],
             'copyWidget' => [
                 'type' => Segment::class,
                 'options' => [
@@ -199,6 +198,22 @@ return [
                             'put' => 'MANAGE_DASHBOARD_WRITE',
                             'post' => 'MANAGE_DASHBOARD_WRITE',
                             'delete' => 'MANAGE_DASHBOARD_WRITE',
+                        ],
+                    ],
+                ],
+            ],
+            'template' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/analytics/template[/:templateName]',
+                    'defaults' => [
+                        'controller' => Controller\TemplateController::class,
+                        'access' => [
+                            // SET ACCESS CONTROL
+                            // 'put' => 'MANAGE_TEMPLATE_WRITE',
+                            // 'post' => 'MANAGE_TEMPLATE_WRITE',
+                            // 'delete' => 'MANAGE_TEMPLATE_WRITE',
+                            // 'get' => 'MANAGE_TEMPLATE_READ',
                         ],
                     ],
                 ],

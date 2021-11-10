@@ -282,15 +282,8 @@ class SetupEndorsement extends AbstractAppDelegate
                         $premiumRateCardDetails[$rate['key']] = 0;
                         $data['careerCoveragePrice'] = 0;
                     }
-                    $endorsementCoverages[0][] = array('label' => $rate['coverage'], 'value' => $rate['key']);
+                    $endorsementCoverages[$rate['key']] = $rate['coverage'];
                 }
-            }
-
-            $coverageSelect = "Select DISTINCT coverage_name,coverage_level FROM coverage_options WHERE category IS NULL";
-            $coverageLevels = $persistenceService->selectQuery($coverageSelect);
-            while ($coverageLevels->next()) {
-                $coverage = $coverageLevels->current();
-                $endorsementCoverages[1][] = array('label' => $coverage['coverage_name'], 'value' => $coverage['coverage_level']);
             }
             return $endorsementCoverages;
     }

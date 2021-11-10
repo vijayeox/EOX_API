@@ -1,22 +1,14 @@
 <?php
 namespace Oxzion\Document\Template\Smarty;
 
-use Oxzion\Utils\FileUtils;
-use Exception;
-use Smarty;
-use Oxzion\Service\AbstractService;
-use Oxzion\Utils\BosUtils;
-use Oxzion\Auth\AuthContext;
-use Oxzion\Auth\AuthConstants;
-use Oxzion\Utils\ArtifactUtils;
 use Oxzion\Document\Template\TemplateParser;
-use Oxzion\Service\TemplateService;
+use Smarty;
 
 class SmartyTemplateProcessorImpl implements TemplateParser
 {
     private $client;
     private $templateExt = ".tpl";
-    
+
     /**
      * Initializes the template processor
      * @method init
@@ -30,8 +22,9 @@ class SmartyTemplateProcessorImpl implements TemplateParser
         $this->client->setConfigDir($params['configsDir']);
         $this->client->setTemplateDir($params['templateDir']);
         $this->client->setCompileDir($params['compileDir']);
+        $this->client->setCompileDir($params['OITemplateDir']);
     }
-    
+
     /**
      * Merges the data provided with the template
      * @method getContent

@@ -32,6 +32,20 @@ return [
                     ],
                 ],
             ],
+            'snooze' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/file/:fileId/snooze',
+                    'defaults' => [
+                        'controller' => Controller\SnoozeController::class,
+                        'method' => 'POST',
+                        'action' => 'snoozeFile',
+                        'access'=>[
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
             'subscriber' => [
                 'type' => Segment::class,
                 'options' => [

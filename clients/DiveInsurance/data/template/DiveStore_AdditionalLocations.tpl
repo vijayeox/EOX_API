@@ -178,7 +178,7 @@
                     </tr>
                     <tr>
                         <td class = "info">Lake,quarry and pond:</td>
-                        {if $additionalLocationDataItem.ALlakequarrypondContactVicenciaBuckleyforsupplementalformPL == "true"}
+                        {if $additionalLocationDataItem.ALlakequarrypondContactVicenciaBuckleyforsupplementalformPL}
                         <td class = "info">Included</td>
                         {else}
                         <td class = "info">Not Included</td>

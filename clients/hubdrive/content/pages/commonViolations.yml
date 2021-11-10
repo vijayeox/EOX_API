@@ -1,0 +1,39 @@
+name: 'List Common Violations'
+description: 'Shows a list of Common Violations'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Common Violations'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of Common Violations</h5>'
+            operations:
+                title: "Add Common Violation"
+                actions:
+                    -
+                        name: Add Common Violation
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: a286dfbd-5ce2-446f-a3ca-8d8d6a90408a      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

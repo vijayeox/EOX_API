@@ -5,7 +5,7 @@
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="template" value="endorsementDiveStoreConsolidation" />
-          <camunda:property name="fields" value="premium_barrier,initiatedByCsr,csrApproved,paymentVerified,userApproved,policyStatus,email,business_padi,identifier_field,product,userApprovalRequired" />
+          <camunda:property name="fields" value="premium_barrier,initiatedByCsr,csrApproved,paymentVerified,userApproved,policyStatus,email,business_padi,identifier_field,product,userApprovalRequired,endorsement_options,initiatedByUser" />
         </camunda:properties>
         <camunda:executionListener event="end">
           <camunda:script scriptFormat="groovy">execution.setVariable("premium_barrier",false);</camunda:script>
@@ -29,6 +29,7 @@
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_131tfxv</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_0c8kwl1</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1kd1uw3</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0191gsl123</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:endEvent id="EndEvent_0wnid44123" name="Insurance Application Completed">
@@ -186,7 +187,24 @@ execution.setVariable('initiatedByUser',true)</camunda:script>
     <bpmn:serviceTask id="ServiceTask_1tfyapp" name="Policy Status Change During Review" camunda:expression="0">
       <bpmn:extensionElements>
         <camunda:executionListener event="start">
-          <camunda:script scriptFormat="groovy">execution.setVariable('policyStatus', 'Payment To Be Verified')</camunda:script>
+          <camunda:script scriptFormat="groovy">def initiatedByUser = execution.getVariable('initiatedByUser')
+if(initiatedByUser == true){
+	def endorseOptions = new groovy.json.JsonSlurper().parseText(endorsement_options)
+	if(endorseOptions.modify_personalInformation == true &amp;&amp; endorseOptions.modify_propertyInformation == false &amp;&amp; endorseOptions.modify_generalLiabilityInformation == false &amp;&amp; endorseOptions.modify_additionalCoverages == false &amp;&amp; endorseOptions.modify_optionalCoverages == false &amp;&amp; endorseOptions.modify_groupProfessionalLiability == false){
+				execution.setVariable('paymentVerified','approved')
+				execution.setVariable('policyStatus','Payment To Be Verified')
+			} else {
+				execution.setVariable('policyStatus','Payment To Be Verified')
+			}
+	} else if(initiatedByUser == ""){
+		if(endorsement_options['modify_personalInformation'] == true &amp;&amp; endorsement_options['modify_propertyInformation'] == false &amp;&amp; endorsement_options['modify_generalLiabilityInformation'] == false &amp;&amp; endorsement_options['modify_additionalCoverages'] == false &amp;&amp; endorsement_options['modify_optionalCoverages'] == false &amp;&amp; endorsement_options['modify_groupProfessionalLiability'] == false){
+				execution.setVariable('paymentVerified','approved')
+				execution.setVariable('policyStatus','Payment To Be Verified')
+			} else {
+				execution.setVariable('policyStatus','Payment To Be Verified')
+			}
+		}else
+			execution.setVariable('policyStatus','Payment To Be Verified')</camunda:script>
         </camunda:executionListener>
         <camunda:inputOutput>
           <camunda:inputParameter name="commands">
@@ -199,8 +217,8 @@ execution.setVariable('initiatedByUser',true)</camunda:script>
       <bpmn:incoming>SequenceFlow_184jheh123</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_1ogcqu9</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_05tnhxw</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1kd1uw3</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="SequenceFlow_05tnhxw" sourceRef="ServiceTask_1tfyapp" targetRef="UserTask_1teet0g" />
     <bpmn:exclusiveGateway id="ExclusiveGateway_147p2dr">
       <bpmn:incoming>SequenceFlow_17gr275</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_14ri1fo</bpmn:outgoing>
@@ -260,6 +278,12 @@ execution.setVariable('initiatedByUser',true)</camunda:script>
     <bpmn:sequenceFlow id="SequenceFlow_05q7odx" name="User Rejected" sourceRef="ExclusiveGateway_1bd36dj" targetRef="ServiceTask_0mu2xsj">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentVerified == "declined" &amp;&amp; userApproved =="rejected"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_05tnhxw" sourceRef="ServiceTask_1tfyapp" targetRef="UserTask_1teet0g">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${policyStatus == "Payment To Be Verified" &amp;&amp; paymentVerified == ""}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1kd1uw3" sourceRef="ServiceTask_1tfyapp" targetRef="ServiceTask_0kfeda1123">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${policyStatus == "Payment To Be Verified" &amp;&amp; paymentVerified == "approved"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="DiveStoreEndorsement">
@@ -290,10 +314,6 @@ execution.setVariable('initiatedByUser',true)</camunda:script>
       <bpmndi:BPMNEdge id="SequenceFlow_17gr275_di" bpmnElement="SequenceFlow_17gr275">
         <di:waypoint x="421" y="350" />
         <di:waypoint x="421" y="276" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_05tnhxw_di" bpmnElement="SequenceFlow_05tnhxw">
-        <di:waypoint x="1510" y="508" />
-        <di:waypoint x="1590" y="508" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0jtqtts_di" bpmnElement="SequenceFlow_0jtqtts">
         <di:waypoint x="512" y="582" />
@@ -477,6 +497,16 @@ execution.setVariable('initiatedByUser',true)</camunda:script>
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1306" y="242" width="70" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_05tnhxw_di" bpmnElement="SequenceFlow_05tnhxw">
+        <di:waypoint x="1510" y="508" />
+        <di:waypoint x="1590" y="508" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1kd1uw3_di" bpmnElement="SequenceFlow_1kd1uw3">
+        <di:waypoint x="1480" y="548" />
+        <di:waypoint x="1480" y="700" />
+        <di:waypoint x="2150" y="700" />
+        <di:waypoint x="2150" y="548" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

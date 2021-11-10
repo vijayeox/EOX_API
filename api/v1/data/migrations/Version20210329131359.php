@@ -22,6 +22,7 @@ final class Version20210329131359 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql("INSERT INTO ox_privilege (name,permission_allowed,app_id) values ('MANAGE_MAILADMIN',15,1);");
         $this->addSql("INSERT INTO ox_privilege (name,permission_allowed,app_id) values ('MANAGE_TASKADMIN',15,1);");
+        $this->addSql("DELETE FROM `ox_role_privilege` WHERE `privilege_name` = 'MANAGE_MAILADMIN'");
         $database = $this->connection->getDatabase();
         $sql = "SELECT ox_account.id as account_id,ox_role.id as role_id from ox_account inner join ox_role on ox_account.id=ox_role.account_id where ox_role.name='Admin' and ox_role.app_id is NULL ";
         $result = $this->connection->executeQuery($sql)->fetchAll();

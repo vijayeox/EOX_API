@@ -1,0 +1,4 @@
+name: "Admin Page"
+description: "Admin page to manage producer code"
+content:
+  - type: AdminPage

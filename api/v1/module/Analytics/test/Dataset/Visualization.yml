@@ -23,3 +23,15 @@ ox_visualization:
     renderer: "value2"
     type: "inline"
     version: 1
+  -
+    id: 13
+    uuid: '101a1d1e-175b-43d8-ac38-485e80e6b2f3'
+    name: 'jsGrid'
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    configuration: '{"data":"value"}'
+    renderer: "jsGrid"
+    type: "jsGrid"
+    version: 1

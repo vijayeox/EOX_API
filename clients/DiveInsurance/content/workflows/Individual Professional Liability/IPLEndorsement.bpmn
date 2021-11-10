@@ -117,6 +117,7 @@ boolean result5 = false
 boolean result6 = true
 boolean result7 = false
 boolean result8 = false
+boolean result9 = false
 
 if(personalInfo){
     if (country != "United States of America" &amp;&amp; country != "Mexico" &amp;&amp; country != "The Bahamas" &amp;&amp; country != "Turks and Caicos" &amp;&amp; country != "British Virgin Islands" &amp;&amp; country != "Cayman Islands" &amp;&amp; country != "Jamaica" &amp;&amp; country != "Aruba" &amp;&amp; country != "Curacao" &amp;&amp; country != "Grenada" &amp;&amp; country != "Barbados" &amp;&amp; country != "St Lucia" &amp;&amp; country != "Trinidad and Tobago" &amp;&amp; country != "Belize" &amp;&amp; country != "Costa Rica" &amp;&amp; country != "Dominican Republic" &amp;&amp; country != "Dominica" &amp;&amp; country != "Martinique" &amp;&amp; country != "Anguilla" &amp;&amp; country != "St Kitts and Nevis") {
@@ -133,13 +134,13 @@ if (excessLiability) {
     result7 = true;
   }
 }
-if(coverage || AdditionalInsuredOption){
-if (AdditionalInsuredOption== 'addAdditionalInsureds') {
+if(coverage || additionalIn){
+if (AdditionalInsuredOption == 'addAdditionalInsureds') {
  additionalInsured.each {
-  if (it.hasProperty('businessRelation') &amp;&amp; it.businessRelation == 'other') {
+  if (it.businessRelation == 'other') {
     result1 = true
   }
-  if (it.hasProperty('doYouHaveAWrittenContract') &amp;&amp; it.doYouHaveAWrittenContract=='no'){
+  if (it.doYouHaveAWrittenContract=='no'){
     result1 = true
 }
  }
@@ -159,9 +160,15 @@ if(coverage &amp;&amp; paymentOptions){
 if(paymentOptions == ""){
     result6 = false
   }
-if((initiatedByCsr == false || initiatedByCsr == "false" || initiatedByCsr == "") &amp;&amp; (tecRecEndorsment == "withTecRecEndorsementForSelectionAbove" || result1 || result4 || result8 || scubaFit == "scubaFitInstructor" || result5||result6||result7 || result0)) {
+
+if((scubaFit == "scubaFitInstructor" || tecRecEndorsment == "withTecRecEndorsementForSelectionAbove") &amp;&amp; coverage){
+  $result9 = true
+}
+
+if((initiatedByCsr == false || initiatedByCsr == "false" || initiatedByCsr == "") &amp;&amp; (result1 || result4 || result8 || result5||result6||result7 || result0 || result9)) {
   result3=true
 }
+
 execution.setVariable('CSRReviewRequired', result3)
 
 if(result3){

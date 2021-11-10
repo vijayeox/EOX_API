@@ -7,4 +7,5 @@ interface DocumentAppDelegate extends AppDelegate
 {
     public function setDocumentBuilder(DocumentBuilder $documentBuilder);
     public function setDocumentPath($destination);
+    public function setBaseUrl($url);
 }

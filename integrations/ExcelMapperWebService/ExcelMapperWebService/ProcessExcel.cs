@@ -181,6 +181,10 @@ namespace ProcessExcel
                                 shp.ControlFormat.Value = 1;
                             }
                         break;
+                    case "Macro":
+                        Worksheet ws = (wbCarrier.Worksheets[vDestSheet] as Worksheet);
+                        ws.Activate();
+                        wbCarrier.Application.Run(macro);
                     default:
                         vVal = mapdata["value"].ToString();
                         if (vVal!="") { 

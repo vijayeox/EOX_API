@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true" printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinter">
+    <testsuites>
+        <testsuite name="Arrowhead Fixtures">
+            <directory>test/</directory>
+        </testsuite>
+    </testsuites> 
+    <php>
+        <ini name="memory_limit" value="1G" />
+    </php>
+    <listeners>
+        <listener class="\MyBuilder\PhpunitAccelerator\TestListener"/>
+        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" />
+    </listeners>
+</phpunit>

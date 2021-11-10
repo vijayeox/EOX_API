@@ -1,0 +1,15 @@
+name: Dashboard
+description: 'Shows dashboard'
+content:
+    -
+        type: Dashboard
+        content:
+            uuid: 6c7d8cff-a5ec-4921-b182-75253f734712
+            toolbarTemplate: '<h5>List</h5>'
+            operations:
+                title: "Admin Dashboard"
+                actions:
+                    -
+                        name: Dashboard Details
+                        rule: "true"
+                        details:

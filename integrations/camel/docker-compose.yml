@@ -1,17 +1,22 @@
 version: '3.5'
 services:
-    camel:
+    ca:
         build:
             context: ./docker
-            args:
-                HOST: ${HOST}
-                DB_USERNAME: ${DB_USERNAME}
-                DB_PASSWORD: ${DB_PASSWORD}
-                DB_HOST: ${DB_HOST}
-                QUARTZ_DB: ${QUARTZ_DB}
-                API_DB : ${API_DB}
-                ELASTIC_CLUSTER : ${ELASTIC_CLUSTER}
-        network_mode: "host"    
+        environment:
+            HOST: ${HOST}
+            DB_USERNAME: ${DB_USERNAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DB_HOST: ${DB_HOST}
+            QUARTZ_DB: ${QUARTZ_DB}
+            API_DB: ${API_DB}
+            ELASTIC_CLUSTER: ${ELASTIC_CLUSTER}
+            SMTP_HOST: ${SMTP_HOST}
+            SMTP_PORT: ${SMTP_PORT}
+            SMTP_USERNAME: ${SMTP_USERNAME}
+            SMTP_PASSWORD: ${SMTP_PASSWORD}
+            SMTP_EMAIL_FROM: ${SMTP_EMAIL_FROM}
+            SMTP_EMAIL_TO: ${SMTP_EMAIL_TO}
         ports:
             - "8161:8161"
             - "8085:8085"
@@ -22,4 +27,4 @@ services:
             - "61614:61614"
         volumes:
             - ./:/workspace/app
-            - ../../:/app      
+            - ../../:/app

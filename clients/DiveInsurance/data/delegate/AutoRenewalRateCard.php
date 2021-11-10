@@ -10,32 +10,84 @@ require_once __DIR__."/RateCard.php";
 class AutoRenewalRateCard extends RateCard{
     public function __construct(){
         parent::__construct();
-        $this->unsetVariables = array('workflowInstanceId','policy_id','certificate_no','start_date','end_date','documents','previous_policy_data');
+        $this->unsetVariables = array(
+            'uuid',
+            'entity_name',
+            'AdditionalInsuredOption',
+            'TechRec_attachments',
+            'additionalInsured',
+            'additional_email',
+            'address1',
+            'address2',
+            'appId',
+            'automatic_renewal',
+            'businessPadiEmpty',
+            'businessPadiNotFound',
+            'businessPadiVerified',
+            'careerCoverage',
+            'city',
+            'country',
+            'cylinder',
+            'cylinderInspector_attachments',
+            'cylinderInstructor_attachments',
+            'email',
+            'equipment',
+            'excessLiability',
+            'excludedOperation',
+            'fax',
+            'firstname',
+            'home_country_code',
+            'home_phone',
+            'home_phone_number',
+            'identifier_field',
+            'initial',
+            'lastname',
+            'name',
+            'padi',
+            'padiEmployee',
+            'padiNotApplicable',
+            'padiNotFound',
+            'padiNotFoundCsrReview',
+            'padiVerified',
+            'padiVerifiedCSRCheck',
+            'padi_empty',
+            'phone',
+            'phone_country_code',
+            'phone_number',
+            'physical_country',
+            'physical_state',
+            'physical_zip',
+            'product',
+            'product_email_id',
+            'scubaFit',
+            'scubaFit_attachments',
+            'state',
+            'tecRecEndorsment',
+            'username',
+            'zip',
+            'orgId',
+            'state_in_short',
+            'transaction_status',
+        );
     }
-
     // Premium Calculation values are fetched here
     public function execute(array $data,Persistence $persistenceService)
     {  
         $this->logger->info("AutoRenewal Rate Card");
-        $data['endDate'] = $data['end_date'];
-        $this->cleanData($data);
-        $startYear = date_parse($data['endDate'])['year'];
+        $endDate = $data['end_date'];
+        $data = $this->cleanData($data);
+        $startYear = date_parse($endDate)['year'];
         $endYear = $startYear + 1;
         
-        if($data['product'] == 'Dive Boat'){
-            $data['start_date'] = $startYear."-07-22";
-            $data['end_date'] = $endYear."-07-22";
-            $data['policyPeriod'] = $data['start_date']."(MM DD YYYY)";
-        }
-        else{
-            $data['start_date'] = $startYear."-07-01";
-            $data['end_date'] = $endYear."-06-30";
-            $policy_period = "July 01,".$startYear." - June 30,".$endYear;
-            $data['start_date_range'] = array("label" => $policy_period,"value" => $data['start_date']); 
-        }
-        $this->logger->info("AUTO RATE CARD PERSISTENCE".print_r($data,true));
-        $data = parent::execute($data,$persistenceService);
+        $data['csrPolicyPeriod'] = $data['start_date'] = $startYear."-06-30";
+        $data['end_date'] = $endYear."-06-30";
+        $policy_period = "July 01,".$startYear." - June 30,".$endYear;
+        $data['start_date_range'] = array("label" => $policy_period,"value" => $data['start_date']); 
 
+
+        $this->logger->info("AUTO RATE CARD PERSISTENCE".print_r($data,true));
+        
+        $data = parent::execute($data,$persistenceService);
         $this->logger->info("PRESENT RATE card".print_r($data,true));
         if($data['product'] == 'Individual Professional Liability'){
             $coverageList = array();
@@ -57,8 +109,9 @@ class AutoRenewalRateCard extends RateCard{
         }else if($data['product'] == 'Dive Store'){
             $this->DiveStoreRates($data);
         }
-        $data['policyStatus'] = 'AutoRenewal Pending';
-        $data['previous_policy_data'] = json_encode(array());
+        $data['CSRReviewRequired'] = false;
+        $data['verified'] = true;
+        $data['efrToIPLUpgrade'] = false;
         $this->logger->info("AutoRenewalRateCard Final DATA".print_r($data,true));
         return $data;
     }
@@ -738,17 +791,19 @@ $data['amount'] = $data['totalAmount'];
 }
 
 // Data Cleanup is done here
-private function cleanData(&$data){
+private function cleanData($data){
+    $cleanData = array();
     $this->logger->info("CLEAN DATA");
     $unsetVar = $this->unsetVariables;
     $this->logger->info("UNSET VARIABLES".print_r($unsetVar,true));
     for($i=0;$i< sizeof($unsetVar);$i++){
         $this->logger->info("CLEAN DATA FOR");
         if(isset($data[$unsetVar[$i]])){
-            unset($data[$unsetVar[$i]]);
+            $cleanData[$unsetVar[$i]] = $data[$unsetVar[$i]];
         }
     }
     $this->logger->info("CLEAN DATA END".print_r($data,true));
+    return $cleanData;
 }
 
 private function monthDiveStore(&$data,$month){

@@ -6,6 +6,7 @@ use Oxzion\Model\Employee;
 use Oxzion\Model\EmployeeTable;
 use Oxzion\ServiceException;
 use Oxzion\OxServiceException;
+use Oxzion\EntityNotFoundException;
 use Oxzion\ValidationException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Utils\UuidUtil;

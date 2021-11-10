@@ -127,7 +127,7 @@
    cell: C27
    type: DataGrid
 -
-   key: locationSchedule_garagenumberofdealerplates
+   key: franchisedAutoDealer*locationSpecificData_garagenumberofdealerplates
    pageName: Garage Liability
    cell: L27
    method: simpleDatagrid
@@ -618,14 +618,14 @@
    pageName: Garage Supplemental
    cell: 'D118'
 -
-   key: locationSchedule_garagekeepersperlocation
+   key: franchisedAutoDealer*locationSpecificData_garagekeepersperlocation
    method: simpleDatagrid
    Source Worksheet: Garagekeepers (per location)
    pageName: Garage Keepers (printable)
    cell: C31
    type: DataGrid
 -
-   key: locationSchedule_numberofservicebays
+   key: franchisedAutoDealer*locationSpecificData_numberofservicebays
    method: simpleDatagrid
    Source Worksheet: '# of Service Bays'
    pageName: Garage Keepers (printable)
@@ -975,37 +975,37 @@
    cell: A41
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_buildingNumber
+   key: locations_buildingNum
    method: simpleDatagrid
    pageName: Property
    cell: B40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_address
+   key: locations_address
    method: simpleDatagrid
    pageName: Property
    cell: C40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_state
+   key: locations_state
    method: simpleDatagrid
    pageName: Property
    cell: E40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_city
+   key: locations_city
    method: simpleDatagrid
    pageName: Property
    cell: D40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_zip
+   key: locations_zip
    method: simpleDatagrid
    pageName: Property
    cell: F40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_occupancyType
+   key: locations_occupancyType
    method: simpleDatagrid
    pageName: Property
    cell: G40
@@ -1027,7 +1027,7 @@
       vacantBuilding: Vacant Building
       deliveryPrep: Delivery Prep
 -
-   key: genericData*locationScheduleGridData_occupancyType
+   key: locations_occupancyType
    method: simpleDatagrid
    pageName: Property
    cell: H40
@@ -1049,7 +1049,7 @@
       vacantBuilding: Vacant
       deliveryPrep: Occupied
 -
-   key: genericData*locationScheduleGridData_occupancyType
+   key: locations_occupancyType
    method: simpleDatagrid
    pageName: Property
    cell: I40
@@ -1071,7 +1071,7 @@
       vacantBuilding: ''
       deliveryPrep: '100%'
 -
-   key: genericData*locationScheduleGridData_constructiontype
+   key: buildings_constructiontype
    method: simpleDatagrid
    pageName: Property
    cell: J40
@@ -1087,7 +1087,7 @@
       superiorNonCombustible : ""
       superiorMasonryNonCombustible : ""
 -
-   key: genericData*locationScheduleGridData_buildinginterest
+   key: buildings_buildinginterest
    method: simpleDatagrid
    pageName: Property
    cell: L40
@@ -1096,61 +1096,64 @@
       buildinginterestowned: Owner
       buildinginterestleased: Tenant
 -
-   key: genericData*locationScheduleGridData_yearBuilt
+   key: buildings_yearBuilt
    method: simpleDatagrid
    pageName: Property
    cell: M40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_dolhydrantfeet
+   key: buildings_dolhydrantfeet
    method: simpleDatagrid
    pageName: Property
    cell: N40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_dolfirestamiles
+   key: buildings_dolfirestamiles
    method: simpleDatagrid
    pageName: Property
    cell: O40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_wiringyear
+   key: buildings_wiringyear
    method: simpleDatagrid
    pageName: Property
    cell: P40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_roofingyear
+   key: buildings_roofingyear
    method: simpleDatagrid
    pageName: Property
    cell: Q40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_plumbingyear
+   key: buildings_plumbingyear
    method: simpleDatagrid
    pageName: Property
    cell: R40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_heatingyear
+   key: buildings_heatingyear
    method: simpleDatagrid
    pageName: Property
    cell: S40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_stories
+   key: buildings_stories
    method: simpleDatagrid
    pageName: Property
    cell: V40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_basement
+   key: buildings_basement
    method: simpleDatagrid
    pageName: Property
    cell: W40
    type: DataGrid
+   returnValue: 
+      yes: 'Yes'
+      no: 'No'
 -
-   key: genericData*locationScheduleGridData_equipmentBreakdown
+   key: buildings_equipmentBreakdown
    method: simpleDatagrid
    pageName: Property
    cell: X40
@@ -1159,7 +1162,7 @@
       yes: 'Yes'
       no: 'No'
 -
-   key: genericData*locationScheduleGridData_boiler
+   key: buildings_boiler
    method: simpleDatagrid
    pageName: Property
    cell: Y40
@@ -1168,19 +1171,19 @@
       yes: 'Yes'
       no: 'No'
 -
-   key: genericData*locationScheduleGridData_sprinklerprotected
+   key: buildings_sprinklerprotected
    method: simpleDatagrid
    pageName: Property
    cell: Z40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_buildingsquarefootage
+   key: buildings_buildingsquarefootage
    method: simpleDatagrid
    pageName: Property
    cell: AG40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_firealarmmonitoring
+   key: buildings_firealarmmonitoring
    method: simpleDatagrid
    pageName: Property
    cell: AB40
@@ -1191,7 +1194,7 @@
       'central' : 'C = Central'
       'both' : 'B = Both'
 -
-   key: genericData*locationScheduleGridData_burglaralarmmonitoring
+   key: buildings_burglaralarmmonitoring
    method: simpleDatagrid
    pageName: Property
    cell: AC40
@@ -1202,13 +1205,19 @@
       'central' : 'C = Central'
       'both' : 'B = Both'
 -
-   key: franchisedAutoDealer*checkTotalbuildinglimit_result
+   key: buildings_buildingLimit
    method: simpleDatagrid
    pageName: Property
    cell: AD40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_signsnotattached
+   key: franchisedAutoDealer*checkTotalbuildinglimit_result
+   method: simpleDatagrid
+   pageName: Property
+   cell: AF40
+   type: DataGrid
+-
+   key: buildings_signsnotattached
    method: simpleDatagrid
    pageName: Property
    cell: AE40
@@ -1225,13 +1234,13 @@
       '100' : 'Agreed Amount'
       'Agreed Amount' : 'Agreed Amount'
 -
-   key: genericData*locationScheduleGridData_businesspersonal
+   key: buildings_businesspersonal
    method: simpleDatagrid
    pageName: Property
    cell: AL40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_businessincomelimit
+   key: buildings_businessincomelimit
    method: simpleDatagrid
    pageName: Property
    cell: AR40
@@ -1301,7 +1310,7 @@
    cell: AT40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_biwaitingperiod
+   key: buildings_biwaitingperiod
    method: simpleDatagrid
    pageName: Property
    cell: AU40
@@ -1310,25 +1319,25 @@
       '24Hours': '24 Hours'
       'none': '24 Hours'
 -
-   key: genericData*locationScheduleGridData_dolright
+   key: buildings_dolright
    method: simpleDatagrid
    pageName: Property
    cell: AW40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_dolleft
+   key: buildings_dolleft
    method: simpleDatagrid
    pageName: Property
    cell: AX40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_dolfront
+   key: buildings_dolfront
    method: simpleDatagrid
    pageName: Property
    cell: AY40
    type: DataGrid
 -
-   key: genericData*locationScheduleGridData_dolrear
+   key: buildings_dolrear
    method: simpleDatagrid
    pageName: Property
    cell: AZ40

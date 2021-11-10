@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.10.2
+FROM phusion/baseimage:bionic-1.0.0
 # SETUP Docker Arguments
 ARG VERSION=7.9.0
 ARG DISTRO=tomcat
@@ -34,7 +34,7 @@ RUN groupmod -g ${BOOT2DOCKER_GID} staff
 ENV DEBIAN_FRONTEND noninteractive
 
 # Setup Nodejs
-RUN rm -rf /var/lib/apt/lists/* && curl -sL https://deb.nodesource.com/setup_8.x | bash - 
+RUN rm -rf /var/lib/apt/lists/* && curl -sL https://deb.nodesource.com/setup_14.x | bash - 
 
 RUN add-apt-repository -y ppa:ondrej/php && \
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C && \
@@ -43,8 +43,13 @@ RUN add-apt-repository -y ppa:ondrej/php && \
 RUN apt-get -o Dpkg::Options::="--force-confnew" --force-yes -fuy upgrade
 RUN apt-get -y install postfix python3-setuptools wget git apache2 php-xdebug libapache2-mod-php7.2 php7.2-fpm mysql-server zip unzip curl php7.2-cli php7.2-dev 
 RUN apt-get -y install php7.2-mysql php7.2-gd php7.2-imagick php7.2-recode php7.2-tidy php7.2-xmlrpc php7.2-curl php7.2-json php7.2-msgpack php7.2-memcached php7.2-intl 
-RUN apt-get -y install php7.2-sqlite3 php7.2-gmp php7.2-geoip php7.2-mbstring php7.2-xml php7.2-zip php7.2-imap php7.2-soap supervisor pdftk php7.2-imagick 
+RUN apt-get -y install php7.2-sqlite3 php7.2-gmp php7.2-geoip php7.2-mbstring php7.2-xml php7.2-zip php7.2-imap php7.2-soap supervisor php7.2-imagick 
 RUN apt-get -y install libapache2-mod-xsendfile dos2unix xmlstarlet tar tzdata ca-certificates nodejs zlib1g-dev libglib2.0-dev
+
+COPY pdftk_installer.sh /
+
+RUN chmod +x pdftk_installer.sh && bash /pdftk_installer.sh
+
 RUN apt-get -y autoremove
 
 # Apache2 conf
@@ -106,6 +111,7 @@ RUN chmod 755 /*.sh
 RUN mkdir -p /app/api
 RUN mkdir -p /app/view
 RUN mkdir -p /app/camel
+RUN mkdir -p /app/smtp
 RUN mkdir -p /app/workflow
 RUN mkdir -p /app/clients
 
@@ -218,5 +224,6 @@ RUN mkdir -p /var/run/mysqld \
     && chown -R www-data:staff /var/lib/mysql \
     && chown -R www-data:staff /var/run/mysqld \
     && chown -R www-data:staff /var/log/mysql
+RUN npm install -g npm    
 
 CMD ["/services/run.sh"]

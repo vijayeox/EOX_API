@@ -201,6 +201,30 @@ class SetupEndorsementDiveStore extends AbstractAppDelegate
                     $data['previous_additionalInsured'] = array();
                     $policy['previous_additionalInsured'] = array();
                 }
+                if ($data['lossPayeesSelect'] == "yes") {
+                    foreach ($data['lossPayees'] as $key => $value) {
+                        if (!isset($value['existingLossPayee'])){
+                            $data['lossPayees'][$key]['existingLossPayee'] = uniqid();
+                        }
+                    }
+                    $data['previous_lossPayees'] = $data['lossPayees'];
+                    $policy['previous_lossPayees'] = $data['lossPayees'];
+                } else {
+                    $data['previous_lossPayees'] = array();
+                    $policy['previous_lossPayees'] = array();
+                }
+                if ($data['additional_named_insureds_option'] == "yes") {
+                    foreach ($data['additionalNamedInsured'] as $key => $value) {
+                        if (!isset($value['existingNamedInsured'])){
+                            $data['additionalNamedInsured'][$key]['existingNamedInsured'] = uniqid();
+                        }
+                    }
+                    $data['previous_additionalNamedInsured'] = $data['additionalNamedInsured'];
+                    $policy['previous_additionalNamedInsured'] = $data['additionalNamedInsured'];
+                } else {
+                    $data['previous_additionalNamedInsured'] = array();
+                    $policy['previous_additionalNamedInsured'] = array();
+                }
                 $data['previous_policy_data'] = isset($data['previous_policy_data']) ? $data['previous_policy_data'] : array();
                 if ($data['groupProfessionalLiabilitySelect'] == 'yes') {
                     $policy['previous_groupCoverageAmount'] = isset($data['groupCoverageAmount']) ? $data['groupCoverageAmount'] : 0;

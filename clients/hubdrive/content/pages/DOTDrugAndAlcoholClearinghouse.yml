@@ -1,0 +1,39 @@
+name: 'List DOT Drug And Alcohol Clearing house'
+description: 'Shows a list of DOT Drug And Alcohol Clearing house'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/DOT Drug And Alcohol Clearing house'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of DOT Drug And Alcohol Clearing house</h5>'
+            operations:
+                title: "Add Common Violation"
+                actions:
+                    -
+                        name: Add Common Violation
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: df8954cb-d4d3-4856-8d55-37e87e71829f      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

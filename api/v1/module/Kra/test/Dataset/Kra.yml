@@ -1,0 +1,282 @@
+ox_datasource:
+-
+    id: 2
+    uuid: '7700c623-1361-4c85-8203-e255ac995c4a'
+    name: 'mattermost'
+    type: 'MySql'
+    configuration: '{"data": { "server": "myServerAddress", "Database": "myDataBase", "Uid": "myUsername","Pwd": "myPassword"}}'
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+-
+    id: 3
+    uuid: 'cb1bebce-df33-4266-bbd6-d8da5571b10a'
+    name: 'reporting engine'
+    type: 'Elastic'
+    configuration: '{"data": {"user": "elastic","password": "changeme","serveraddress": "localhost","port": "9200", "core":"core", "type":"type", "scheme":"http"}}'
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+-
+    id: 4
+    uuid: 'aa1bebce-df33-4266-bbd6-d8da5571b10a'
+    name: 'api engine'
+    type: 'API'
+    configuration: '{"data": {"module": "unitTest"}}'
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+ox_target:
+  -
+    id: 10
+    uuid: '44f22a46-3434-48df-96b9-c58520005817'
+    type: 0
+    period_type: monthly
+    red_limit: 1000
+    yellow_limit: 2000
+    green_limit: 3000
+    red_workflow_id: 111
+    yellow_workflow_id: 222
+    green_workflow_id: 333
+    trigger_after: 10
+    created_by: 1
+    account_id: 1
+    version: 1
+    isdeleted: 0
+  -
+    id: 11
+    uuid: '44f22a46-3434-48df-8888-c58520005817'
+    type: 0
+    period_type: daily
+    red_limit: 10000
+    yellow_limit: 25000
+    green_limit: 35000
+    red_workflow_id: 444
+    yellow_workflow_id: 555
+    green_workflow_id: 666
+    trigger_after: 5
+    created_by: 1
+    account_id: 1
+    version: 1
+    isdeleted: 0
+  -
+    id: 12
+    uuid: '44f22a46-3434-48df-9999-c58520005817'
+    type: 0
+    period_type: yearly
+    red_limit: 2000
+    yellow_limit: 3000
+    green_limit: 4000
+    red_workflow_id: 444
+    yellow_workflow_id: 555
+    green_workflow_id: 666
+    trigger_after: 5
+    created_by: 1
+    account_id: 1
+    version: 1
+    isdeleted: 0
+ox_query:
+  -
+    id: 11
+    uuid: '8f1d2819-c5ff-4426-bc40-f7a20704a738'
+    name: 'query1'
+    datasource_id: 3
+    configuration: '{"app_name":"sampleapp","group":"field3","field":"field5","operation":"avg"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+  -
+    id: 12
+    uuid: '86c0cc5b-2567-4e5f-a741-f34e9f6f1af1'
+    name: 'query2'
+    datasource_id: 3
+    configuration: '{"app_name":"crm","date_type":"createdAt","date-period":"2018-01-01/2019-12-12","operation":"count"}'
+    ispublic: 1
+    created_by: 2
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+  -
+    id: 13
+    uuid: '1a7d9e0d-f6cd-40e2-9154-87de247b9ce1'
+    name: 'query3'
+    datasource_id: 3
+    configuration: '{"app_name":"crm","date_type":"date_created","date-period":"2018-01-01/now","list":"name,amount"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+  -
+    id: 14
+    uuid: '5f1d2819-c5ff-4426-bc40-f7a20704a748'
+    name: 'query4'
+    datasource_id: 3
+    configuration: '{"app_name":"sampleapp","group":"field3","field":"field6","operation":"avg"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+  -
+    id: 15
+    uuid: '7f1d2819-c5ff-4426-aa40-f7a20704a748'
+    name: 'hub 1'
+    datasource_id: 3
+    configuration: '{"app_name":"diveinsurance","group":"state","field":"total","operation":"sum"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+  -
+    id: 16
+    uuid: '7f1d2819-c5ff-2326-bc40-f7a20704a748'
+    name: 'hub 2'
+    datasource_id: 3
+    configuration: '{"app_name":"diveinsurance","group":"state","field":"totalLiability","operation":"sum"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+  -
+    id: 17
+    uuid: '6f1d2819-c5ff-2326-bc40-f7a20704a748'
+    name: 'hub 3'
+    datasource_id: 3
+    configuration: '{"app_name":"diveinsurance","frequency":"2","field":"total","operation":"sum","date_type":"start_date","date-period":"2018-01-01/now"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+
+  -
+    id: 18
+    uuid: '5f1d2819-c5ff-2326-bc40-f7a20704a748'
+    name: 'hub 4'
+    datasource_id: 3
+    configuration: '{"app_name":"diveinsurance","frequency":"2","field":"totalLiability","operation":"sum","date_type":"start_date","date-period":"2018-01-01/now"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+
+  -
+    id: 19
+    uuid: '771d2819-c5ff-2326-bc40-f7a20704a748'
+    name: 'crmDoubleGrouping'
+    datasource_id: 3
+    configuration: '{"app_name":"crm","group":"owner_username,industry","field":"amount","operation":"sum"}'
+    ispublic: 0
+    created_by: 1
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+
+  -
+    id: 20
+    uuid: 'd5b79092-61f3-42ee-9bea-0d026157153f'
+    name: 'queryNonAgg'
+    datasource_id: 3
+    configuration: '{"app_name":"sampleapp","date_type":"workflow_instance_date_created","date-period":"2018-01-01/2019-12-12","list":"form_name"}'
+    ispublic: 1
+    created_by: 2
+    date_created: '2019-06-27 07:25:06'
+    account_id: 1
+    isdeleted: 0
+    version: 1
+ox_kra:
+  -
+        id: 1
+        uuid : 2db1c5a3-8a82-4d5b-b60a-c648cf1e27de
+        name: 'Test Kra'
+        account_id: 1
+        user_id: 1
+        target_id: 10
+        query_id: 11
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        modified_by: 1
+        status: 'Inactive'
+  -
+        id: 2
+        uuid : 153f3e9e-eb07-4ca4-be78-34f715bd50db
+        name: 'Test Kra Once Again'
+        account_id: 1
+        user_id: 1
+        target_id: 10
+        query_id: 11
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        modified_by: 1
+        status: 'Active'
+  -
+        id: 3
+        uuid : 153f3e9e-eb07-4ca4-be78-34f715bd50sd
+        name: 'Test Kra 3'
+        account_id: 2
+        user_id: 1
+        target_id: 10
+        query_id: 11
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        modified_by: 1
+        status: 'Active'
+  -
+        id: 4
+        uuid : 153f3e9e-eb07-4ca4-be78-34f715bd50ab
+        name: 'Test Kra 4'
+        account_id: 1
+        user_id: 1
+        target_id: 10
+        query_id: 11
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        modified_by: 1
+        status: 'Active'
+  -
+        id: 5
+        uuid : 153f3e9e-eb07-4ca4-be78-34f715bd124
+        name: 'Test Kra 5'
+        account_id: 1
+        user_id: 1
+        target_id: 10
+        query_id: 11
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        modified_by: 1
+        status: 'Active'
+ox_team:
+  -
+        id: 1
+        uuid: '10766504-bf40-4824-a16a-fbc7df45b944'
+        name: 'Team 1'
+        description: 'Sample Team'
+        status: Active
+        account_id: 1
+        manager_id: 2
+        date_created: '2018-11-11 07:25:06'
+        created_id: 1
+
+
+

@@ -1,6 +1,7 @@
 <?php
 namespace Callback;
 
+use Oxzion\Utils\UuidUtil;
 use Zend\Router\Http\Segment;
 
 return [
@@ -70,9 +71,54 @@ return [
                 'type'    => Segment::class,
                 'options' => [
                     'route'    => '/callback/chat/postfilecomment',
+                    'constraints' => [
+                        'commentId' => UuidUtil::UUID_PATTERN
+                    ],
                     'defaults' => [
-                        'controller' => Controller\ChatCallbackController::class,
-                        'action' => 'postFileComment',
+                        'controller' => Controller\CommentController::class,
+                    ],
+                ],
+            ],
+            'putfilecommentupdate' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/callback/chat/postfilecomment/:commentId',
+                    'constraints' => [
+                        'commentId' => UuidUtil::UUID_PATTERN
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\CommentController::class,
+                        'method' => 'POST',
+                        'action' => 'update',
+                    ],
+                ],
+            ],
+            'savecommentattachment' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/comment/:commentId/saveCommentAttachment',
+                    'constraints' => [
+                        'commentId' => UuidUtil::UUID_PATTERN
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\CommentController::class,
+                        'method' => 'POST',
+                        'action' => 'saveCommentAttachment',
+                    ],
+                ],
+            ],
+
+            'putfilecommentgetattachment' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/comment/:commentId/attachment/:fileName',
+                    'constraints' => [
+                        'commentId' => UuidUtil::UUID_PATTERN,
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\CommentController::class,
+                        'method' => 'GET',
+                        'action' => 'getCommentFile',
                     ],
                 ],
             ],

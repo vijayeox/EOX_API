@@ -1,0 +1,39 @@
+name: 'List CDL Drug And Alcohol Clearinghouse Checklist'
+description: 'Shows a list of CDL Drug And Alcohol Clearinghouse Checklist'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/CDL Drug And Alcohol Clearinghouse Checklist'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of CDL Drug And Alcohol Clearinghouse Checklist</h5>'
+            operations:
+                title: "Create New Checklist"
+                actions:
+                    -
+                        name: Create New Checklist
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 3a9c32a8-cc02-49b0-91bd-61d91b04d27b      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

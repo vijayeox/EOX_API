@@ -1,6 +1,6 @@
-import React_app from "./react-app";
+ import AdminPage from "./AdminPage";
 
 let guiComponent = {
-  SampleComponent: React_app
+ AdminPage: AdminPage
 };
 export { guiComponent };

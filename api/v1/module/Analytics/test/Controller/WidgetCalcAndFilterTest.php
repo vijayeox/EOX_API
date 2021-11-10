@@ -539,4 +539,54 @@ class WidgetCalcAndFilterTest extends ControllerTest
         $jsoncontent = json_encode($content['data']['widget']['data']);
         $this->assertEquals($jsoncontent, '[{"test1":1},{"test2":2}]');
     }
+    public function testGridLazyLoadingData()
+    {
+
+        $input1 = json_decode('{"index":"' . $this->index_pre . 'crmnew_index","body":{"query":{"bool":{"must":[{"term":{"account_id":1}}]}},"_source":["owner_username","industry","budget_amount"],"explain":true,"sort":{"owner_username.keyword":"desc"}},"_source":["owner_username","industry","budget_amount"],"from":"10","size":"100","track_total_hits":true}', true);
+        $output1 = json_decode('{"took":378,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":{"value":5,"relation":"eq"},"max_score":null,"hits":[]}}', true); //This is a dummy output
+
+        $clientMock = Mockery::mock('Elasticsearch\Client');
+        $this->elasticService->setElasticClient($clientMock);
+        $indexMock = Mockery::mock('Elasticsearch\Namespaces\IndicesNamespace');
+        $clientMock->shouldReceive('indices')->andReturn($indexMock);
+        $indexMock->shouldReceive('create')->withAnyArgs();
+        $clientMock->shouldReceive('search')->with($input1)->andReturn($output1);
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/analytics/widget/66e44343-9876-44d8-9295-f2c3130bafbc?data=true&top=100&skip=10', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+    }
+
+    public function testGridLazyLoadingFromConfig()
+    {
+
+        $input1 = json_decode('{"index":"' . $this->index_pre . 'crmnew_index","body":{"query":{"bool":{"must":[{"term":{"account_id":1}}]}},"_source":["owner_username","industry","budget_amount"],"explain":true,"sort":{"budget_amount":"asc"}},"_source":["owner_username","industry","budget_amount"],"from":"0","size":"50","track_total_hits":true}', true);
+        $output1 = json_decode('{"took":378,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":{"value":5,"relation":"eq"},"max_score":null,"hits":[]}}', true); //This is a dummy output
+
+        $clientMock = Mockery::mock('Elasticsearch\Client');
+        $this->elasticService->setElasticClient($clientMock);
+        $indexMock = Mockery::mock('Elasticsearch\Namespaces\IndicesNamespace');
+        $clientMock->shouldReceive('indices')->andReturn($indexMock);
+        $indexMock->shouldReceive('create')->withAnyArgs();
+        $clientMock->shouldReceive('search')->with($input1)->andReturn($output1);
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/analytics/widget/66e44343-9876-44d8-9295-f2c3130bafbc?data=true&orderby=budget_amount asc', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+    }
+    
+    public function testParticipants()
+    {
+
+        if (enableElastic == 0) {
+            $this->markTestSkipped('Only Integration Test');
+        }
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/analytics/widget/66e44343-1009-44d8-9295-f2c3130bafbc?data=true', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals(count($content['data']['widget']['data']), 3);
+    }
 }

@@ -303,6 +303,7 @@ class UserService extends AbstractService
                 'username' => $data['username'],
                 'firstname' => $data['firstname'],
                 'lastname' => $data['lastname'],
+                'name' => $data['name'],
                 'email' => $data['email'],
                 'accountId' => $accountId,
                 'password' => $password,
@@ -665,6 +666,18 @@ class UserService extends AbstractService
             throw new ServiceException('Not allowed to delete the project manager', 'project.manager', OxServiceException::ERR_CODE_FORBIDDEN);
         }
         $account = $this->getAccount($form->account_id);
+        $queryString = "SELECT e.* FROM ox_employee e
+        INNER JOIN ox_user u ON u.person_id = e.manager_id
+        WHERE u.uuid = :userId";
+        $params = ['userId' => $id['userId']];
+        $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
+        if (isset($resultSet[0]['manager_id'])) {
+            $sql = $this->getSqlObject();
+            $updatedData['manager_id'] = NULL;
+            $update = $sql->update('ox_employee')->set($updatedData)
+                ->where(array('ox_employee.manager_id' => $resultSet[0]['manager_id']));
+            $this->executeUpdate($update);
+        }
         $originalArray = array();
         $originalArray['status'] = 'Inactive';
         $originalArray['modified_id'] = AuthContext::get(AuthConstants::USER_ID);
@@ -713,12 +726,11 @@ class UserService extends AbstractService
         $pageSize = 20;
         $offset = 0;
         $sort = "name";
-        $select = "SELECT ou.uuid, ou.username, per.firstname, per.lastname, ou.name,
-                            per.email, au.uuid as accountId, ou.icon, per.date_of_birth,
-                            oxemp.designation,per.phone,oa.address1,oa.address2,oa.city,
-                            oa.state,oa.country,oa.zip,per.gender,oxemp.website,
-                            oxemp.about, manager_user.uuid as managerId, 
-                            ou.timezone,oxemp.id as employee_id, oxemp.date_of_join, oxemp.interest, ou.preferences";
+        $select = "SELECT ou.uuid, ou.username, ou.name, ou.icon, ou.timezone, ou.preferences,
+        	au.uuid as accountId, per.firstname, per.lastname, per.email, per.date_of_birth, per.phone, per.gender,
+        	oxemp.designation, oxemp.website, oxemp.about, oxemp.id as employee_id, oxemp.date_of_join, oxemp.interest,
+        	oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip,
+        	manager_user.uuid as managerId,manager_user.name as manager_name";
         $from = " FROM `ox_user` as ou 
                   inner join ox_account au on au.id = ou.account_id
                   join ox_person per on per.id = ou.person_id 
@@ -733,22 +745,26 @@ class UserService extends AbstractService
                 if (isset($filterArray[0]['filter'])) {
                     $filterlogic = isset($filterArray[0]['filter']['logic']) ? $filterArray[0]['filter']['logic'] : "AND";
                     $filterList = $filterArray[0]['filter']['filters'];
-                    $where = " WHERE " . FilterUtils::filterArray($filterList, $filterlogic, self::$userField);
+                    $clause = FilterUtils::filterArray($filterList, $filterlogic, self::$userField);
+                    if(!empty($clause)){
+                        $where = " WHERE " . $clause;
+                    }
                 }
                 if (isset($filterArray[0]['sort']) && count($filterArray[0]['sort']) > 0) {
                     $sort = $filterArray[0]['sort'];
                     $sort = FilterUtils::sortArray($sort, self::$userField);
                 }
                 $pageSize = $filterArray[0]['take'];
-                $offset = $filterArray[0]['skip'];
             }
             if (isset($filterParams['exclude'])) {
-                $where .= strlen($where) > 0 ? " AND ou.uuid NOT in ('" . implode("','", $filterParams['exclude']) . "') " : " WHERE ou.uuid NOT in ('" . implode("','", $filterParams['exclude']) . "') ";
+                $where .= (strlen($where) > 0 ? " AND " : " WHERE "). "ou.uuid NOT in ('" . implode("','", $filterParams['exclude']) . "') ";
             }
         }
 
-        $where .= strlen($where) > 0 ? " AND ou.status = 'Active' AND ou.account_id = " . $accountId : " WHERE ou.status = 'Active' AND ou.account_id = " . $accountId;
-        $sort = " ORDER BY " . $sort;
+        $where .= (strlen($where) > 0 ? " AND " : " WHERE ") . "ou.status = 'Active' AND ou.account_id = " . $accountId;
+        if(!empty($sort)){
+            $sort = " ORDER BY " . $sort;
+        }
         $limit = " LIMIT " . $pageSize . " offset " . $offset;
         $resultSet = $this->executeQuerywithParams($cntQuery . $where);
         $count = $resultSet->toArray()[0]['count'];
@@ -931,7 +947,8 @@ class UserService extends AbstractService
                         per.firstname,per.lastname,ou.name,per.email,oxemp.designation,
                         au.uuid as accountId, per.phone, per.date_of_birth, oxemp.date_of_join,
                         oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip, 
-                        oxemp.website, oxemp.about, per.gender, manager_user.uuid as managerId,
+                        oxemp.website, oxemp.about, per.gender,
+                        manager_user.uuid as managerId,manager_user.name as manager_name,
                         oxemp.interest,ou.icon,ou.preferences 
                     from ox_user as ou 
                     inner join ox_account_user oau on oau.user_id = ou.id
@@ -1136,31 +1153,31 @@ class UserService extends AbstractService
     {
         $accountId = AuthContext::get(AuthConstants::ACCOUNT_ID);
         $userId = AuthContext::get(AuthConstants::USER_ID);
-        $query = "SELECT uuid, name 
-                   from (
-                        SELECT DISTINCT app.uuid, app.name , 
-                            count(NULLIF(urp.privilege_name,NULL)) as app_count 
-                        from (
-                            SELECT DISTINCT ap.uuid, ap.name, op.name as privilege_name, ar.account_id 
-                            from ox_app as ap
-                            INNER JOIN ox_app_registry as ar ON ap.id = ar.app_id 
-                            INNER JOIN ox_privilege as op ON ar.app_id = op.app_id 
-                            where ar.account_id = :accountId) app 
-                        LEFT JOIN (
-                            SELECT DISTINCT orp.privilege_name 
-                            from ox_role_privilege as orp 
-                            INNER JOIN ox_user_role as ou on orp.role_id = ou.role_id 
-                            INNER JOIN ox_account_user au on au.id = ou.account_user_id 
-                                                         AND au.account_id = orp.account_id 
-                            WHERE au.user_id = :userId 
-                                and orp.account_id = :accountId ) urp ON app.privilege_name = urp.privilege_name 
-                        GROUP BY app.uuid,app.name) a 
-                        WHERE a.app_count = 0 
-                        union 
-                        SELECT oa.uuid, oa.name 
-                        FROM ox_app oa 
-                        LEFT JOIN `ox_app_registry` ar on oa.id = ar.app_id and ar.account_id = :accountId
-                        WHERE account_id IS NULL";
+        $query = "SELECT uuid, name
+                    FROM (
+                        SELECT DISTINCT app.uuid, app.name, COUNT( NULLIF(urp.privilege_name, NULL) ) AS app_count
+                        FROM (
+                            SELECT DISTINCT ap.uuid, ap.name, op.name AS privilege_name, ar.account_id
+                            FROM ox_app AS ap
+                            INNER JOIN ox_app_registry AS ar ON ap.id = ar.app_id
+                            INNER JOIN ox_privilege AS op ON ar.app_id = op.app_id
+                            WHERE ar.account_id = :accountId
+                        ) app
+                        LEFT JOIN(
+                            SELECT DISTINCT orp.privilege_name
+                            FROM ox_role_privilege AS orp
+                            INNER JOIN ox_user_role AS ou ON orp.role_id = ou.role_id
+                            INNER JOIN ox_account_user au ON au.id = ou.account_user_id AND au.account_id = orp.account_id
+                            WHERE au.user_id = :userId AND orp.account_id = :accountId
+                        ) urp ON app.privilege_name = urp.privilege_name
+                        GROUP BY app.uuid, app.name
+                    ) a
+                    WHERE a.app_count = 0
+                UNION
+                    SELECT oa.uuid, oa.name
+                    FROM ox_app oa
+                    LEFT JOIN `ox_app_registry` ar ON oa.id = ar.app_id AND ar.account_id = :accountId
+                    WHERE account_id IS NULL";
         $params = ['userId' => $userId, 'accountId' => $accountId];
         $this->logger->info("Query - $query with params - ".print_r($params, true));
         $result = $this->executeQueryWithBindParameters($query, $params);
@@ -1261,7 +1278,7 @@ class UserService extends AbstractService
             $userId = AuthContext::get(AuthConstants::USER_ID);
         }
         $query = "SELECT * from 
-                  (SELECT DISTINCT oa.name,oa.description, oa.uuid, oa.type, oa.logo, oa.category 
+                  (SELECT DISTINCT oa.name,oa.description, oa.uuid, oa.type, oa.logo, oa.category,oar.start_options 
                     from ox_app as oa 
                     INNER JOIN ox_app_registry as oar ON oa.id = oar.app_id 
                     INNER JOIN ox_privilege as op on oar.app_id = op.app_id 
@@ -1269,9 +1286,9 @@ class UserService extends AbstractService
                     INNER JOIN ox_account_user au on orp.account_id = au.account_id
                     INNER JOIN ox_user_role as our ON orp.role_id = our.role_id AND 
                                                       our.account_user_id = au.id
-                    WHERE orp.account_id = :accountId  AND au.user_id = :userId
+                    WHERE oar.account_id = :accountId  AND au.user_id = :userId
                  union 
-                 SELECT DISTINCT name,description, uuid, type, logo, category 
+                 SELECT DISTINCT name,description, uuid, type, logo, category,oar.start_options 
                     FROM ox_app as oa 
                     INNER JOIN ox_app_registry as oar ON oa.id= oar.app_id  
                     WHERE oa.id NOT IN (SELECT app_id FROM ox_privilege WHERE app_id IS NOT NULL) 
@@ -1323,12 +1340,15 @@ class UserService extends AbstractService
             return array('data' => array(), 'role' => array());
         }
         $responseUserData = $userData[0];
+        $responseUserData['manager_name'] = "";
         $responseUserData['preferences'] = json_decode($responseUserData['preferences'], true);
         if (isset($responseUserData['managerId']) &&  ($responseUserData['managerId'] !== 0)) {
-            $result = $this->getUserWithMinimumDetails($responseUserData['managerId'], $params['accountId']);
-            $responseUserData['manager_name'] = $result['firstname']." ".$result['lastname'];
-        } else {
-            $responseUserData['manager_name'] = "";
+            try {
+                $result = $this->getUserWithMinimumDetails($responseUserData['managerId'], $params['accountId']);
+                $responseUserData['manager_name'] = $result['firstname']." ".$result['lastname'];
+            } catch (Exception $e) {
+                unset($responseUserData['managerId']);
+            }
         }
         $responseUserData['role'] = $this->getRolesofUser($params['accountId'], $params['userId']);
         return $responseUserData;
@@ -1474,5 +1494,30 @@ class UserService extends AbstractService
         if (isset($userdata['state'])) {
             unset($addressData['state']);
         }
+    }
+
+    private function getRoleFromUuid($uuid) {
+        $select = "SELECT name from ox_role as oxr WHERE oxr.uuid = :uuid";
+        $selectParams = array("uuid" => $uuid);
+        $result = $this->executeQuerywithBindParameters($select, $selectParams)->toArray();
+        if(count($result) > 0){
+            return $result[0]['name'];
+        }else{
+            return null;
+        }
+    }
+
+    public function getUserDataByIdentifier($appId, $identifier, $identifierField){
+        $select = "SELECT oxu.uuid as userId, oxa.uuid as accountId,oxa.id as account_id, oxae.id as entityId
+                    FROM ox_wf_user_identifier owui
+                    INNER JOIN ox_user oxu ON oxu.id = owui.user_id
+                    INNER JOIN ox_account oxa ON oxa.id = owui.account_id
+                    INNER JOIN ox_app app ON app.id = owui.app_id
+                    INNER JOIN ox_app_entity oxae ON oxae.app_id = app.id
+                    WHERE owui.identifier_name = :identityField AND 
+                    app.uuid = :appId AND owui.identifier = :identifier";
+        $selectQuery = array("identityField" => $identifierField, "appId" => $appId, "identifier" => $identifier);
+        $this->logger->info("INFO---$select with Parasm--".print_r($selectQuery,true));
+        return $this->executeQuerywithBindParameters($select, $selectQuery)->toArray();
     }
 }

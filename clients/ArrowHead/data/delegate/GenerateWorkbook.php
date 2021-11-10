@@ -26,11 +26,11 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
             "excelFile" => "DealerGuard_Application_Open_Lot.xlsx",
             "customData" => "dealerguardOpenLot"
         ),
-        "harco" => array(
+        "victor_AutoPhysDamage" => array(
             "type" => "excel",
-            "excelFile" => "Harco.xlsm",
-            "template" => "harco.yaml",
-            "customData" => "harcoExcelData"
+            "template" => "victor_AutoPhysDamage.yaml",
+            "excelFile" => "Victor_AutoPhysDamage.xls",
+            "customData" => "victorAutoPhysicalDamage"
         ),
         "victor_FranchisedAutoDealer" => array(
             "type" => "excel",
@@ -38,11 +38,11 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
             "excelFile" => "Victor_FranchisedAutoDealer.xls",
             "customData" => "franchisedAutoDealer"
         ),
-        "victor_AutoPhysDamage" => array(
+        "harco" => array(
             "type" => "excel",
-            "template" => "victor_AutoPhysDamage.yaml",
-            "excelFile" => "Victor_AutoPhysDamage.xls",
-            "customData" => "victorAutoPhysicalDamage"
+            "excelFile" => "Harco.xlsm",
+            "template" => "harco.yaml",
+            "customData" => "harcoExcelData"
         ),
         "epli" => array(
             "type" => "pdf",
@@ -56,6 +56,8 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
         )
     );
 
+    const EXCELTEMPLATE = "DOC_and_UM_CarPort_Design.xlsx";
+
     public function __construct()
     {
         parent::__construct();
@@ -66,10 +68,9 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
         $this->logger->info("Executing GenerateWorkbook with data- " . json_encode($data, JSON_UNESCAPED_SLASHES));
         // Add logs for created by id and producer name who triggered submission
         $fieldTypeMappingPDF = include(__DIR__ . "/fieldMappingPDF.php");
-
-        $fileUUID = isset($data['fileId']) ? $data['fileId'] : $data['uuid'];
-        $orgUuid = isset($data['orgId']) ? $data['orgId'] : AuthContext::get(AuthConstants::ORG_UUID);
-        $fileDestination =  ArtifactUtils::getDocumentFilePath($this->destination, $fileUUID, array('orgUuid' => $orgUuid));
+        $fileId = isset($data['fileId']) ? $data['fileId'] : $data['uuid'];
+        $orgId = isset($data['orgId']) ? $data['orgId'] : AuthContext::get(AuthConstants::ORG_UUID);
+        $fileDestination =  ArtifactUtils::getDocumentFilePath($this->destination, $fileId, array('orgUuid' => $orgId));
         $this->logger->info("GenerateWorkbook Dest" . json_encode($fileDestination, JSON_UNESCAPED_SLASHES));
         $generatedDocumentsList = array();
         $excelData = array();
@@ -84,6 +85,25 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
             }
             unset($data["genericData"]);
         }
+        $template['templateNameWithExt'] = self::EXCELTEMPLATE;
+        $template['templatePath'] = __DIR__."/../template";
+        $documentDestination = $fileDestination['absolutePath'].self::EXCELTEMPLATE;
+        $requiredData = $this->getNecessaryDataForMails($data,$persistenceService);
+        $response = $this->documentBuilder->fillExcelTemplate(
+            $template['templateNameWithExt'],
+            $requiredData,
+            $documentDestination,
+            array("Sheet1")
+        );
+        array_push(
+            $generatedDocumentsList,
+            array(
+                "fullPath" => $documentDestination,
+                "file" => $fileDestination['relativePath'] . self::EXCELTEMPLATE,
+                "originalName" => self::EXCELTEMPLATE,
+                "type" => "excel/xlsx"
+            )
+        );
         foreach ($this->checkJSON($data['workbooksToBeGenerated']) as  $key => $templateSelected) {
             if ($templateSelected) {
                 $selectedTemplate = $this->carrierTemplateList[$key];
@@ -93,20 +113,25 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
                     $fieldMappingExcel = file_get_contents(__DIR__ . "/../template/" . $selectedTemplate["template"]);
                     $fieldMappingExcel = YMLUtils::ymlToArray($fieldMappingExcel);
                     if (isset($data[$selectedTemplate["customData"]])) {
-                        foreach ($this->checkJSON(
-                            $data[$selectedTemplate["customData"]]
-                        ) as $customKey => $customValue) {
-                            if (isset($customValue) && !empty($customValue) && !isset($data[$customKey])) {
-                                $data[$selectedTemplate["customData"] . "*" . $customKey] = $customValue;
+                        try {
+                            foreach ((array)$this->checkJSON(
+                                $data[$selectedTemplate["customData"]]
+                            ) as $customKey => $customValue) {
+                                if (isset($customValue) && !empty($customValue) && !isset($data[$customKey])) {
+                                    $data[$selectedTemplate["customData"] . "*" . $customKey] = $customValue;
+                                }
                             }
+                        } catch (Exception $e) {
                         }
+
                         unset($data[$selectedTemplate["customData"]]);
                     }
                     foreach ($fieldMappingExcel as $fieldConfig) {
-
-                        $formFieldKey = str_contains($fieldConfig["key"], "_") ?
-                            explode("_", $fieldConfig["key"])[0]
-                            : $fieldConfig["key"];
+                        if (isset($fieldConfig["key"])) {
+                            $formFieldKey = str_contains($fieldConfig["key"], "_") ?
+                                explode("_", $fieldConfig["key"])[0]
+                                : $fieldConfig["key"];
+                        }
                         if (isset($data[$formFieldKey]) && !empty($data[$formFieldKey]) && $data[$formFieldKey] !== "[]") {
                             $userInputValue = $data[$formFieldKey];
                             $tempFieldConfig = $fieldConfig;
@@ -166,9 +191,9 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
                     array_push(
                         $excelData,
                         [
-                            "fileId" => $fileUUID,
+                            "fileId" => $fileId,
                             "appId" => $data['appId'],
-                            "orgId" => $orgUuid,
+                            "orgId" => $orgId,
                             "mapping" => [
                                 "filename" => $selectedTemplate["excelFile"],
                                 "data" => $templateData
@@ -226,8 +251,12 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
                     }
                     if (isset($selectedTemplate["customData"])) {
                         $customTemplateData = $this->checkJSON($data[$selectedTemplate["customData"]]);
-                        foreach ($customTemplateData as  $field => $value) {
-                            $pdfData[$field] = $value;
+                        try {
+                            foreach ((array)$customTemplateData as  $field => $value) {
+                                $pdfData[$field] = $value;
+                            }
+                        } catch (\Throwable $th) {
+                            //throw $th;
                         }
                     }
                     $pdfData = array_filter($pdfData);
@@ -273,6 +302,7 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
                 array(
                     "fullPath" => $fileDestination['absolutePath'] . "excelMapperInput.json",
                     "file" => $fileDestination['relativePath'] . "excelMapperInput.json",
+                    "created_date" => date('Y-m-d H:i:s'),
                     "originalName" => "excelMapperInput.json",
                     "type" => "file/json"
                 )
@@ -282,11 +312,27 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
             $data['documentsSelectedCount'] = count($excelData) + count($generatedDocumentsList) - 1;
             $data["status"] = "Processing";
         } else {
+            $sendNotificationMail = false;
+            if (isset($data['managementSubmitApplication']) && !empty($data['managementSubmitApplication'])) {
+                if ($data['managementSubmitApplication'] == true || $data['managementSubmitApplication'] == "true") {
+                    $sendNotificationMail = true;
+                }
+            }
+            if ($sendNotificationMail == true) {
+                $tempFileData = $data;
+                $tempFileData["fileId"] = $fileId;
+                $tempFileData["orgId"] = $orgId;
+                $mailResponse = $this->executeDelegate("DispatchMail", $tempFileData);
+                $data['mailStatus'] = $mailResponse['Mail1'];
+                if(isset($mailResponse['Mail2'])) {
+                    $data['mailStatus2'] = $mailResponse['Mail2'];
+                }
+            }
             $data["status"] = "Generated";
         }
         $this->logger->info("Completed GenerateWorkbook with data- " . json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
-        $this->saveFile($data, $fileUUID);
+        $this->saveFile($data, $fileId);
 
         if (count($excelData) > 0) {
             $selectQuery = "Select value FROM applicationConfig WHERE type ='excelMapperURL'";
@@ -303,7 +349,7 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
                     $excelItem
                 );
                 $this->logger->info("Excel Mapper POST Request for " . $excelItem["fileId"] . "\n" . $response);
-                sleep(5);
+                sleep(7);
             }
         }
 
@@ -325,6 +371,54 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
             "m-d-Y",
             strtotime($date)
         );
+    }
+
+    private function addSymbolToAllElements(&$data,$symbol,$prepend = true) {
+        foreach ($data as $key => $value) {
+            if($prepend) {
+                $data[$key] = strval($symbol).strval($value);
+            } else {
+                $data[$key] = strval($value).strval($symbol);
+            }
+        }
+    }
+
+    private function getNecessaryDataForMails($data,$persistenceService)
+    {
+        $name = $data['producername'];
+        $selectQuery = "SELECT * FROM user WHERE name='".$name."'";
+        $producerCode = $persistenceService->selectQuery($selectQuery)->current() ? $persistenceService->selectQuery($selectQuery)->current()['producer_code'] : null;
+        $requiredData['producerCode'] = $producerCode;
+        $requiredData['umim'] = isset($data['garageumUim']) ? $data['garageumUim'] : 0;
+        $requiredData['medicalExpense'] = $data['garageLiabilityMedicalExpense'];
+        $requiredData['compDeductible'] = 0;
+        $requiredData['collDeductible'] = 0;
+        $requiredData['driverName'] = $requiredData['umim1'] = $requiredData['medicaL'] = $requiredData['comP'] = $requiredData['colL'] = array();
+        if(isset($data['driverOtherCargrid'])) {
+            $data['driverOtherCargrid'] = is_array($data['driverOtherCargrid']) ? $data['driverOtherCargrid'] : json_decode($data['driverOtherCargrid'],true);
+            $requiredData['compDeductible'] = isset($data['driverOtherCargrid'][0]['compdeductible']) ? $data['driverOtherCargrid'][0]['compdeductible'] : 1000;
+            $requiredData['collDeductible'] = isset($data['driverOtherCargrid'][0]['colldeductible']) ? $data['driverOtherCargrid'][0]['colldeductible'] : 1000;
+            $requiredData['driverName'] = array_column($data['driverOtherCargrid'], 'nameofdrivertobecovered');
+            $requiredData['umim1'] = array_column($data['driverOtherCargrid'], 'driveumuim');
+            $this->addSymbolToAllElements($requiredData['umim1'],'$');
+            //Last letter of the following 3 variables is uppercased at the end to avoid conflict and incorrect data being added to excel
+            $requiredData['medicaL'] = array_column($data['driverOtherCargrid'], 'medicalexpenceautopremises');
+            $this->addSymbolToAllElements($requiredData['medicaL'],'$');
+            $requiredData['comP'] = array_column($data['driverOtherCargrid'], 'compdeductible');
+            $this->addSymbolToAllElements($requiredData['comP'],'$');
+            $requiredData['colL'] = array_column($data['driverOtherCargrid'], 'colldeductible');
+            $this->addSymbolToAllElements($requiredData['colL'],'$');
+        }
+        $requiredData['umbrellaCoverageName'] = array();
+        $requiredData['umbrellaCoveragePercentage'] = array();
+        if(isset($data['UmbrellaCoverageAdditional'])) {
+            $data['UmbrellaCoverageAdditional'] = is_array($data['UmbrellaCoverageAdditional']) ? $data['UmbrellaCoverageAdditional'] : json_decode($data['UmbrellaCoverageAdditional'],true);
+            $requiredData['umbrellaCoverageName'] = array_column($data['UmbrellaCoverageAdditional'], 'umbrellaCoverageAdditionalName');
+            $requiredData['umbrellaCoveragePercentage'] = array_column($data['UmbrellaCoverageAdditional'], 'ownershipPercentageUmbrella');
+            $this->addSymbolToAllElements($requiredData['umbrellaCoveragePercentage'],'%',false);
+        }
+        $this->logger->info("Required data for email- " . print_r($requiredData,true));
+        return $requiredData;
     }
 
     private function checkValue($data, $fieldConfig, $formData)
@@ -452,11 +546,21 @@ class GenerateWorkbook extends AbstractDocumentAppDelegate
     {
         $data = $this->checkJSON($data);
         if (str_contains($fieldConfig["key"], "_")) {
-            $childKey = explode("_", $fieldConfig["key"])[1];
-            if (isset($data[$childKey]) && !empty($data[$childKey])) {
-                $value = $data[$childKey];
+            if (count(explode("_", $fieldConfig["key"])) > 2) {
+                $childKey1 = explode("_", $fieldConfig["key"])[1];
+                $childKey2 = explode("_", $fieldConfig["key"])[2];
+                if (isset($data[$childKey1][$childKey2]) && !empty($data[$childKey1][$childKey2])) {
+                    $value = $data[$childKey1][$childKey2];
+                } else {
+                    return "";
+                }
             } else {
-                return "";
+                $childKey = explode("_", $fieldConfig["key"])[1];
+                if (isset($data[$childKey]) && !empty($data[$childKey])) {
+                    $value = $data[$childKey];
+                } else {
+                    return "";
+                }
             }
         } else {
             $formKey = $fieldConfig["key"];

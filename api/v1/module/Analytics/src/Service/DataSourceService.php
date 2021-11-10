@@ -147,7 +147,7 @@ class DataSourceService extends AbstractService
         $select = $sql->select();
         $select->from('ox_datasource')
             ->columns(array('id','name','type','configuration','account_id','isdeleted','uuid'))
-            ->where(array('uuid' => $uuid,'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),'isdeleted' => 0));
+            ->where(array('uuid' => $uuid,'isdeleted' => 0));
         $response = $this->executeQuery($select)->toArray();
         if (count($response) == 0) {
             throw new Exception("Error Processing Request", 1);

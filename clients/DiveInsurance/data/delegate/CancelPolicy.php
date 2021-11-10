@@ -5,12 +5,14 @@ use Oxzion\Utils\ArtifactUtils;
 use Oxzion\Utils\FileUtils;
 use Oxzion\Auth\AuthContext;
 use Oxzion\Auth\AuthConstants;
+use Oxzion\AppDelegate\FileTrait;
 
 require_once __DIR__ . "/PolicyDocument.php";
 
 
 class CancelPolicy extends PolicyDocument
 {
+    use FileTrait;
     protected $documentBuilder;
     protected $type;
     protected $template;
@@ -166,6 +168,7 @@ class CancelPolicy extends PolicyDocument
         unset($data['groupPolicyId']);
         unset($data['multiplePolicy']);
         unset($data['coverageTitle']);
+        $this->saveFile($data, $data['fileId']);
         return $data;
     }
 }

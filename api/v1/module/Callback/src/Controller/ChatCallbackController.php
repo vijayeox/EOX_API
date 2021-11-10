@@ -203,17 +203,4 @@ class ChatCallbackController extends AbstractApiControllerHelper
             return $this->getErrorResponse($e->getMessage(), $e->getCode());
         }
     }
-
-    public function postFileCommentAction()
-    {
-        $params = $this->extractPostData();
-        $this->log->info("postFileComment Params- " . json_encode($params));
-        try {
-            $this->chatService->postFileComment($params);
-            return $this->getSuccessResponse();
-        } catch (Exception $e) {
-            $this->log->error($e->getMessage(), $e);
-            return $this->exceptionToResponse($e);
-        }
-    }
 }

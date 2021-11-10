@@ -17,7 +17,7 @@ class AnalyticsEngineImpl extends AnalyticsAbstract
 
     public function __construct($appDBAdapter, $appConfig, ElasticService $elasticService)
     {
-        parent::__construct(null, $appDBAdapter, $appConfig);
+        parent::__construct($appDBAdapter, $appConfig);
         $this->elasticService = $elasticService;
     }
 
@@ -188,6 +188,9 @@ class AnalyticsEngineImpl extends AnalyticsAbstract
         }
         if (isset($parameters['append_account_id'])) {
             $returnarray['append_account_id'] = $parameters['append_account_id'];
+        }
+        if (isset($parameters['use_participants'])) {
+            $returnarray['use_participants'] = $parameters['use_participants'];
         }
         if (isset($parameters['list'])) {
             if ($parameters['list']=="*") {

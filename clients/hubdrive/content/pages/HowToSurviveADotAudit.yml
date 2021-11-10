@@ -1,0 +1,39 @@
+name: 'List How To Survive A Dot Audit'
+description: 'Shows a list of How To Survive A Dot Audit'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/How To Survive A Dot Audit'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of How To Survive A Dot Audit</h5>'
+            operations:
+                title: "Create New"
+                actions:
+                    -
+                        name: Create New
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 9ccee23a-e134-47aa-9736-0c022a29a0a8      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName

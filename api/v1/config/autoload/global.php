@@ -71,6 +71,7 @@ return [
         'authToken' => ''
     ],
     'esign' => [
+        'integrator' => 'VANTAGE',
         'clientid' => '6l3lpgsbrha13u8rdg9t5hq3au',
         'clientsecret' => '3uvdithse6p3qmjvv4s3k1mcjt33p06f9iiein5sbmka9prdcqj',
         'url' => 'https://lab-auth.insuresign.io/oauth2/token',
@@ -81,7 +82,7 @@ return [
         "callbackUrl" => 'https://qa3.eoxvantage.com/esign/event'
     ],
     'ims' => [
-        'apiUrl' => 'https://ws2.mgasystems.com/ims_demo/',
+        'wsdlUrl' => 'https://ws2.mgasystems.com/ims_demo/',
         "userName" => "vantage.agora",
         "tripleDESEncryptedPassword" => "9srGG5hflGT0aDrgsxs3GQ=="
     ],

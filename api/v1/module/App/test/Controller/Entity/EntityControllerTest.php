@@ -58,7 +58,7 @@ class EntityControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data']['name'], 'entity1');
-        $this->assertEquals($content['data']['app_id'], 99);
+        $this->assertEquals($content['data']['app_id'], 199);
     }
 
     public function testGetNotFound()
@@ -98,13 +98,13 @@ class EntityControllerTest extends ControllerTest
         $this->assertEquals(count($result), 1);
         $this->assertEquals($result[0]['name'], $data['name']);
         $this->assertEquals($result[0]['description'], $data['description']);
-        $this->assertEquals($result[0]['app_id'], 99);
+        $this->assertEquals($result[0]['app_id'], 199);
     }
 
     public function testCreateFailure()
     {
         $this->initAuthToken($this->adminUser);
-        $data = ['app_id' => 99];
+        $data = ['app_id' => 199];
         $this->setJsonContent(json_encode($data));
         $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/entity', 'POST', null);
         $this->assertResponseStatusCode(406);

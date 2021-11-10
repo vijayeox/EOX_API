@@ -3,6 +3,7 @@
 namespace Analytics\Controller;
 
 use Analytics\Model\Widget;
+use Analytics\Service\WidgetService;
 use Exception;
 use Oxzion\Controller\AbstractApiController;
 
@@ -13,7 +14,7 @@ class WidgetController extends AbstractApiController
     /**
      * @ignore __construct
      */
-    public function __construct($widgetService)
+    public function __construct(WidgetService $widgetService)
     {
         parent::__construct(null, __class__, Widget::class);
         $this->setIdentifierName('widgetUuid');
@@ -189,4 +190,29 @@ class WidgetController extends AbstractApiController
             return $this->exceptionToResponse($e);
         }
     }
+
+    /**
+     * Preview Widget Template API
+     * @api
+     * @link /analytics/widget/preiewTemplate
+     * @method POST
+     * @param array[json] $configuration
+     * @param array[json] $queries
+     * @param array[json] $expression
+     * @return array Returns a JSON Response with Status Code and the HTML for preview
+     */
+
+    public function previewWidgetAction()
+    {
+        $data = $this->params()->fromPost();
+        $params = array_merge($data, $this->params()->fromRoute());
+        try {
+            $result = $this->widgetService->previewWidget($params);
+            return $this->getSuccessResponseWithData($result, 200);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+    }
+
 }

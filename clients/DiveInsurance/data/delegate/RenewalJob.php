@@ -20,15 +20,17 @@ class RenewalJob extends FileBatchProcessing{
         
         $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'end_date','operator'=>'eq','value'=> $endDate);
         $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'policyStatus','operator'=>'eq','value'=> 'In Force');
-        // $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'automatic_renewal','operator'=>'eq','value'=> false);
-        
+        if($data['flag'] == "AutoRenewal Notification" || $data['flag'] == "Schedule AutoRenewal"){
+            $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'automatic_renewal','operator'=>'eq','value'=> true);
+        }else{
+            $filterParams['filter'][0]['filter']['filters'][] = array('field'=>'automatic_renewal','operator'=>'eq','value'=> false);
+        }
         $data['filterParams'] = $filterParams;
-
         $data['entityName'] = 'Individual Professional Liability';
-        $this->processRenewal($data,$persistenceService);
+        $this->processNotification($data,$persistenceService);
 
         $data['entityName'] = 'Emergency First Response';
-        $this->processRenewal($data,$persistenceService);
+        $this->processNotification($data,$persistenceService);
 
         return $data;
    }

@@ -1,12 +1,10 @@
 <?php
 namespace FileIndexer\Service;
 
-use Oxzion\Auth\AuthConstants;
-use Oxzion\Auth\AuthContext;
 use Oxzion\Service\AbstractService;
-use Oxzion\ValidationException;
 use Zend\Db\Adapter\AdapterInterface;
 use Oxzion\Messaging\MessageProducer;
+use Oxzion\ServiceException;
 use Zend\Log\Logger;
 use Exception;
 
@@ -33,7 +31,7 @@ class FileIndexerService extends AbstractService
     public function getRelevantDetails($fileId)
     {
         if (isset($fileId)) {
-            $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entity_name,
+            $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
             file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,
             CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields
             from ox_file as file
@@ -86,8 +84,8 @@ class FileIndexerService extends AbstractService
 
         //Need to store file data seperately as its a json string and perform actions on the same
         $data = $indexedData = null;
-
-        if ($result) {
+        
+        if (isset($result[0]) && isset($result[0]['id'])) {
             $app_name = $result[0]['app_name'];
             $indexedData = $this->getAllFieldsWithCorrespondingValues($result[0]);
             $this->logger->info("\nINDEXED DATA :".print_r($indexedData, true));
@@ -96,23 +94,28 @@ class FileIndexerService extends AbstractService
             return $indexedData;
         } else {
             // Handle empty file data in case of some error
-            return null;
+            throw new ServiceException("Incorrect file uuid specified", "file.uuid.incorrect");        
         }
     }
 
-    public function deleteDocument($fileId)
+    public function deleteDocument($fileUUId)
     {
-        $sql = $this->getSqlObject();
-        $select = $sql->select();
-        $select->from('ox_app')
-        ->columns(array('name'))->join('ox_form', 'ox_form.app_id = ox_app.id', array(), 'inner')->join('ox_file', 'ox_file.form_id = ox_form.id', array(), 'inner')
-        ->where(array('ox_file.id' => $fileId));
-        $response = $this->executeQuery($select)->toArray();
+        $this->logger->info("In FileIndexer Delete. Id:".$fileUUId);
+        $select = "SELECT file.id as id,app.name as name
+        from ox_file as file
+        INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
+        INNER JOIN ox_app as app on entity.app_id = app.id
+        where file.uuid = :uuid";
+        $params = array('uuid' => $fileUUId);
+        $response = $this->executeQuerywithBindParameters($select, $params)->toArray();
+        
         if (count($response) == 0) {
             return 0;
         }
         $app_name = $response[0]['name'];
         if (isset($app_name)) {
+            $fileId = $response[0]['id'];
+            $this->logger->info("Sennding Elastic Delete Message for fileid:".$fileId);
             $this->messageProducer->sendQueue(json_encode(array('index'=>  $app_name.'_index','id' => $fileId, 'operation' => 'Delete', 'type' => '_doc')), 'elastic');
             return array('fileId' => $fileId);
         }
@@ -168,7 +171,7 @@ class FileIndexerService extends AbstractService
                     $select = 'SELECT file.id from ox_file as file
                     INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
                     INNER JOIN ox_app as app on entity.app_id = app.id
-                    where file.id in ('.$fileIds.') AND app.id ='.$appID.' and file.is_active = 1';
+                    where file.id in ('.$fileIds.') AND app.id ='.$appID.' and file.is_active = 0';
                     $list = $this->executeQuerywithParams($select)->toArray();
                     $deleteIdList = array_column($list, 'id');
 
@@ -215,6 +218,26 @@ class FileIndexerService extends AbstractService
         return $databody;
     }
 
+    private function checkTypeAndReturnDefault($value) {
+        switch($value) {
+            case 'date':
+            case 'boolean':
+            case 'datetime':
+            case 'numeric':
+                return null;
+                break;
+            case 'document':
+            case 'json':
+            case 'list':
+            case 'longtext':
+                return '';
+                break;
+            default:
+                return null;
+                break;
+        }
+    }
+
     public function getAllFieldsWithCorrespondingValues($result)
     {
         $entityId = $result['entity_id'];
@@ -222,23 +245,23 @@ class FileIndexerService extends AbstractService
         $data = json_decode($result['file_data'], true);
 
         //get all fields for a particular entity
-        $selectFields = "Select name from ox_field where entity_id = :entity_id AND parent_id IS NULL AND data_type NOT IN ('file')";
+        $selectFields = "Select name,data_type from ox_field where entity_id = :entity_id AND parent_id IS NULL AND data_type NOT IN ('file') AND isdeleted = 0";
         $params = array('entity_id' => $entityId);
         $fieldResult = $this->executeQuerywithBindParameters($selectFields, $params)->toArray();
-        $fieldArray = array_column($fieldResult, 'name');
+        $fieldArray = array_column($fieldResult, 'data_type','name');
         $toBeIndexedArray = array();
         //storing the values for each field from the file data
         foreach ($fieldArray as $key => $value) {
-            if (array_key_exists($value, $data)) {
+            if (array_key_exists($key, $data)) {
                 //remove old data with no type - before data types was introduced
-                if (is_array($data[$value])) {
-                    $toBeIndexedArray[$value] = null;
-                    unset($data[$value]);
+                if (is_array($data[$key]) || $data[$key] === '[]') {
+                    $toBeIndexedArray[$key] = null;
+                    unset($data[$key]);
                     continue;
                 }
-                $toBeIndexedArray[$value] = $data[$value];
+                $toBeIndexedArray[$key] = (isset($data[$key]) && !empty($data[$key])) ?$data[$key] : $this->checkTypeAndReturnDefault($value);
             } else {
-                $toBeIndexedArray[$value] = null;
+                $toBeIndexedArray[$key] = null;
             }
         }
         unset($result['file_data']);

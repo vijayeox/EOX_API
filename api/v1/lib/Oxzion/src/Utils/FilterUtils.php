@@ -69,12 +69,13 @@ class FilterUtils
         $where = "";
         for ($x = 0; $x < sizeof($filterList); $x++) {
             if (!isset($filterList[$x]['operator'])) {
-                print_r($filterList);
-                exit;
                 continue;
             }
             $operator = $filterList[$x]['operator'];
             $field = $filterList[$x]['field'];
+            if(empty($field)){
+                continue;
+            }
             $field = isset($fieldMap[$field]) ? $fieldMap[$field] : $field;
             $value = $filterList[$x]['value'];
             $operatorp1 = '';
@@ -204,6 +205,9 @@ class FilterUtils
         foreach ($sort as $key => $value) {
             if ($value['dir'] == 'dsc') {
                 $value['dir'] = 'desc';
+            }
+            if(empty($value['field'])){
+                continue;
             }
             $value['field'] = isset($fieldMap[$value['field']]) ? $fieldMap[$value['field']] : $value['field'];
             $sSort .= strlen($sSort) == 0 ? $value['field'] . " " . $value['dir'] : " ," . $value['field'] . " " . $value['dir'];

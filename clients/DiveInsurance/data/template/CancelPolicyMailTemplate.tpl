@@ -3,7 +3,8 @@
             <div style='width:100%;background:#452767;color:#fff;height:35px;margin-bottom:2px'>
             </div>
             <div style='line-height: 24px'>Dear {$lastname}, {$firstname}{if isset($initial)}, {$initial}{/if}, <br/><br/>
-			<p>Your PADI Endorsed Professional Liability insurance has been canceled effective 12:01 a.m. {$cancelDate|date_format:"%m/%d/%Y"} due to {if $reasonforCsrCancellation == 'nonPaymentOfPremium'}
+			<p>Your PADI Endorsed {if $product == "Individual Professional Liability" || $product == "Emergency First Response"}Professional Liability
+			{elseif $product == "Dive Store"}Dive Store{/if} Insurance has been canceled effective 12:01 a.m. {$cancelDate|date_format:"%m/%d/%Y"} due to {if $reasonforCsrCancellation == 'nonPaymentOfPremium'}
 				Non-payment of installment premium. 
 			{elseif $reasonforCsrCancellation == 'padiMembershipNotCurrent'}
 				PADI Membership is not current.
@@ -17,7 +18,10 @@
 				Per your request - Business Closed.
 			{elseif $reasonforCsrCancellation == 'others'}
 				{$othersCsr}
+			{else}
+				{$reasonforCsrCancellation}
 			{/if}
+			{if isset($reinstatementCriteria)}
 			</p>To reinstate your coverage, with no lapse, we need the following within 10days.<br/>
 				<center>{assign var=reasons value=$reinstatementCriteria|json_decode:true}
 				{assign var=count value=$reasons|@sizeof}
@@ -28,6 +32,7 @@
 				<br/><br/>
 				<p>If you have any questions feel free to give us a call or send us an email.</p>
 			 <br/>
+			 {/if}
 
             </div>
 

@@ -5,8 +5,22 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
   overflow-y: visible !important;
 }
 
+.osjs-panel-item--icon.in-window{
+  display: none;
+}
+
+.osjs-window-icon{
+  div{
+    display: none;
+  }
+}
+
 .swal2-shown {
   overflow: visible !important;
+}
+
+.swal2-title {
+  white-space: pre-line;
 }
 
 .swal2-icon.swal2-warning::before {
@@ -27,6 +41,10 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
   $secondary: #55b089;
   $secondary-dark: #282b2d;
   $secondary-light-grey: #7b7878;
+
+  .osjs-window-title{
+    color: $primary-color;
+  }
 
   .formContent {
     height: 100%;
@@ -99,6 +117,97 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
     }
   }
 
+  .hideModelLabel {
+    .formio-component-modal-wrapper {
+      div[ref="openModalWrapper"] {
+        br {
+          display: none;
+        }
+        label.control-label {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .locationsDataGrid {
+    .form-group {
+      padding-bottom: 5px;
+      margin-bottom: 5px;
+    }
+    tr[ref="datagrid-locations-row"] {
+      td[ref="datagrid-locations"] {
+        padding: 0.5rem;
+        padding-top: 7px !important;
+      }
+    }
+    tr[ref="datagrid-buildings-row"] {
+      td[ref="datagrid-buildings"] {
+        padding: 0.5rem;
+        padding-top: 7px !important;
+      }
+    }
+    .formio-component-modal-wrapper-well {
+      height: 35px;
+      div[ref="openModalWrapper"] {
+        label.control-label {
+          display: none;
+        }
+        br {
+          display: none;
+        }
+      }
+    }
+
+    .locHidden {
+      display: none;
+    }
+    .addBuildingButton {
+      padding-bottom: 5px;
+      height: 35px;
+    }
+  }
+
+  .dolModel {
+    .card-body:first-child {
+      padding-bottom: 0px;
+    }
+  }
+
+  .dolContainer {
+    margin-bottom: 0px;
+  }
+
+  .listViewTitles {
+    text-align: center;
+  }
+
+  // .formio-component-pollutionLiabilityUnderwritingSurvey,
+  // .formio-component-underwritesurvey {
+  //   tr:first-child {
+  //     td {
+  //       // style only first td
+  //       width: 50%;
+  //     }
+  //   }
+  // }
+
+  .financeDataGrid {
+    tr {
+      td {
+        padding: 0.5rem;
+        padding-top: 7px !important;
+        .financialColumns .firstLineFinancials {
+          height: 36px;
+        }
+      }
+    }
+    .locationSumColumn > div.col-md-push-0 {
+      padding: 10px;
+      // height: 46px;
+    }
+  }
+
   .table.datagrid-table.table-bordered {
     th {
       background-color: $primary-color;
@@ -109,7 +218,7 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
     background-color: $secondary;
   }
 
-  .formio-component-modal-wrapper.formio-component-modal-wrapper-panel {
+  .formio-component-modal-wrapper {
     .formio-dialog-close.float-right.btn.btn-secondary {
       background-color: $primary-color;
       border: solid 4px lightgray;
@@ -168,6 +277,61 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
   .policyStatusFailed {
     background-color: #ec5b4f;
     color: white;
+  }
+
+  .btn-wizard-nav-submit {
+    display: none;
+  }
+
+  .producerCode {
+    text-align: right;
+    color: #212529;
+    padding: 8px;
+    padding-right:10px;
+    margin: 5px;
+    border-radius: 5px;
+    font-size: small;
+    border:2px black solid;
+  }
+  .totalClaimsAmount {
+    text-align: center;
+    color: #212529;
+    background-color: $secondary;
+    padding: 8px;
+    border-radius: 25px;
+  }
+
+  .totalClaimsAmountMini {
+    text-align: center;
+    color: #212529;
+    background-color: $secondary;
+    padding: 4px;
+    border-radius: 20px;
+  }
+
+  .claimsMiniListView {
+    .k-header.k-grid-toolbar {
+      background-color: $primary-color;
+      color: #f8f9fa;
+      padding: 0.65rem 1.25rem;
+      .namedInsuredtext {
+        font-family: "Lato", sans-serif;
+        margin-bottom: 0px;
+        font-size: 15px;
+      }
+    }
+  }
+
+  .Navigation .appButtons {
+    height: 85%;
+    .moduleBtn {
+      .titles {
+        color: $primary-color;
+      }
+      .block {
+        background-color: $primary-color;
+      }
+    }
   }
 
   .formLoader {

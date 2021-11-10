@@ -1,0 +1,31 @@
+@font-face {
+  font-family: "Gotham";
+  src: url(./font/Gotham/Gotham-Light.otf) format("opentype");
+}
+//Colors
+// $primary: #55B089;
+$primary: #263746;
+$purple: #835d86;
+$blue: #4495d1;
+$green: #319966;
+$grey: #575757;
+$secondary: #0678d5;
+$soft: #eaeaea;
+$arctic-gray: #e3e3e3;
+$charcoal-gray: #757584;
+$hopeful-green: #3ebd3e;
+$royal-blue: #1818b5;
+$shocking-blue: #00aeef;
+
+//Neturals
+$text: #333333;
+$black: #18252d;
+$white: #ffffff;
+
+//Layout Variables
+$bdr-rad: 4px;
+$shadow: rgba(0, 0, 0, 0.1);
+$font: "Gotham";
+
+//Misc
+@import url("https://fonts.googleapis.com/css?family=Lato:400,400i,700,900");

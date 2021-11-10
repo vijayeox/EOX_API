@@ -1,0 +1,1099 @@
+app:
+    name: HubDrive
+    uuid: a4b1f073-fc20-477f-a804-1aa206938c42
+    description: HubDriveOnline
+    category: EXAMPLE_CATEGORY
+    type: 2
+    autostart: true
+    status: 4
+    isdefault: false
+    logo: default_app.png
+    start_options: null
+    title: HubDriveOnline
+    app_properties: '{"chat_notification":"","appIdentifiers":""}'
+org:
+    -
+        name: HUB
+        uuid: 5060e4d5-006a-4054-85c0-bbf78579412d
+        email: admin@hub.com
+        address1: '6 bCenterpoint'
+        address2: Dr.
+        city: 'La Palma'
+        state: CA
+        zip: 90623
+        country: 'United States of America'
+        contact:
+            username: HubAdmin
+            firstname: Admin
+            lastname: User
+            email: admin@hub.com
+        preferences: '{}'
+    -
+        name: OnTrac
+        uuid: 6b88905a-fa7b-47a4-af18-a5eed6ade5c5
+        email: admin@OnTrac.com
+        address1: Addr1
+        address2: Addr2
+        city: City
+        state: CA
+        zip: 90623
+        country: 'United States of America'
+        contact:
+            username: OnTracAdmin
+            firstname: Admin
+            lastname: User
+            email: admin@OnTrac.com
+        businessOffering:
+            -
+                businessRole: 'Contract Carrier - Compliance only'
+                entity:
+                    - Compliance
+        preferences: '{}'
+    -
+        name: IGGI
+        uuid: 48037656-b78e-11eb-8529-0242ac130003
+        email: admin@Iggi.com
+        address1: 'IGGI Addr1'
+        address2: 'IGGI Addr2'
+        city: 'IGGI City'
+        state: CA
+        zip: 90623
+        country: 'United States of America'
+        contact:
+            username: IggiAdmin
+            firstname: Admin
+            lastname: User
+            email: admin@Iggi.com
+        businessOffering:
+            -
+                businessRole: 'Contract Carrier'
+                entity:
+                    - 'Independent Contractor Onboarding'
+        preferences: '{}'
+businessRole:
+    -
+        name: 'Insurance Carrier'
+        uuid: 19d8f4c3-e79d-425b-9e23-e1fc3808cfdd
+    -
+        name: 'Contract Carrier'
+        uuid: f55f36c4-00d8-48f3-851d-793274658b37
+    -
+        name: 'Independent Contractor'
+        uuid: f915fe2a-790e-4940-a576-5b1001febdd3
+    -
+        name: Driver
+        uuid: eee9f35d-acef-4b38-81b5-f48be17acc7a
+    -
+        name: 'Contract Carrier - Compliance only'
+        uuid: b01e2f50-0d65-4940-9070-62ed710dd2ca
+privilege:
+    -
+        name: MANAGE_COMPLIANCE
+        permission: 3
+    -
+        name: MANAGE_UNDERWRITING
+        permission: 3
+    -
+        name: MANAGE_ACCOUNT_MANAGER
+        permission: 3
+    -
+        name: MANAGE_AGENCY
+        permission: 3
+    -
+        name: MANAGE_VERIFIERS
+        permission: 3
+    -
+        name: MANAGE_EXECUTIVE
+        permission: 3
+    -
+        name: MANAGE_IC
+        permission: 3
+    -
+        name: MANAGE_EMPLOYEE
+        permission: 3
+role:
+    -
+        name: 'Manage Executive'
+        privileges:
+            -
+                privilege_name: MANAGE_EXECUTIVE
+                permission: 3
+        uuid: caddaf9f-64eb-4e57-8176-3647a59ecbc4
+        businessRole:
+            name: 'Insurance Carrier'
+    -
+        name: 'Safety Director'
+        privileges:
+            -
+                privilege_name: MANAGE_COMPLIANCE
+                permission: 3
+        uuid: 18ed4d29-7188-482e-b544-67797c319935
+        businessRole:
+            name: 'Insurance Carrier'
+    -
+        name: 'Manage Underwriting'
+        privileges:
+            -
+                privilege_name: MANAGE_UNDERWRITING
+                permission: 3
+        uuid: 8cd179eb-3787-43a3-8446-73aca036284a
+        businessRole:
+            name: 'Insurance Carrier'
+    -
+        name: 'Account Manager'
+        privileges:
+            -
+                privilege_name: MANAGE_ACCOUNT_MANAGER
+                permission: 3
+        uuid: 99eaa419-0622-438b-b1b5-e21186394681
+        businessRole:
+            name: 'Insurance Carrier'
+    -
+        name: 'Compliance Manager'
+        privileges:
+            -
+                privilege_name: MANAGE_COMPLIANCE
+                permission: 3
+        uuid: 2d0ef663-af0e-4f1c-a107-6f39605309b3
+        businessRole:
+            name: 'Insurance Carrier'
+    -
+        name: 'Manage Verifiers'
+        privileges:
+            -
+                privilege_name: MANAGE_VERIFIERS
+                permission: 3
+        uuid: b3dd84d1-ff31-403d-9e97-cdc02272df97
+        businessRole:
+            name: 'Insurance Carrier'
+    -
+        name: 'Manage Executives'
+        default: true
+        privileges:
+            -
+                privilege_name: MANAGE_EXECUTIVE
+                permission: 3
+        uuid: efcbf9d6-b867-4810-a88d-8c5d01c11067
+        businessRole:
+            name: 'Contract Carrier'
+    -
+        name: 'Compliance Manager'
+        default: true
+        privileges:
+            -
+                privilege_name: MANAGE_COMPLIANCE
+                permission: 3
+        uuid: 7d73ada4-8e1c-436d-8c27-17503ac7e254
+        businessRole:
+            name: 'Contract Carrier - Compliance only'
+    -
+        name: 'Safety Director'
+        privileges:
+            -
+                privilege_name: MANAGE_COMPLIANCE
+                permission: 3
+        uuid: 907cbcb3-51e8-4c36-8699-72821b3bab5f
+        businessRole:
+            name: 'Contract Carrier'
+    -
+        name: 'Manage Independent Contractor'
+        default: true
+        privileges:
+            -
+                privilege_name: MANAGE_IC
+                permission: 3
+        uuid: 6880de61-40bd-4439-89a9-849a08b24696
+        businessRole:
+            name: 'Contract Carrier'
+    -
+        name: 'Manage Employee'
+        privileges:
+            -
+                privilege_name: MANAGE_EMPLOYEE
+                permission: 3
+        uuid: 14936671-5cba-4994-97cc-2c86c49a4a1e
+        businessRole:
+            name: 'Contract Carrier'
+    -
+        name: 'Manage Drivers'
+        privileges:
+            -
+                privilege_name: MANAGE_EMPLOYEE
+                permission: 3
+        uuid: d3ef9902-3bf8-4d70-8c79-129e6bc4e45c
+        businessRole:
+            name: 'Independent Contractor'
+entity:
+    -
+        name: 'Independent Contractor Onboarding'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: true
+        identifiers:
+            -
+                identifier: email
+        participantRole:
+            -
+                businessRole: 'Independent Contractor'
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                        useRowData: false
+            metadata: {  }
+        page_uuid: 788ee1ca-f850-4e2c-ae68-e20a85c0cdf0
+    -
+        name: 'Driver Application'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'HUB Incident Response Guide'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: Compliance
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        field:
+            -
+                name: attachments
+                text: Attachment
+                data_type: document
+            -
+                name: name
+                text: Name
+                index: true
+                data_type: text
+            -
+                name: iCEmail
+                text: Email
+                data_type: text
+                index: true
+            -
+                name: effectiveDate
+                data_type: datetime
+                index: true
+        identifiers:
+            -
+                identifier: iCEmail
+        participantRole:
+            -
+                businessRole: 'Independent Contractor'
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: true
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                        useRowData: false
+            metadata: {  }
+        page_uuid: 5a466ac9-e137-48ac-b999-c7e8a42be57e
+    -
+        name: 'Certificate Of Violations'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'Hired Non Owned'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'Common Violations'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'Telematics Policy And Procedure'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'FMCSR Commercial Vehicle'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'CDL Drug And Alcohol Clearinghouse Checklist'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'FMCSA Drug And Alcohol Clearing hous'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'DOT Drug And Alcohol Clearing house'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'clearing House Facts'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+    -
+        name: 'How To Survive A Dot Audit'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+pages:
+    -
+        uuid: 7074d8e0-a3a2-4d4c-8215-779ac4709f75
+        name: Dashboard
+        description: 'Shows dashboard'
+        content:
+            -
+                type: Dashboard
+                content:
+                    uuid: c0670ab4-8538-4f60-94ef-fde6a530775e
+                    toolbarTemplate: '<h5>List</h5>'
+                    operations:
+                        title: 'Insured App form'
+                        actions:
+                            -
+                                name: 'Insured Application form'
+                                rule: 'true'
+                                details:
+                                    -
+                                        type: Form
+                                        form_id: 385dea4d-64d6-487e-ac23-359c5265f791
+    -
+        name: 'Independent Contractors'
+        uuid: 8ebdefa5-531b-4390-9d8b-573d4b412744
+        description: 'Shows a list of Independent Contractors'
+        content:
+            -
+                type: List
+                content:
+                    route: file
+                    filterable: true
+                    defaultFilters: '{"filter": {"logic": "and","filters": [{"field": "entity_name","operator": "eq","value": "Independent Contractor Onboarding"}]},"sort": [{"field": "date_created","dir": "desc"}]}'
+                    resizable: true
+                    refreshButton: true
+                    pageable:
+                        buttonCount: 3
+                        pageSizes:
+                            - 10
+                            - 20
+                            - 50
+                        info: true
+                    sortable:
+                        allowUnsort: true
+                        mode: single
+                    actions:
+                        -
+                            name: View
+                            icon: 'fa fa-eye'
+                            rule: 'true'
+                            details:
+                                -
+                                    type: EntityViewer
+                                    page_id: ''
+                                    htmlContent: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                                    externalDataSource: ''
+                                    formSource: ''
+                                    form_name: {  }
+                                    formUrl: ''
+                                    urlPostParams: ''
+                                    dashboard_uuid: ''
+                                    url: ''
+                                    content: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                                    useRowData: false
+                            paramsDuplicate:
+                                -
+                                    parameterKey: ''
+                                    parameterValue: ''
+                            contentDuplicate:
+                                data:
+                                    content:
+                                        -
+                                            type: EntityViewer
+                                            page_id: ''
+                                            htmlContent: ''
+                                            externalDataSource: ''
+                                            formSource: ''
+                                            form_name: {  }
+                                            formUrl: ''
+                                            urlPostParams: ''
+                                            dashboard_uuid: ''
+                                            url: ''
+                                            content: ''
+                                            useRowData: false
+                                    listActionContent: true
+                                    listAction: true
+                                metadata: {  }
+                            defaultAction: true
+                        -
+                            name: Edit
+                            rule: 'false'
+                            details:
+                                -
+                                    type: Form
+                                    form_id: 02510bad-981c-43a9-a83d-c7436c9aba1a
+                                    fileId: '{{uuid}}'
+                            icon: 'far fa-pencil-alt'
+                        -
+                            name: Edit
+                            rule: 'false'
+                            details:
+                                -
+                                    type: Form
+                                    form_id: cfc8cd3f-58c4-400f-b9f1-e1916506f5e6
+                                    fileId: '{{uuid}}'
+                            icon: 'far fa-pencil-alt'
+                    operations:
+                        title: 'Create Independent Contractor'
+                        actions:
+                            -
+                                name: 'Create New PartTime IC'
+                                icon: 'fa fa-plus'
+                                rule: 'true'
+                                details:
+                                    -
+                                        type: Form
+                                        form_id: 02510bad-981c-43a9-a83d-c7436c9aba1a
+                            -
+                                name: 'Create New FullTime IC'
+                                icon: 'fa fa-plus'
+                                rule: 'true'
+                                details:
+                                    -
+                                        type: Form
+                                        form_id: cfc8cd3f-58c4-400f-b9f1-e1916506f5e6
+                    columnConfig:
+                        -
+                            title: Name
+                            field: name
+                        -
+                            title: Status
+                            field: status
+                        -
+                            title: 'Policy Effective Date'
+                            field: effectiveDate
+                            cell: '<td>{formatDate(item.effectiveDate)}</td>'
+                            filter: date
+                            filterFormat: YYYY-MM-DD
+    -
+        name: 'Independent Contractor View'
+        uuid: 1cc7f23c-539b-488d-97da-1f02f7dc2090
+        description: 'Shows the Independent Contractor'
+        content:
+            -
+                type: List
+                content:
+                    route: file
+                    filterable: true
+                    defaultFilters: '{"filter": {"logic": "and","filters": [{"field": "entity_name","operator": "eq","value": "Independent Contractor Onboarding"}]},"sort": [{"field": "date_created","dir": "desc"}]}'
+                    resizable: true
+                    refreshButton: true
+                    pageable:
+                        buttonCount: 3
+                        pageSizes:
+                            - 10
+                            - 20
+                            - 50
+                        info: true
+                    sortable:
+                        allowUnsort: true
+                        mode: single
+                    actions:
+                        -
+                            name: View
+                            icon: 'fa fa-eye'
+                            rule: 'true'
+                            details:
+                                -
+                                    type: EntityViewer
+                                    page_id: ''
+                                    htmlContent: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                                    externalDataSource: ''
+                                    formSource: ''
+                                    form_name: {  }
+                                    formUrl: ''
+                                    urlPostParams: ''
+                                    dashboard_uuid: ''
+                                    url: ''
+                                    content: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                                    useRowData: false
+                            paramsDuplicate:
+                                -
+                                    parameterKey: ''
+                                    parameterValue: ''
+                            contentDuplicate:
+                                data:
+                                    content:
+                                        -
+                                            type: EntityViewer
+                                            page_id: ''
+                                            htmlContent: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                                            externalDataSource: ''
+                                            formSource: ''
+                                            form_name: {  }
+                                            formUrl: ''
+                                            urlPostParams: ''
+                                            dashboard_uuid: ''
+                                            url: ''
+                                            content: '<table style="width:100%"><tr><th>Name</th><th>Status</th></tr><tr><td>{data.name}</td><td>{data.status}</td></tr></table>'
+                                            useRowData: false
+                                    listActionContent: true
+                                    listAction: true
+                                metadata: {  }
+                            defaultAction: true
+                        -
+                            name: Edit
+                            rule: 'false'
+                            details:
+                                -
+                                    type: Form
+                                    form_id: 02510bad-981c-43a9-a83d-c7436c9aba1a
+                                    fileId: '{{uuid}}'
+                            icon: 'far fa-pencil-alt'
+                        -
+                            name: Edit
+                            rule: 'false'
+                            details:
+                                -
+                                    type: Form
+                                    form_id: cfc8cd3f-58c4-400f-b9f1-e1916506f5e6
+                                    fileId: '{{uuid}}'
+                            icon: 'far fa-pencil-alt'
+                    columnConfig:
+                        -
+                            title: Name
+                            field: name
+    -
+        name: 'View Compliances'
+        uuid: d81809b0-bd0f-11eb-8529-0242ac130003
+        description: 'Shows a list of Compliances'
+        content:
+            -
+                type: List
+                content:
+                    route: file
+                    filterable: true
+                    defaultFilters: '{"filter": {"logic": "and","filters": [{"field": "entity_name","operator": "eq","value": "Compliance"}]},"sort": [{"field": "date_created","dir": "desc"}]}'
+                    resizable: true
+                    refreshButton: true
+                    pageable:
+                        buttonCount: 3
+                        pageSizes:
+                            - 10
+                            - 20
+                            - 50
+                        info: true
+                    sortable:
+                        allowUnsort: true
+                        mode: single
+                    actions:
+                        -
+                            name: View
+                            icon: 'fa fa-eye'
+                            rule: 'true'
+                            details:
+                                -
+                                    type: EntityViewer
+                                    page_id: ''
+                                    htmlContent: ''
+                                    externalDataSource: ''
+                                    formSource: ''
+                                    form_name: {  }
+                                    formUrl: ''
+                                    urlPostParams: ''
+                                    dashboard_uuid: ''
+                                    url: ''
+                                    content: ''
+                                    useRowData: false
+                            paramsDuplicate:
+                                -
+                                    parameterKey: ''
+                                    parameterValue: ''
+                            contentDuplicate:
+                                data:
+                                    content:
+                                        -
+                                            type: EntityViewer
+                                            page_id: ''
+                                            htmlContent: ''
+                                            externalDataSource: ''
+                                            formSource: ''
+                                            form_name: {  }
+                                            formUrl: ''
+                                            urlPostParams: ''
+                                            dashboard_uuid: ''
+                                            url: ''
+                                            content: ''
+                                            useRowData: false
+                                    listActionContent: true
+                                    listAction: true
+                                metadata: {  }
+                            defaultAction: true
+                        -
+                            name: Edit
+                            rule: 'row.status == "Pending Review" || row.status == "Review"'
+                            details:
+                                -
+                                    type: Form
+                                    form_id: e26bd719-f47f-455b-9be4-9b26c18a0b78
+                                    fileId: '{{uuid}}'
+                            icon: 'far fa-pencil-alt'
+                    operations:
+                        title: 'Create Compliance'
+                        icon: 'fa fa-plus'
+                        actions:
+                            -
+                                name: 'Create New Compliance'
+                                icon: 'fa fa-plus'
+                                rule: 'true'
+                                details:
+                                    -
+                                        type: Form
+                                        form_id: e26bd719-f47f-455b-9be4-9b26c18a0b78
+                    columnConfig:
+                        -
+                            title: Name
+                            field: name
+                        -
+                            title: Status
+                            field: status
+                        -
+                            title: 'Policy Effective Date'
+                            field: effectiveDate
+                            cell: '<td>{formatDate(item.effectiveDate)}</td>'
+                            filter: date
+                            filterFormat: YYYY-MM-DD
+menu:
+    -
+        name: 'Independent Contractor'
+        icon: 'fas fa-list'
+        page_uuid: 8ebdefa5-531b-4390-9d8b-573d4b412744
+        uuid: 00a0c261-4283-4eb3-85db-753692c27172
+        privilege: MANAGE_IC
+    -
+        name: 'Independent Contractor'
+        icon: 'fas fa-list'
+        page_uuid: 1cc7f23c-539b-488d-97da-1f02f7dc2090
+        uuid: 86ebed31-7acf-4a98-993b-830c440d2bca
+        privilege: '{"eq" : "MANAGE_EMPLOYEE_READ","neq" : "MANAGE_IC_READ"}'
+    -
+        name: Compliance
+        icon: 'fas fa-list'
+        page_uuid: d81809b0-bd0f-11eb-8529-0242ac130003
+        uuid: d8180a96-bd0f-11eb-8529-0242ac130003
+        privilege: MANAGE_COMPLIANCE
+form:
+    -
+        name: 'Compliance CheckList Form'
+        uuid: e26bd719-f47f-455b-9be4-9b26c18a0b78
+        description: Compliance
+        template_file: hubComplianceChecklist.json
+        entity: Compliance
+    -
+        name: 'Part Time IC Registration Form'
+        uuid: 02510bad-981c-43a9-a83d-c7436c9aba1a
+        description: 'Onboarding IC'
+        template_file: partTimeICRegistration.json
+        entity: 'Independent Contractor Onboarding'
+    -
+        name: 'Full Time IC Registration Form'
+        uuid: cfc8cd3f-58c4-400f-b9f1-e1916506f5e6
+        description: 'Onboarding IC'
+        template_file: fullTimeICRegistration.json
+        entity: 'Independent Contractor Onboarding'
+    -
+        name: 'Driver Employement Application Form'
+        uuid: 6c7d8cff-a5ec-4921-b182-75253f734712
+        description: 'Driver Employement Application form'
+        template_file: driverEmployementApplication.json
+        entity: 'Driver Employement Application'
+    -
+        name: 'COI Checklist Form'
+        uuid: f7d6c928-e45c-4978-b321-2e612c67e756
+        description: 'COI Checklist form'
+        template_file: coiChecklistForm.json
+        entity: 'Driver Checklist'
+    -
+        name: 'Certificate Of Violations'
+        uuid: 72ba695b-73e4-439f-8a78-20e8a8628a50
+        description: 'Certificate Of Violations'
+        template_file: certificateOfViolations.json
+        entity: 'Independent Contractor Pages'
+    -
+        name: 'Hired Non Owned'
+        uuid: 7648dafe-cf9b-4d6d-bad2-4a1f3d4fc16c
+        description: 'Hired Non Owned'
+        template_file: hiredNonOwned.json
+        entity: 'Hired Non Owned'
+    -
+        name: 'Common Violations'
+        uuid: a286dfbd-5ce2-446f-a3ca-8d8d6a90408a
+        description: 'Common Violations'
+        template_file: commonViolations.json
+        entity: 'Common Violations'
+    -
+        name: 'Telematics Policy And Procedure'
+        uuid: b2224391-2017-42de-a4d5-f4d7b8719afe
+        description: 'CTelematics Policy And Procedure'
+        template_file: telematicsPolicyAndProcedure.json
+        entity: 'Telematics Policy And Procedure'
+    -
+        name: 'FMCSR Commercial Vehicle'
+        uuid: 3a9c32a8-cc02-49b0-91bd-61d91b04d27b
+        description: 'FMCSR Commercial Vehicle'
+        template_file: fmcsrCommercialVehicle.json
+        entity: 'FMCSR Commercial Vehicle'
+    -
+        name: 'CDL Drug And Alcohol Clearinghouse Checklist'
+        uuid: 011c261c-4223-4aaa-bc99-002b037184fd
+        description: 'CDL Drug And Alcohol Clearinghouse Checklist'
+        template_file: cdlDrugAndAlcoholClearinghouseChecklist.json
+        entity: 'CDL Drug And Alcohol Clearinghouse Checklist'
+    -
+        name: 'FMCSA Drug And Alcohol Clearing Hous'
+        uuid: 12b378fb-fdd3-49f2-99f0-1c688923bd2c
+        description: 'FMCSA Drug And Alcohol Clearing Hous'
+        template_file: fmcsaDrugAndAlcoholClearinghouse.json
+        entity: 'FMCSA Drug And Alcohol Clearing hous'
+    -
+        name: 'DOT Drug And Alcohol Clearing house'
+        uuid: df8954cb-d4d3-4856-8d55-37e87e71829f
+        description: 'DOT Drug And Alcohol Clearing house'
+        template_file: dotDrugAlcoholClearinghouse.json
+        entity: 'DOT Drug And Alcohol Clearing house'
+    -
+        name: 'clearing House Facts'
+        uuid: cffb5747-8f44-4038-baf8-c5488b7ec94d
+        description: 'clearing House Facts'
+        template_file: clearinghouseFacts.json
+        entity: 'clearing House Facts'
+    -
+        name: 'How To Survive A Dot Audit'
+        uuid: 9ccee23a-e134-47aa-9736-0c022a29a0a8
+        description: 'How To Survive A Dot Audit'
+        template_file: howToSurviveADotAudit.json
+        entity: 'How To Survive A Dot Audit'

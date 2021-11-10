@@ -1,27 +1,24 @@
 <?php
 namespace Ims\Controller;
 
-use Exception;
-use Oxzion\Service\ImsService;
-use Zend\Db\Adapter\AdapterInterface;
+use Oxzion\Insurance\InsuranceService;
 use Oxzion\Controller\AbstractApiController;
 
 class AbstractController extends AbstractApiController
 {
     protected $imsService;
-    public function __construct(ImsService $imsService, string $functionClass)
+    public function __construct(InsuranceService $insuranceService, String $handle)
     {
         parent::__construct();
-        $this->imsService = $imsService;
-        $this->imsService->setSoapClient($functionClass);
+        $this->imsService = $insuranceService->getService('IMS', ['handle' => $handle]);
     }
 
     public function getFunctionStructureAction()
     {
         try {
-            $params = $this->params()->fromRoute();
-            $response = $this->imsService->getFunctionStructure($params['operation']);
-        } catch (Exception $e) {
+            $route = $this->params()->fromRoute();
+            $response = $this->imsService->getFunctionStructure($route['operation']);
+        } catch (\Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
@@ -31,9 +28,14 @@ class AbstractController extends AbstractApiController
     public function getList()
     {
         try {
+            $route = $this->params()->fromRoute();
             $params = $this->params()->fromQuery();
-            $response = $this->imsService->search($params);
-        } catch (Exception $e) {
+            if (isset($route['operation'])) {
+                $response = $this->imsService->perform($route['operation'], $params);
+            } else {
+                $response = $this->imsService->search($params);
+            }
+        } catch (\Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
@@ -43,11 +45,17 @@ class AbstractController extends AbstractApiController
     public function create($data)
     {
         try {
-            $response = $this->imsService->create($data);
-        } catch (Exception $e) {
+            $route = $this->params()->fromRoute();
+            if (isset($route['operation'])) {
+                $response = $this->imsService->perform($route['operation'], $data);
+            } else {
+                $response = $this->imsService->create($data);
+            }
+        } catch (\Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
         return $this->getSuccessResponseWithData($response, 201);
     }
+
 }

@@ -41,6 +41,10 @@ class Module implements ConfigProviderInterface
                     $dbAdapter = $container->get(AdapterInterface::class);
                     return new Service\ChatService($container->get('config'), $dbAdapter, $container->get(\Oxzion\Service\FileService::class), $container->get(\Oxzion\Service\SubscriberService::class), $container->get(\Oxzion\Service\CommentService::class), $container->get(\Oxzion\Service\UserService::class));
                 },
+                Service\CommentsService::class => function ($container) {
+                    $dbAdapter = $container->get(AdapterInterface::class);
+                    return new Service\CommentsService($container->get('config'), $dbAdapter, $container->get(\Oxzion\Service\FileService::class), $container->get(\Oxzion\Service\SubscriberService::class), $container->get(\Oxzion\Service\CommentService::class), $container->get(\Oxzion\Service\UserService::class), $container->get(\Callback\Service\ChatService::class));
+                },
                 Service\CRMService::class => function ($container) {
                     return new Service\CRMService($container->get('config'), $container->get(\Contact\Service\ContactService::class), $container->get(UserService::class));
                 },
@@ -96,6 +100,9 @@ class Module implements ConfigProviderInterface
                 },
                 Controller\CommunicationCallbackController::class => function ($container) {
                     return new Controller\CommunicationCallbackController();
+                },
+                Controller\CommentController::class => function ($container) {
+                    return new Controller\CommentController($container->get(Service\CommentsService::class));
                 },
             ],
         ];

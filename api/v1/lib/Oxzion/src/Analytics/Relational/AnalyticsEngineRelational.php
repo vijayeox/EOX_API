@@ -57,7 +57,7 @@ abstract class AnalyticsEngineRelational extends AnalyticsAbstract
         }
     }
 
-    private function formatQuery($parameters)
+    public function formatQuery($parameters)
     {
         $range=null;
         $field = null;

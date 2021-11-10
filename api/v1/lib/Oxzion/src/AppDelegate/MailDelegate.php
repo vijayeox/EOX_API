@@ -16,8 +16,8 @@ abstract class MailDelegate extends CommunicationDelegate
     protected function sendMail(array $data, string $template, array $mailOptions)
     {
         $this->logger->info("SEND MAIL ----".print_r($data, true));
-        $orgUuid = isset($data['orgUuid']) ? $data['orgUuid'] : (isset($data['orgId']) ? $data['orgId'] : AuthContext::get(AuthConstants::ORG_UUID));
-        $data['orgUuid'] = $orgUuid;
+        $accountId = isset($data['orgUuid']) ? $data['orgUuid'] : (isset($data['accountId']) ? $data['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID));
+        $data['accountId'] = $accountId;
 
         $mailOptions['body'] = $this->templateService->getContent($template, $data);
         $userMail = $this->sendMessage($mailOptions, 'mail');

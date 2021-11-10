@@ -14,6 +14,7 @@ use Oxzion\OxServiceException;
 use Oxzion\EntityNotFoundException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\EntityService;
+use Oxzion\Service\AppRegistryService;
 use Oxzion\Utils\FileUtils;
 use Oxzion\Utils\FilterUtils;
 use Oxzion\Utils\UuidUtil;
@@ -32,6 +33,7 @@ class AccountService extends AbstractService
     private $privilegeService;
     private $organizationService;
     private $entityService;
+    private $appRegistryService;
     public static $userField = array('name' => 'ox_user.name', 'id' => 'ox_user.id', 'city' => 'ox_address.city', 'country' => 'ox_address.country', 'address' => 'ox_address.address1', 'address2' => 'ox_address.address2', 'state' => 'ox_address.state');
     public static $teamField = array('name' => 'oxg.name', 'description' => 'oxg.description', 'date_created' => 'oxg.date_created');
     public static $projectField = array('name' => 'oxp.name', 'description' => 'oxp.description', 'date_created' => 'oxp.date_created');
@@ -47,7 +49,7 @@ class AccountService extends AbstractService
     /**
      * @ignore __construct
      */
-    public function __construct($config, $dbAdapter, AccountTable $table, UserService $userService, RoleService $roleService, PrivilegeService $privilegeService, OrganizationService $organizationService, EntityService $entityService, MessageProducer $messageProducer)
+    public function __construct($config, $dbAdapter, AccountTable $table, UserService $userService, RoleService $roleService, PrivilegeService $privilegeService, OrganizationService $organizationService, EntityService $entityService, AppRegistryService $appRegistryService, MessageProducer $messageProducer)
     {
         parent::__construct($config, $dbAdapter);
         $this->table = $table;
@@ -58,6 +60,7 @@ class AccountService extends AbstractService
         $this->messageProducer = $messageProducer;
         $this->organizationService = $organizationService;
         $this->entityService = $entityService;
+        $this->appRegistryService = $appRegistryService;
     }
 
     /**
@@ -152,8 +155,8 @@ class AccountService extends AbstractService
         $params = $data;
         $params['preferences'] = array();
         $appId = null;
-        if (isset($params['app_id'])) {
-            $appId = $this->getAppId($params['app_id']);
+        if (isset($params['appId'])) {
+            $appId = $this->getAppId($params['appId']);
             $params['app_id'] = $appId;
         }
         if (!$appId) {
@@ -165,11 +168,11 @@ class AccountService extends AbstractService
             AuthContext::put(AuthConstants::REGISTRATION, true);
             $this->createAccount($params, null);
             $data['accountId'] = $params['uuid'];
+            $this->appRegistryService->createAppRegistry($this->getUuidFromId('ox_app', $appId),$data['accountId']);
             $this->setupBusinessRole($data, $data['accountId'], $this->getUuidFromId('ox_app', $appId));
             $this->roleService->createRolesByBusinessRole($data['accountId'], $appId);
             $user = $this->getContactUserForAccount($data['accountId']);
             $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
-
             $this->addIdentifierForAccount($appId, $params);
             $this->commit();
         } catch (Exception $e) {
@@ -239,9 +242,16 @@ class AccountService extends AbstractService
         if (!isset($appId) || !isset($params['businessRole'])) {
             return;
         }
-        $query = "delete from ox_account_business_role where account_id = :accountId";
+        //Remove foreign key constaint on business role
+        $query = "delete ox_account_offering from ox_account_offering 
+        inner join ox_account_business_role on ox_account_offering.account_business_role_id = ox_account_business_role.id 
+        where ox_account_business_role.account_id = :accountId";
         $queryParams = ["accountId" => $accountId];
         $resultSet = $this->executeUpdateWithBindParameters($query, $queryParams);
+        //Remove business role
+        $query2 = "delete from ox_account_business_role where account_id = :accountId";
+        $resultSet = $this->executeUpdateWithBindParameters($query, $queryParams);
+
         if (is_string($params['businessRole'])) {
             $businessRole = json_decode($params['businessRole'], true);
             $businessRole = [$params['businessRole']];
@@ -260,7 +270,7 @@ class AccountService extends AbstractService
         }
         $bRole .=")";
         
-        $query = "INSERT INTO ox_account_business_role (account_id, business_role_id)
+        $query = "INSERT IGNORE INTO ox_account_business_role (account_id, business_role_id)
                     SELECT ".$accountId.", id from ox_business_role 
                     WHERE app_id = :appId and name in $bRole";
                     
@@ -355,7 +365,7 @@ class AccountService extends AbstractService
                     INNER JOIN ox_account_user au on au.user_id = ou.id and au.account_id = acct.id
                     WHERE acct.uuid=:accountId";
         $selectParams = array("accountId" => $accountId);
-        $result = $this->executeQuerywithBindParameters($select, $selectParams)->toArray();
+        $result = $this->executeQueryWithBindParameters($select, $selectParams)->toArray();
         if (count($result) > 0) {
             return $result[0];
         } else {
@@ -383,9 +393,9 @@ class AccountService extends AbstractService
                     throw $e;
                 }
             }
+        } else {
+            $this->createAccount($accountData, null);
         }
-        
-        $this->createAccount($accountData, null);
     }
 
     /**
@@ -489,10 +499,15 @@ class AccountService extends AbstractService
 
     public function getAccountIdByUuid($uuid)
     {
-        $select = "SELECT id from ox_account where uuid = '" . $uuid . "'";
-        $result = $this->executeQueryWithParams($select)->toArray();
+        return $this->getIdFromUuid('ox_account', $uuid);
+    }
+
+    public function getAccountByName($name) {
+        $select = "SELECT uuid from ox_account where `name` = :name";
+        $params = ['name' => $name];
+        $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
         if (isset($result[0])) {
-            return $result[0]['id'];
+            return $result[0]['uuid'];
         } else {
             return null;
         }
@@ -605,55 +620,46 @@ class AccountService extends AbstractService
             $userSingleArray = array_unique(array_map('current', $userArray));
             $querystring = "SELECT u.username FROM ox_account_user as ouo
             inner join ox_user as u on u.id = ouo.user_id
-            inner join ox_account as account on ouo.account_id = account.id and account.id =" . $accountId . "
+            inner join ox_account as account on ouo.account_id = account.id
             where ouo.account_id =" . $accountId . " and ouo.user_id not in (" . implode(',', $userSingleArray) . ") and ouo.user_id != account.contactid";
             $deletedUser = $this->executeQuerywithParams($querystring)->toArray();
             $query = "SELECT ou.username from ox_user as ou 
-                        LEFT OUTER JOIN ox_account_user as our on our.user_id = ou.id 
-                                    AND our.account_id = ou.account_id and our.account_id =" . $accountId . "
-            WHERE ou.id in (" . implode(',', $userSingleArray) . ") AND our.account_id is Null and ou.id not in (select user_id from  ox_account_user where user_id in (" . implode(',', $userSingleArray) . ") and account_id =" . $accountId . ")";
+            LEFT OUTER JOIN ox_account_user as our on our.user_id = ou.id and our.account_id =" . $accountId . "
+            WHERE ou.id in (" . implode(',', $userSingleArray) . ") AND our.account_id is Null";
             $insertedUser = $this->executeQuerywithParams($query)->toArray();
             $this->beginTransaction();
             try {
                 $query = "UPDATE ox_user as ou
-                inner join ox_account as account on account.id = ou.account_id
-                and ou.id != account.contactid
-                SET ou.account_id = NULL WHERE ou.id not in (" . implode(',', $userSingleArray) . ") AND ou.account_id = $accountId";
-                $resultSet = $this->executeQuerywithParams($query);
-                $select = "SELECT u.id FROM ox_account_user as ouo
-                inner join ox_user as u on u.id = ouo.user_id
-                inner join ox_account as account on ouo.account_id = account.id and account.id =" . $accountId . "
+                inner join ox_account as account on account.id = ou.account_id and ou.id != account.contactid
+                SET ou.account_id = NULL
+                WHERE ou.id not in (" . implode(',', $userSingleArray) . ") AND ou.account_id = $accountId";
+                $this->executeQuerywithParams($query);
+                $subQuery = "
+                inner join ox_account as account on ouo.account_id = account.id
                 where ouo.account_id =" . $accountId . " and ouo.user_id not in (" . implode(',', $userSingleArray) . ") and ouo.user_id != account.contactid";
-                $accountUserId = $this->executeQuerywithParams($select)->toArray();
-                $subQuery = "inner join ox_user as u on u.id = ouo.user_id
-                inner join ox_account as account on ouo.account_id = account.id and account.id =" . $accountId . "
-                where ouo.account_id =" . $accountId . " and ouo.user_id not in (" . implode(',', $userSingleArray) . ") and ouo.user_id != account.contactid";
-                $query = "DELETE ur FROM ox_user_role ur INNER JOIN ox_account_user as ouo on ur.account_user_id = ouo.id $subQuery";
-                $resultSet = $this->executeQuerywithParams($query);
+                $query = "DELETE ur FROM ox_user_role ur
+                INNER JOIN ox_account_user as ouo on ur.account_user_id = ouo.id $subQuery";
+                $this->executeQuerywithParams($query);
                 $query = "DELETE ouo FROM ox_account_user as ouo $subQuery";
-                $resultSet = $this->executeQuerywithParams($query);
+                $this->executeQuerywithParams($query);
                 $insert = "INSERT INTO ox_account_user (user_id,account_id,`default`)
                 SELECT ou.id," . $accountId . ",case when (ou.account_id is NULL)
                 then 1
                 end
-                from ox_user as ou 
-                LEFT OUTER JOIN ox_account_user as our on our.user_id = ou.id AND our.account_id = ou.account_id and our.account_id =" . $accountId . "
-                WHERE ou.id in (" . implode(',', $userSingleArray) . ") AND our.account_id is Null AND ou.id not in (select user_id from  ox_account_user where user_id in (" . implode(',', $userSingleArray) . ") and account_id =" . $accountId . ")";
-                $resultSet = $this->executeQuerywithParams($insert);
+                from ox_user as ou
+                LEFT OUTER JOIN ox_account_user as our on our.user_id = ou.id and our.account_id =" . $accountId . "
+                WHERE ou.id in (" . implode(',', $userSingleArray) . ") and our.account_id is null";
+                $this->executeQuerywithParams($insert);
                 //handle user_role update using default role
                 $insert = "INSERT INTO ox_user_role (account_user_id, role_id)
-                SELECT our.id, r.id
-                from ox_role as r 
-                INNER JOIN (SELECT au.id, au.account_id FROM ox_account_user au inner join ox_user ou on ou.id = au.user_id where au.account_id = $accountId and ou.username in ('".implode("','", array_unique(array_map('current', $insertedUser)))."') ) as our on our.account_id = r.account_id
+                SELECT our.id, r.id from ox_role as r
+                INNER JOIN (SELECT au.id, au.account_id FROM ox_account_user au
+                inner join ox_user ou on ou.id = au.user_id
+                where au.account_id = $accountId and ou.username in ('".implode("','", array_unique(array_map('current', $insertedUser)))."')) as our on our.account_id = r.account_id
                 WHERE r.account_id =" . $accountId . " AND r.default_role = 1";
-                $resultSet = $this->executeQuerywithParams($insert);
+                $this->executeQuerywithParams($insert);
                 $update = "UPDATE ox_user SET account_id = $accountId WHERE id in (" . implode(',', $userSingleArray) . ") AND account_id is NULL";
-                $resultSet = $this->executeQuerywithParams($update);
-                if (count($accountUserId) > 0) {
-                    $accountUserIdArray = array_unique(array_map('current', $accountUserId));
-                    $update = "UPDATE ox_user SET account_id = NULL WHERE id in (" . implode(',', $accountUserIdArray) . ")";
-                    $resultSet = $this->executeQuerywithParams($update);
-                }
+                $this->executeQuerywithParams($update);
                 $this->commit();
             } catch (Exception $e) {
                 $this->rollback();

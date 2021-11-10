@@ -1,15 +1,13 @@
 <?php
 namespace Ims\Controller;
 
-use Exception;
-use Oxzion\Service\ImsService;
-use Zend\Db\Adapter\AdapterInterface;
 use Ims\Controller\AbstractController;
 
 class ProducerController extends AbstractController
 {
-    public function __construct(ImsService $imsService)
+    public function __construct($insuranceService)
     {
-        parent::__construct($imsService, 'ProducerFunctions');
+        parent::__construct($insuranceService, 'ProducerFunctions');
     }
+
 }

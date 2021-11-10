@@ -1,0 +1,53 @@
+name: 'List Driver Employement Application'
+description: 'Shows a list of Driver Employement Application'
+content:
+    -
+        type: List
+        content:
+            route: 'file/search/entity/Driver Employement Application'
+            filterable: true
+            defaultFilters: 
+                sort:
+                    -
+                        field: date_modified
+                        dir: desc                 
+            resizable: true
+            actions:
+                -
+                    name: Edit
+                    rule: "true"
+                    details:
+                        -
+                            type: Form
+                            form_id: 6c7d8cff-a5ec-4921-b182-75253f734712
+                            fileId: "{{uuid}}"
+                    icon: 'far fa-pencil-alt'
+            pageable:
+                buttonCount: 3
+                pageSizes:
+                    - 10
+                    - 20
+                    - 50
+                info: true
+            sortable: 
+                allowUnsort: true
+                mode: single
+            toolbarTemplate: '<h5>List of Driver Employement Application Test</h5>'
+            operations:
+                title: "Create Application"
+                actions:
+                    -
+                        name: Create Application
+                        rule: "true"
+                        details:
+                            -
+                                type: Form
+                                form_id: 6c7d8cff-a5ec-4921-b182-75253f734712      
+            columnConfig:
+                -
+                    title: Name
+                    field: firstName
+                -
+                    title: City
+                    field: city
+               

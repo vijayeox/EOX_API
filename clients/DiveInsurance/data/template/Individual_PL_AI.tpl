@@ -66,7 +66,7 @@
 					<p class = "ai_list" style="font-size:15px;margin-bottom:5px;text-transform:none";>Effective 
 							{$key|date_format:"%d %B %Y"}
 					</p> 
-					{foreach from=$newList item=$additional}
+          			{foreach $result[$key] as $additional}
 		    		<p class = "ai_list" style="font-size: 13px;">
 		    		{if (isset($additional.name))}
 		    			{$additional.name} 

@@ -18,6 +18,7 @@ class Comment extends Entity
         'date_created' => null,
         'date_modified' => null,
         'isdeleted' => 0,
+        'attachments' => NULL,
     );
     protected $attributes = array();
 

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_00nsbu5" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.3.5">
+  <bpmn:collaboration id="Collaboration_0o3xmz0">
+    <bpmn:participant id="Participant_1gt0uy5" name="HUB" processRef="Process_113qbkd" />
+    <bpmn:participant id="Participant_0ifuls1" name="HUB" processRef="Process_0uzizbb" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_113qbkd" isExecutable="true" />
+  <bpmn:process id="Process_0uzizbb" isExecutable="false" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0o3xmz0">
+      <bpmndi:BPMNShape id="Participant_1gt0uy5_di" bpmnElement="Participant_1gt0uy5" isHorizontal="true">
+        <dc:Bounds x="1880" y="9990" width="600" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_0ifuls1_di" bpmnElement="Participant_0ifuls1" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="600" height="250" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
