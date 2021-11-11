@@ -1958,6 +1958,11 @@ class FileService extends AbstractService
                 }
             }
         }
+        
+        if ((isset($value['type']) && $value['type'] =='documentsigner')){
+            return '';// Ignoring the documentsigner component from showing up on the history data.
+         }
+
         if ($labelMapping && !empty($initialData) && isset($labelMapping[$initialData])) {
           if ($value['data_type'] == 'numeric') {
             $initialData = $initialData;
