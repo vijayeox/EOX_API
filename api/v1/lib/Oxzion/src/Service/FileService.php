@@ -752,7 +752,7 @@ class FileService extends AbstractService
             // AuthContext::get(AuthConstants::ACCOUNT_ID);
             $params = array('id' => $id, 'isActive' => 1);
             // 
-            $select = "SELECT oxf.id, oxf.uuid, oxf.data, ou.uuid as ownerId, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf 
+            $select = "SELECT oxf.id, oxf.uuid, oxf.data, ou.uuid as ownerId, ou.name as created_by, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf 
             inner join ox_user as ou on `oxf`.created_by = `ou`.id
                         inner join ox_app_entity oae on oae.id = oxf.entity_id";
             $where = " where oxf.uuid = :id and oxf.is_active = :isActive ";
@@ -776,6 +776,7 @@ class FileService extends AbstractService
                 $this->logger->info("FILE ID  ------" . json_encode($result));
                 if ($result[0]['data']) {
                         $result[0]['data'] = json_decode($result[0]['data'], true);
+                        $result[0]['data']['myId'] = $result[0]['id'];
                     }
                     unset($result[0]['id']);
                     $this->logger->info("FILE DATA SUCCESS ------" . print_r($result[0], true));
@@ -1958,6 +1959,11 @@ class FileService extends AbstractService
                 }
             }
         }
+        
+        if ((isset($value['type']) && $value['type'] =='documentsigner')){
+            return '';// Ignoring the documentsigner component from showing up on the history data.
+         }
+
         if ($labelMapping && !empty($initialData) && isset($labelMapping[$initialData])) {
           if ($value['data_type'] == 'numeric') {
             $initialData = $initialData;
