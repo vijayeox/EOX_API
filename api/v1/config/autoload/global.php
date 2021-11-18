@@ -1,27 +1,30 @@
 <?php
 /**
- * Global Configuration Override
- *
- * You can use this file for overriding configuration values from modules, etc.
- * You would place values in here that are agnostic to the environment and not
- * sensitive to security.
- *
- * @NOTE: In practice, this file will typically be INCLUDED in your source
- * control, so do not include passwords or other sensitive information in this
- * file.
- */
+* Global Configuration Override
+*
+* You can use this file for overriding configuration values from modules, etc.
+* You would place values in here that are agnostic to the environment and not
+* sensitive to security.
+*
+* @NOTE: In practice, this file will typically be INCLUDED in your source
+* control, so do not include passwords or other sensitive information in this
+* file.
+*/
 use Doctrine\DBAL\Driver\PDOMySql\Driver as PDOMySqlDriver;
 
-$host = 'localhost';
-$db = 'oxzionapi';
-$username = 'user';
-$password = 'password';
+putenv('ENV=production');
 
-if(isset($_ENV['ENV']) && $_ENV['ENV'] == 'test'){
-    $host = 'localhost';
-    $db = "oxzionapi_test";
-    $username = "user";
-    $password = "password";
+$host       = 'localhost';
+$db         = 'oxzionapi';
+$username   = 'user';
+$password   = 'password';
+
+if(isset($_ENV['ENV']) && $_ENV['ENV'] == 'test') {
+    putenv('ENV=test');
+    $host       = 'localhost';
+    $db         = "oxzionapi_test";
+    $username   = "user";
+    $password   = "password";
 }
 
 return [
@@ -80,11 +83,6 @@ return [
         "username" => "info@vantageagora.com",
         "password" => "CFnEWs0g",
         "callbackUrl" => 'https://qa3.eoxvantage.com/esign/event'
-    ],
-    'ims' => [
-        'wsdlUrl' => 'https://ws2.mgasystems.com/ims_axon/',
-        "userName" => "vantage.agora",
-        "tripleDESEncryptedPassword" => "ZjdEW6DH44E="
     ],
     'DELEGATE_FOLDER'=>__DIR__.'/../../data/delegate/',
     'ENTITY_FOLDER'=>__DIR__.'/../../data/entity/',
