@@ -28,6 +28,10 @@ class ImsEngineImpl implements InsuranceEngine
     }
     public function setConfig($data)
     {
+        if (empty($data['wsdlUrl']) || empty($data['userName']) || empty($data['tripleDESEncryptedPassword'])) {
+            throw new \Exception("Insurance Management Systems auth not provided.", 404);
+        }
+        $this->config['ims'] = $data;
         $this->setSoapClient($data['handle']);
     }
     private function setSoapClient($handle)
