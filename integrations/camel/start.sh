@@ -7,7 +7,7 @@ fi
 
 dirName="$(tr [A-Z] [a-z] <<< "${PWD##*/}")"
 echo "Stopping container if already running..."
-docker stop "${dirName//_}_ca_1"
+docker stop "${dirName//_}-ca-1"
 
 IP=`hostname -I | awk '{ print $1 }'`
 
@@ -34,7 +34,7 @@ else
 	echo "Please wait for few seconds before the service is available on the browser."
 	while true; do
 		case $startOptions in
-			[Yy]* ) docker exec -it "${dirName//_}_ca_1" bash; break;;
+			[Yy]* ) docker exec -it "${dirName//_}-ca-1" bash; break;;
 			[Nn]* ) break;;
 				* ) read -p "Do you wish to enter the container?(y/n)" startOptions;;
 		esac

@@ -6,7 +6,7 @@ if [ ! -f ./.env ]; then
 fi
 
 dirName="$(tr [A-Z] [a-z] <<< "${PWD##*/}")"
-containerName=$dirName'_wf_1'
+containerName=$dirName'-wf-1'
 containerStatus="$(docker container inspect --format="{{.State.Status}}" $containerName)"
 
 if [ $containerStatus != "exited" ]; then
@@ -55,7 +55,7 @@ else
 	echo "Camunda is being served in the background on port 8090/camunda";
 	while true; do
 		case $startOptions in
-			[Yy]* ) docker exec -it "${dirName//_}_wf_1" bash; break;;
+			[Yy]* ) docker exec -it "${dirName//_}-wf-1" bash; break;;
 			[Nn]* ) break;;
 				* ) read -p "Do you wish to enter the container?(y/n)" startOptions;;
 		esac

@@ -7,7 +7,7 @@ fi
 
 echo "Stopping container if already running..."
 dirName="$(tr [A-Z] [a-z] <<< "${PWD##*/}")";
-docker stop "${dirName//_}_zf_1"
+docker stop "${dirName//_}-zf-1"
 
 IP=`hostname -I | awk '{ print $1 }'`
 
@@ -34,7 +34,7 @@ else
 	echo "API is being served in the background on port 8080."
 	while true; do
 		case $startOptions in
-			[Yy]* ) docker exec -it "${dirName//_}_zf_1" bash; break;;
+			[Yy]* ) docker exec -it "${dirName//_}-zf-1" bash; break;;
 			[Nn]* ) break;;
 				* ) read -p "Do you wish to enter the container?(y/n)" startOptions;;
 		esac
