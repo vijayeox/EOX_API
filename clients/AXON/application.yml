@@ -4,7 +4,7 @@ app:
     description: 'Insurance OI Application'
     category: Dashboards
     type: 2
-    autostart: 'true'
+    autostart: 'false'
     uuid: 648ddff8-71b7-4fe0-ac94-eeab5ad56e58
     isdefault: false
     logo: default_app.png

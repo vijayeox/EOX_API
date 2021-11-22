@@ -5,7 +5,7 @@ app:
         description: 'Insurance OI Application'
         category: Dashboards
         type: 2
-        autostart: 'true'
+        autostart: 'false'
 org:
     -
         name: 'HIIG'
