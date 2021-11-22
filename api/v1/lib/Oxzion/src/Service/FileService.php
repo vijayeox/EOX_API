@@ -1788,7 +1788,7 @@ class FileService extends AbstractService
     public function getChangeLog($entityId, $startData, $completionData, $labelMapping=null,$fileId=null)
     {
         $fieldSelect = "SELECT ox_field.name,ox_field.template,ox_field.type,ox_field.text,ox_field.data_type,COALESCE(parent.name,'') as parentName,COALESCE(parent.text,'') as parentText,parent.data_type as parentDataType FROM ox_field 
-                    left join ox_field as parent on ox_field.parent_id = parent.id WHERE ox_field.entity_id=:entityId AND ox_field.type NOT IN ('hidden','file','document','documentviewer') ORDER BY parentName, ox_field.name ASC";
+                    left join ox_field as parent on ox_field.parent_id = parent.id WHERE ox_field.entity_id=:entityId AND ox_field.type NOT IN ('file','document','documentviewer') ORDER BY parentName, ox_field.name ASC";
 
         $fieldParams = array('entityId' => $entityId);
         $resultSet = $this->executeQueryWithBindParameters($fieldSelect, $fieldParams)->toArray();
@@ -1858,7 +1858,19 @@ class FileService extends AbstractService
                 return "";
             }
         }
-        
+        if ($value['type'] == 'hidden') {
+            if (isset($value['template']) && is_string($value['template'])) {
+                $template = json_decode($value['template'],true);
+                if (isset($template['properties'])) {
+                   $template = is_string($template['properties']) ? json_decode($template['properties'],true) : $template['properties'];
+                }
+                if (isset($template['shadow']) && $template['shadow'] == 'true') {
+                    $initialData = $initialData;
+                }else{
+                    return "";
+                }
+            }
+        }
 
         if ($value['data_type'] == 'text') {
             //handle string data being sent
@@ -1914,16 +1926,14 @@ class FileService extends AbstractService
             }
         } elseif ($value['data_type'] =='list') {
             $radioFields =json_decode($value['template'], true);
-            if (is_string($initialData)) {
+            if (!is_array($initialData) && $this->isJson($initialData)) {
                 $selectValues = json_decode($initialData, true);
             } else {
-                if (is_array($initialData)) {
                     $selectValues = $initialData;
-                }
             }
             $initialData = "";
             $processed =0;
-            if (isset($selectValues) && is_string($selectValues)) {
+            if (isset($selectValues) && !is_array($selectValues) && $this->isJson($selectValues)) {
                 $selectValues = json_decode($selectValues, true);
             }
             if (isset($selectValues) && is_array($selectValues)) {
@@ -1941,6 +1951,9 @@ class FileService extends AbstractService
                         }
                     }
                 }
+            }
+            else{
+                $initialData = $selectValues;
             }
         } elseif ($value['data_type'] == 'datetime') {
             $initialData = date("Y-m-d", strtotime($initialData));
