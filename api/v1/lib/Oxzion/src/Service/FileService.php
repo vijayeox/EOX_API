@@ -468,7 +468,7 @@ class FileService extends AbstractService
                 $queryWhere = array("fileId" => $fileId);
                 $result = $this->executeUpdateWithBindParameters($query, $queryWhere);
                 $this->multiInsertOrUpdate('ox_file_attribute', $validFields);
-                $this->logger->info("Checking Fields update ---- " . print_r($validFields, true));
+                $this->logger->info("Checking Fields update ---- " . print_r(json_encode($validFields), true));
                 $query = "update ox_indexed_file_attribute ifa 
                             inner join ox_file_attribute fa on ifa.file_id = fa.file_id and ifa.field_id = fa.field_id 
                             inner join ox_field f on fa.field_id = f.id
@@ -2289,7 +2289,7 @@ class FileService extends AbstractService
         }
         if (isset($params['assocId'])) {
             $queryParams['assocId'] = $this->getIdFromUuid('ox_file', $params['assocId']);
-            $where .= " of.assoc_id = :assocId AND ";
+                $where .= " of.assoc_id = :assocId AND ";
         }
         if (isset($params['gtCreatedDate'])) {
             $where .= " of.date_created >= :gtCreatedDate AND ";
