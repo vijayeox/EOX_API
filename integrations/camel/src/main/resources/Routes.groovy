@@ -41,7 +41,7 @@ routes {
 		// ['from':'activemq:topic:USER_ADDED', 			'to':["${callback.URL}"]],
 		// ['from':'activemq:topic:USER_DELETED', 			'to':["${callback.URL}"]],
 
-		['from':'activemq:queue:FILE_ADDED', 			'to':["${callback.URL}/callback/file/update"],
+		['from':'activemq:queue:FILE_ADDED', 			'to':["${callback.URL}/callback/file/update"]],
 		['from':'activemq:queue:FILE_UPDATED', 			'to':["${callback.URL}/callback/file/update"]],
 		['from':'activemq:queue:FILE_UPDATED_WITH_UUID','to':["${callback.URL}/fileindexer/file"]],													  
 		['from':'activemq:queue:FILE_DELETED', 			'to':["${callback.URL}/fileindexer/remove"]],
