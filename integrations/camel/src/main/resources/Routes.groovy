@@ -1,7 +1,7 @@
 if(System.getenv("HOST")){
 	callback.URL = "http4://${System.getenv("HOST")}:8080"
 } else {
-    callback.URL = "http4://127.0.0.1:8080"
+    callback.URL = "http4://192.168.0.95:8080"
 }
 routes {
 	route = [
@@ -41,10 +41,9 @@ routes {
 		// ['from':'activemq:topic:USER_ADDED', 			'to':["${callback.URL}"]],
 		// ['from':'activemq:topic:USER_DELETED', 			'to':["${callback.URL}"]],
 
-		['from':'activemq:queue:FILE_ADDED', 			'to':["${callback.URL}/callback/file/update",
-															  "${callback.URL}/fileindexer/file"]],
+		['from':'activemq:queue:FILE_ADDED', 			'to':["${callback.URL}/callback/file/update"],
 		['from':'activemq:queue:FILE_UPDATED', 			'to':["${callback.URL}/callback/file/update"]],
-		['from':'activemq:queue:FILE_UPDATED_WITH_UUID','to':[ "${callback.URL}/fileindexer/file"]],													  
+		['from':'activemq:queue:FILE_UPDATED_WITH_UUID','to':["${callback.URL}/fileindexer/file"]],													  
 		['from':'activemq:queue:FILE_DELETED', 			'to':["${callback.URL}/fileindexer/remove"]],
 		['from':'activemq:topic:PROCESS_BATCH_INDEX',	'to':["${callback.URL}/fileindexer/batch"]],
 
