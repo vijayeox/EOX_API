@@ -348,7 +348,19 @@ class FileService extends AbstractService
                 return;
             }
         } elseif ($user == 'manager') {
-            $manager = $this->executeQuerywithParams("SELECT manager_id FROM `ox_employee_manager` inner join ox_user on ox_employee_manager.employee_id=ox_user.id inner join ox_file on ox_user.id=ox_file.created_by WHERE `ox_file`.`id` = " . $fileId . ";")->toArray();
+            // $manager = $this->executeQuerywithParams("SELECT manager_id FROM `ox_employee_manager` inner join ox_user on ox_employee_manager.employee_id=ox_user.id inner join ox_file on ox_user.id=ox_file.created_by WHERE `ox_file`.`id` = " . $fileId . ";")->toArray();
+
+            // Added inner joins on ox_user and ox_employee
+            // Rather than doing a inner join on file and employee table
+            // As the User ID and Employee ID are not the same.
+            $manager = $this->executeQuerywithParams("SELECT oem.manager_id 
+            FROM ox_employee_manager oem
+            inner join ox_employee oe on oem.employee_id=oe.id
+            inner join ox_user ou on oe.person_id = ou.person_id 
+            inner join ox_file of2 on of2.created_by = ou.id
+            WHERE of2.id = " . $fileId . ";")->toArray();
+            $this->logger->info("The Manager Assignment Query ------ ".print_r($manager,true));
+
             if (isset($manager) && count($manager) > 0) {
                 $userId = $manager[0]['manager_id'];
             } else {
