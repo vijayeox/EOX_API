@@ -40,7 +40,7 @@ class ValidationUtils
                     break;
                 case 'date':
                     if ($value) {
-                        if ((strlen($value) != 10) || !checkdate(date('m', strtotime($value)), date('d', strtotime($value)), date('Y', strtotime($value))))
+                        if (!strtotime($value) || !checkdate(date('m', strtotime($value)), date('d', strtotime($value)), date('Y', strtotime($value))))
                             throw new \InvalidArgumentException('Invalid Date');
                     }
                 case 'datetime':

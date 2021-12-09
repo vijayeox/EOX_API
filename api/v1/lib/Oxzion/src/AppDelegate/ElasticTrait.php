@@ -55,4 +55,32 @@ trait ElasticTrait
         return $finalResult;
     }
 
+    public function getSearchResults($index, $bodyjson, $source, $start, $pagesize)
+    {
+        $this->logger->info("FilterDirect -> " . print_r($bodyjson, true));
+        $result_obj = $this->elasticService->getSearchResults($index, $bodyjson, $source, $start, $pagesize);
+        $result = array();
+        foreach ($result_obj['hits']['hits'] as $key => $value) {
+            $result['data'][$key] = $value['_source'];
+        }
+        $finalResult['meta'] = json_decode($bodyjson, true);
+        $finalResult['meta']['type'] = 'list';
+        $finalResult['meta']['query'] = $this->elasticService->getElasticQuery();
+        $finalResult['total_count'] = $result_obj['hits']['total']['value'];
+        if (isset($result['data'])) {
+            if (isset($result['data']['value'])) {
+                $finalResult['data']  = $result['data']['value'];
+            } else {
+                $finalResult['data']  = $result['data'];
+            }
+        }
+        if (isset($query['select'])) {
+            $finalResult['meta']['list'] = $query['select'];
+        }
+        if (isset($query['displaylist'])) {
+            $finalResult['meta']['displaylist'] = $query['displaylist'];
+        }
+        return $finalResult;
+    }
+
 }

@@ -106,11 +106,11 @@ class DocumentBuilder
         return;
     }
 
-    public function mergePDF(array $sourceArray, $destination, $hasFields = false)
+    public function mergePDF(array $sourceArray, $destination, $hasFields = false, $pdfOptions = [])
     {
         $this->logger->info("Merge documents");
         if ($hasFields) {
-            return $this->documentGenerator->mergePdf($sourceArray, $destination);
+            return $this->documentGenerator->mergePdf($sourceArray, $destination, $pdfOptions);
         } else {
             return $this->documentGenerator->mergeDocuments($sourceArray, $destination);
         }
