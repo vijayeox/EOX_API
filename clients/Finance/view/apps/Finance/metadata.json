@@ -8,6 +8,7 @@
 	"defaultAppforOrgs":false,
 	"icon": "icon.png",
 	"icon_white": "icon-white.png",
+	"fontIcon": "fad fa-box-usd",
 	"title": {
 		"en_EN": "Finance"
 	},
