@@ -1,7 +1,7 @@
 if(System.getenv("HOST")){
 	callback.URL = "http4://${System.getenv("HOST")}:8080"
 } else {
-    callback.URL = "http4://192.168.0.95:8080"
+    callback.URL = "http4://127.0.0.1:8080"
 }
 routes {
 	route = [
