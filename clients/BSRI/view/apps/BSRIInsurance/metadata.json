@@ -8,6 +8,7 @@
     "server": "server.js",
     "icon": "icon.png",
 	"icon_white": "icon_white.png",
+    "fontIcon": "fad fa-user-chart",
     "title": {
         "en_EN": "Insurance"
     },
