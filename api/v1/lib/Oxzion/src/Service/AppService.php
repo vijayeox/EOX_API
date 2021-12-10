@@ -385,7 +385,10 @@ class AppService extends AbstractService
         try {
             $result = $this->deployApp($appDeployDir, $params);
         } finally {
-            FileUtils::copy($appDeployDir . "application.yml", "application.yml", $appSourceDir);
+            $appSourceDir = FileUtils::joinPath($appSourceDir);
+            if (!file_exists($appSourceDir . 'application.yml')) {
+                FileUtils::copy($appDeployDir . "application.yml", "application.yml", $appSourceDir);
+            }
         }
         return $result;
     }
@@ -485,7 +488,8 @@ class AppService extends AbstractService
             if (!empty($user)) {
                 $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
             }
-            $startOptions = $this->getAppStartOptions($appId, $yamlData['org']);
+            $yamlData['org'] = isset($yamlData['org']) ? $yamlData['org'] : null;
+            $startOptions = $this->getAppStartOptions($appId, $yamlData['org'] );
             $result = $this->appRegistryService->createAppRegistry($appId, $accountId, $startOptions);
             $this->logger->info("PATH--- $path");
             $this->setupAccountFiles($path, $accountId, $appId);
