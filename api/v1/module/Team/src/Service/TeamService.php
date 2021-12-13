@@ -315,6 +315,8 @@ class TeamService extends AbstractService
         if (isset($data['parentId'])) {
             $data['parent_id'] = $this->getIdFromUuid('ox_team', $data['parentId']);
             $data['parent_id'] = $data['parent_id'] == 0 ? null : $data['parent_id'];
+        }else{
+            $data['parent_id'] = (isset($data['parent_id']) && !is_numeric($data['parent_id'])) ?  $this->getIdFromUuid('ox_team', $data['parent_id']) : $data['parent_id'];
         }
         $form->exchangeArray($data);
         $form->validate();
