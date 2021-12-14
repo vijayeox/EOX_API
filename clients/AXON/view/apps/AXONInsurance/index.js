@@ -10,7 +10,8 @@ const register = (core, args, options, metadata) => {
   proc.createWindow({
       id: "Window_AXONInsurance",
       title: metadata.title.en_EN,
-      icon: proc.resource(icon_white),
+      // icon: proc.resource(icon_white),
+      icon: metadata.fontIcon,
       dimension: {
         width: document.body.clientWidth,
         height: document.body.clientHeight
