@@ -232,7 +232,7 @@ class FileIndexerControllerTest extends ControllerTest
               '_id' => '101',
               'found' => false,
               ))));
-        }
+        } 
         if (enableActiveMQ == 0) {
             $mockMessageProducer = $this->getMockMessageProducer();
             $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), '/topic/elastic')->once()->andReturn();
