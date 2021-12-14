@@ -105,7 +105,7 @@ class FileIndexerService extends AbstractService
         from ox_file as file
         INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
         INNER JOIN ox_app as app on entity.app_id = app.id
-        where file.uuid = :uuid";
+        where file.id = :uuid";
         $params = array('uuid' => $fileUUId);
         $response = $this->executeQuerywithBindParameters($select, $params)->toArray();
         
