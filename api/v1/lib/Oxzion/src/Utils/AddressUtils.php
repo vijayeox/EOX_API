@@ -10,6 +10,7 @@ class AddressUtils
 
     public static function search(string $address, array $list = [])
     {
+        if (empty($address)) return [];
         $list = !empty($list) ? $list : [
             'address', 'formatted_address', 'street_number', 'street', 'city', 'state', 'zip'
         ];
@@ -224,7 +225,11 @@ class AddressUtils
         }
         if (empty($response) || isset($response['error'])) {
             $client = new RestClient("https://api.zippopotam.us/$countryISO2/");
-            $response = json_decode($client->get($zip), true);
+            try {
+                $response = json_decode($client->get($zip), true);
+            } catch (\Exception $e) {
+                $response = [];
+            }
             if (!empty($response)) {
                 $response = [
                     "country" => strtoupper($response['country abbreviation']),
