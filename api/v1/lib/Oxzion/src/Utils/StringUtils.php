@@ -43,7 +43,7 @@ class StringUtils
             case 'ExcelDateToTimestamp':
                 $unixDate = ($value - 25569) * 86400;
                 $value = gmdate("Y-m-d H:i:s", $unixDate);
-                $value = (($value == '1970-01-01 00:00:00') ? null : $value);
+                $value = (($value == '1970-01-01 00:00:00') ? null : strtotime($value));
                 break;
         }
         return $value;
