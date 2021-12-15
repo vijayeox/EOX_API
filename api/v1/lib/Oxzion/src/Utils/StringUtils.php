@@ -41,9 +41,9 @@ class StringUtils
                 $value = numfmt_format_currency(numfmt_create('en_US', \NumberFormatter::CURRENCY), $value, 'USD');
                 break;
             case 'ExcelDateToTimestamp':
-                $unixDate = ($value - 25569) * 86400;
-                $value = gmdate("Y-m-d H:i:s", $unixDate);
-                $value = (($value == '1970-01-01 00:00:00') ? null : strtotime($value));
+                $timestamp = ($value - 25569) * 86400;
+                $date = gmdate("Y-m-d H:i:s", $timestamp);
+                $value = (($date == '1970-01-01 00:00:00') ? null : strtotime($date));
                 break;
         }
         return $value;
