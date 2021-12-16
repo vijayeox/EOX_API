@@ -385,7 +385,10 @@ class AppService extends AbstractService
         try {
             $result = $this->deployApp($appDeployDir, $params);
         } finally {
-            FileUtils::copy($appDeployDir . "application.yml", "application.yml", $appSourceDir);
+            $appSourceDir = FileUtils::joinPath($appSourceDir);
+            if (!file_exists($appSourceDir . 'application.yml')) {
+                FileUtils::copy($appDeployDir . "application.yml", "application.yml", $appSourceDir);
+            }
         }
         return $result;
     }
@@ -485,7 +488,8 @@ class AppService extends AbstractService
             if (!empty($user)) {
                 $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
             }
-            $startOptions = $this->getAppStartOptions($appId, $yamlData['org']);
+            $yamlData['org'] = isset($yamlData['org']) ? $yamlData['org'] : null;
+            $startOptions = $this->getAppStartOptions($appId, $yamlData['org'] );
             $result = $this->appRegistryService->createAppRegistry($appId, $accountId, $startOptions);
             $this->logger->info("PATH--- $path");
             $this->setupAccountFiles($path, $accountId, $appId);
@@ -590,6 +594,9 @@ class AppService extends AbstractService
         }
         $result = $this->getDataByParams('ox_app_registry', array(), $deleteParams)->toArray();
         if (count($result) > 0) {
+            if (!isset($deleteParams['account_id'])) {
+                $deleteParams['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
+            }
             $this->deleteInfo('ox_app_registry', $deleteParams['app_id'], $deleteParams['account_id']);
         }
     }
@@ -1635,6 +1642,8 @@ class AppService extends AbstractService
                 $this->deleteInfo('ox_privilege', $this->getIdFromUuid('ox_app', $appId));
             }
             $this->deleteApp($appId);
+            $this->logger->info("appId remapp----".print_r($appId,true));
+            $this->removeAppFromDeployedLocations($appId);
             $this->commit();
         } catch (Exception $e) {
             $this->rollback();
@@ -1663,6 +1672,17 @@ class AppService extends AbstractService
             throw new ServiceException('Failed to complete package discover for the application.', 'E_APP_PACKAGE_DISCOVER_FAIL', 0);
         }
         $this->logger->info("\n Finished package discover " . print_r($output, true));
+    }
+    private function removeAppFromDeployedLocations($appId){
+        $appData['uuid'] = $appId;
+        $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $appData);
+        if (file_exists($appSourceDir)) {
+            FileUtils::rmDir($appSourceDir);
+        }
+        $appDeployDir = AppArtifactNamingStrategy::getDeployAppDirectory($this->config, $appData);        
+        if (file_exists($appDeployDir)) {
+            FileUtils::rmDir($appDeployDir);
+        }
     }
 
     private function processInstalledTemplates($appId, $path)

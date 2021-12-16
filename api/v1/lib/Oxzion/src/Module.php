@@ -557,7 +557,8 @@ class Module
                         $container->get(Service\BusinessParticipantService::class),
                         $container->get(\Analytics\Service\QueryService::class),
                         $container->get(Insurance\InsuranceService::class),
-                        $container->get(\Team\Service\TeamService::class)
+                        $container->get(\Team\Service\TeamService::class),
+                        $container->get(Service\AppService::class)
                 );
                 },
                 Document\DocumentBuilder::class => function ($container) {

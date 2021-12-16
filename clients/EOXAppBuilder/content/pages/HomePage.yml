@@ -2,6 +2,26 @@ name: 'Home Page'
 description: 'Shows a list of users'
 content:
     -
+        type: RenderButtons
+        content:
+                buttonList:
+                    -
+                        name: Build Application
+                        icon: 'fa fa-gavel'
+                        rule: 'true'
+                        details:
+                            -
+                                type: Form
+                                form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
+                    -
+                        name: Import Application
+                        icon: 'fa fa-cloud-upload'
+                        rule: 'true'
+                        details:
+                            -
+                                type: UploadArtifact
+                                entity: app
+    -
         type: List
         content:
             route: 'app'
@@ -110,25 +130,25 @@ content:
                                 disableAppId: true
                     icon: 'fas fa-trash-alt'
                     updateOnly: true 
-            operations:
-                title: "Create Application"
-                actions:
-                    -
-                        name: Build Application
-                        icon: 'fa fa-gavel'
-                        rule: 'true'
-                        details:
-                            -
-                                type: Form
-                                form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
-                    -
-                        name: Import Application
-                        icon: 'fa fa-cloud-upload'
-                        rule: 'true'
-                        details:
-                            -
-                                type: UploadArtifact
-                                entity: app
+            # operations:
+            #     title: "Create Application"
+            #     actions:
+            #         -
+            #             name: Build Application
+            #             icon: 'fa fa-gavel'
+            #             rule: 'true'
+            #             details:
+            #                 -
+            #                     type: Form
+            #                     form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
+            #         -
+            #             name: Import Application
+            #             icon: 'fa fa-cloud-upload'
+            #             rule: 'true'
+            #             details:
+            #                 -
+            #                     type: UploadArtifact
+            #                     entity: app
             columnConfig:
                 -
                     title: Name
