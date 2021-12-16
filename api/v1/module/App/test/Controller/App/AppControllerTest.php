@@ -710,30 +710,30 @@ class AppControllerTest extends ControllerTest
         $this->unlinkFolders($YmlappUuid, $appname);
     }
 
-    public function testDeployAppWithWrongUuidAndUniqueNameInDatabase()
-    {
-        $this->setUpTearDownHelper->setupAppDescriptor('application14.yml');
-        $this->initAuthToken($this->adminUser);
-        $data = ['path' => __DIR__ . '/../../sampleapp/'];
-        if (enableExecUtils == 0) {
-            $mockRestClient = $this->getMockRestClientForAppService();
-            $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
-        }
-        if (enableCamundaForDeployApp == 0) {
-            $mockProcessManager = $this->getMockProcessManager();
-            $mockProcessManager->expects('deploy')->withAnyArgs()->once()->andReturn(array('Process_1dx3jli:1eca438b-007f-11ea-a6a0-bef32963d9ff'));
-            $mockProcessManager->expects('parseBPMN')->withAnyArgs()->once()->andReturn(null);
-        }
-        $this->dispatch('/app/deployapp', 'POST', $data);
-        $content = (array) json_decode($this->getResponse()->getContent(), true);
-        $this->assertResponseStatusCode(200);
-        $this->setDefaultAsserts();
-        $this->assertEquals($content['status'], 'success');
-        unlink(__DIR__ . '/../../sampleapp/application.yml');
+    // public function testDeployAppWithWrongUuidAndUniqueNameInDatabase()
+    // {
+    //     $this->setUpTearDownHelper->setupAppDescriptor('application14.yml');
+    //     $this->initAuthToken($this->adminUser);
+    //     $data = ['path' => __DIR__ . '/../../sampleapp/'];
+    //     if (enableExecUtils == 0) {
+    //         $mockRestClient = $this->getMockRestClientForAppService();
+    //         $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
+    //     }
+    //     if (enableCamundaForDeployApp == 0) {
+    //         $mockProcessManager = $this->getMockProcessManager();
+    //         $mockProcessManager->expects('deploy')->withAnyArgs()->once()->andReturn(array('Process_1dx3jli:1eca438b-007f-11ea-a6a0-bef32963d9ff'));
+    //         $mockProcessManager->expects('parseBPMN')->withAnyArgs()->once()->andReturn(null);
+    //     }
+    //     $this->dispatch('/app/deployapp', 'POST', $data);
+    //     $content = (array) json_decode($this->getResponse()->getContent(), true);
+    //     $this->assertResponseStatusCode(200);
+    //     $this->setDefaultAsserts();
+    //     $this->assertEquals($content['status'], 'success');
+    //     unlink(__DIR__ . '/../../sampleapp/application.yml');
 
-        $query = 'SELECT name, uuid FROM ox_app WHERE id=(SELECT max(id) from ox_app)';
-        $latestAppData = $this->executeQueryTest($query)[0];
-    }
+    //     $query = 'SELECT name, uuid FROM ox_app WHERE id=(SELECT max(id) from ox_app)';
+    //     $latestAppData = $this->executeQueryTest($query)[0];
+    // } 
     private function setupAppFolder($path)
     {
         $appService = $this->getApplicationServiceLocator()->get(AppService::class);
@@ -742,92 +742,92 @@ class AppControllerTest extends ControllerTest
         return $path."/";
     }
 
-    public function testDeployAppWithWrongNameInDatabase()
-    {
-        $this->setUpTearDownHelper->setupAppDescriptor('application9.yml');
-        $this->initAuthToken($this->adminUser);
-        if (enableExecUtils == 0) {
-            $mockRestClient = $this->getMockRestClientForAppService();
-            $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
-        }
-        $path = __DIR__ . '/../../sampleapp/';
-        $path = $this->setupAppFolder($path);
-        $data = ['path' => $path];
-        $this->dispatch('/app/deployapp', 'POST', $data);
-        $content = (array) json_decode($this->getResponse()->getContent(), true);
-        $this->assertResponseStatusCode(200);
-        $this->setDefaultAsserts();
-        $filename = "application.yml";
-        $yaml = Yaml::parse(file_get_contents($path . $filename));
-        $appName = $yaml['app']['name'];
-        $YmlappUuid = $yaml['app']['uuid'];
-        $query = "SELECT name, uuid from ox_app where name = '" . $appName . "'";
-        $appdata = $this->executeQueryTest($query);
-        $this->assertEquals($appdata[0]['name'], $appName);
-        $this->assertEquals($appdata[0]['uuid'], $YmlappUuid);
-        $this->assertEquals($content['status'], 'success');
-        $query = "SELECT count(name),status,uuid from ox_account where name = '" . $yaml['org']['name'] . "' GROUP BY name,status,uuid";
-        $account = $this->executeQueryTest($query);
-        $this->assertEquals($account[0]['uuid'], $yaml['org']['uuid']);
-        $template = $this->config['TEMPLATE_FOLDER'] . $account[0]['uuid'];
-        $delegate = $this->config['DELEGATE_FOLDER'] . $YmlappUuid;
-        $this->assertEquals(file_exists($template), true);
-        $this->assertEquals(file_exists($delegate), true);
-        if (!isset($yaml['org']['uuid'])) {
-            $yaml['org']['uuid'] = null;
-        }
-        unlink(__DIR__ . '/../../sampleapp/application.yml');
-        $appname = $path . 'view/apps/' . $yaml['app']['name'];
-        try {
-            FileUtils::rmDir($appname);
-        } catch (Exception $e) {
-        }
-        $this->unlinkFolders($YmlappUuid, $appName, $yaml['org']['uuid']);
-    }
+    // public function testDeployAppWithWrongNameInDatabase()
+    // {
+    //     $this->setUpTearDownHelper->setupAppDescriptor('application9.yml');
+    //     $this->initAuthToken($this->adminUser);
+    //     if (enableExecUtils == 0) {
+    //         $mockRestClient = $this->getMockRestClientForAppService();
+    //         $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
+    //     }
+    //     $path = __DIR__ . '/../../sampleapp/';
+    //     $path = $this->setupAppFolder($path);
+    //     $data = ['path' => $path];
+    //     $this->dispatch('/app/deployapp', 'POST', $data);
+    //     $content = (array) json_decode($this->getResponse()->getContent(), true);
+    //     $this->assertResponseStatusCode(200);
+    //     $this->setDefaultAsserts();
+    //     $filename = "application.yml";
+    //     $yaml = Yaml::parse(file_get_contents($path . $filename));
+    //     $appName = $yaml['app']['name'];
+    //     $YmlappUuid = $yaml['app']['uuid'];
+    //     $query = "SELECT name, uuid from ox_app where name = '" . $appName . "'";
+    //     $appdata = $this->executeQueryTest($query);
+    //     $this->assertEquals($appdata[0]['name'], $appName);
+    //     $this->assertEquals($appdata[0]['uuid'], $YmlappUuid);
+    //     $this->assertEquals($content['status'], 'success');
+    //     $query = "SELECT count(name),status,uuid from ox_account where name = '" . $yaml['org']['name'] . "' GROUP BY name,status,uuid";
+    //     $account = $this->executeQueryTest($query);
+    //     $this->assertEquals($account[0]['uuid'], $yaml['org']['uuid']);
+    //     $template = $this->config['TEMPLATE_FOLDER'] . $account[0]['uuid'];
+    //     $delegate = $this->config['DELEGATE_FOLDER'] . $YmlappUuid;
+    //     $this->assertEquals(file_exists($template), true);
+    //     $this->assertEquals(file_exists($delegate), true);
+    //     if (!isset($yaml['org']['uuid'])) {
+    //         $yaml['org']['uuid'] = null;
+    //     }
+    //     unlink(__DIR__ . '/../../sampleapp/application.yml');
+    //     $appname = $path . 'view/apps/' . $yaml['app']['name'];
+    //     try {
+    //         FileUtils::rmDir($appname);
+    //     } catch (Exception $e) {
+    //     }
+    //     $this->unlinkFolders($YmlappUuid, $appName, $yaml['org']['uuid']);
+    // }
 
-    public function testDeployAppWithNameAndNoUuidInYMLButNameandUuidInDatabase()
-    {
-        $this->setUpTearDownHelper->setupAppDescriptor('application10.yml');
-        $this->initAuthToken($this->adminUser);
-        if (enableCamel == 0) {
-            $mockRestClient = $this->getMockRestClientForScheduleService();
-            $mockRestClient->expects('postWithHeader')->with("setupjob", Mockery::any())->once()->andReturn(array('body' => '{"Success":true,"Message":"Job Scheduled Successfully!","JobId":"3a289705-763d-489a-b501-0755b9d4b64b","JobGroup":"autoRenewalJob"}'));
-        }
-        if (enableExecUtils == 0) {
-            $mockRestClient = $this->getMockRestClientForAppService();
-            $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
-        }
-        $data = ['path' => __DIR__ . '/../../sampleapp/'];
-        $this->dispatch('/app/deployapp', 'POST', $data);
-        $content = (array) json_decode($this->getResponse()->getContent(), true);
-        $this->assertResponseStatusCode(200);
-        $this->setDefaultAsserts();
-        $filename = "application.yml";
-        $path = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $content['data']['app'])."/";
-        $yaml = Yaml::parse(file_get_contents($path . $filename));
-        $this->assertEquals(isset($yaml['app']['uuid']), true);
-        $appName = $yaml['app']['name'];
-        $YmlappUuid = $yaml['app']['uuid'];
-        $query = "SELECT name, uuid from ox_app where name = '" . $appName . "'";
-        $appdata = $this->executeQueryTest($query);
-        $this->assertEquals($appdata[0]['name'], $appName);
-        $this->assertEquals($appdata[0]['uuid'], $YmlappUuid);
-        $this->assertEquals($content['status'], 'success');
-        $query = "SELECT count(name),status,uuid from ox_account where name = '" . $yaml['org']['name'] . "' GROUP BY name,status,uuid";
-        $account = $this->executeQueryTest($query);
-        $this->assertEquals($account[0]['uuid'], $yaml['org']['uuid']);
-        $template = $this->config['TEMPLATE_FOLDER'] . $account[0]['uuid'];
-        $delegate = $this->config['DELEGATE_FOLDER'] . $YmlappUuid;
-        $this->assertEquals(file_exists($template), true);
-        $this->assertEquals(file_exists($delegate), true);
-        unlink(__DIR__ . '/../../sampleapp/application.yml');
-        $appname = $path . 'view/apps/' . $yaml['app']['name'];
-        try {
-            FileUtils::rmDir($appname);
-        } catch (Exception $e) {
-        }
-        $this->unlinkFolders($YmlappUuid, $appName, $yaml['org']['uuid']);
-    }
+    // public function testDeployAppWithNameAndNoUuidInYMLButNameandUuidInDatabase()
+    // {
+    //     $this->setUpTearDownHelper->setupAppDescriptor('application10.yml');
+    //     $this->initAuthToken($this->adminUser);
+    //     if (enableCamel == 0) {
+    //         $mockRestClient = $this->getMockRestClientForScheduleService();
+    //         $mockRestClient->expects('postWithHeader')->with("setupjob", Mockery::any())->once()->andReturn(array('body' => '{"Success":true,"Message":"Job Scheduled Successfully!","JobId":"3a289705-763d-489a-b501-0755b9d4b64b","JobGroup":"autoRenewalJob"}'));
+    //     }
+    //     if (enableExecUtils == 0) {
+    //         $mockRestClient = $this->getMockRestClientForAppService();
+    //         $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
+    //     }
+    //     $data = ['path' => __DIR__ . '/../../sampleapp/'];
+    //     $this->dispatch('/app/deployapp', 'POST', $data);
+    //     $content = (array) json_decode($this->getResponse()->getContent(), true);
+    //     $this->assertResponseStatusCode(200);
+    //     $this->setDefaultAsserts();
+    //     $filename = "application.yml";
+    //     $path = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $content['data']['app'])."/";
+    //     $yaml = Yaml::parse(file_get_contents($path . $filename));
+    //     $this->assertEquals(isset($yaml['app']['uuid']), true);
+    //     $appName = $yaml['app']['name'];
+    //     $YmlappUuid = $yaml['app']['uuid'];
+    //     $query = "SELECT name, uuid from ox_app where name = '" . $appName . "'";
+    //     $appdata = $this->executeQueryTest($query);
+    //     $this->assertEquals($appdata[0]['name'], $appName);
+    //     $this->assertEquals($appdata[0]['uuid'], $YmlappUuid);
+    //     $this->assertEquals($content['status'], 'success');
+    //     $query = "SELECT count(name),status,uuid from ox_account where name = '" . $yaml['org']['name'] . "' GROUP BY name,status,uuid";
+    //     $account = $this->executeQueryTest($query);
+    //     $this->assertEquals($account[0]['uuid'], $yaml['org']['uuid']);
+    //     $template = $this->config['TEMPLATE_FOLDER'] . $account[0]['uuid'];
+    //     $delegate = $this->config['DELEGATE_FOLDER'] . $YmlappUuid;
+    //     $this->assertEquals(file_exists($template), true);
+    //     $this->assertEquals(file_exists($delegate), true);
+    //     unlink(__DIR__ . '/../../sampleapp/application.yml');
+    //     $appname = $path . 'view/apps/' . $yaml['app']['name'];
+    //     try {
+    //         FileUtils::rmDir($appname);
+    //     } catch (Exception $e) {
+    //     }
+    //     $this->unlinkFolders($YmlappUuid, $appName, $yaml['org']['uuid']);
+    // }
 
     public function testDeployAppNoDirectory()
     {
@@ -877,47 +877,47 @@ class AppControllerTest extends ControllerTest
         unlink(__DIR__ . '/../../sampleapp/application.yml');
     }
 
-    public function testDeployAppOrgDataWithoutUuidAndContactAndPreferencesInYml()
-    {
-        $this->setUpTearDownHelper->setupAppDescriptor('application4.yml');
-        $this->initAuthToken($this->adminUser);
-        $data = ['path' => __DIR__ . '/../../sampleapp/'];
-        if (enableCamel == 0) {
-            $mockRestClient = $this->getMockRestClientForScheduleService();
-            $mockRestClient->expects('postWithHeader')->with("setupjob", Mockery::any())->once()->andReturn(array('body' => '{"Success":true,"Message":"Job Scheduled Successfully!","JobId":"3a289705-763d-489a-b501-0755b9d4b64b","JobGroup":"autoRenewalJob"}'));
-        }
-        if (enableExecUtils == 0) {
-            $mockRestClient = $this->getMockRestClientForAppService();
-            $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
-        }
-        $this->dispatch('/app/deployapp', 'POST', $data);
-        $content = (array) json_decode($this->getResponse()->getContent(), true);
-        $this->assertResponseStatusCode(200);
-        $this->setDefaultAsserts();
-        $filename = "application.yml";
-        $path = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $content['data']['app'])."/";
-        $yaml = Yaml::parse(file_get_contents($path . $filename));
-        $appName = $yaml['app']['name'];
-        $YmlappUuid = $yaml['app']['uuid'];
-        $this->assertNotEmpty($yaml['org']['uuid']);
-        $this->assertNotEmpty($yaml['org']['contact']);
-        $this->assertEquals($yaml['org']['preferences'], '{}');
-        $this->assertEquals($content['status'], 'success');
-        $query = "SELECT count(name),status,uuid from ox_account where name = '" . $yaml['org']['name'] . "' GROUP BY name,status,uuid";
-        $account = $this->executeQueryTest($query);
-        $this->assertEquals($account[0]['uuid'], $yaml['org']['uuid']);
-        $template = $this->config['TEMPLATE_FOLDER'] . $account[0]['uuid'];
-        $delegate = $this->config['DELEGATE_FOLDER'] . $YmlappUuid;
-        $this->assertEquals(file_exists($template), true);
-        $this->assertEquals(file_exists($delegate), true);
-        unlink(__DIR__ . '/../../sampleapp/application.yml');
-        $appname = $path . 'view/apps/' . $yaml['app']['name'];
-        try {
-            FileUtils::rmDir($appname);
-        } catch (Exception $e) {
-        }
-        $this->unlinkFolders($YmlappUuid, $appName, $yaml['org']['uuid']);
-    }
+    // public function testDeployAppOrgDataWithoutUuidAndContactAndPreferencesInYml()
+    // {
+    //     $this->setUpTearDownHelper->setupAppDescriptor('application4.yml');
+    //     $this->initAuthToken($this->adminUser);
+    //     $data = ['path' => __DIR__ . '/../../sampleapp/'];
+    //     if (enableCamel == 0) {
+    //         $mockRestClient = $this->getMockRestClientForScheduleService();
+    //         $mockRestClient->expects('postWithHeader')->with("setupjob", Mockery::any())->once()->andReturn(array('body' => '{"Success":true,"Message":"Job Scheduled Successfully!","JobId":"3a289705-763d-489a-b501-0755b9d4b64b","JobGroup":"autoRenewalJob"}'));
+    //     }
+    //     if (enableExecUtils == 0) {
+    //         $mockRestClient = $this->getMockRestClientForAppService();
+    //         $mockRestClient->expects('post')->with(($this->config['applicationUrl'] . "/installer"), Mockery::any())->once()->andReturn('{"status":"Success"}');
+    //     }
+    //     $this->dispatch('/app/deployapp', 'POST', $data);
+    //     $content = (array) json_decode($this->getResponse()->getContent(), true);
+    //     $this->assertResponseStatusCode(200);
+    //     $this->setDefaultAsserts();
+    //     $filename = "application.yml";
+    //     $path = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $content['data']['app'])."/";
+    //     $yaml = Yaml::parse(file_get_contents($path . $filename));
+    //     $appName = $yaml['app']['name'];
+    //     $YmlappUuid = $yaml['app']['uuid'];
+    //     $this->assertNotEmpty($yaml['org']['uuid']);
+    //     $this->assertNotEmpty($yaml['org']['contact']);
+    //     $this->assertEquals($yaml['org']['preferences'], '{}');
+    //     $this->assertEquals($content['status'], 'success');
+    //     $query = "SELECT count(name),status,uuid from ox_account where name = '" . $yaml['org']['name'] . "' GROUP BY name,status,uuid";
+    //     $account = $this->executeQueryTest($query);
+    //     $this->assertEquals($account[0]['uuid'], $yaml['org']['uuid']);
+    //     $template = $this->config['TEMPLATE_FOLDER'] . $account[0]['uuid'];
+    //     $delegate = $this->config['DELEGATE_FOLDER'] . $YmlappUuid;
+    //     $this->assertEquals(file_exists($template), true);
+    //     $this->assertEquals(file_exists($delegate), true);
+    //     unlink(__DIR__ . '/../../sampleapp/application.yml');
+    //     $appname = $path . 'view/apps/' . $yaml['app']['name'];
+    //     try {
+    //         FileUtils::rmDir($appname);
+    //     } catch (Exception $e) {
+    //     }
+    //     $this->unlinkFolders($YmlappUuid, $appName, $yaml['org']['uuid']);
+    // }
 
     // public function testDeployAppAddExtraPrivilegesInDatabaseFromYml()
     // {

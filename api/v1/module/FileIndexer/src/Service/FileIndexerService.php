@@ -33,8 +33,10 @@ class FileIndexerService extends AbstractService
         if (isset($fileId)) {
             $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
             file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,
-            CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields
+            CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
+            CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
             from ox_file as file
+            left join ox_file_participant ofp on ofp.file_id = file.id
             INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
             INNER JOIN ox_app as app on entity.app_id = app.id
             INNER JOIN ox_field as field ON field.entity_id = entity.id
@@ -72,8 +74,10 @@ class FileIndexerService extends AbstractService
         //Get all file data and relevant parameters
         $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
             file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,
-            CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields
+            CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
+            CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
             from ox_file as file
+            left join ox_file_participant ofp on ofp.file_id = file.id
             INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
             INNER JOIN ox_app as app on entity.app_id = app.id
             INNER JOIN ox_field as field ON field.entity_id = entity.id
@@ -153,8 +157,10 @@ class FileIndexerService extends AbstractService
                     //Index list
                     $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entity_name,
                     file.data as file_data, file.uuid as file_uuid, file.is_active,file.account_id,
-                    CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields
+                    CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
+                    CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
                     from ox_file as file
+                    left join ox_file_participant ofp on ofp.file_id = file.id
                     INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
                     INNER JOIN ox_app as app on entity.app_id = app.id
                     INNER JOIN ox_field as field ON field.entity_id = entity.id
@@ -243,7 +249,9 @@ class FileIndexerService extends AbstractService
         $entityId = $result['entity_id'];
         $app_name = $result['app_name'];
         $data = json_decode($result['file_data'], true);
-
+        if($result['participants']){
+            $result['participants'] = json_decode($result['participants'], true);;
+        }
         //get all fields for a particular entity
         $selectFields = "Select name,data_type from ox_field where entity_id = :entity_id AND parent_id IS NULL AND data_type NOT IN ('file') AND isdeleted = 0";
         $params = array('entity_id' => $entityId);

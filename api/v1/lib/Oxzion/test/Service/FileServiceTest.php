@@ -1715,7 +1715,7 @@ class FileServiceTest extends AbstractServiceTest
         $this->assertEquals(1, count($selectFileId));
         $sqlQuery2 = "SELECT * FROM ox_file_assignee where file_id = '".$selectFileId[0]['id']."'";
         $sqlQuery2Result = $this->runQuery($sqlQuery2);
-        $this->assertEquals(0, count($sqlQuery2Result));
+        $this->assertEquals(1, count($sqlQuery2Result));
     }
 
     //Test for file assignment for observers data
