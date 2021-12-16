@@ -83,13 +83,20 @@ class CommentsService extends AbstractService
             }
             
             //Appending the attachment to existing attachment list if comment already has an attachment
+            // if (isset($res[0]['commentAttachment'])) {
+            //     $attach = json_decode($res[0]['commentAttachment'],true);
+            //     $attach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].$file['name']];
+            //     $data['attachments'] = json_encode($attach);              
+            // }else{
+            //     $data['attachments'] = json_encode(array("attachments" => array(array("name" => $file['name'], "path" => $dest['relativePath'].$file['name']))));
+            // }
             if (isset($res[0]['commentAttachment'])) {
                 $attach = json_decode($res[0]['commentAttachment'],true);
-                $attach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].$file['name']];
-                $data['attachments'] = json_encode($attach);              
+                $attach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].str_replace(' ', '_', $file['name'])];
+                $data['attachments'] = json_encode($attach); 
             }else{
-                $data['attachments'] = json_encode(array("attachments" => array(array("name" => $file['name'], "path" => $dest['relativePath'].$file['name']))));
-            }
+                $data['attachments'] = json_encode(array("attachments" => array(array("name" => $file['name'], "path" => $dest['relativePath'].str_replace(' ', '_', $file['name'])))));
+            } 
             $data['accountId'] = $res[0]['accountId'];
             $this->commentService->updateComment($params['commentId'],$res[0]['fileId'],$data);
             
