@@ -1,12 +1,9 @@
 <?php
 namespace Oxzion\Service;
 
-use Oxzion\Auth\AuthContext;
 use Oxzion\Auth\AuthConstants;
+use Oxzion\Auth\AuthContext;
 use Oxzion\Service\AbstractService;
-use Oxzion\ValidationException;
-use Zend\Db\Sql\Expression;
-use Exception;
 
 class UserSessionService extends AbstractService
 {
@@ -14,7 +11,6 @@ class UserSessionService extends AbstractService
     {
         parent::__construct($config, $dbAdapter);
     }
-
 
     public function updateSessionData($data)
     {
@@ -29,18 +25,18 @@ class UserSessionService extends AbstractService
             $updatedData['data'] = $data['data'];
             $updatedData['date_modified'] = date('Y-m-d H:i:s');
             $update = $sql->update('ox_user_session')->set($updatedData)
-            ->where(array('ox_user_session.user_id' => AuthContext::get(AuthConstants::USER_ID),'ox_user_session.account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
+                ->where(array('ox_user_session.user_id' => AuthContext::get(AuthConstants::USER_ID), 'ox_user_session.account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
             $result = $this->executeUpdate($update);
         }
     }
-    
+
     public function getSessionData()
     {
         $sql = $this->getSqlObject();
         $select = $sql->select();
         $select->from('ox_user_session')
-        ->columns(array('data'))
-        ->where(array('user_id' => AuthContext::get(AuthConstants::USER_ID),'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
+            ->columns(array('data'))
+            ->where(array('user_id' => AuthContext::get(AuthConstants::USER_ID), 'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
         $result = $this->executeQuery($select)->toArray();
         return array_column($result, 'data');
     }
