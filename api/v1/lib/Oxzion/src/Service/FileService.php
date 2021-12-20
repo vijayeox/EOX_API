@@ -353,7 +353,7 @@ class FileService extends AbstractService
             // Added inner joins on ox_user and ox_employee
             // Rather than doing a inner join on file and employee table
             // As the User ID and Employee ID are not the same.
-            $manager = $this->executeQuerywithParams("SELECT oem.manager_id 
+            $manager = $this->executeQuerywithParams("SELECT oem.manager_id , ou.id
             FROM ox_employee_manager oem
             inner join ox_employee oe on oem.employee_id=oe.id
             inner join ox_user ou on oe.person_id = ou.person_id 
@@ -362,7 +362,16 @@ class FileService extends AbstractService
             $this->logger->info("The Manager Assignment Query ------ ".print_r($manager,true));
 
             if (isset($manager) && count($manager) > 0) {
-                $userId = $manager[0]['manager_id'];
+                $managerEmployeeId = $manager[0]['manager_id'];
+                $managerUserId = $this->executeQuerywithParams("SELECT ou.id from ox_user ou 
+                inner join ox_employee oe on oe.person_id = ou.person_id
+                WHERE oe.id = " . $managerEmployeeId . ";")->toArray();
+                $this->logger->info("The Manager User Id ------ ".print_r($managerUserId,true));
+                if(isset($managerUserId) && count($managerUserId) > 0) {
+                    $userId = $managerUserId[0]['id'];
+                } else {
+                    return;
+                }
             } else {
                 return;
             }
