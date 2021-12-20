@@ -1,19 +1,19 @@
 <?php
 namespace User\Controller;
 
+use Exception;
 use Oxzion\Auth\AuthConstants;
 use Oxzion\Auth\AuthContext;
 use Oxzion\Controller\AbstractApiController;
 use Oxzion\Model\User;
 use Oxzion\Model\UserTable;
 use Oxzion\Service\EmailService;
+use Oxzion\Service\EmployeeService;
 use Oxzion\Service\UserService;
 use Project\Service\ProjectService;
-use Oxzion\Service\EmployeeService;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\Sql\Ddl\Column\Datetime;
 use Zend\View\Model\JsonModel;
-use Exception;
 
 class UserController extends AbstractApiController
 {
@@ -378,7 +378,7 @@ class UserController extends AbstractApiController
             }
             if ($userInfo) {
                 $baseUrl = $this->getBaseUrl();
-                $userInfo['icon'] = $baseUrl . "/user/profile/" . $userInfo["uuid"];                
+                $userInfo['icon'] = $baseUrl . "/user/profile/" . $userInfo["uuid"];
             }
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
@@ -468,7 +468,7 @@ class UserController extends AbstractApiController
                 if ($this->userService->hasAccount($data['accountId'])) {
                     $data = [
                         'username' => AuthContext::get(AuthConstants::USERNAME),
-                        'accountId' => $data['accountId']
+                        'accountId' => $data['accountId'],
                     ];
                     $dataJwt = $this->getTokenPayload($data);
                     $jwt = $this->generateJwtToken($dataJwt);
@@ -567,6 +567,50 @@ class UserController extends AbstractApiController
             return $this->getSuccessResponse();
         } else {
             return $this->getErrorResponse("Invalid Username", 401);
+        }
+    }
+
+    /**
+     * Get the session info to check if the user needs to clear the cache or not
+     * @api
+     * @link /user/:userId/checkbrowsercache
+     * @method GET
+     * @return array returns a JSON Response with Status Code and Created User.
+     *
+     */
+    public function getUserBrowserCacheStatusAction()
+    {
+        if (AuthContext::get(AuthConstants::USER_ID)) {
+            $userId = AuthContext::get(AuthConstants::USER_ID);
+            try {
+                $userInfo = $this->userService->getUser($userId);
+                return $this->getSuccessResponseWithData($userInfo, 200);
+            } catch (Exception $e) {
+                return $this->getErrorResponse("User Retrieval Failure", 404, array("message" => $e->getMessage()));
+            }
+        }
+    }
+
+    /**
+     * Update the cache status set to 1, so that the user cache can be cleared
+     * @api
+     * @link /user/:userId/setuserbrowsercache
+     * @method GET
+     * @return array returns a JSON Response with Status Code and Created User.
+     *
+     */
+    public function setUserBrowserCacheAction()
+    {
+
+        if (AuthContext::get(AuthConstants::USER_ID)) {
+            $userId = AuthContext::get(AuthConstants::USER_ID);
+            $this->log->info(__CLASS__ . "-> \n Setting User Session Cache By User - " . print_r($userId, true));
+            try {
+                $userInfo = $this->userService->updateUserCacheData();
+                return $this->getSuccessResponseWithData($userInfo, 200);
+            } catch (Exception $e) {
+                return $this->getErrorResponse("Update Failure", 404, array("message" => $e->getMessage()));
+            }
         }
     }
 }
