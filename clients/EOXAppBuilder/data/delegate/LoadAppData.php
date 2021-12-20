@@ -18,14 +18,8 @@ class LoadAppData extends AbstractAppDelegate
     {
         $this->logger->info("Data in the delegate----".print_r($data,true));
         if (isset($data['app']['uuid'])) {
-            $res = $this->getApp($data['app']['uuid']);
-            if(!empty($data['form'])) {
-                foreach ($data['form'] as $key => &$values) {
-                    $values['template'][0]['originalName'] = $values['template_file'];
-                //    $this->logger->info("Data in the filesize----".print_r(filesize($values['template_file']),true));
-                //    $values['template'][0]['size'] = filesize($values['template_file']);
-                }
-            }
+            $data['listOFForms']  =  $this->getArtifacts($data['app']['uuid'], 'form');  
+            $data['listOFWorkflows']  =  $this->getArtifacts($data['app']['uuid'], 'workflow');
             if(!empty($data['pages'])) { 
                 foreach ($data['pages'] as $key => &$value) {
                     $this->logger->info("Dapagesssss---".print_r($value,true));
@@ -59,6 +53,19 @@ class LoadAppData extends AbstractAppDelegate
                     }
                     array_shift($value['privilegesDuplicate']);
                 }
+            }
+            
+            $valuePartiRole = [];
+            if (!empty($data['entity'])) {
+                foreach ($data['entity'] as $key => &$value) {
+                    foreach ($value['participantRole'] as $keyParticipantRole => $valueParticipantRole) {
+                        if (!empty($valueParticipantRole['businessRole'])) {
+                            $valuePartiRole['businessRole']['name'] = $valueParticipantRole['businessRole'];
+                            $value['participantRoleDuplicate'][] = $valuePartiRole;
+                        }
+                    }
+                }
+                array_shift($value['participantRoleDuplicate']);
             }
         }
          $this->logger->info("Data out of delegate----".print_r($data,true));

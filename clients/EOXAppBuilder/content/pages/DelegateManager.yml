@@ -1,0 +1,68 @@
+name: 'Delegates'
+description: 'Shows a list of delegates'
+content:
+    # -
+    #     type: RenderButtons
+    #     content:
+    #             buttonList:
+                    # -
+                    #     name: Import Delegate
+                    #     rule: 'true'
+                    #     icon: 'fa fa-cloud-upload'
+                    #     details:
+                    #         -
+                    #             type: UploadArtifact
+                    #             entity: delegate
+                    #             params:
+                    #                 app_uuid: '{{app_uuid}}'
+    -
+        type: List
+        content:
+            route: 'app/{{app_uuid}}/artifact/list/delegate'
+            disableAppId: true    
+            resizable: true
+            actions:
+                -
+                    name: Delete
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            successMessage: "Delegate deleted successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/artifact/delete/delegate/{{name}}.php'
+                                disableAppId: true
+                    icon: 'fas fa-trash-alt' 
+                    updateOnly: true
+                -
+                    name: Download
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            method: "GET"
+                            successMessage: "Delegate downloaded successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/download/delegate/{{name}}.php'
+                                disableAppId: true
+                    icon: 'fa fa-download' 
+                    updateOnly: true
+            operations:
+                title: "Import Delegate"
+                actions:
+                    -
+                        name: Import Delegate
+                        rule: 'true'
+                        icon: 'fa fa-cloud-upload'
+                        details:
+                            -
+                                type: UploadArtifact
+                                entity: delegate
+                                params:
+                                    app_uuid: '{{app_uuid}}'
+            columnConfig:
+                -
+                    title: Name
+                    field: name
