@@ -24,6 +24,7 @@ class TaskService extends AbstractService
     public function addProjectToTask($name, $description, $uuid, $parentIdentifier, $manager_login = null)
     {
         try {
+            $uuid = isset($uuid) ? "p".$uuid : NULL; //Openproject has issues when the identifier does not begin with an alphabet
             $response = $this->restClient->postWithHeader('projects', array('name' => $name, 'description' => $description, 'uuid' => $uuid, 'manager_login' => $manager_login, 'parent_identifier' => $parentIdentifier));
             $projectData = json_decode($response['body'], true);
             return $projectData;
@@ -35,6 +36,7 @@ class TaskService extends AbstractService
     public function deleteProjectFromTask($uuid)
     {
         try {
+            $uuid = isset($uuid) ? "p".$uuid : NULL; //Openproject has issues when the identifier does not begin with an alphabet
             $response = $this->restClient->deleteWithHeader('projects/' . $uuid);
             $projectData = json_decode($response['body'], true);
             return $projectData;
@@ -46,6 +48,7 @@ class TaskService extends AbstractService
     public function updateProjectInTask($name, $description, $uuid, $parentIdentifier, $manager_login = null)
     {
         try {
+            $uuid = isset($uuid) ? "p".$uuid : NULL; //Openproject has issues when the identifier does not begin with an alphabet
             if ($manager_login) {
                 $response = $this->restClient->updateWithHeader('projects/' . $uuid, array('name' => $name, 'description' => $description, 'parent_identifier' => $parentIdentifier, 'manager_login' => $manager_login));
             } else {
@@ -62,6 +65,7 @@ class TaskService extends AbstractService
     public function addUserToTask($projectUuid, $username, $firstname, $lastname, $email, $timezone)
     {
         try {
+            $projectUuid = isset($projectUuid) ? "p".$projectUuid : NULL; //Openproject has issues when the identifier does not begin with an alphabet
             $response = $this->restClient->postWithHeader('oxusers', array('username' => $username, 'firstname' => $firstname, 'lastname' => $lastname, 'email' => $email, 'timezone' => $timezone, 'projectUuid' => $projectUuid));
             if ($response != 0) {
                 $projectData = json_decode($response['body'], true);
@@ -106,6 +110,7 @@ class TaskService extends AbstractService
     public function deleteUserFromTask($projectUuid, $username)
     {
         try {
+            $projectUuid = isset($projectUuid) ? "p".$projectUuid : NULL; //Openproject has issues when the identifier does not begin with an alphabet
             $response = $this->restClient->deleteWithHeader('oxusers', array('username' => $username, 'projectUuid' => $projectUuid));
             $projectData = json_decode($response['body'], true);
             return $projectData;
