@@ -68,4 +68,34 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
   .page-link {
     color: $primary-color;;
   }
+  //custom render buttons for Appbuilder
+  .appButtons {
+    max-height: 45px !important;
+    justify-content: flex-end !important;
+    flex-wrap: unset !important;
+    padding-right: 1.5%;
+    gap: 1rem;
+    .moduleBtn {
+        .titles {
+            display: none;
+        }
+        .block {
+            box-shadow: 0px 0px 4px 0px grey;
+            height: 30px !important;
+            width: 30px !important;
+            color: #345561 !important;
+            background-color: #e4e7eb !important;
+            font-size: 14px !important;
+            padding: 16px !important;
+            border-radius: 50% !important;
+            &:focus {
+                background-color: #c5d2d6 !important;
+            }
+            &:active {
+                border: 3px solid #92c6fb !important;
+                transition: 0.25s ease-in all !important;
+            }
+        }
+    }
+}
 }

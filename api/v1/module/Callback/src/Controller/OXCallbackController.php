@@ -48,6 +48,7 @@ class OXCallbackController extends AbstractApiControllerHelper
         }
         $this->messageProducer->sendQueue(json_encode(array(
             'to' => $params['email'],
+            'from' => 'support@eoxvantage.com',
             'bcc' => $bcc,
             'subject' => isset($params['subject']) ? $params['subject'] : 'Your Login Credentials.',
             'body' => $body,

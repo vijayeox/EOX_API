@@ -5,28 +5,27 @@ use Exception;
 use Oxzion\AccessDeniedException;
 use Oxzion\Auth\AuthConstants;
 use Oxzion\Auth\AuthContext;
+use Oxzion\EntityNotFoundException;
+use Oxzion\InsertFailedException;
 use Oxzion\Messaging\MessageProducer;
+use Oxzion\Model\Account;
 use Oxzion\Model\User;
 use Oxzion\Model\UserTable;
-use Oxzion\Model\Account;
+use Oxzion\OxServiceException;
 use Oxzion\Search\Elastic\IndexerImpl;
 use Oxzion\Security\SecurityManager;
 use Oxzion\ServiceException;
-use Oxzion\OxServiceException;
-use Oxzion\InsertFailedException;
-use Oxzion\EntityNotFoundException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\AddressService;
 use Oxzion\Service\EmailService;
+use Oxzion\Service\EmployeeService;
+use Oxzion\Service\PersonService;
+use Oxzion\Service\RoleService;
 use Oxzion\Service\TemplateService;
 use Oxzion\Utils\BosUtils;
 use Oxzion\Utils\FilterUtils;
 use Oxzion\Utils\UuidUtil;
-use Oxzion\Utils\ArrayUtils;
-use Oxzion\Service\PersonService;
-use Oxzion\Service\EmployeeService;
 use Oxzion\ValidationException;
-use Oxzion\Service\RoleService;
 
 class UserService extends AbstractService
 {
@@ -88,8 +87,8 @@ class UserService extends AbstractService
     {
         $userId = $this->getIdFromUuid('ox_user', $id);
         $accountId = $this->getIdFromUuid('ox_account', $accountId);
-        $select = "SELECT oro.uuid, oro.name 
-                    from ox_user_role as ouo 
+        $select = "SELECT oro.uuid, oro.name
+                    from ox_user_role as ouo
                     inner join ox_account_user au on ouo.account_user_id = au.id
                     inner join ox_role as oro on ouo.role_id = oro.id and oro.account_id = au.account_id
                     where au.user_id = :userId and oro.account_id = :accountId";
@@ -106,11 +105,11 @@ class UserService extends AbstractService
             $accountClause = " AND acct.id = :accountId";
             $params['accountId'] = $accountId;
         }
-        $select = "SELECT ou.id, ou.name, ou.uuid as userId, acct.id as account_id, acct.uuid as accountId, acct.organization_id, org.uuid as organizationId 
-            from ox_user as ou 
-            inner join ox_account_user au on au.user_id = ou.id 
-            inner join ox_account as acct on au.account_id = acct.id 
-            LEFT OUTER JOIN ox_organization as org on org.id = acct.organization_id 
+        $select = "SELECT ou.id, ou.name, ou.uuid as userId, acct.id as account_id, acct.uuid as accountId, acct.organization_id, org.uuid as organizationId
+            from ox_user as ou
+            inner join ox_account_user au on au.user_id = ou.id
+            inner join ox_account as acct on au.account_id = acct.id
+            LEFT OUTER JOIN ox_organization as org on org.id = acct.organization_id
             where ou.username = :userName $accountClause";
         $results = $this->executeQueryWithBindParameters($select, $params)->toArray();
         return (!empty($results)) ? $results[0] : $results;
@@ -159,14 +158,14 @@ class UserService extends AbstractService
     {
         $data = $userData;
         unset($userData['password']);
-            
+
         if (!$register) {
             if (isset($params['accountId']) && $params['accountId'] != '') {
                 if (!SecurityManager::isGranted('MANAGE_INSTALL_APP_WRITE') &&
                     !AuthContext::get(AuthConstants::REGISTRATION) &&
-                     (!SecurityManager::isGranted('MANAGE_USER_WRITE') &&
+                    (!SecurityManager::isGranted('MANAGE_USER_WRITE') &&
                         (!SecurityManager::isGranted('MANAGE_ACCOUNT_WRITE') &&
-                         $params['accountId'] != AuthContext::get(AuthConstants::ACCOUNT_UUID)))) {
+                            $params['accountId'] != AuthContext::get(AuthConstants::ACCOUNT_UUID)))) {
                     throw new AccessDeniedException("You do not have permissions to create user");
                 } else {
                     $data['account_id'] = $this->getIdFromUuid('ox_account', $params['accountId']);
@@ -195,13 +194,13 @@ class UserService extends AbstractService
             unset($data['id']);
         }
         $params = ['username' => $data['username'],
-                    'email' => $data['email']];
-                  
-        $select = "SELECT ou.id, ou.uuid, count(ou.id) as account_count, ou.status, ou.username, per.email, GROUP_CONCAT(au.account_id) as account_id 
-            from ox_user as ou 
-            inner join ox_account_user as au on au.user_id = ou.id 
-            inner join ox_person as per on per.id = ou.person_id 
-            where ou.username = :username OR per.email = :email 
+            'email' => $data['email']];
+
+        $select = "SELECT ou.id, ou.uuid, count(ou.id) as account_count, ou.status, ou.username, per.email, GROUP_CONCAT(au.account_id) as account_id
+            from ox_user as ou
+            inner join ox_account_user as au on au.user_id = ou.id
+            inner join ox_person as per on per.id = ou.person_id
+            where ou.username = :username OR per.email = :email
             GROUP BY ou.id,ou.uuid,ou.status,ou.username, per.email";
         $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
         /*
@@ -273,16 +272,16 @@ class UserService extends AbstractService
             $form->save();
             $accountId = $this->getUuidFromId('ox_account', $data['account_id']);
             $accountUserId = $this->addUserToAccount($form->id, $form->account_id);
-            if(isset($data['project'])){
-                $this->addUserToProject($form->uuid,$data['project']);
+            if (isset($data['project'])) {
+                $this->addUserToProject($form->uuid, $data['project']);
             }
             if (isset($data['role']) && is_array($data['role'])) {
                 $skipRoleByUuid = 1;
                 foreach ($data['role'] as $roleItem) {
                     if (is_string($roleItem)) {
                         $roleQuery = "select ox_role.id,ox_role.name,oa.id as appId from ox_role left join ox_app as oa on ox_role.app_id=oa.id where ox_role.account_id=:accountId and ox_role.name =:roleName";
-                        $this->logger->info("Executing Query $roleQuery with params--".print_r(array('accountId'=>$data['account_id'],'roleName'=>$roleItem), true));
-                        $role = $this->executeQueryWithBindParameters($roleQuery, array('accountId'=>$data['account_id'],'roleName'=>$roleItem))->toArray();
+                        $this->logger->info("Executing Query $roleQuery with params--" . print_r(array('accountId' => $data['account_id'], 'roleName' => $roleItem), true));
+                        $role = $this->executeQueryWithBindParameters($roleQuery, array('accountId' => $data['account_id'], 'roleName' => $roleItem))->toArray();
                         if (!empty($role) && $role[0]) {
                             if (isset($role[0]['appId']) && $role[0]['appId'] != null) {
                                 $this->addUserRole($accountUserId, $roleItem, $role[0]['appId']);
@@ -297,7 +296,7 @@ class UserService extends AbstractService
                     $this->addRoleToUser($accountUserId, $data['role'], $form->account_id);
                 }
             }
-            
+
             $this->commit();
             $newUserMailParams = array_merge($data, array(
                 'username' => $data['username'],
@@ -309,7 +308,7 @@ class UserService extends AbstractService
                 'password' => $password,
                 'uuid' => $data['uuid'],
                 'resetCode' => $setPasswordCode,
-                'subject' => isset($data['subject']) ? $data['subject'] : null
+                'subject' => isset($data['subject']) ? $data['subject'] : null,
             ));
             $this->messageProducer->sendTopic(json_encode($newUserMailParams), 'USER_ADDED');
         } catch (Exception $e) {
@@ -322,9 +321,9 @@ class UserService extends AbstractService
     {
         $data['status'] = 'Active';
         $params = ['userId' => $userId,
-                    'accountId' => $data['account_id']];
-        $select = "SELECT id  
-                    from ox_account_user 
+            'accountId' => $data['account_id']];
+        $select = "SELECT id
+                    from ox_account_user
                     where user_id = :userId
                     and account_id = :accountId";
         $accountUsers = $this->executeQueryWithBindParameters($select, $params)->toArray();
@@ -351,20 +350,20 @@ class UserService extends AbstractService
     {
         $projectSingleArray = array_map('current', $project);
         $params = ['userId' => $userId,
-                    'accountId' => !is_numeric($accountId) ? $accountId : $this->getUuidFromId('ox_account', $accountId)];
+            'accountId' => !is_numeric($accountId) ? $accountId : $this->getUuidFromId('ox_account', $accountId)];
         $delete = "DELETE oxup FROM ox_user_project as oxup
-                    inner join ox_project as oxp on oxup.project_id = oxp.id 
+                    inner join ox_project as oxp on oxup.project_id = oxp.id
                     inner join ox_account acct on acct.id = oxp.account_id
-                    where oxp.uuid not in 
+                    where oxp.uuid not in
                     ('" . implode("','", $projectSingleArray) . "') and oxup.user_id = :userId and acct.uuid = :accountId";
         $this->executeUpdateWithBindParameters($delete, $params);
-        $query = "INSERT into ox_user_project(user_id,project_id) 
-                    SELECT :userId,oxp.id from ox_project as oxp 
+        $query = "INSERT into ox_user_project(user_id,project_id)
+                    SELECT :userId,oxp.id from ox_project as oxp
                     inner join ox_account acct on acct.id = oxp.account_id
-                    LEFT OUTER JOIN ox_user_project as oxup on oxp.id = oxup.project_id 
-                                                            and oxup.user_id = :userId 
+                    LEFT OUTER JOIN ox_user_project as oxup on oxp.id = oxup.project_id
+                                                            and oxup.user_id = :userId
                     where oxp.uuid in ('" . implode("','", $projectSingleArray) .
-                    "') and acct.uuid = :accountId and oxup.user_id is null";
+            "') and acct.uuid = :accountId and oxup.user_id is null";
         $this->executeUpdateWithBindParameters($query, $params);
     }
 
@@ -372,16 +371,16 @@ class UserService extends AbstractService
     {
         $roleSingleArray = array_map('current', $role);
         $params = ['accountUserId' => $accountUserId,
-                    'accountId' => $accountId];
+            'accountId' => $accountId];
         $delete = "DELETE our FROM ox_user_role as our
                     inner join ox_role as oro on our.role_id = oro.id where oro.uuid not in ('" . implode("','", $roleSingleArray) . "') and our.account_user_id = :accountUserId and oro.account_id = :accountId";
 
         $this->executeQuerywithBindParameters($delete, $params);
-        $query = "INSERT into ox_user_role(account_user_id,role_id) 
-                    SELECT :accountUserId, oro.id 
-                    from ox_role as oro 
-                    LEFT OUTER JOIN ox_user_role as our on oro.id = our.role_id 
-                                    and our.account_user_id = :accountUserId 
+        $query = "INSERT into ox_user_role(account_user_id,role_id)
+                    SELECT :accountUserId, oro.id
+                    from ox_role as oro
+                    LEFT OUTER JOIN ox_user_role as our on oro.id = our.role_id
+                                    and our.account_user_id = :accountUserId
                     where oro.uuid in ('" . implode("','", $roleSingleArray) . "') and oro.account_id = :accountId and our.account_user_id is null";
         $resultInsert = $this->executeQuerywithBindParameters($query, $params);
     }
@@ -435,7 +434,7 @@ class UserService extends AbstractService
         try {
             $this->beginTransaction();
             $result = $this->createUser($params, $data);
-            $select = "SELECT au.id from `ox_account_user` au 
+            $select = "SELECT au.id from `ox_account_user` au
                         inner join ox_user u on u.id = au.user_id
                         where u.uuid = :userId and au.account_id = :accountId";
             $queryParams = ['userId' => $data['uuid'], 'accountId' => $account['id']];
@@ -481,7 +480,7 @@ class UserService extends AbstractService
         }
         $user = $this->getDataByParams('ox_account_user', array('id', 'account_id'), array('id' => $accountUserId))->toArray();
         if ($user) {
-            $params = ['accountId' => $user[0]['account_id'],'roleName'=> $roleName];
+            $params = ['accountId' => $user[0]['account_id'], 'roleName' => $roleName];
             if (isset($appId)) {
                 $appClause = " And app_id=:appId";
                 $params['appId'] = $appId;
@@ -489,7 +488,7 @@ class UserService extends AbstractService
                 $appClause = " And app_id IS NULL";
             }
             $select = "select id,name from ox_role where account_id=:accountId and name =:roleName $appClause";
-            $this->logger->info("Executing Query $select with params--".print_r($params, true));
+            $this->logger->info("Executing Query $select with params--" . print_r($params, true));
             $role = $this->executeQueryWithBindParameters($select, $params)->toArray();
             if (!empty($role)) {
                 if (!$this->getDataByParams('ox_user_role', array(), array('account_user_id' => $user[0]['id'], 'role_id' => $role[0]['id']))->toArray()) {
@@ -497,7 +496,7 @@ class UserService extends AbstractService
                         'account_user_id' => $user[0]['id'],
                         'role_id' => $role[0]['id'],
                     ));
-                    $this->logger->info("Executing Data---".print_r($data, true));
+                    $this->logger->info("Executing Data---" . print_r($data, true));
                     $result = $this->multiInsertOrUpdate('ox_user_role', $data);
                     if ($result->getAffectedRows() == 0) {
                         return $result;
@@ -510,7 +509,6 @@ class UserService extends AbstractService
         }
         return 0;
     }
-
 
     private function generateUserIndexForElastic($data)
     {
@@ -571,7 +569,7 @@ class UserService extends AbstractService
         }
         try {
             $this->beginTransaction();
-            $this->logger->info("USER-DATA--------\n".print_r($userdata, true));
+            $this->logger->info("USER-DATA--------\n" . print_r($userdata, true));
             if (!isset($userdata['address1']) || empty($userdata['address1'])) {
                 $accountId = AuthContext::get(AuthConstants::ACCOUNT_UUID);
                 $addressData = $this->addressService->getOrganizationAddress($accountId);
@@ -581,7 +579,7 @@ class UserService extends AbstractService
             $this->personService->updatePerson($userdata['person_id'], $userdata);
             $userdata['name'] = $userdata['firstname'] . " " . $userdata['lastname'];
             $userdata['uuid'] = $form->uuid;
-            
+
             $userdata['modified_id'] = isset($userdata['modified_id']) ? $userdata['modified_id'] : AuthContext::get(AuthConstants::USER_ID);
             $userdata['date_modified'] = date('Y-m-d H:i:s');
             if (isset($userdata['preferences'])) {
@@ -673,7 +671,7 @@ class UserService extends AbstractService
         $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
         if (isset($resultSet[0]['manager_id'])) {
             $sql = $this->getSqlObject();
-            $updatedData['manager_id'] = NULL;
+            $updatedData['manager_id'] = null;
             $update = $sql->update('ox_employee')->set($updatedData)
                 ->where(array('ox_employee.manager_id' => $resultSet[0]['manager_id']));
             $this->executeUpdate($update);
@@ -702,7 +700,7 @@ class UserService extends AbstractService
         $result = $this->executeQueryWithParams($query)->toArray();
         return $result;
     }
-    
+
     /**
      * GET List User API
      * @api
@@ -732,10 +730,10 @@ class UserService extends AbstractService
         	oxemp.designation, oxemp.website, oxemp.about, oxemp.id as employee_id, oxemp.date_of_join, oxemp.interest,
         	oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip,
         	manager_user.uuid as managerId,manager_user.name as manager_name";
-        $from = " FROM `ox_user` as ou 
+        $from = " FROM `ox_user` as ou
                   inner join ox_account au on au.id = ou.account_id
-                  join ox_person per on per.id = ou.person_id 
-                  inner join ox_employee oxemp on oxemp.person_id = per.id 
+                  join ox_person per on per.id = ou.person_id
+                  inner join ox_employee oxemp on oxemp.person_id = per.id
                   LEFT JOIN ox_employee man on man.id = oxemp.manager_id
                   LEFT JOIN ox_user manager_user on manager_user.person_id = man.person_id
                   left join ox_address as oa on per.address_id = oa.id ";
@@ -747,7 +745,7 @@ class UserService extends AbstractService
                     $filterlogic = isset($filterArray[0]['filter']['logic']) ? $filterArray[0]['filter']['logic'] : "AND";
                     $filterList = $filterArray[0]['filter']['filters'];
                     $clause = FilterUtils::filterArray($filterList, $filterlogic, self::$userField);
-                    if(!empty($clause)){
+                    if (!empty($clause)) {
                         $where = " WHERE " . $clause;
                     }
                 }
@@ -758,12 +756,12 @@ class UserService extends AbstractService
                 $pageSize = $filterArray[0]['take'];
             }
             if (isset($filterParams['exclude'])) {
-                $where .= (strlen($where) > 0 ? " AND " : " WHERE "). "ou.uuid NOT in ('" . implode("','", $filterParams['exclude']) . "') ";
+                $where .= (strlen($where) > 0 ? " AND " : " WHERE ") . "ou.uuid NOT in ('" . implode("','", $filterParams['exclude']) . "') ";
             }
         }
 
         $where .= (strlen($where) > 0 ? " AND " : " WHERE ") . "ou.status = 'Active' AND ou.account_id = " . $accountId;
-        if(!empty($sort)){
+        if (!empty($sort)) {
             $sort = " ORDER BY " . $sort;
         }
         $limit = " LIMIT " . $pageSize . " offset " . $offset;
@@ -798,12 +796,12 @@ class UserService extends AbstractService
                           per.phone,per.gender,oxemp.website,oxemp.about,
                           manager_user.uuid as managerId,manager_user.name as manager_name,ou.timezone,oxemp.date_of_join,
                           oxemp.interest,ou.preferences,ou.password, ou.password_reset_expiry_date,
-                          ou.password_reset_code 
-                    from ox_user as ou 
+                          ou.password_reset_code, ou.cleared_browser_cache
+                    from ox_user as ou
                     inner join ox_account au on au.id = ou.account_id
-                    inner join ox_person as per on per.id = ou.person_id 
-                    left join ox_employee as oxemp on oxemp.person_id = per.id 
-                    left join ox_address as oa on per.address_id = oa.id 
+                    inner join ox_person as per on per.id = ou.person_id
+                    left join ox_employee as oxemp on oxemp.person_id = per.id
+                    left join ox_address as oa on per.address_id = oa.id
                     left join ox_employee as man on man.id = oxemp.manager_id
                     left join ox_user as manager_user on manager_user.person_id = man.person_id
                     where ou.id =" . $id . " and ou.status = 'Active'";
@@ -841,7 +839,7 @@ class UserService extends AbstractService
 
     public function getActiveAccount($accountId)
     {
-        $select = "SELECT au.uuid as accountId, au.name 
+        $select = "SELECT au.uuid as accountId, au.name
                     from ox_account au
                     where au.id =:id";
         $params = array("id" => $accountId);
@@ -849,13 +847,13 @@ class UserService extends AbstractService
         if (!empty($response)) {
             return $response[0];
         }
-        
+
         return null;
     }
 
     public function getAccounts($userId)
     {
-        $select = "SELECT uuid as accountId, au.name 
+        $select = "SELECT uuid as accountId, au.name
                     from ox_account au
                     INNER join ox_account_user oau on oau.account_id = au.id
                     where oau.user_id = :user_id AND au.status = 'Active'";
@@ -877,8 +875,8 @@ class UserService extends AbstractService
         } elseif (!is_numeric($userId)) {
             $userId = $this->getIdFromUuid('ox_user', $userId);
         }
-        $select = "SELECT count(id) as count 
-        from ox_account_user oau 
+        $select = "SELECT count(id) as count
+        from ox_account_user oau
         where oau.user_id = :user_id AND oau.account_id = :account_id";
         $params = array("user_id" => $userId, 'account_id' => $accountId);
         $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
@@ -896,10 +894,10 @@ class UserService extends AbstractService
 
     private function getPrivilegesFromDb($userId, $accountId)
     {
-        $query = "SELECT privilege_name, permission 
+        $query = "SELECT privilege_name, permission
                     from ox_role_privilege rp
                     INNER join ox_user_role ur on ur.role_id = rp.role_id
-                    INNER JOIN ox_account_user au on au.id = ur.account_user_id 
+                    INNER JOIN ox_account_user au on au.id = ur.account_user_id
                                                   and rp.account_id = au.account_id
                     where au.user_id = :userId and rp.account_id = :accountId";
         $params = ['userId' => $userId, 'accountId' => $accountId];
@@ -944,19 +942,19 @@ class UserService extends AbstractService
     {
         $accountId = ($accountId != null) ? $accountId : AuthContext::get(AuthConstants::ACCOUNT_UUID);
         $id = (is_numeric($id)) ? $id : $this->getIdFromUuid('ox_user', $id);
-        $select = "SELECT ou.id,ou.password, ou.uuid, ou.username, 
+        $select = "SELECT ou.id,ou.password, ou.uuid, ou.username,
                         per.firstname,per.lastname,ou.name,per.email,oxemp.designation,
                         au.uuid as accountId, per.phone, per.date_of_birth, oxemp.date_of_join,
-                        oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip, 
+                        oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip,
                         oxemp.website, oxemp.about, per.gender,
                         manager_user.uuid as managerId,manager_user.name as manager_name,
-                        oxemp.interest,ou.icon,ou.preferences 
-                    from ox_user as ou 
+                        oxemp.interest,ou.icon,ou.preferences
+                    from ox_user as ou
                     inner join ox_account_user oau on oau.user_id = ou.id
                     inner join ox_account au on au.id = oau.account_id
-                    inner join ox_person as per on per.id = ou.person_id 
-                    inner join ox_employee as oxemp on oxemp.person_id = per.id 
-                    left join ox_address as oa on per.address_id = oa.id 
+                    inner join ox_person as per on per.id = ou.person_id
+                    inner join ox_employee as oxemp on oxemp.person_id = per.id
+                    left join ox_address as oa on per.address_id = oa.id
                     left join ox_employee man on man.id = oxemp.manager_id
                     left join ox_user manager_user on manager_user.person_id = man.person_id
                     where au.uuid = :accountId AND ou.id = :userId AND ou.status = 'Active'";
@@ -984,11 +982,11 @@ class UserService extends AbstractService
     {
         $select = "SELECT ou.uuid,ou.username,per.firstname,per.lastname,
                           ou.name,per.email,au.uuid as accountId,
-                          oa.address1,oa.address2,oa.city,oa.state,oa.country,oa.zip 
-                    from ox_user as ou 
+                          oa.address1,oa.address2,oa.city,oa.state,oa.country,oa.zip
+                    from ox_user as ou
                     inner join ox_account au on au.id = ou.account_id
-                    inner join ox_person per on per.id = ou.person_id 
-                    LEFT join ox_address as oa on per.address_id = oa.id 
+                    inner join ox_person per on per.id = ou.person_id
+                    LEFT join ox_address as oa on per.address_id = oa.id
                     where ou.username = :username OR per.email = :username";
         $params = ['username' => $username];
         $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
@@ -1012,7 +1010,7 @@ class UserService extends AbstractService
         $oxUserProject = array();
         foreach ($projectList as $key => $value) {
             $oxUserProject[$key]['user_id'] = $userId;
-            $oxUserProject[$key]['project_id'] = $this->getIdFromUuid('ox_project',$value['uuid']);
+            $oxUserProject[$key]['project_id'] = $this->getIdFromUuid('ox_project', $value['uuid']);
         }
 
         $this->multiInsertOrUpdate('ox_user_project', $oxUserProject, array());
@@ -1059,7 +1057,7 @@ class UserService extends AbstractService
     public function getUserBySearchName($searchVal)
     {
         $query = "SELECT u.uuid, p.firstname, p.lastname
-                    FROM ox_user u 
+                    FROM ox_user u
                     inner join ox_person p on p.id = u.person_id
                     where p.firstname LIKE :search OR lastname LIKE :search";
         $params = ['search' => "%$searchVal%"];
@@ -1122,7 +1120,7 @@ class UserService extends AbstractService
             'accountId' => $accountId,
             'default' => 1,
         );
-        $query = "INSERT into ox_account_user (`user_id`, `account_id`, `default`) 
+        $query = "INSERT into ox_account_user (`user_id`, `account_id`, `default`)
                   VALUES (:userId, :accountId, :default)";
         $result = $this->executeUpdateWithBindParameters($query, $params);
         $accountUserId = $result->getGeneratedValue();
@@ -1180,7 +1178,7 @@ class UserService extends AbstractService
                     LEFT JOIN `ox_app_registry` ar ON oa.id = ar.app_id AND ar.account_id = :accountId
                     WHERE account_id IS NULL";
         $params = ['userId' => $userId, 'accountId' => $accountId];
-        $this->logger->info("Query - $query with params - ".print_r($params, true));
+        $this->logger->info("Query - $query with params - " . print_r($params, true));
         $result = $this->executeQueryWithBindParameters($query, $params);
         $result = $result->toArray();
         $arr = array();
@@ -1195,9 +1193,9 @@ class UserService extends AbstractService
         $resetCode = $data['password_reset_code'];
         $password = md5(sha1($data['new_password']));
         $expiry = date("Y-m-d H:i:s");
-        $query = "SELECT id from ox_user 
-                    where (password_reset_expiry_date > :expiry OR 
-                    password_reset_expiry_date is NULL) and 
+        $query = "SELECT id from ox_user
+                    where (password_reset_expiry_date > :expiry OR
+                    password_reset_expiry_date is NULL) and
                     password_reset_code = :resetCode";
         $params = ['expiry' => $expiry, 'resetCode' => $resetCode];
         $result = $this->executeQueryWithBindParameters($query, $params);
@@ -1215,8 +1213,8 @@ class UserService extends AbstractService
     {
         $resetPasswordCode = UuidUtil::uuid();
         $userDetails = $this->getUserBaseProfile($username);
-        $userRecord = $userDetails['firstname']."_".$userDetails['username']."@eoxvantage.";
-        if (($userDetails['email'] == $userRecord."com") || ($userDetails['email'] == $userRecord."in")) {
+        $userRecord = $userDetails['firstname'] . "_" . $userDetails['username'] . "@eoxvantage.";
+        if (($userDetails['email'] == $userRecord . "com") || ($userDetails['email'] == $userRecord . "in")) {
             throw new ValidationException("Invalid Email");
         }
         if ($username === $userDetails['username']) {
@@ -1229,7 +1227,7 @@ class UserService extends AbstractService
             $userReset['accountId'] = $userDetails['accountId'];
             $userDetails['password_reset_expiry_date'] = $userReset['password_reset_expiry_date'];
             $userDetails['password_reset_code'] = $resetPasswordCode;
-            
+
             //Code to update the password reset and expiration time
             $this->updateUser($userDetails['uuid'], $userDetails);
             $subject = $userReset['firstname'] . ', Your login details for EOX vantage!';
@@ -1237,7 +1235,7 @@ class UserService extends AbstractService
             if (isset($this->config['emailConfig'])) {
                 $emailConfig = $this->config['emailConfig'];
                 if (isset($emailConfig['resetPassword'])) {
-                    $subject = isset($emailConfig['resetPassword']['subject']) ? $userReset['firstname'].', '.$emailConfig['resetPassword']['subject'] : $subject;
+                    $subject = isset($emailConfig['resetPassword']['subject']) ? $userReset['firstname'] . ', ' . $emailConfig['resetPassword']['subject'] : $subject;
                 }
             }
             $this->messageProducer->sendQueue(json_encode(array(
@@ -1245,7 +1243,7 @@ class UserService extends AbstractService
                 'subject' => $subject,
                 'body' => $this->templateService->getContent('resetPassword', $userReset),
             )), 'mail');
-            $userReset['email']= $this->hideEmailAddress($userReset['email']);
+            $userReset['email'] = $this->hideEmailAddress($userReset['email']);
             return $userReset;
         }
 
@@ -1259,10 +1257,10 @@ class UserService extends AbstractService
         }
         $query = "SELECT acct.name,acct.uuid as accountId, oxa.address1,oxa.address2,oxa.city,
                             oxa.state,oxa.country,oxa.zip,acct.logo, org.uuid, org.labelfile,
-                            org.languagefile,acct.status 
-                    from ox_account as acct 
-                    LEFT join ox_organization org on org.id=acct.organization_id 
-                    LEFT join ox_address as oxa on oxa.id = org.address_id 
+                            org.languagefile,acct.status
+                    from ox_account as acct
+                    LEFT join ox_organization org on org.id=acct.organization_id
+                    LEFT join ox_address as oxa on oxa.id = org.address_id
                     LEFT JOIN ox_account_user as uo ON uo.account_id=acct.id
                     LEFT JOIN ox_user as u on u.id = uo.user_id
                     where u.uuid = :userId AND acct.status='Active'";
@@ -1278,22 +1276,22 @@ class UserService extends AbstractService
         if (!isset($userId)) {
             $userId = AuthContext::get(AuthConstants::USER_ID);
         }
-        $query = "SELECT * from 
-                  (SELECT DISTINCT oa.name,oa.description, oa.uuid, oa.type, oa.logo, oa.category,oar.start_options 
-                    from ox_app as oa 
-                    INNER JOIN ox_app_registry as oar ON oa.id = oar.app_id 
-                    INNER JOIN ox_privilege as op on oar.app_id = op.app_id 
-                    INNER JOIN ox_role_privilege as orp ON op.name = orp.privilege_name 
+        $query = "SELECT * from
+                  (SELECT DISTINCT oa.name,oa.description, oa.uuid, oa.type, oa.logo, oa.category,oar.start_options
+                    from ox_app as oa
+                    INNER JOIN ox_app_registry as oar ON oa.id = oar.app_id
+                    INNER JOIN ox_privilege as op on oar.app_id = op.app_id
+                    INNER JOIN ox_role_privilege as orp ON op.name = orp.privilege_name
                     INNER JOIN ox_account_user au on orp.account_id = au.account_id
-                    INNER JOIN ox_user_role as our ON orp.role_id = our.role_id AND 
+                    INNER JOIN ox_user_role as our ON orp.role_id = our.role_id AND
                                                       our.account_user_id = au.id
                     WHERE oar.account_id = :accountId  AND au.user_id = :userId
-                 union 
-                 SELECT DISTINCT name,description, uuid, type, logo, category,oar.start_options 
-                    FROM ox_app as oa 
-                    INNER JOIN ox_app_registry as oar ON oa.id= oar.app_id  
-                    WHERE oa.id NOT IN (SELECT app_id FROM ox_privilege WHERE app_id IS NOT NULL) 
-                    AND oar.account_id = :accountId) a 
+                 union
+                 SELECT DISTINCT name,description, uuid, type, logo, category,oar.start_options
+                    FROM ox_app as oa
+                    INNER JOIN ox_app_registry as oar ON oa.id= oar.app_id
+                    WHERE oa.id NOT IN (SELECT app_id FROM ox_privilege WHERE app_id IS NOT NULL)
+                    AND oar.account_id = :accountId) a
                  ORDER BY a.name";
         $params = ['userId' => $userId, 'accountId' => $accountId];
         $result = $this->executeQueryWithBindParameters($query, $params);
@@ -1343,10 +1341,10 @@ class UserService extends AbstractService
         $responseUserData = $userData[0];
         $responseUserData['manager_name'] = "";
         $responseUserData['preferences'] = json_decode($responseUserData['preferences'], true);
-        if (isset($responseUserData['managerId']) &&  ($responseUserData['managerId'] !== 0)) {
+        if (isset($responseUserData['managerId']) && ($responseUserData['managerId'] !== 0)) {
             try {
                 $result = $this->getUserWithMinimumDetails($responseUserData['managerId'], $params['accountId']);
-                $responseUserData['manager_name'] = $result['firstname']." ".$result['lastname'];
+                $responseUserData['manager_name'] = $result['firstname'] . " " . $result['lastname'];
             } catch (Exception $e) {
                 unset($responseUserData['managerId']);
             }
@@ -1357,7 +1355,7 @@ class UserService extends AbstractService
 
     public function checkUserExists($data)
     {
-        $from = "FROM ox_user as u 
+        $from = "FROM ox_user as u
                  INNER join ox_person per on per.id = u.person_id ";
         $where = "WHERE (username=:username OR email=:email)";
         $queryParams = array("username" => $data['username'],
@@ -1370,7 +1368,7 @@ class UserService extends AbstractService
                 $appId = $data['app_id'];
             }
             $from .= " INNER JOIN ox_wf_user_identifier ui ON ui.user_id = u.id";
-            $where .= " AND ui.app_id = :appId 
+            $where .= " AND ui.app_id = :appId
                         OR (ui.identifier = :identifier AND ui.identifier_name = :identifierName)";
             $queryParams = array_merge($queryParams, array("appId" => $appId,
                 "identifier" => $data[$data['identifier_field']],
@@ -1384,7 +1382,7 @@ class UserService extends AbstractService
         $result = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (!empty($result)) {
             if ($data['username'] == $result[0]['username'] &&
-                    $data['email'] == $result[0]['email']) {
+                $data['email'] == $result[0]['email']) {
                 $data['username'] = $result[0]['username'];
                 $data['id'] = $result[0]['id'];
                 $data['uuid'] = $result[0]['uuid'];
@@ -1414,9 +1412,9 @@ class UserService extends AbstractService
                 $pageSize = 20;
                 $offset = 0;
                 $sort = "name";
-                $select = "SELECT ou.uuid, ou.username, per.firstname, per.lastname, 
+                $select = "SELECT ou.uuid, ou.username, per.firstname, per.lastname,
                                     ou.name,a.uuid as accountId";
-                $from = " FROM `ox_user` as ou  
+                $from = " FROM `ox_user` as ou
                           INNER JOIN ox_account a on a.id = ou.account_id
                           inner join ox_person per on per.id = ou.person_id";
                 $where .= "WHERE ou.status = 'Active' AND ou.account_id = :accountId";
@@ -1443,18 +1441,18 @@ class UserService extends AbstractService
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             list($first, $last) = explode('@', $email);
-            $first = str_replace(substr($first, '3'), str_repeat('*', strlen($first)-3), $first);
+            $first = str_replace(substr($first, '3'), str_repeat('*', strlen($first) - 3), $first);
             $last = explode('.', $last);
-            $last_domain = str_replace(substr($last['0'], '1'), str_repeat('*', strlen($last['0'])-1), $last['0']);
-            $hideEmailAddress = $first.'@'.$last_domain.'.'.$last['1'];
+            $last_domain = str_replace(substr($last['0'], '1'), str_repeat('*', strlen($last['0']) - 1), $last['0']);
+            $hideEmailAddress = $first . '@' . $last_domain . '.' . $last['1'];
             return $hideEmailAddress;
         }
     }
 
     public function getUserDetailsByIdentifier($identifier, $identifierName)
     {
-        $select = "SELECT ou.* from ox_user as ou 
-                    join ox_wf_user_identifier as owi on ou.id = owi.user_id 
+        $select = "SELECT ou.* from ox_user as ou
+                    join ox_wf_user_identifier as owi on ou.id = owi.user_id
                     WHERE owi.identifier = :identifier AND owi.identifier_name = :identifierName";
         $selectParams = array("identifier" => $identifier, "identifierName" => $identifierName);
         $result = $this->executeQueryWithBindParameters($select, $selectParams)->toArray();
@@ -1470,8 +1468,8 @@ class UserService extends AbstractService
         $sql = $this->getSqlObject();
         $select = $sql->select();
         $select->from('ox_user')
-        ->columns(array('has_logged_in','verification_pending'))
-        ->where(array('id' => AuthContext::get(AuthConstants::USER_ID),'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
+            ->columns(array('has_logged_in', 'verification_pending'))
+            ->where(array('id' => AuthContext::get(AuthConstants::USER_ID), 'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
         $result = $this->executeQuery($select)->toArray();
         if (count($result)) {
             return $result[0];
@@ -1483,7 +1481,7 @@ class UserService extends AbstractService
         $sql = $this->getSqlObject();
         $updatedData['has_logged_in'] = "1";
         $update = $sql->update('ox_user')->set($updatedData)
-        ->where(array('ox_user.id' => AuthContext::get(AuthConstants::USER_ID),'ox_user.account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
+            ->where(array('ox_user.id' => AuthContext::get(AuthConstants::USER_ID), 'ox_user.account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID)));
         $result = $this->executeUpdate($update);
     }
     private function unsetAddressData(&$addressData, $userdata)
@@ -1497,13 +1495,14 @@ class UserService extends AbstractService
         }
     }
 
-    private function getRoleFromUuid($uuid) {
+    private function getRoleFromUuid($uuid)
+    {
         $select = "SELECT name from ox_role as oxr WHERE oxr.uuid = :uuid";
         $selectParams = array("uuid" => $uuid);
         $result = $this->executeQuerywithBindParameters($select, $selectParams)->toArray();
-        if(count($result) > 0){
+        if (count($result) > 0) {
             return $result[0]['name'];
-        }else{
+        } else {
             return null;
         }
     }
@@ -1516,10 +1515,19 @@ class UserService extends AbstractService
                     INNER JOIN ox_account oxa ON oxa.id = owui.account_id
                     INNER JOIN ox_app app ON app.id = owui.app_id
                     INNER JOIN ox_app_entity oxae ON oxae.app_id = app.id
-                    WHERE owui.identifier_name = :identityField AND 
+                    WHERE owui.identifier_name = :identityField AND
                     app.uuid = :appId AND owui.identifier = :identifier";
         $selectQuery = array("identityField" => $identifierField, "appId" => $appId, "identifier" => $identifier);
-        $this->logger->info("INFO---$select with Parasm--".print_r($selectQuery,true));
+        $this->logger->info("INFO---$select with Parasm--" . print_r($selectQuery, true));
         return $this->executeQuerywithBindParameters($select, $selectQuery)->toArray();
+    }
+
+    public function updateUserCacheData()
+    {
+        $sql = $this->getSqlObject();
+        $updatedData['cleared_browser_cache'] = 1;
+        $update = $sql->update('ox_user')->set($updatedData);
+        $result = $this->executeUpdate($update);
+        return $updatedData;
     }
 }

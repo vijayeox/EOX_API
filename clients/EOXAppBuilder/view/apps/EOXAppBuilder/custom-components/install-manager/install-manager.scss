@@ -1,0 +1,50 @@
+.install-manager{
+    .install-manager-tabs{
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin: 10px 0px 0px 1rem;
+    
+        p{
+          margin: 0;
+          padding: 0;
+          padding: 7.5px;
+          border: 1px solid #275362; 
+          border-radius: 5px;
+          cursor: pointer;
+          color: #275362;
+        }
+    
+        &_active{
+          background: #275362 !important;
+          color: #FFF !important;
+        }
+    }
+    .organizations{
+      max-height: calc(100vh - 220px);
+      overflow: auto;
+      padding: 1rem;
+      margin: 5px 0;
+
+      p{
+        margin: 0;
+        padding: 10px 7px;
+        cursor: pointer;
+        border-radius: 5px;
+        &:hover{
+          background: #2753626b;
+        }
+      }
+    }
+    .install-manager-submission {
+      button{
+        float: right;
+        padding: 7px 15px;
+        margin-right: 1rem;
+        border: none;
+        background: #275362;
+        color: #FFF;
+        cursor: pointer;
+      }
+    }
+}

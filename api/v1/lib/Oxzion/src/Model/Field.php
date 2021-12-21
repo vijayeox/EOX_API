@@ -33,6 +33,7 @@ class Field extends Entity
         'index' => 0,
         'sequence' => null,
         'isdeleted' => 0,
+        'uuid' =>0,
     );
 
     public function validate()

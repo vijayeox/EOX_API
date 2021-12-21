@@ -24,6 +24,7 @@ abstract class MailDelegate extends CommunicationDelegate
         $data['accountId'] = $accountId;
 
         $mailOptions['body'] = $this->templateService->getContent($template, $data);
+        $mailOptions['from'] = "support@eoxvantage.com";
         $userMail = $this->sendMessage($mailOptions, 'mail');
         return $userMail;
     }
