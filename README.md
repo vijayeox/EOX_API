@@ -68,7 +68,8 @@ To learn how to install Docker [click here.](https://www.digitalocean.com/commun
 
 <h4>2. <u>MySql 5.7</u>: </h4>
 
-To learn how to install MySql [click here.](https://linuxize.com/post/how-to-install-mysql-on-ubuntu-18-04/)
+To learn how to install MySql on Ubuntu 18.04 [click here.](https://linuxize.com/post/how-to-install-mysql-on-ubuntu-18-04/)
+To learn how to install MySql on Ubuntu 20.04 [click here.](https://computingforgeeks.com/how-to-install-mysql-on-ubuntu-focal/)
 
 <h5><center> OR RUN THE FOLLOWING COMMANDS in terminal</center></h5>
 

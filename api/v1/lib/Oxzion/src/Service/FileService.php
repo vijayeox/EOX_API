@@ -166,8 +166,10 @@ class FileService extends AbstractService
             // IF YOU DELETE THE BELOW TWO LINES MAKE SURE YOU ARE PREPARED TO CHECK THE ENTIRE INDEXER FLOW
 
             if (isset($result['id'])) {
-                $this->logger->info("THE FILE ID TO BE INDEXED IS ".$result['uuid']);
-                $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED');
+                $this->logger->info("THE FILE ID TO BE INDEXED IS ".$result['id']);
+                $this->logger->info("THE FILE UUID TO BE INDEXED IS ".$result['uuid']);
+                $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED_WITH_UUID');
+                $this->messageProducer->sendQueue(json_encode(array('id' => $result['id'])), 'FILE_ADDED');
             }
         } catch (Exception $e) {
             $this->rollback();
@@ -348,7 +350,19 @@ class FileService extends AbstractService
                 return;
             }
         } elseif ($user == 'manager') {
-            $manager = $this->executeQuerywithParams("SELECT manager_id FROM `ox_employee_manager` inner join ox_user on ox_employee_manager.employee_id=ox_user.id inner join ox_file on ox_user.id=ox_file.created_by WHERE `ox_file`.`id` = " . $fileId . ";")->toArray();
+            // $manager = $this->executeQuerywithParams("SELECT manager_id FROM `ox_employee_manager` inner join ox_user on ox_employee_manager.employee_id=ox_user.id inner join ox_file on ox_user.id=ox_file.created_by WHERE `ox_file`.`id` = " . $fileId . ";")->toArray();
+
+            // Added inner joins on ox_user and ox_employee
+            // Rather than doing a inner join on file and employee table
+            // As the User ID and Employee ID are not the same.
+            $manager = $this->executeQuerywithParams("SELECT oem.manager_id 
+            FROM ox_employee_manager oem
+            inner join ox_employee oe on oem.employee_id=oe.id
+            inner join ox_user ou on oe.person_id = ou.person_id 
+            inner join ox_file of2 on of2.created_by = ou.id
+            WHERE of2.id = " . $fileId . ";")->toArray();
+            $this->logger->info("The Manager Assignment Query ------ ".print_r($manager,true));
+
             if (isset($manager) && count($manager) > 0) {
                 $userId = $manager[0]['manager_id'];
             } else {
@@ -442,7 +456,11 @@ class FileService extends AbstractService
         $this->updateFileUserContext($obj);
         $fields = json_decode($obj['data'], true);
         $this->updateFileAttributesInternal($obj['entity_id'], $fields, $fileId);
-    }
+        //$this->messageProducer->sendQueue($fileId,'FILE_INDEX');
+        $this->logger->info("justbefore FILE_UPDATED_WITH_UUID---".$obj['uuid']);
+        $this->messageProducer->sendQueue(json_encode(array('uuid' => $obj['uuid'])), 'FILE_UPDATED_WITH_UUID');
+        $this->logger->info("justafter FILE_UPDATED_WITH_UUID---");
+            }
     
     private function updateFileUserContext($obj)
     {
@@ -751,7 +769,7 @@ class FileService extends AbstractService
             // AuthContext::get(AuthConstants::ACCOUNT_ID);
             $params = array('id' => $id, 'isActive' => 1);
             // 
-            $select = "SELECT oxf.id, oxf.uuid, oxf.data, ou.uuid as ownerId, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf 
+            $select = "SELECT oxf.id, oxf.uuid, oxf.data, ou.uuid as ownerId, ou.name as created_by, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf 
             inner join ox_user as ou on `oxf`.created_by = `ou`.id
                         inner join ox_app_entity oae on oae.id = oxf.entity_id";
             $where = " where oxf.uuid = :id and oxf.is_active = :isActive ";
@@ -775,6 +793,7 @@ class FileService extends AbstractService
                 $this->logger->info("FILE ID  ------" . json_encode($result));
                 if ($result[0]['data']) {
                         $result[0]['data'] = json_decode($result[0]['data'], true);
+                        $result[0]['data']['myId'] = $result[0]['id'];
                     }
                     unset($result[0]['id']);
                     $this->logger->info("FILE DATA SUCCESS ------" . print_r($result[0], true));
@@ -1787,7 +1806,7 @@ class FileService extends AbstractService
     public function getChangeLog($entityId, $startData, $completionData, $labelMapping=null,$fileId=null)
     {
         $fieldSelect = "SELECT ox_field.name,ox_field.template,ox_field.type,ox_field.text,ox_field.data_type,COALESCE(parent.name,'') as parentName,COALESCE(parent.text,'') as parentText,parent.data_type as parentDataType FROM ox_field 
-                    left join ox_field as parent on ox_field.parent_id = parent.id WHERE ox_field.entity_id=:entityId AND ox_field.type NOT IN ('hidden','file','document','documentviewer') ORDER BY parentName, ox_field.name ASC";
+                    left join ox_field as parent on ox_field.parent_id = parent.id WHERE ox_field.entity_id=:entityId AND ox_field.type NOT IN ('file','document','documentviewer') ORDER BY parentName, ox_field.name ASC";
 
         $fieldParams = array('entityId' => $entityId);
         $resultSet = $this->executeQueryWithBindParameters($fieldSelect, $fieldParams)->toArray();
@@ -1857,7 +1876,19 @@ class FileService extends AbstractService
                 return "";
             }
         }
-        
+        if ($value['type'] == 'hidden') {
+            if (isset($value['template']) && is_string($value['template'])) {
+                $template = json_decode($value['template'],true);
+                if (isset($template['properties'])) {
+                   $template = is_string($template['properties']) ? json_decode($template['properties'],true) : $template['properties'];
+                }
+                if (isset($template['shadow']) && $template['shadow'] == 'true') {
+                    $initialData = $initialData;
+                }else{
+                    return "";
+                }
+            }
+        }
 
         if ($value['data_type'] == 'text') {
             //handle string data being sent
@@ -1913,16 +1944,14 @@ class FileService extends AbstractService
             }
         } elseif ($value['data_type'] =='list') {
             $radioFields =json_decode($value['template'], true);
-            if (is_string($initialData)) {
+            if (!is_array($initialData) && $this->isJson($initialData)) {
                 $selectValues = json_decode($initialData, true);
             } else {
-                if (is_array($initialData)) {
                     $selectValues = $initialData;
-                }
             }
             $initialData = "";
             $processed =0;
-            if (isset($selectValues) && is_string($selectValues)) {
+            if (isset($selectValues) && !is_array($selectValues) && $this->isJson($selectValues)) {
                 $selectValues = json_decode($selectValues, true);
             }
             if (isset($selectValues) && is_array($selectValues)) {
@@ -1941,6 +1970,9 @@ class FileService extends AbstractService
                     }
                 }
             }
+            else{
+                $initialData = $selectValues;
+            }
         } elseif ($value['data_type'] == 'datetime') {
             $initialData = date("Y-m-d", strtotime($initialData));
         }elseif ($value['data_type'] == 'longtext') {
@@ -1957,6 +1989,11 @@ class FileService extends AbstractService
                 }
             }
         }
+        
+        if ((isset($value['type']) && $value['type'] =='documentsigner')){
+            return '';// Ignoring the documentsigner component from showing up on the history data.
+         }
+
         if ($labelMapping && !empty($initialData) && isset($labelMapping[$initialData])) {
           if ($value['data_type'] == 'numeric') {
             $initialData = $initialData;
