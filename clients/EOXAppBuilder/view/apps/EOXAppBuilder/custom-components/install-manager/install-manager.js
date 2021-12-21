@@ -40,7 +40,7 @@ class AppInstaller extends React.Component{
                 payload,
                 rest
             )
-            resolve(status === 'status' && data || null)
+            resolve(status === 'success' && data || null)
         })
     }
     render(){
@@ -91,7 +91,7 @@ class Organization extends React.Component{
         this.core = props.core;
     }
     render(){
-        const data = (props.organization || []).map((org) => {
+        const data = (this.props.organization || []).map((org) => {
             return <p key={org.uuid}>{org.name}</p>
         })
         return <div className="organizations">{data}</div>
