@@ -340,6 +340,32 @@ return [
                     ],
                 ],
             ],
+            'getupdatecache' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/user/:userId/getuserbrowsercachestatus',
+                    'defaults' => [
+                        'controller' => Controller\UserController::class,
+                        'method' => 'GET',
+                        'action' => 'getUserBrowserCacheStatus',
+                    ],
+                ],
+            ],
+            'setusercache' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/user/setuserbrowsercache',
+                    'defaults' => [
+                        'controller' => Controller\UserController::class,
+                        'method' => 'PUT',
+                        'action' => 'setUserBrowserCache',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                            'setUserBrowserCache' => 'MANAGE_USER_WRITE',
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

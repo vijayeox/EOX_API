@@ -117,6 +117,12 @@ class CleanYml extends AbstractAppDelegate
     private function cleanApplicationDescriptorData(&$descriptorData)
     {
         $this->logger->info("DECRPTOR DATA AT ENTRANCE-----".print_r($descriptorData,true));
+        if (isset($descriptorData['listOFForms'])) {
+           unset($descriptorData['listOFForms']);
+        }
+        if (isset($descriptorData['listOFWorkflows'])) {
+            unset($descriptorData['listOFWorkflows']);
+        }
         if (isset($descriptorData["entity"])) {
             $descEntity = [];
             foreach ($descriptorData["entity"] as &$value) {
@@ -126,7 +132,9 @@ class CleanYml extends AbstractAppDelegate
                 if (isset($value['field']) && array_key_exists('name', $value['field'][0]) && empty($value['field'][0]['name'])) {
                     unset($value['field']);
                 }
-
+                if (isset($value['participantRoleDuplicate'])) {
+                    unset($value['participantRoleDuplicate']);
+                }
                 if (isset($value['pageContent']['data']['pagesList'])) {
                    unset($value['pageContent']['data']['pagesList']);
                 }
