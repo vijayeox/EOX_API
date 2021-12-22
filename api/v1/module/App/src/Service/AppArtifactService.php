@@ -269,7 +269,7 @@ class AppArtifactService extends AbstractService
                 ['directory' => $appSourceDir]
             );
         }
-        if ($artifactType == 'form' && $artifactType == 'workflow') {
+        if ($artifactType == 'form' || $artifactType == 'workflow') {
             $contentDir = $appSourceDir . $this->contentFolder;
         } else{
             $contentDir = $appSourceDir . $this->dataFolder;
