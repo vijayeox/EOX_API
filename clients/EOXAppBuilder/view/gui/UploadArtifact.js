@@ -22,6 +22,18 @@ class UploadArtifact extends React.Component {
       this.infoMessage =
         "Please verify if the BPMN file has a unique Workflow Name and has both start and end events";
       this.fileExtension = ".bpmn";
+    } else if(this.props.entity == 'delegate'){
+      this.postURL =
+        "app/" + this.props.params.app_uuid + "/artifact/add/delegate";
+      this.infoMessage =
+        "Please verify if the PHP file has a unique File Name";
+      this.fileExtension = ".php";
+    } else if(this.props.entity == 'template'){
+      this.postURL =
+        "app/" + this.props.params.app_uuid + "/artifact/add/template";
+      this.infoMessage =
+        "Please verify if the Template file has a unique File Name";
+      this.fileExtension = ".tpl";
     }
     this.core = this.props.core;
     this.loader = this.core.make("oxzion/splash");

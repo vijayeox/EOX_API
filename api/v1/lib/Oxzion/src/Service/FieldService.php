@@ -8,6 +8,7 @@ use Oxzion\Model\Field;
 use Oxzion\Model\FieldTable;
 use Oxzion\ServiceException;
 use Oxzion\Service\AbstractService;
+use Oxzion\Utils\UuidUtil;
 
 class FieldService extends AbstractService
 {
@@ -37,6 +38,7 @@ class FieldService extends AbstractService
         }
         $data['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
         $data['date_modified'] = date('Y-m-d H:i:s');
+        $data['uuid'] = !empty($data['uuid']) ? $data['uuid'] : UuidUtil::uuid();
         $this->logger->info(__CLASS__ . "-> Data modified before create - " . print_r($data, true));
         $field->exchangeArray($data);
         $field->validate();

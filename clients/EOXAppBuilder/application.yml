@@ -67,6 +67,12 @@ pages:
     -
         page_name: InstallManager.yml
         uuid: 96953fc8-7269-494d-b126-6ea45a07a007
+    -
+        page_name: DelegateManager.yml
+        uuid: 7302ba08-5ea3-11ec-bf63-0242ac130002
+    -
+        page_name: TemplateManager.yml
+        uuid: 7302bd3c-5ea3-11ec-bf63-0242ac130002
 menu:
     -
         name: 'Manage EOX Apps'
