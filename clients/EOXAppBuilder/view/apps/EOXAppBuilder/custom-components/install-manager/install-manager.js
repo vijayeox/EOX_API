@@ -1,13 +1,11 @@
-import { React, ReactDOM, EOXApplication } from "oxziongui";
+import { OX_Grid, React, ReactDOM, EOXApplication, ReactBootstrap, FormRender, KendoReactButtons, KendoReactWindow} from "oxziongui";
+import * as OxzionGUIComponents from 'oxziongui'
+import UploadArtifact from "../../../../gui/UploadArtifact";
 import './install-manager.scss'
+import form from './metadata-form.json'
 export default  function InstallManager(props){
     return <AppInstaller core={props.core}  appId={props.appId}/>
 }
-/**
- * 
-            appId={this.appId}
-            fileId={fileId}
- */
 class AppInstaller extends React.Component{
     constructor(props){
         super(props);
@@ -16,18 +14,14 @@ class AppInstaller extends React.Component{
         this.helper = this.core.make("oxzion/restClient");
         this.appId = props.appId;
         this.state = {
-            tab : 0,
-            organization : null,
-            templates : null
+            orgInstallSelected : null,
+            orgTemplateSelected : null
         }
+        this.onOrgAction = this.onOrgAction.bind(this)
+        this.uninstall = this.uninstall.bind(this)
+        this.install = this.install.bind(this)
     }
     componentDidMount(){
-        Promise.all([
-            this.api('account?filter=[{%22take%22:1000,%22skip%22:0}]'), 
-            this.api(`app/${this.appId}/artifact/list/template`)
-        ]).then(([orgsList, templates]) => {
-            this.setState({organization : orgsList || [], templates : templates || [] })
-        })
     }
     getActive(n){
         return this.state.tab === n &&'install-manager-tabs_active'
@@ -43,19 +37,55 @@ class AppInstaller extends React.Component{
             resolve(status === 'success' && data || null)
         })
     }
+    onOrgAction(type, org){
+        if(type === 'INSTALL'){
+            this.setState({orgInstallSelected : org})
+            return;
+        }
+        this.setState({orgTemplateSelected : org})
+    }
+    uninstall(){
+
+    }
+    install(){
+        this.setState({orgInstallSelected : null})
+    }
+    closeTemplate(){
+        this.setState({orgTemplateSelected : null})
+    }
     render(){
         return <div className='install-manager'>
-                    <div className='install-manager-tabs width-100'>
-                        <p className={this.getActive(0)} onClick={() => this.setState({tab : 0})}>Select Organization</p>
-                        <p className={this.getActive(1)} onClick={() => this.setState({tab : 1})}>Auto-start</p>
-                        <p className={this.getActive(2)} onClick={() => this.setState({tab : 2})}>Email Template</p>
-                    </div>
-                    {this.state.tab === 0 && <Organization organization={this.state.organization}/>}
-                    {this.state.tab === 1 && <Metadata core={this.core}/>}
-                    {this.state.tab === 2 && <Template templates={this.state.templates}/>}
-                    <div className='install-manager-submission'>
-                        <button>Next</button>
-                    </div>
+            <div className="install-manager-header">
+                <p>{this.state.orgInstallSelected?.uuid ? 'Meta Data' : this.state.orgTemplateSelected?.uuid ? 'Template Manager' : 'Organizations'}</p>
+                {this.state.orgInstallSelected ||  this.state.orgTemplateSelected ?
+                    <KendoReactButtons.Button className={"btn btn-primary install-manager-btn"} 
+                        onClick={() => {
+                            this.setState({orgInstallSelected : null, orgTemplateSelected : null})
+                        }}>
+                        <i className="fas fa-arrow-left"></i>
+                    </KendoReactButtons.Button> : null
+                }
+            </div>
+            {this.state.orgInstallSelected && 
+                <Metadata 
+                    core={this.core} 
+                    org={this.state.orgInstallSelected} 
+                    install={this.install.bind(this)}
+                /> || 
+                this.state.orgTemplateSelected && 
+                <Template 
+                    org={this.state.orgTemplateSelected} 
+                    closeTemplate={this.closeTemplate.bind(this)}
+                    core={this.props.core}
+                    appId={this.appId}
+                /> || 
+                <Organization 
+                organization={this.state.organization} 
+                install={this.onOrgAction} 
+                uninstall={this.uninstall}
+                core={this.props.core}
+            />
+            }
         </div>
     }
 }
@@ -65,11 +95,22 @@ class Template extends React.Component{
         super(props);
         this.core = props.core;
         this.templates = props.templates;
+        this.closeTemplate = props.closeTemplate;
     }
     componentDidMount(){
     }
     render(){
-        return <div>{JSON.stringify(this.templates)}</div>
+        return <div>
+            <UploadArtifact components={OxzionGUIComponents} entity='template' refresh={() =>{}} core={this.core} appId={this.props.appId} params={{app_uuid: this.props.org?.uuid}}/>
+            <OX_Grid
+                osjsCore={this.core}
+                data={`app/${this.props.org?.uuid}/artifact/list/template`}
+                columnConfig={[{title : 'Template', field : 'name'}]}
+                actions={[
+                    {icon : 'far fa-trash', name : 'Delete', callback : ()=>{}, rule: "true"},
+                ]}
+            />
+        </div>
     }
 }
 
@@ -77,11 +118,19 @@ class Metadata extends React.Component{
     constructor(props){
         super(props);
         this.core = props.core;
+        this.install = this.props.install;
     }
     componentDidMount(){
     }
     render(){
-        return <div>AUTO START</div>
+        return   <FormRender 
+        content = {form}
+        core ={this.core}
+        postSubmitCallback = {(...args) => {
+            console.log(args)
+        }}
+        updateFormData={true}
+    />
     }
 }
 
@@ -89,11 +138,23 @@ class Organization extends React.Component{
     constructor(props){
         super(props);
         this.core = props.core;
+        this.install = this.props.install;
+        this.uninstall = this.props.uninstall;
     }
     render(){
-        const data = (this.props.organization || []).map((org) => {
-            return <p key={org.uuid}>{org.name}</p>
-        })
-        return <div className="organizations">{data}</div>
+        return <OX_Grid
+                    osjsCore={this.core}
+                    data={'account?filter=[{%22take%22:1000,%22skip%22:0}]'}
+                    columnConfig={[{title : 'Organization', field : 'name'}]}
+                    actions={[
+                        {icon : 'far fa-download', name : 'Install', callback : (data) => { 
+                            this.install('INSTALL', data)
+                        }, rule: "true"},
+                        {icon : 'far fa-trash', name : 'Uninstall', callback : this.uninstall.bind(this), rule: "true"},
+                        {icon : 'far fa-upload', name : 'Template Manager', callback : (data) => {
+                            this.install('TEMPLATE', data)
+                         }, rule: "true"},
+                    ]}
+                />
     }
 }
