@@ -59,6 +59,14 @@
 				"tableView": false,
 				"hideOnChildrenHidden": false
 			}, {
+				"label": "Previous Version of the App",
+				"calculateValue": "if(!value){\n  value = '1.0';\n}",
+				"key": "previousVersion",
+				"type": "hidden",
+				"input": true,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
 				"label": "Old App Name",
 				"customDefaultValue": "console.log(\"APP NME---\");\nconsole.log(value);",
 				"key": "oldAppName",
@@ -2490,10 +2498,20 @@
 			"type": "textarea",
 			"rows": 10,
 			"input": true
+		}, {
+			"label": "App Version",
+			"mask": false,
+			"tableView": false,
+			"delimiter": false,
+			"requireDecimal": false,
+			"inputFormat": "plain",
+			"key": "appVersion",
+			"type": "number",
+			"input": true
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 781,
+	"_vid": 784,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2577,6 +2595,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2021-12-16T11:12:48.852Z",
+	"modified": "2021-12-23T06:35:28.335Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
