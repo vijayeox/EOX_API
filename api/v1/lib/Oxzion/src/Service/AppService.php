@@ -34,8 +34,9 @@ use Oxzion\Utils\RestClient;
 use Oxzion\Utils\UuidUtil;
 use Oxzion\ValidationException;
 use Symfony\Component\Yaml\Yaml;
+use Oxzion\App\AppUpgrade;
 
-class AppService extends AbstractService
+class AppService extends AbstractService implements AppUpgrade
 {
     const EOX_RESERVED_APP_NAME = 'SampleApp';
     const APPLICATION_DESCRIPTOR_FILE_NAME = 'application.yml';
@@ -83,6 +84,7 @@ class AppService extends AbstractService
         $this->appRegistryService = $appRegistryService;
         $this->userService = $userService;
         $this->messageProducer = $messageProducer;
+        $this->appUpgradeDir = $this->config['UPGRADE_FOLDER'];
         $this->restClient = new RestClient(null);
         $this->appDeployOptions = array("initialize", "entity", "workflow", "form", "page", "menu", "job", "migration", "view", "symlink");
     }
@@ -100,6 +102,45 @@ class AppService extends AbstractService
      * }
      * </code>
      */
+
+    public function upgrade(array $data){
+        $result = $this->upgradeFile($data);
+        if ($result) {
+            $file = 'AppUpgrade'.str_replace('.','_',$data['appVersion']);
+            $obj = new $file;
+            $output = $obj->upgrade($data);
+            if (!$output) {
+                $output = array();
+            }
+            return $output;
+        }
+    } 
+
+    private function upgradeFile($data)
+    {
+        $appId = $data['app']['uuid'];
+        $formlink = $this->appUpgradeDir . $appId;
+        $formsTarget = $this->config['EOX_APP_DEPLOY_DIR'] .$appId. "/data/appupgrade";
+        if (is_link($formlink)) {
+            FileUtils::unlink($formlink);
+        }
+        if (file_exists($formsTarget)) {
+            $this->setupLink($formsTarget, $formlink);
+        }
+
+        $file = 'AppUpgrade'.str_replace('.','_',$data['appVersion']).'.php';
+        $path = $this->appUpgradeDir . $appId . "/" . $file;
+        $this->logger->info(AppDelegateService::class . "App Upgrade File Path ---\n" . $path);
+        if ((file_exists($path))) {
+            // include $path;
+            $this->logger->info("Loading App Upgrade file");
+            require_once $path;
+        } else {
+            throw new EntityNotFoundException("App Upgrade File not found");
+        }
+        return true;
+    }
+
     public function getApps()
     {
         $queryString = 'SELECT ap.name, ap.uuid, ap.description, ap.type, ap.logo, ap.category, ap.date_created,
@@ -264,6 +305,17 @@ class AppService extends AbstractService
             $params = $this->appDeployOptions;
         }
         try {
+            if (isset($ymlData['appVersion'])) {                
+                if ($ymlData['appVersion'] != $ymlData['app']['previousVersion']) {
+                    $updatedYml = $this->upgrade($ymlData);
+                    $yamlText = Yaml::dump($updatedYml, 20);
+                    $deployPath = $path .'application.yml';
+                    $sourcePath = $this->config['EOX_APP_SOURCE_DIR'] .$ymlData['app']['uuid'].'/application.yml';
+                    file_put_contents($deployPath, $yamlText);
+                    file_put_contents($sourcePath, $yamlText);
+                    $ymlData = Yaml::parse(file_get_contents($sourcePath));
+                }
+            }
             foreach ($this->appDeployOptions as $key => $value) {
                 if (!in_array($value, $params)) {
                     continue;
@@ -1034,7 +1086,7 @@ class AppService extends AbstractService
             $this->setupLink($target, $link);
         }
         $formlink = $this->config['FORM_FOLDER'] . $appId;
-        $formsTarget = $path . "/content/forms";
+        $formsTarget = FileUtils::joinPath($path) . "content/forms";
         if (is_link($formlink)) {
             FileUtils::unlink($formlink);
         }
@@ -1043,7 +1095,7 @@ class AppService extends AbstractService
         }
 
         $formlink = $this->config['PAGE_FOLDER'] . $appId;
-        $formsTarget = $path . "/content/pages";
+        $formsTarget = FileUtils::joinPath($path) . "content/pages";
         if (is_link($formlink)) {
             FileUtils::unlink($formlink);
         }
@@ -1051,7 +1103,7 @@ class AppService extends AbstractService
             $this->setupLink($formsTarget, $formlink);
         }
         $formlink = $this->config['ENTITY_FOLDER'] . $appId;
-        $formsTarget = $path . "/content/entity";
+        $formsTarget = FileUtils::joinPath($path) . "content/entity";
         if (is_link($formlink)) {
             FileUtils::unlink($formlink);
         }
@@ -1483,7 +1535,7 @@ class AppService extends AbstractService
                 if (isset($entity['identifiers'])) {
                     $result = $this->entityService->saveIdentifiers($entity['id'], $entity['identifiers']);
                 }
-                if (isset($entity['participantRole'])) {
+                if (!empty($entity['participantRole'][0])) {
                     $result = $this->entityService->saveParticipantRoles($entity['id'], $appId, $entity['participantRole']);
                 }
                 if (isset($entity['field'])) {
