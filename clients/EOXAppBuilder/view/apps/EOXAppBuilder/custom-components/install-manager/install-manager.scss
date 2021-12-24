@@ -1,9 +1,22 @@
+$eox_theme : #275362;
 .install-manager{
-    &-header{
-      display: flex;
+    &_header{
+      display: inline-flex;
       justify-content: space-between;
       align-items: center;
       margin-top: 1rem;
+      gap: 10px;
+
+      div{
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: 1px solid $eox_theme;
+      }
+      &--active{
+        background: $eox_theme !important;
+        color: #FFF !important;
+      }
     }
     .install-manager-tabs{
         display: flex;
@@ -15,14 +28,14 @@
           margin: 0;
           padding: 0;
           padding: 7.5px;
-          border: 1px solid #275362; 
+          border: 1px solid $eox_theme; 
           border-radius: 5px;
           cursor: pointer;
-          color: #275362;
+          color: $eox_theme;
         }
     
         &_active{
-          background: #275362 !important;
+          background: $eox_theme !important;
           color: #FFF !important;
         }
     }
@@ -38,7 +51,7 @@
         cursor: pointer;
         border-radius: 5px;
         // &:hover{
-        //   background: #2753626b;
+        //   background: $eox_theme6b;
         // }
       }
       &-org{
@@ -62,7 +75,7 @@
         padding: 7px 15px;
         margin-right: 1rem;
         border: none;
-        background: #275362;
+        background: $eox_theme;
         color: #FFF;
         cursor: pointer;
       }

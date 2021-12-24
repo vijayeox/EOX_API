@@ -1,0 +1,483 @@
+{
+	"_id": "61c5ad8d245b70d5363fd347",
+	"type": "resource",
+	"tags": [],
+	"owner": "6022c8ed8a3c363aa2fbe5ef",
+	"components": [{
+		"title": "Account Info",
+		"theme": "primary",
+		"collapsible": false,
+		"key": "organizationInfo",
+		"type": "panel",
+		"label": "Organization Info",
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"breadcrumbClickable": true,
+		"tableView": false,
+		"input": false,
+		"components": [{
+			"label": "Do you want to add account information",
+			"tooltip": "If selected a new Account will be Created when the Application is being Deployed",
+			"autofocus": true,
+			"tableView": false,
+			"defaultValue": false,
+			"clearOnHide": false,
+			"key": "checkOrg",
+			"type": "checkbox",
+			"input": true
+		}, {
+			"label": "Container",
+			"tableView": false,
+			"clearOnHide": false,
+			"key": "org",
+			"conditional": {
+				"show": true,
+				"when": "checkOrg",
+				"eq": "true"
+			},
+			"type": "container",
+			"input": true,
+			"components": [{
+				"label": "Columns",
+				"columns": [{
+					"components": [{
+						"label": "Name",
+						"tooltip": "Please enter the Name of the Organization to be created",
+						"autofocus": true,
+						"tableView": true,
+						"clearOnHide": false,
+						"validate": {
+							"required": true
+						},
+						"errorLabel": "Organization Name",
+						"key": "name",
+						"type": "textfield",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}, {
+					"components": [{
+						"label": "Email",
+						"tooltip": "Please enter the Email Id of the Organization to be created",
+						"tableView": true,
+						"clearOnHide": false,
+						"validate": {
+							"required": true
+						},
+						"errorLabel": "Organization Email",
+						"key": "email",
+						"type": "email",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}],
+				"key": "columns",
+				"type": "columns",
+				"input": false,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"title": "Address Details",
+				"theme": "primary",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"collapsible": false,
+				"key": "addressDetails",
+				"type": "panel",
+				"label": "Panel",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "Columns",
+					"columns": [{
+						"components": [{
+							"label": "Address",
+							"description": "The Address of the Account",
+							"tooltip": "Please enter the Address of the Account to be created",
+							"tableView": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "address1",
+							"type": "textfield",
+							"input": true,
+							"lockKey": true,
+							"hideOnChildrenHidden": false
+						}],
+						"width": 4,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 4
+					}, {
+						"components": [{
+							"label": "City",
+							"description": "The City the Account Resides in",
+							"tooltip": "Please enter the City of the Account to be created",
+							"tableView": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "city",
+							"type": "textfield",
+							"input": true,
+							"lockKey": true,
+							"hideOnChildrenHidden": false
+						}],
+						"width": 4,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 4
+					}, {
+						"components": [{
+							"label": "Zip Code",
+							"description": "The Zip Code the Account resides in",
+							"tooltip": "Please enter the Zip Code of the Account to be created",
+							"tableView": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true,
+								"custom": "if (data.org.zip && data.org.zip != \"\") {\n  if (data.org.zip.length <= 12) {\n    valid = data.org.zip.match(/^[0-9\\s-]*$/)\n      ? true\n      : \"Please enter a valid Zip Code for your region.\";\n  } else {\n    valid =\n      data.org.zip.length > 12\n        ? \"Please enter a valid Zip Code for your region.\"\n        : true;\n  }\n}"
+							},
+							"key": "zip",
+							"type": "textfield",
+							"input": true,
+							"hideOnChildrenHidden": false
+						}],
+						"size": "md",
+						"width": 4,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"currentWidth": 4
+					}],
+					"key": "columns11",
+					"type": "columns",
+					"input": false,
+					"tableView": false,
+					"hideOnChildrenHidden": false
+				}, {
+					"label": "Columns",
+					"columns": [{
+						"components": [{
+							"label": "Country",
+							"widget": "choicesjs",
+							"description": "The Country the Account resides in",
+							"tooltip": "Please enter the Country of the Account to be created",
+							"uniqueOptions": true,
+							"tableView": true,
+							"dataSrc": "custom",
+							"data": {
+								"custom": "values = data['countryList'];"
+							},
+							"valueProperty": "country",
+							"template": "<span>{{ item.country }}</span>",
+							"readOnlyValue": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "country",
+							"type": "select",
+							"input": true,
+							"lockKey": true,
+							"source": "5d347da33e9be31e15d3b115",
+							"hideOnChildrenHidden": false,
+							"searchThreshold": 0.3
+						}],
+						"width": 6,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 6
+					}, {
+						"components": [{
+							"label": "State",
+							"widget": "choicesjs",
+							"description": "The State that the Account Resides in",
+							"tooltip": "Please enter the State of the Account to be created",
+							"uniqueOptions": true,
+							"tableView": false,
+							"dataSrc": "custom",
+							"data": {
+								"custom": "try {\ncountrylist = JSON.parse(data['countryList']);\n} catch(e) {\ncountrylist = data['countryList'];\n}\nif(countrylist){\nlet obj = countrylist.find(o => o.country === row['country']);\nif(obj){\nvalues = obj.states\n}\n}"
+							},
+							"template": "<span>{{ item }}</span>",
+							"refreshOn": "country",
+							"clearOnRefresh": true,
+							"readOnlyValue": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "state",
+							"type": "select",
+							"input": true,
+							"lockKey": true,
+							"hideOnChildrenHidden": false,
+							"isNew": false,
+							"searchThreshold": 0.3
+						}],
+						"width": 6,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 6
+					}],
+					"key": "columns3",
+					"type": "columns",
+					"input": false,
+					"tableView": false,
+					"hideOnChildrenHidden": false
+				}]
+			}, {
+				"title": "Contact Person",
+				"theme": "primary",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"collapsible": false,
+				"key": "contactPerson",
+				"type": "panel",
+				"label": "Panel",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "Container",
+					"tableView": false,
+					"clearOnHide": false,
+					"key": "contact",
+					"type": "container",
+					"input": true,
+					"components": [{
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Firstname",
+								"tooltip": "Please enter the First Name of the Contact Person",
+								"tableView": true,
+								"clearOnHide": false,
+								"validate": {
+									"required": true
+								},
+								"key": "firstname",
+								"type": "textfield",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}, {
+							"components": [{
+								"label": "Lastname",
+								"tooltip": "Please enter the First Name of the Contact Person",
+								"tableView": true,
+								"clearOnHide": false,
+								"validate": {
+									"required": true
+								},
+								"key": "lastname",
+								"type": "textfield",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}],
+						"tableView": false,
+						"key": "columns5",
+						"type": "columns",
+						"input": false,
+						"hideOnChildrenHidden": false
+					}, {
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Username",
+								"description": "This will be the Username for the Contact Person created",
+								"disabled": true,
+								"tableView": true,
+								"clearOnHide": false,
+								"calculateValue": "if(data.org && data.org.contact && data.org.contact.firstname && data.org.contact.lastname){\n    var username = data.org.contact.firstname.toLowerCase() + data.org.contact.lastname.toLowerCase();\n    value = username.split(\" \").join(\"\");\n}",
+								"allowCalculateOverride": true,
+								"validate": {
+									"required": true
+								},
+								"key": "username",
+								"attributes": {
+									"style": "color:black"
+								},
+								"type": "textfield",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}, {
+							"components": [{
+								"label": "Email",
+								"tooltip": "The Email of the Contact Person",
+								"tableView": true,
+								"clearOnHide": false,
+								"validate": {
+									"required": true
+								},
+								"key": "email",
+								"type": "email",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}],
+						"tableView": false,
+						"key": "columns4",
+						"type": "columns",
+						"input": false,
+						"hideOnChildrenHidden": false
+					}]
+				}]
+			}, {
+				"title": "Business Offering",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"scrollToTop": false,
+				"collapsible": false,
+				"key": "businessOffering",
+				"type": "panel",
+				"label": "Panel",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "Business Offering",
+					"reorder": false,
+					"addAnotherPosition": "bottom",
+					"layoutFixed": false,
+					"enableRowGroups": false,
+					"initEmpty": false,
+					"hideLabel": true,
+					"tableView": false,
+					"defaultValue": [{
+						"businessRole": "",
+						"entity": ""
+					}],
+					"key": "dataGrid",
+					"type": "datagrid",
+					"input": true,
+					"components": [{
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Business Role",
+								"widget": "choicesjs",
+								"tableView": true,
+								"key": "businessRole",
+								"type": "select",
+								"input": true
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}, {
+							"components": [{
+								"label": "Entity",
+								"widget": "choicesjs",
+								"tableView": true,
+								"key": "entity",
+								"type": "select",
+								"input": true
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}],
+						"hideLabel": true,
+						"key": "columns",
+						"type": "columns",
+						"input": false,
+						"tableView": false
+					}]
+				}]
+			}]
+		}]
+	}],
+	"revisions": "",
+	"_vid": 0,
+	"title": "AccountFormForAppBuilder",
+	"display": "form",
+	"access": [{
+		"roles": ["5d70a2198e9aff51d0f3c171", "5d70a2198e9afffba0f3c172", "5d70a2198e9affff8af3c173"],
+		"type": "read_all"
+	}],
+	"submissionAccess": [],
+	"controller": "",
+	"properties": {
+		"showBreadcrumbs": "true",
+		"submission_commands": "[{\"command\":\"delegate\",\"delegate\":\"CleanYml\"}]",
+		"clearVariables": "orgId",
+		"theme": "https://stackpath.bootstrapcdn.com/bootswatch/4.1.3/materia/bootstrap.min.css",
+		"commands": "[{ \t\"command\": \"delegate\", \t\"delegate\": \"LoadAppData\" }]"
+	},
+	"settings": {},
+	"name": "accountFormForAppBuilder",
+	"path": "accountformforappbuilder",
+	"project": "5d70a2198e9aff60caf3c170",
+	"created": "2021-12-24T11:22:53.201Z",
+	"modified": "2021-12-24T11:26:46.953Z",
+	"machineName": "onboarding-eoxvantage:accountFormForAppBuilder"
+}

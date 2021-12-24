@@ -3,8 +3,9 @@ import * as OxzionGUIComponents from 'oxziongui'
 import UploadArtifact from "../../../../gui/UploadArtifact";
 import './install-manager.scss'
 import form from './metadata-form.json'
+import accountForm from './account-form.json'
 export default  function InstallManager(props){
-    return <AppInstaller core={props.core}  appId={props.appId}/>
+    return <AppInstaller core={props.core}  appId={props.appId} parentPageData={props.parentPageData}/>
 }
 class AppInstaller extends React.Component{
     constructor(props){
@@ -20,6 +21,7 @@ class AppInstaller extends React.Component{
         this.onOrgAction = this.onOrgAction.bind(this)
         this.uninstall = this.uninstall.bind(this)
         this.install = this.install.bind(this)
+        this.parentPageData = props.parentPageData
     }
     componentDidMount(){
     }
@@ -55,16 +57,18 @@ class AppInstaller extends React.Component{
     }
     render(){
         return <div className='install-manager'>
-            <div className="install-manager-header">
-                <p>{this.state.orgInstallSelected?.uuid ? 'Meta Data' : this.state.orgTemplateSelected?.uuid ? 'Template Manager' : 'Organizations'}</p>
-                {this.state.orgInstallSelected ||  this.state.orgTemplateSelected ?
+            <div className="install-manager_header">
+                <div>Organization</div>
+                <div className="install-manager_header--active">Metadata</div>
+                <div>Template Manager</div>
+                {/* {this.state.orgInstallSelected ||  this.state.orgTemplateSelected ?
                     <KendoReactButtons.Button className={"btn btn-primary install-manager-btn"} 
                         onClick={() => {
                             this.setState({orgInstallSelected : null, orgTemplateSelected : null})
                         }}>
                         <i className="fas fa-arrow-left"></i>
                     </KendoReactButtons.Button> : null
-                }
+                } */}
             </div>
             {this.state.orgInstallSelected && 
                 <Metadata 
@@ -78,6 +82,7 @@ class AppInstaller extends React.Component{
                     closeTemplate={this.closeTemplate.bind(this)}
                     core={this.props.core}
                     appId={this.appId}
+                    parentPageData={this.parentPageData}
                 /> || 
                 <Organization 
                 organization={this.state.organization} 
@@ -89,6 +94,11 @@ class AppInstaller extends React.Component{
         </div>
     }
 }
+class Installer extends React.Component{
+    constructor(prosp){
+        super(props);
+    }
+}
 
 class Template extends React.Component{
     constructor(props){
@@ -96,24 +106,47 @@ class Template extends React.Component{
         this.core = props.core;
         this.templates = props.templates;
         this.closeTemplate = props.closeTemplate;
+        this.app = this.props.parentPageData;
     }
     componentDidMount(){
     }
     render(){
-        return <div>
-            <UploadArtifact components={OxzionGUIComponents} entity='template' refresh={() =>{}} core={this.core} appId={this.props.appId} params={{app_uuid: this.props.org?.uuid}}/>
+        return <>
+            <UploadArtifact 
+                components={OxzionGUIComponents} 
+                entity='template' 
+                refresh={() =>{}} 
+                core={this.core} 
+                appId={this.props.appId} 
+                params={{app_uuid: this.app?.uuid}}
+            />
             <OX_Grid
                 osjsCore={this.core}
-                data={`app/${this.props.org?.uuid}/artifact/list/template`}
+                data={`app/${this.app?.uuid}/artifact/list/template`}
                 columnConfig={[{title : 'Template', field : 'name'}]}
                 actions={[
                     {icon : 'far fa-trash', name : 'Delete', callback : ()=>{}, rule: "true"},
                 ]}
             />
-        </div>
+        </>
     }
 }
-
+class Account extends React.Component{
+    constructor(props){
+        super(props);
+        this.core = props.core;
+    }
+    render(){
+        return   <FormRender 
+        content = {accountForm}
+        core ={this.core}
+        postSubmitCallback = {(...args) => {
+            console.log(args)
+        }}
+        updateFormData={true}
+    />
+    }
+}
 class Metadata extends React.Component{
     constructor(props){
         super(props);
@@ -133,7 +166,6 @@ class Metadata extends React.Component{
     />
     }
 }
-
 class Organization extends React.Component{
     constructor(props){
         super(props);
@@ -147,9 +179,11 @@ class Organization extends React.Component{
                     data={'account?filter=[{%22take%22:1000,%22skip%22:0}]'}
                     columnConfig={[{title : 'Organization', field : 'name'}]}
                     actions={[
-                        {icon : 'far fa-download', name : 'Install', callback : (data) => { 
+                        {icon : 'far fa-download', name : 'Install', 
+                        callback : (data) => { 
                             this.install('INSTALL', data)
-                        }, rule: "true"},
+                        }, 
+                        rule: "true"},
                         {icon : 'far fa-trash', name : 'Uninstall', callback : this.uninstall.bind(this), rule: "true"},
                         {icon : 'far fa-upload', name : 'Template Manager', callback : (data) => {
                             this.install('TEMPLATE', data)
