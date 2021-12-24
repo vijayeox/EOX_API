@@ -1369,6 +1369,11 @@ class AppService extends AbstractService implements AppUpgrade
                 ['directory' => $appSourceDir]
             );
         }
+        $appDeployDir = AppArtifactNamingStrategy::getDeployAppDirectory($this->config, $appData);
+        if (file_exists($appDeployDir)) {
+            $metadataPath = $appDeployDir . '/view/apps/'.$appData['name'].'/metadata.json';
+            $appData['start_options'] = file_get_contents($metadataPath);
+        }
         $app = new App($this->table);
         $app->loadByUuid($uuid);
         if (array_key_exists('type', $appData)) {
@@ -1385,6 +1390,7 @@ class AppService extends AbstractService implements AppUpgrade
             //IMPORTANT: Don't commit database transaction here.
             $appProperties = $app->getProperties();
             ArrayUtils::merge($appData, $appProperties);
+            $appData['start_options'] = null;
             $data['app'] = $appData;
             if (App::MY_APP == $app->getProperty('type')) {
                 $this->setupOrUpdateApplicationDirectoryStructure($data);
@@ -1747,6 +1753,25 @@ class AppService extends AbstractService implements AppUpgrade
         $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
         foreach ($result as $accountId) {
             $this->setupAccountFiles($path, $accountId['accountId'], $appId, true);
+        }
+    }
+
+
+    public function getAccountOnServiceType($data){
+        $select = "SELECT acct.uuid as accountId
+                   FROM ox_app_registry oxar
+                   INNER JOIN ox_app oxa ON oxa.id = oxar.app_id
+                   INNER JOIN ox_account acct ON acct.id = oxar.account_id
+                   WHERE oxa.uuid =:appId";
+        $params = ['appId' => $data['appId']];           
+        $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
+        if (count($result) > 0) {                
+            foreach ($result as $key => $value) {
+                $accountIdList[] = $value['accountId'];
+            }
+            return $this->accountService->getAccounts($data['filterParams'],$accountIdList,$data['serviceType']);
+        }else{
+            return $this->accountService->getAccounts($data['filterParams'],null,$data['serviceType']);
         }
     }
 }
