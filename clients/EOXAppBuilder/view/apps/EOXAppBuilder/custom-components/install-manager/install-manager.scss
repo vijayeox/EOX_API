@@ -6,6 +6,8 @@ $eox_theme : #275362;
       align-items: center;
       margin-top: 1rem;
       gap: 10px;
+      width: 100%;
+      justify-content: end;
 
       div{
         padding: 10px;
@@ -92,5 +94,19 @@ $eox_theme : #275362;
       border: none;
       display: flex;
       font-size: 10px !important;
+    }
+    &_content{
+        max-height: calc(100vh - 170px);
+        overflow: auto;
+        height: 100vh;
+    }
+    &_submit{
+      float: right;
+      padding: 10px 20px;
+      border: none;
+      background-color: #275362;
+      color: #FFF;
+      border-radius: 5px;
+      cursor: pointer;
     }
 }

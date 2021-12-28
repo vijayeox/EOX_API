@@ -27,6 +27,66 @@
 				"label": "Category",
 				"widget": "choicesjs",
 				"tableView": true,
+				"data": {
+					"values": [{
+						"label": "HR Management",
+						"value": "hrmanagement"
+					}, {
+						"label": "Collaboration",
+						"value": "collaboration"
+					}, {
+						"label": "Utilities",
+						"value": "utilities"
+					}, {
+						"label": "Other",
+						"value": "other"
+					}, {
+						"label": "Dashboard",
+						"value": "dashboard"
+					}, {
+						"label": "Travel",
+						"value": "travel"
+					}, {
+						"label": "Entertainment",
+						"value": "entertainment"
+					}, {
+						"label": "Productivity",
+						"value": "productivity"
+					}, {
+						"label": "Medical",
+						"value": "medical"
+					}, {
+						"label": "News",
+						"value": "news"
+					}, {
+						"label": "Finance",
+						"value": "finance"
+					}, {
+						"label": "Business",
+						"value": "business"
+					}, {
+						"label": "System",
+						"value": "system"
+					}, {
+						"label": "Multimedia",
+						"value": "multimedia"
+					}, {
+						"label": "Internet",
+						"value": "internet"
+					}, {
+						"label": "Graphics",
+						"value": "graphics"
+					}, {
+						"label": "Games",
+						"value": "games"
+					}, {
+						"label": "Science",
+						"value": "science"
+					}, {
+						"label": "Development",
+						"value": "development"
+					}]
+				},
 				"key": "category",
 				"type": "select",
 				"input": true
@@ -93,10 +153,10 @@
 				"label": "Default Application for organization",
 				"tableView": false,
 				"defaultValue": false,
-				"key": "defaultApplicationForOrganization",
+				"key": "defaultAppforOrgs",
 				"type": "checkbox",
-				"input": true,
-				"labelMargin": 5
+				"labelMargin": 5,
+				"input": true
 			}],
 			"size": "md",
 			"width": 4,
@@ -156,6 +216,6 @@
 	"path": "appinstallermetadata",
 	"project": "5dc1489e4f668513e9535090",
 	"created": "2021-12-22T05:33:06.199Z",
-	"modified": "2021-12-22T05:33:06.204Z",
+	"modified": "2021-12-28T10:25:55.412Z",
 	"machineName": "eoxproductsupport:appInstallerMetadata"
 }

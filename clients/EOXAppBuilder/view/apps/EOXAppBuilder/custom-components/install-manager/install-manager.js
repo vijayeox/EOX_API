@@ -1,194 +1,259 @@
-import { OX_Grid, React, ReactDOM, EOXApplication, ReactBootstrap, FormRender, KendoReactButtons, KendoReactWindow} from "oxziongui";
-import * as OxzionGUIComponents from 'oxziongui'
+import {
+  OX_Grid,
+  React,
+  ReactDOM,
+  EOXApplication,
+  ReactBootstrap,
+  FormRender,
+  KendoReactButtons,
+  KendoReactWindow,
+} from "oxziongui";
+import * as OxzionGUIComponents from "oxziongui";
 import UploadArtifact from "../../../../gui/UploadArtifact";
-import './install-manager.scss'
-import form from './metadata-form.json'
-import accountForm from './account-form.json'
-export default  function InstallManager(props){
-    return <AppInstaller core={props.core}  appId={props.appId} parentPageData={props.parentPageData}/>
+import "./install-manager.scss";
+import form from "./metadata-form.json";
+import accountForm from "./account-form.json";
+import { InstallManagerService } from "./install-manager.service";
+export default function InstallManager(props) {
+  return (
+    <AppInstaller
+      core={props.core}
+      appId={props.appId}
+      parentPageData={props.parentPageData}
+      data={props.data}
+    />
+  );
 }
-class AppInstaller extends React.Component{
-    constructor(props){
-        super(props);
-        this.core = props.core;
-        this.loader = this.core.make("oxzion/splash");
-        this.helper = this.core.make("oxzion/restClient");
-        this.appId = props.appId;
-        this.state = {
-            orgInstallSelected : null,
-            orgTemplateSelected : null
-        }
-        this.onOrgAction = this.onOrgAction.bind(this)
-        this.uninstall = this.uninstall.bind(this)
-        this.install = this.install.bind(this)
-        this.parentPageData = props.parentPageData
-    }
-    componentDidMount(){
-    }
-    getActive(n){
-        return this.state.tab === n &&'install-manager-tabs_active'
-    }
-    api(api, payload = {}, rest = 'get'){
-        return new Promise(async (resolve) => {
-            const {status, data} = await this.helper.request(
-                "v1",
-                api,
-                payload,
-                rest
-            )
-            resolve(status === 'success' && data || null)
-        })
-    }
-    onOrgAction(type, org){
-        if(type === 'INSTALL'){
-            this.setState({orgInstallSelected : org})
-            return;
-        }
-        this.setState({orgTemplateSelected : org})
-    }
-    uninstall(){
-
-    }
-    install(){
-        this.setState({orgInstallSelected : null})
-    }
-    closeTemplate(){
-        this.setState({orgTemplateSelected : null})
-    }
-    render(){
-        return <div className='install-manager'>
-            <div className="install-manager_header">
-                <div>Organization</div>
-                <div className="install-manager_header--active">Metadata</div>
-                <div>Template Manager</div>
-                {/* {this.state.orgInstallSelected ||  this.state.orgTemplateSelected ?
-                    <KendoReactButtons.Button className={"btn btn-primary install-manager-btn"} 
-                        onClick={() => {
-                            this.setState({orgInstallSelected : null, orgTemplateSelected : null})
-                        }}>
-                        <i className="fas fa-arrow-left"></i>
-                    </KendoReactButtons.Button> : null
-                } */}
-            </div>
-            {this.state.orgInstallSelected && 
-                <Metadata 
-                    core={this.core} 
-                    org={this.state.orgInstallSelected} 
-                    install={this.install.bind(this)}
-                /> || 
-                this.state.orgTemplateSelected && 
-                <Template 
-                    org={this.state.orgTemplateSelected} 
-                    closeTemplate={this.closeTemplate.bind(this)}
-                    core={this.props.core}
-                    appId={this.appId}
-                    parentPageData={this.parentPageData}
-                /> || 
-                <Organization 
-                organization={this.state.organization} 
-                install={this.onOrgAction} 
-                uninstall={this.uninstall}
-                core={this.props.core}
-            />
-            }
+class AppInstaller extends React.Component {
+  constructor(props) {
+    super(props);
+    this.core = props.core;
+    this.loader = this.core.make("oxzion/splash");
+    this.helper = this.core.make("oxzion/restClient");
+    this.appId = props.appId;
+    this.state = {
+      service: new InstallManagerService(
+        props.parentPageData,
+        this.props.data?.params?.type || 'forInstall',
+        this.core,
+        this.appId
+      ),
+    };
+  }
+  render() {
+    return (
+      <div className="install-manager">
+        <div className="install-manager_header">
+          {this.state.service.selectedOrganization ||
+          this.state.service.updateOrganization ? (
+            <KendoReactButtons.Button
+              className={"btn btn-primary install-manager-btn"}
+              onClick={() => {
+                this.setState({ service: this.state.service.goBack() });
+              }}
+            >
+              <i className="fas fa-arrow-left"></i>
+            </KendoReactButtons.Button>
+          ) : null}
         </div>
-    }
-}
-class Installer extends React.Component{
-    constructor(prosp){
-        super(props);
-    }
+        <div className="install-manager_content">
+            {this.state.service.updateOrganization ? (
+            <Account
+                service={this.state.service}
+                setService={this.setState.bind(this)}
+            />
+            ) : (
+            <>
+                {(!this.state.service.selectedOrganization && (
+                <Organization
+                    service={this.state.service}
+                    setService={this.setState.bind(this)}
+                />
+                )) ||
+                (!this.state.service.metaData && (
+                    <Metadata
+                    service={this.state.service}
+                    setService={this.setState.bind(this)}
+                    />
+                )) || (
+                    <Template
+                    service={this.state.service}
+                    setService={this.setState.bind(this)}
+                    />
+                )}
+            </>
+            )}
+        </div>
+        {this.state.service.metaData && (
+         <button className="install-manager_submit">{this.state.service.installationType === 'forInstall' ? 'Install' : 'Uninstall'}</button>
+        )}
+      </div>
+    );
+  }
 }
 
-class Template extends React.Component{
-    constructor(props){
-        super(props);
-        this.core = props.core;
-        this.templates = props.templates;
-        this.closeTemplate = props.closeTemplate;
-        this.app = this.props.parentPageData;
-    }
-    componentDidMount(){
-    }
-    render(){
-        return <>
-            <UploadArtifact 
-                components={OxzionGUIComponents} 
-                entity='template' 
-                refresh={() =>{}} 
-                core={this.core} 
-                appId={this.props.appId} 
-                params={{app_uuid: this.app?.uuid}}
-            />
-            <OX_Grid
-                osjsCore={this.core}
-                data={`app/${this.app?.uuid}/artifact/list/template`}
-                columnConfig={[{title : 'Template', field : 'name'}]}
-                actions={[
-                    {icon : 'far fa-trash', name : 'Delete', callback : ()=>{}, rule: "true"},
-                ]}
-            />
+class Template extends React.Component {
+  constructor(props) {
+    super(props);
+    this.service = this.props.service;
+    this.setService = this.props.setService;
+    this.core = this.service.core;
+    this.api = this.core.make("oxzion/restClient");
+    this.state = { gridLoading: false };
+  }
+  componentDidMount() {}
+  async refreshGrid() {
+    this.setState({ gridLoading: true });
+    await new Promise((r) => setTimeout(r, 100));
+    this.setState({ gridLoading: false });
+  }
+  async delete({ name }) {
+    let { status, data } = await this.api.request(
+      "v1",
+      `app/${this.service.parentData.uuid}/artifact/delete/template/${name}.tpl`,
+      this.service.parentData,
+      "post"
+    );
+    status === "success" && this.refreshGrid();
+  }
+  render() {
+    return (
+      (!this.state.gridLoading && (
+        <>
+          <UploadArtifact
+            components={OxzionGUIComponents}
+            entity="template"
+            postSubmitCallback={this.refreshGrid.bind(this)}
+            core={this.core}
+            appId={this.service.appId}
+            params={{ app_uuid: this.service.parentData?.uuid }}
+          />
+          <OX_Grid
+            osjsCore={this.core}
+            data={`app/${this.service.parentData?.uuid}/artifact/list/template`}
+            columnConfig={[{ title: "Template", field: "name" }]}
+            actions={[
+              {
+                icon: "far fa-trash",
+                name: "Delete",
+                callback: this.delete.bind(this),
+                rule: "true",
+              },
+            ]}
+          />
         </>
-    }
+      )) ||
+      null
+    );
+  }
 }
-class Account extends React.Component{
-    constructor(props){
-        super(props);
-        this.core = props.core;
-    }
-    render(){
-        return   <FormRender 
-        content = {accountForm}
-        core ={this.core}
-        postSubmitCallback = {(...args) => {
-            console.log(args)
+class Account extends React.Component {
+  constructor(props) {
+    super(props);
+    this.service = this.props.service;
+    this.core = this.service.core;
+  }
+  render() {
+    return (
+      <FormRender
+        content={accountForm}
+        core={this.core}
+        postSubmitCallback={(...args) => {
+          console.log(args);
         }}
         updateFormData={true}
-    />
-    }
+        data={this.service.updateOrganization}
+      />
+    );
+  }
 }
-class Metadata extends React.Component{
-    constructor(props){
-        super(props);
-        this.core = props.core;
-        this.install = this.props.install;
+class Metadata extends React.Component {
+  constructor(props) {
+    super(props);
+    this.service = this.props.service;
+    this.setService = this.props.setService;
+    this.core = this.service.core;
+    this.api = this.core.make("oxzion/restClient");
+    this.state = {
+      data: null,
+    };
+  }
+  async componentDidMount() {
+    try {
+      let { status, data } = await this.api.request(
+        "v1",
+        `app/${this.service.parentData.uuid}/account/${this.service.selectedOrganization.uuid}/appProperties`,
+        {},
+        "get"
+      );
+      data = JSON.parse(data[0]["start_options"]);
+      if (status === "success") {
+        this.setState({
+          data: {
+            ...data,
+            description: data.description.en_EN,
+            title: data.title.en_EN,
+          },
+        });
+      }
+    } catch (e) {
+      console.error(e);
     }
-    componentDidMount(){
-    }
-    render(){
-        return   <FormRender 
-        content = {form}
-        core ={this.core}
-        postSubmitCallback = {(...args) => {
-            console.log(args)
+  }
+  render() {
+    return this.state.data ? (
+      <FormRender
+        content={form}
+        core={this.core}
+        postSubmitCallback={(...args) => {
+          this.setService({ service: this.service.setMetadata(args) });
         }}
+        data={this.state.data}
         updateFormData={true}
-    />
-    }
+      />
+    ) : null;
+  }
 }
-class Organization extends React.Component{
-    constructor(props){
-        super(props);
-        this.core = props.core;
-        this.install = this.props.install;
-        this.uninstall = this.props.uninstall;
-    }
-    render(){
-        return <OX_Grid
-                    osjsCore={this.core}
-                    data={'account?filter=[{%22take%22:1000,%22skip%22:0}]'}
-                    columnConfig={[{title : 'Organization', field : 'name'}]}
-                    actions={[
-                        {icon : 'far fa-download', name : 'Install', 
-                        callback : (data) => { 
-                            this.install('INSTALL', data)
-                        }, 
-                        rule: "true"},
-                        {icon : 'far fa-trash', name : 'Uninstall', callback : this.uninstall.bind(this), rule: "true"},
-                        {icon : 'far fa-upload', name : 'Template Manager', callback : (data) => {
-                            this.install('TEMPLATE', data)
-                         }, rule: "true"},
-                    ]}
-                />
-    }
+class Organization extends React.Component {
+  constructor(props) {
+    super(props);
+    this.service = this.props.service;
+    this.setService = this.props.setService;
+    this.actions = [
+        {
+          icon: "far fa-download",
+          name: this.service.installationType === 'forInstall' && 'Install' || 'Uninstall',
+          callback: (data) => {
+            this.setService({ service: this.service.setOrganization(data) });
+          },
+          rule: "true",
+          defaultAction: true,
+        }
+      ]
+  }
+  componentDidMount(){
+      if(this.service.installationType === 'forInstall') return;
+      this.actions.push(
+        {
+          icon: "far fa-pencil",
+          name: "Edit",
+          callback: (data) => {
+            this.setService({
+              service: this.service.updateOrganizationData(data),
+            });
+          },
+          rule: "true",
+        }
+    )
+  }
+  render() {
+    return (
+      <OX_Grid
+        osjsCore={this.service.core}
+        data={`app/${this.service.parentData.uuid}/getAccounts/${this.service.installationType}?filter=[{%22take%22:1000,%22skip%22:0}]`}
+        columnConfig={[{ title: "Account", field: "name" }]}
+        actions={this.actions}
+      />
+    );
+  }
 }
