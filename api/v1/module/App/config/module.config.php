@@ -1070,24 +1070,24 @@ return [
                     ],
                 ],
             ],
-            // 'downloadAppFile' => [
-            //     'type' => Segment::class,
-            //     'options' => [
-            //         'route' => '/app/:appUuid/download/:artifactType/:artifactName',
-            //         'constraints' => [
-            //             'appUuid' => UuidUtil::UUID_PATTERN,
-            //             'artifactType' => 'delegate|template',
-            //         ],
-            //         'defaults' => [
-            //             'controller' => Controller\AppArtifactController::class,
-            //             'method' => 'GET',
-            //             'action' => 'downloadAppFile',
-            //             'access' => [
-            //                 // SET ACCESS CONTROL
-            //             ],
-            //         ],
-            //     ],
-            // ],
+            'downloadAppFile' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appUuid/download/:artifactType/:artifactName',
+                    'constraints' => [
+                        'appUuid' => UuidUtil::UUID_PATTERN,
+                        'artifactType' => 'delegate|template',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\AppArtifactController::class,
+                        'method' => 'GET',
+                        'action' => 'downloadAppFile',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

@@ -361,4 +361,40 @@ class AppArtifactService extends AbstractService
         }
         return $appSourceDir;
     }
+
+    public function createDownload($appUuid,$artifactType,$artifactNamer){
+        $appSourceDir = $this->getAppSourceDirPath($appUuid);
+        $this->logger->info("DOWNLOAD Appsource----".print_r($appSourceDir,true));
+        $filePath = $appSourceDir . $this->dataFolder . $artifactType . DIRECTORY_SEPARATOR. $artifactNamer;
+        $this->logger->info("DOWNLOAD PATH----".print_r($filePath,true));
+        // $file = FileUtils::createTempFileName();
+        // FileUtils::downloadFile($filePath, $file);
+        // $this->logger->info("DOWNLOAD File----".print_r($file,true));
+        // return $file;
+        //Check the file exists or not
+        if(file_exists($filePath)) {
+
+        // //Define header information
+        // header('Content-Description: File Transfer');
+        // header('Content-Type: application/octet-stream');
+        // header("Cache-Control: no-cache, must-revalidate");
+        // header("Expires: 0");
+        // header('Content-Disposition: attachment; filename="'.basename($filePath).'"');
+        // header('Content-Length: ' . filesize($filePath));
+        // header('Pragma: public');
+
+        // //Clear system output buffer
+        // flush();
+
+        // //Read the size of the file
+        // readfile($filename);
+
+        //Terminate from the script
+        // die();
+        return $filePath;
+        }
+        else{
+            echo "File does not exist.";
+        }
+    }
 }
