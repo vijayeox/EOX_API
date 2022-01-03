@@ -47,6 +47,7 @@ content:
                                 app_uuid: '{{app_uuid}}'
                                 url: 'app/{{app_uuid}}/download/delegate/{{name}}.php'
                                 disableAppId: true
+                                downloadFile: true
                     icon: 'fa fa-download' 
                     updateOnly: true
             operations:

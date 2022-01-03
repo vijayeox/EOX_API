@@ -115,15 +115,15 @@ class AppArtifactController extends AbstractApiController
         try {
             $fileData = $this->appArtifactService->createDownload($appUuid, $artifactType, $artifactName);
         //    print_r($fileData);exit;
-//             $response = new \Zend\Http\Response\Stream();
+            $response = new \Zend\Http\Response\Stream();
 //             // $zipFilePath = $archiveData['zipFile'];
 //             $f = fopen($fileData, 'r');
 //             $response->setStream($f);
 //             $response->setStatusCode(200);
 //             // $normalizedAppName = AppArtifactNamingStrategy::normalizeAppName($archiveData['name']);
 //             // $downloadFileName = $normalizedAppName . '-OxzionAppArchive.zip';
-//             $headers = new \Zend\Http\Headers();
-//             $headers->addHeaderLine("Pragma: public", true)
+            $headers = new \Zend\Http\Headers();
+            // $headers->addHeaderLine("Pragma: public", true)
 // ->addHeaderLine("Expires: 0")// set expiration time
 // ->addHeaderLine("Cache-Control: must-revalidate, post-check=0, pre-check=0")
 // ->addHeaderLine("Content-Type: application/force-download")
@@ -132,18 +132,18 @@ class AppArtifactController extends AbstractApiController
 // ->addHeaderLine("Content-Disposition: attachment; filename=".basename($fileData))
 // ->addHeaderLine("Content-Transfer-Encoding: binary")
 // ->addHeaderLine("Content-Length: ".filesize($fileData));
-//             // $headers->addHeaderLine('Content-Type', 'application/octet-stream')
-//             //         // ->addHeaderLine('Content-Description: File Transfer')
-//             //         // ->addHeaderLine("Cache-Control: no-cache, must-revalidate")
-//             //         // ->addHeaderLine("Expires: 0")
-//             //         // ->addHeaderLine('Pragma: public')
-//             //         // ->addHeaderLine("Content-Transfer-Encoding: Binary")
-//             //         ->addHeaderLine("Content-disposition: attachment; filename=\"".$artifactName."\"")
-//             //         // ->addHeaderLine("Content-disposition: attachment; filename=\"" . basename($fileData) . "\"")
-//             //         // ->addHeaderLine('Content-Disposition', 'attachment; filename=' . basename($fileData))
-//             //         ->addHeaderLine('Access-Control-Expose-Headers: Content-Disposition')
-//             //         ->addHeaderLine('Content-Length', filesize($fileData));
-//             $response->setHeaders($headers);
+            $headers->addHeaderLine('Content-Type', 'application/octet-stream')
+                    // ->addHeaderLine('Content-Description: File Transfer')
+                    // ->addHeaderLine("Cache-Control: no-cache, must-revalidate")
+                    // ->addHeaderLine("Expires: 0")
+                    // ->addHeaderLine('Pragma: public')
+                    // ->addHeaderLine("Content-Transfer-Encoding: Binary")
+                    ->addHeaderLine("Content-disposition: attachment; filename=\"".$artifactName."\"")
+                    // ->addHeaderLine("Content-disposition: attachment; filename=\"" . basename($fileData) . "\"")
+                    // ->addHeaderLine('Content-Disposition', 'attachment; filename=' . basename($fileData))
+                    ->addHeaderLine('Access-Control-Expose-Headers: Content-Disposition')
+                    ->addHeaderLine('Content-Length', filesize($fileData));
+            $response->setHeaders($headers);
 //             // while (!feof($f)) {
 //             //     // send the file part to the web browser
 //             //     print fread($f, round(200 * 1024));
@@ -162,7 +162,7 @@ class AppArtifactController extends AbstractApiController
 //             // readfile($fileData);
 
             // print_r($fileData);exit;
-            return $fileData;
+            return $response;
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
