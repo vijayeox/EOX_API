@@ -31,14 +31,27 @@ class AppInstaller extends React.Component {
     this.loader = this.core.make("oxzion/splash");
     this.helper = this.core.make("oxzion/restClient");
     this.appId = props.appId;
+    this.installOrUninstall = this.installOrUninstall.bind(this);
     this.state = {
       service: new InstallManagerService(
         props.parentPageData,
-        this.props.data?.params?.type || 'forInstall',
+        this.props.data?.params?.type || "forInstall",
         this.core,
         this.appId
       ),
     };
+  }
+  async installOrUninstall() {
+    await this.helper.request(
+      "v1",
+      `app/${this.state.service.parentData.uuid}/${
+        this.state.service.installationType === "forInstall"
+          ? "install"
+          : "uninstall"
+      }/account/${this.state.service.selectedOrganization.uuid}`,
+      {...this.state.service.parentData, start_options : this.state.service.metaData},
+      "post"
+    );
   }
   render() {
     return (
@@ -57,35 +70,39 @@ class AppInstaller extends React.Component {
           ) : null}
         </div>
         <div className="install-manager_content">
-            {this.state.service.updateOrganization ? (
+          {this.state.service.updateOrganization ? (
             <Account
-                service={this.state.service}
-                setService={this.setState.bind(this)}
+              service={this.state.service}
+              setService={this.setState.bind(this)}
             />
-            ) : (
+          ) : (
             <>
-                {(!this.state.service.selectedOrganization && (
+              {(!this.state.service.selectedOrganization && (
                 <Organization
-                    service={this.state.service}
-                    setService={this.setState.bind(this)}
+                  service={this.state.service}
+                  setService={this.setState.bind(this)}
                 />
-                )) ||
+              )) ||
                 (!this.state.service.metaData && (
-                    <Metadata
+                  <Metadata
                     service={this.state.service}
                     setService={this.setState.bind(this)}
-                    />
+                  />
                 )) || (
-                    <Template
+                  <Template
                     service={this.state.service}
                     setService={this.setState.bind(this)}
-                    />
+                  />
                 )}
             </>
-            )}
+          )}
         </div>
         {this.state.service.metaData && (
-         <button className="install-manager_submit">{this.state.service.installationType === 'forInstall' ? 'Install' : 'Uninstall'}</button>
+          <button className="install-manager_submit" onClick={this.installOrUninstall}>
+            {this.state.service.installationType === "forInstall"
+              ? "Install"
+              : "Uninstall"}
+          </button>
         )}
       </div>
     );
@@ -197,6 +214,9 @@ class Metadata extends React.Component {
         });
       }
     } catch (e) {
+      this.setState({
+        data: {},
+      });
       console.error(e);
     }
   }
@@ -206,7 +226,10 @@ class Metadata extends React.Component {
         content={form}
         core={this.core}
         postSubmitCallback={(...args) => {
-          this.setService({ service: this.service.setMetadata(args) });
+          let newMetadata = args[0];
+          newMetadata["description"] = { en_EN: newMetadata.description ? `${newMetadata.description}` : '' };
+          newMetadata["title"] = { en_EN: newMetadata.title ? `${newMetadata.title}` : newMetadata.title };
+          this.setService({ service: this.service.setMetadata(newMetadata) });
         }}
         data={this.state.data}
         updateFormData={true}
@@ -220,31 +243,31 @@ class Organization extends React.Component {
     this.service = this.props.service;
     this.setService = this.props.setService;
     this.actions = [
-        {
-          icon: "far fa-download",
-          name: this.service.installationType === 'forInstall' && 'Install' || 'Uninstall',
-          callback: (data) => {
-            this.setService({ service: this.service.setOrganization(data) });
-          },
-          rule: "true",
-          defaultAction: true,
-        }
-      ]
+      {
+        icon: "far fa-download",
+        name:
+          (this.service.installationType === "forInstall" && "Install") ||
+          "Uninstall",
+        callback: (data) => {
+          this.setService({ service: this.service.setOrganization(data) });
+        },
+        rule: "true",
+        defaultAction: true,
+      },
+    ];
   }
-  componentDidMount(){
-      if(this.service.installationType === 'forInstall') return;
-      this.actions.push(
-        {
-          icon: "far fa-pencil",
-          name: "Edit",
-          callback: (data) => {
-            this.setService({
-              service: this.service.updateOrganizationData(data),
-            });
-          },
-          rule: "true",
-        }
-    )
+  componentDidMount() {
+    if (this.service.installationType === "forInstall") return;
+    this.actions.push({
+      icon: "far fa-pencil",
+      name: "Edit",
+      callback: (data) => {
+        this.setService({
+          service: this.service.updateOrganizationData(data),
+        });
+      },
+      rule: "true",
+    });
   }
   render() {
     return (
