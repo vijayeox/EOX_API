@@ -631,6 +631,7 @@ class AppServiceTest extends AbstractServiceTest
         $this->assertEquals($result[0]['count'], 4);
     }
 
+
     public function testCreateOrgWithNoOrgInData()
     {
         AuthContext::put(AuthConstants::USER_ID, '1');

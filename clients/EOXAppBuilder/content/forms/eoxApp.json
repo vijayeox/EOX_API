@@ -1,2529 +1,2582 @@
 {
-    "_id": "61a86389801d1d991cda79ce",
-    "type": "resource",
-    "tags": [],
-    "owner": "6022c8ed8a3c363aa2fbe5ef",
-    "components": [{
-        "title": "App Info",
-        "theme": "primary",
-        "breadcrumbClickable": false,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "scrollToTop": false,
-        "collapsible": false,
-        "key": "page1",
-        "logic": [{
-            "name": "Allow Breadcrums",
-            "trigger": {
-                "type": "javascript",
-                "javascript": "result = data.app.uuid.length > 0;"
-            },
-            "actions": [{
-                "name": "Set Breadcrum",
-                "type": "mergeComponentSchema",
-                "schemaDefinition": "schema = {breadcrumbClickable : true};"
-            }]
-        }],
-        "type": "panel",
-        "label": "App Info",
-        "tableView": false,
-        "input": false,
-        "components": [{
-            "label": "formsList",
-            "calculateValue": "var formsList = [];\nif (data.form !== \"\") {\n  formsList = data.form.map((i) => {\n    return { name: i.name, uuid: i.uuid };\n  });\n}\nvalue = formsList;",
-            "key": "formsList",
-            "type": "hidden",
-            "input": true,
-            "tableView": false
-        }, {
-            "label": "pagesList",
-            "calculateValue": "var pagesList;\nif(data.pages){\n  pagesList = data.pages.map((i) => {\n return { name: i.name, uuid: i.uuid };\n});\nvalue = pagesList;\n}\n",
-            "key": "pagesList",
-            "type": "hidden",
-            "input": true,
-            "tableView": false
-        }, {
-            "label": "Container",
-            "tableView": false,
-            "clearOnHide": false,
-            "key": "app",
-            "type": "container",
-            "input": true,
-            "components": [{
-                "label": "App Uuid",
-                "key": "uuid",
-                "type": "hidden",
-                "input": true,
-                "tableView": false,
-                "hideOnChildrenHidden": false
-            }, {
-                "label": "Old App Name",
-                "customDefaultValue": "console.log(\"APP NME---\");\nconsole.log(value);",
-                "key": "oldAppName",
-                "type": "hidden",
-                "input": true,
-                "tableView": false,
-                "hideOnChildrenHidden": false
-            }, {
-                "label": "Columns",
-                "columns": [{
-                    "components": [{
-                        "label": "Title",
-                        "description": "The Title of the Application which will be shown in the Application Menu",
-                        "tooltip": "Please enter the Title of the Application which will be shown in the Application Menu",
-                        "autofocus": true,
-                        "tableView": true,
-                        "validate": {
-                            "required": true,
-                            "maxLength": 25
-                        },
-                        "errorLabel": "Application Title",
-                        "key": "title",
-                        "type": "textfield",
-                        "input": true,
-                        "hideOnChildrenHidden": false
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }, {
-                    "components": [{
-                        "label": "Name",
-                        "description": "The Name of the Application which will be an Internal Name to Differentiate the Application",
-                        "tooltip": "Please enter the Name of the Application which will be an Internal Name to Differentiate the Application",
-                        "spellcheck": false,
-                        "tableView": false,
-                        "clearOnHide": false,
-                        "validate": {
-                            "required": true,
-                            "custom": "if(data.app.name && data.app.name != ''){\n      valid = (data.app.name.match(/^[a-z0-9-]+$/i)) ?  true : 'Application Name must Contain only Alphabets and Numbers.';\n}",
-                            "maxLength": 25
-                        },
-                        "errorLabel": "Application Name",
-                        "key": "name",
-                        "logic": [{
-                            "name": "Readonly on Edit",
-                            "trigger": {
-                                "type": "javascript",
-                                "javascript": "if(data.app.uuid && data.app.uuid != \"\"){\n  result=true;\n}else {\n  result=false;\n}"
-                            },
-                            "actions": [{
-                                "name": "Non Editable",
-                                "type": "property",
-                                "property": {
-                                    "label": "Disabled",
-                                    "value": "disabled",
-                                    "type": "boolean"
-                                },
-                                "state": true
-                            }]
-                        }],
-                        "type": "textfield",
-                        "input": true,
-                        "hideOnChildrenHidden": false
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }],
-                "tableView": false,
-                "key": "columns1",
-                "type": "columns",
-                "input": false,
-                "hideOnChildrenHidden": false
-            }, {
-                "label": "Columns",
-                "columns": [{
-                    "components": [{
-                        "label": "Description",
-                        "description": "The Description of the Application",
-                        "tooltip": "Please enter the Description of the Application",
-                        "tableView": true,
-                        "clearOnHide": false,
-                        "key": "description",
-                        "type": "textfield",
-                        "input": true,
-                        "hideOnChildrenHidden": false
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }, {
-                    "components": [{
-                        "label": "Category",
-                        "widget": "choicesjs",
-                        "tableView": true,
-                        "data": {
-                            "values": [{
-                                "label": "Office",
-                                "value": "office"
-                            }, {
-                                "label": "Utilities",
-                                "value": "utilities"
-                            }, {
-                                "label": "Business",
-                                "value": "business"
-                            }, {
-                                "label": "Finance",
-                                "value": "finance"
-                            }, {
-                                "label": "News",
-                                "value": "news"
-                            }, {
-                                "label": "Medical",
-                                "value": "medical"
-                            }, {
-                                "label": "Entertainment",
-                                "value": "entertainment"
-                            }, {
-                                "label": "Productivity",
-                                "value": "productivity"
-                            }, {
-                                "label": "Education",
-                                "value": "education"
-                            }, {
-                                "label": "Photo & Video",
-                                "value": "photoVideo"
-                            }, {
-                                "label": "Shopping",
-                                "value": "shopping"
-                            }, {
-                                "label": "Travel",
-                                "value": "travel"
-                            }, {
-                                "label": "Dashboard ",
-                                "value": "dashboard"
-                            }]
-                        },
-                        "validate": {
-                            "required": true
-                        },
-                        "errorLabel": "Application Category",
-                        "key": "category",
-                        "type": "select",
-                        "input": true,
-                        "hideOnChildrenHidden": false,
-                        "searchThreshold": 0.3
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }],
-                "tableView": false,
-                "key": "columns2",
-                "type": "columns",
-                "input": false,
-                "hideOnChildrenHidden": false
-            }, {
-                "label": "Columns",
-                "columns": [{
-                    "components": [{
-                        "label": "Application Icon",
-                        "tooltip": "The Application Icon will be visible in the Application Menu",
-                        "tableView": false,
-                        "storage": "url",
-                        "uploadOnly": true,
-                        "webcam": true,
-                        "fileTypes": [{
-                            "label": "",
-                            "value": ""
-                        }],
-                        "filePattern": "image/png",
-                        "fileMaxSize": "10MB",
-                        "clearOnHide": false,
-                        "key": "app_icon",
-                        "properties": {
-                            "absoluteUrl": "true"
-                        },
-                        "type": "file",
-                        "url": "/app/{{data.app.uuid}}/artifact/add/app_icon",
-                        "input": true,
-                        "hideOnChildrenHidden": false
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }, {
-                    "components": [{
-                        "label": "Application Icon White",
-                        "tooltip": "The Application White Icon will be visible in the Window of the Application",
-                        "tableView": false,
-                        "storage": "url",
-                        "uploadOnly": true,
-                        "webcam": true,
-                        "fileTypes": [{
-                            "label": "",
-                            "value": ""
-                        }],
-                        "filePattern": "image/png",
-                        "fileMaxSize": "10MB",
-                        "clearOnHide": false,
-                        "key": "app_icon_white",
-                        "properties": {
-                            "absoluteUrl": "true"
-                        },
-                        "type": "file",
-                        "url": "/app/{{data.app.uuid}}/artifact/add/app_icon_white",
-                        "input": true,
-                        "hideOnChildrenHidden": false
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }],
-                "hideOnChildrenHidden": false,
-                "key": "columns",
-                "customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=true;\n}else {\n  show=false;\n}",
-                "type": "columns",
-                "tableView": false,
-                "input": false
-            }, {
-                "label": "Run automatically at startup",
-                "description": "If Enabled will Auto Start the Application Once the User Logs in",
-                "tableView": false,
-                "defaultValue": false,
-                "clearOnHide": false,
-                "key": "autostart",
-                "customConditional": "show = false;",
-                "type": "checkbox",
-                "input": true,
-                "hideOnChildrenHidden": false
-            }, {
-                "title": "Notifications",
-                "theme": "info",
-                "breadcrumbClickable": true,
-                "buttonSettings": {
-                    "previous": true,
-                    "cancel": true,
-                    "next": true
-                },
-                "collapsible": false,
-                "key": "notifications",
-                "type": "panel",
-                "label": "Notifications",
-                "input": false,
-                "tableView": false,
-                "components": [{
-                    "label": "File Comments on Chat",
-                    "tableView": false,
-                    "defaultValue": false,
-                    "key": "chat_notification",
-                    "type": "checkbox",
-                    "input": true
-                }, {
-                    "title": "Comment would follow the format as shown below:",
-                    "breadcrumbClickable": true,
-                    "buttonSettings": {
-                        "previous": true,
-                        "cancel": true,
-                        "next": true
-                    },
-                    "collapsible": false,
-                    "key": "panel1",
-                    "conditional": {
-                        "show": true,
-                        "when": "app.chat_notification",
-                        "eq": "true"
-                    },
-                    "type": "panel",
-                    "label": "Comment would follow the format as shown below:",
-                    "input": false,
-                    "tableView": false,
-                    "components": [{
-                        "label": "Columns",
-                        "columns": [{
-                            "components": [{
-                                "label": "Comment Format",
-                                "placeholder": "[fromUsername] has commented on [Message Title]:[Message]",
-                                "hideLabel": true,
-                                "spellcheck": false,
-                                "disabled": true,
-                                "tableView": true,
-                                "validateOn": "blur",
-                                "key": "commentFormat",
-                                "attributes": {
-                                    "style": "color:black"
-                                },
-                                "type": "textfield",
-                                "input": true,
-                                "hideOnChildrenHidden": false
-                            }],
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "width": 12,
-                            "currentWidth": 12
-                        }, {
-                            "components": [],
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "width": 4,
-                            "currentWidth": 4
-                        }],
-                        "key": "columns14",
-                        "type": "columns",
-                        "input": false,
-                        "tableView": false,
-                        "hideOnChildrenHidden": false
-                    }]
-                }]
-            }]
-        }, {
-            "label": "Create App",
-            "hideLabel": true,
-            "spellcheck": false,
-            "disabled": true,
-            "tableView": true,
-            "defaultValue": "Please click on the Create App button before you proceed",
-            "validateOn": "blur",
-            "validate": {
-                "custom": "if (data.app.name.length > 0 && data.app.category.length > 0) {\n  valid = data.app.uuid.length > 0\n      ? true\n      : \"Create App to proceed further\";\n} else {\n  valid = true;\n}"
-            },
-            "key": "textFieldValidate",
-            "customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=false;\n}else {\n  show=true;\n}",
-            "attributes": {
-                "style": "color:black"
-            },
-            "type": "textfield",
-            "input": true
-        }, {
-            "label": "Create Application",
-            "action": "event",
-            "showValidations": false,
-            "theme": "success",
-            "tooltip": "This will Create the Application MetaData",
-            "customClass": "alignCenter",
-            "disabled": true,
-            "tableView": false,
-            "key": "save",
-            "properties": {
-                "commands": "[{\"command\":\"delegate\",\"delegate\":\"CreateAppWithAppDetails\"}]"
-            },
-            "customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=false;\n}else {\n  show=true;\n}",
-            "logic": [{
-                "name": "Disable",
-                "trigger": {
-                    "type": "javascript",
-                    "javascript": "result = data.app.name.length > 0 && data.app.category.length > 0;"
-                },
-                "actions": [{
-                    "name": "Disable",
-                    "type": "mergeComponentSchema",
-                    "property": "",
-                    "state": false,
-                    "schemaDefinition": "schema = {disabled : false}"
-                }]
-            }],
-            "type": "button",
-            "event": "callPipeline",
-            "input": true
-        }],
-        "allowPrevious": false
-    }, {
-        "title": "Organization Info",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "scrollToTop": false,
-        "collapsible": false,
-        "key": "organizationInfo",
-        "type": "panel",
-        "label": "Organization Info",
-        "tableView": false,
-        "input": false,
-        "components": [{
-            "label": "Do you want to add organization information",
-            "tooltip": "If selected a new Organization will be Created when the Application is being Deployed",
-            "autofocus": true,
-            "tableView": false,
-            "defaultValue": false,
-            "clearOnHide": false,
-            "key": "checkOrg",
-            "type": "checkbox",
-            "input": true
-        }, {
-            "label": "Container",
-            "tableView": false,
-            "clearOnHide": false,
-            "key": "org",
-            "conditional": {
-                "show": true,
-                "when": "checkOrg",
-                "eq": "true"
-            },
-            "type": "container",
-            "input": true,
-            "components": [{
-                "label": "Columns",
-                "columns": [{
-                    "components": [{
-                        "label": "Name",
-                        "tooltip": "Please enter the Name of the Organization to be created",
-                        "autofocus": true,
-                        "tableView": true,
-                        "clearOnHide": false,
-                        "validate": {
-                            "required": true
-                        },
-                        "errorLabel": "Organization Name",
-                        "key": "name",
-                        "type": "textfield",
-                        "input": true,
-                        "hideOnChildrenHidden": false
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }, {
-                    "components": [{
-                        "label": "Email",
-                        "tooltip": "Please enter the Email Id of the Organization to be created",
-                        "tableView": true,
-                        "clearOnHide": false,
-                        "validate": {
-                            "required": true
-                        },
-                        "errorLabel": "Organization Email",
-                        "key": "email",
-                        "type": "email",
-                        "input": true,
-                        "hideOnChildrenHidden": false
-                    }],
-                    "width": 6,
-                    "offset": 0,
-                    "push": 0,
-                    "pull": 0,
-                    "size": "md",
-                    "currentWidth": 6
-                }],
-                "key": "columns",
-                "type": "columns",
-                "input": false,
-                "tableView": false,
-                "hideOnChildrenHidden": false
-            }, {
-                "title": "Address Details",
-                "theme": "primary",
-                "breadcrumbClickable": true,
-                "buttonSettings": {
-                    "previous": true,
-                    "cancel": true,
-                    "next": true
-                },
-                "collapsible": false,
-                "key": "addressDetails",
-                "type": "panel",
-                "label": "Panel",
-                "input": false,
-                "tableView": false,
-                "components": [{
-                    "label": "Columns",
-                    "columns": [{
-                        "components": [{
-                            "label": "Address",
-                            "description": "The Address of the Organization",
-                            "tooltip": "Please enter the Address of the Organization to be created",
-                            "tableView": true,
-                            "clearOnHide": false,
-                            "validate": {
-                                "required": true
-                            },
-                            "key": "address1",
-                            "type": "textfield",
-                            "input": true,
-                            "lockKey": true,
-                            "hideOnChildrenHidden": false
-                        }],
-                        "width": 4,
-                        "offset": 0,
-                        "push": 0,
-                        "pull": 0,
-                        "size": "md",
-                        "currentWidth": 4
-                    }, {
-                        "components": [{
-                            "label": "City",
-                            "description": "The City the Organization Resides in",
-                            "tooltip": "Please enter the City of the Organization to be created",
-                            "tableView": true,
-                            "clearOnHide": false,
-                            "validate": {
-                                "required": true
-                            },
-                            "key": "city",
-                            "type": "textfield",
-                            "input": true,
-                            "lockKey": true,
-                            "hideOnChildrenHidden": false
-                        }],
-                        "width": 4,
-                        "offset": 0,
-                        "push": 0,
-                        "pull": 0,
-                        "size": "md",
-                        "currentWidth": 4
-                    }, {
-                        "components": [{
-                            "label": "Zip Code",
-                            "description": "The Zip Code the Organization resides in",
-                            "tooltip": "Please enter the Zip Code of the Organization to be created",
-                            "tableView": true,
-                            "clearOnHide": false,
-                            "validate": {
-                                "required": true,
-                                "custom": "if (data.org.zip && data.org.zip != \"\") {\n  if (data.org.zip.length <= 12) {\n    valid = data.org.zip.match(/^[0-9\\s-]*$/)\n      ? true\n      : \"Please enter a valid Zip Code for your region.\";\n  } else {\n    valid =\n      data.org.zip.length > 12\n        ? \"Please enter a valid Zip Code for your region.\"\n        : true;\n  }\n}"
-                            },
-                            "key": "zip",
-                            "type": "textfield",
-                            "input": true,
-                            "hideOnChildrenHidden": false
-                        }],
-                        "size": "md",
-                        "width": 4,
-                        "offset": 0,
-                        "push": 0,
-                        "pull": 0,
-                        "currentWidth": 4
-                    }],
-                    "key": "columns11",
-                    "type": "columns",
-                    "input": false,
-                    "tableView": false,
-                    "hideOnChildrenHidden": false
-                }, {
-                    "label": "Columns",
-                    "columns": [{
-                        "components": [{
-                            "label": "Country",
-                            "widget": "choicesjs",
-                            "description": "The Country the Organization resides in",
-                            "tooltip": "Please enter the Country of the Organization to be created",
-                            "uniqueOptions": true,
-                            "tableView": true,
-                            "dataSrc": "custom",
-                            "data": {
-                                "custom": "values = data['countryList'];"
-                            },
-                            "valueProperty": "country",
-                            "template": "<span>{{ item.country }}</span>",
-                            "readOnlyValue": true,
-                            "clearOnHide": false,
-                            "validate": {
-                                "required": true
-                            },
-                            "key": "country",
-                            "type": "select",
-                            "input": true,
-                            "lockKey": true,
-                            "source": "5d347da33e9be31e15d3b115",
-                            "hideOnChildrenHidden": false,
-                            "searchThreshold": 0.3
-                        }],
-                        "width": 6,
-                        "offset": 0,
-                        "push": 0,
-                        "pull": 0,
-                        "size": "md",
-                        "currentWidth": 6
-                    }, {
-                        "components": [{
-                            "label": "State",
-                            "widget": "choicesjs",
-                            "description": "The State that the Organization Resides in",
-                            "tooltip": "Please enter the State of the Organization to be created",
-                            "uniqueOptions": true,
-                            "tableView": false,
-                            "dataSrc": "custom",
-                            "data": {
-                                "custom": "try {\ncountrylist = JSON.parse(data['countryList']);\n} catch(e) {\ncountrylist = data['countryList'];\n}\nif(countrylist){\nlet obj = countrylist.find(o => o.country === row['country']);\nif(obj){\nvalues = obj.states\n}\n}"
-                            },
-                            "template": "<span>{{ item }}</span>",
-                            "refreshOn": "country",
-                            "clearOnRefresh": true,
-                            "readOnlyValue": true,
-                            "clearOnHide": false,
-                            "validate": {
-                                "required": true
-                            },
-                            "key": "state",
-                            "type": "select",
-                            "input": true,
-                            "lockKey": true,
-                            "hideOnChildrenHidden": false,
-                            "isNew": false,
-                            "searchThreshold": 0.3
-                        }],
-                        "width": 6,
-                        "offset": 0,
-                        "push": 0,
-                        "pull": 0,
-                        "size": "md",
-                        "currentWidth": 6
-                    }],
-                    "key": "columns3",
-                    "type": "columns",
-                    "input": false,
-                    "tableView": false,
-                    "hideOnChildrenHidden": false
-                }]
-            }, {
-                "title": "Contact Person",
-                "theme": "primary",
-                "breadcrumbClickable": true,
-                "buttonSettings": {
-                    "previous": true,
-                    "cancel": true,
-                    "next": true
-                },
-                "collapsible": false,
-                "key": "contactPerson",
-                "type": "panel",
-                "label": "Panel",
-                "input": false,
-                "tableView": false,
-                "components": [{
-                    "label": "Container",
-                    "tableView": false,
-                    "clearOnHide": false,
-                    "key": "contact",
-                    "type": "container",
-                    "input": true,
-                    "components": [{
-                        "label": "Columns",
-                        "columns": [{
-                            "components": [{
-                                "label": "Firstname",
-                                "tooltip": "Please enter the First Name of the Contact Person",
-                                "tableView": true,
-                                "clearOnHide": false,
-                                "validate": {
-                                    "required": true
-                                },
-                                "key": "firstname",
-                                "type": "textfield",
-                                "input": true,
-                                "hideOnChildrenHidden": false
-                            }],
-                            "width": 6,
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "currentWidth": 6
-                        }, {
-                            "components": [{
-                                "label": "Lastname",
-                                "tooltip": "Please enter the First Name of the Contact Person",
-                                "tableView": true,
-                                "clearOnHide": false,
-                                "validate": {
-                                    "required": true
-                                },
-                                "key": "lastname",
-                                "type": "textfield",
-                                "input": true,
-                                "hideOnChildrenHidden": false
-                            }],
-                            "width": 6,
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "currentWidth": 6
-                        }],
-                        "tableView": false,
-                        "key": "columns5",
-                        "type": "columns",
-                        "input": false,
-                        "hideOnChildrenHidden": false
-                    }, {
-                        "label": "Columns",
-                        "columns": [{
-                            "components": [{
-                                "label": "Username",
-                                "description": "This will be the Username for the Contact Person created",
-                                "disabled": true,
-                                "tableView": true,
-                                "clearOnHide": false,
-                                "calculateValue": "if(data.org && data.org.contact && data.org.contact.firstname && data.org.contact.lastname){\n    var username = data.org.contact.firstname.toLowerCase() + data.org.contact.lastname.toLowerCase();\n    value = username.split(\" \").join(\"\");\n}",
-                                "allowCalculateOverride": true,
-                                "validate": {
-                                    "required": true
-                                },
-                                "key": "username",
-                                "attributes": {
-                                    "style": "color:black"
-                                },
-                                "type": "textfield",
-                                "input": true,
-                                "hideOnChildrenHidden": false
-                            }],
-                            "width": 6,
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "currentWidth": 6
-                        }, {
-                            "components": [{
-                                "label": "Email",
-                                "tooltip": "The Email of the Contact Person",
-                                "tableView": true,
-                                "clearOnHide": false,
-                                "validate": {
-                                    "required": true
-                                },
-                                "key": "email",
-                                "type": "email",
-                                "input": true,
-                                "hideOnChildrenHidden": false
-                            }],
-                            "width": 6,
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "currentWidth": 6
-                        }],
-                        "tableView": false,
-                        "key": "columns4",
-                        "type": "columns",
-                        "input": false,
-                        "hideOnChildrenHidden": false
-                    }]
-                }]
-            }]
-        }]
-    }, {
-        "title": "Roles and Privileges",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "collapsible": false,
-        "tableView": false,
-        "key": "page2",
-        "type": "panel",
-        "label": "Roles and Privileges",
-        "input": false,
-        "components": [{
-            "title": "Privileges",
-            "theme": "primary",
-            "breadcrumbClickable": true,
-            "buttonSettings": {
-                "previous": true,
-                "cancel": true,
-                "next": true
-            },
-            "collapsible": false,
-            "tableView": false,
-            "key": "privilegesPanel",
-            "type": "panel",
-            "label": "Privileges",
-            "input": false,
-            "components": [{
-                "label": "Privileges",
-                "tooltip": "Please enter the Privileges to be used\nA Privilege can be used to define or Access different features/Flows within the Application",
-                "reorder": false,
-                "addAnother": "Add Privilege",
-                "addAnotherPosition": "bottom",
-                "defaultOpen": false,
-                "layoutFixed": false,
-                "enableRowGroups": false,
-                "initEmpty": false,
-                "tableView": false,
-                "defaultValue": [{
-                    "name": "",
-                    "permission": ""
-                }],
-                "clearOnHide": false,
-                "validate": {
-                    "minLength": 1,
-                    "custom": "if (data.privilege) {\n  if (data.privilege.length > 0) {\n    valid =\n      data.privilege.length == new Set(data.privilege.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same privilege more than once.\";\n  } else {\n    valid = true;\n  }\n}"
-                },
-                "key": "privilege",
-                "type": "datagrid",
-                "noFirstRow": false,
-                "input": true,
-                "components": [{
-                    "label": "Name",
-                    "tooltip": "Please enter the Privilege Name to be used",
-                    "autofocus": true,
-                    "tableView": true,
-                    "case": "uppercase",
-                    "clearOnHide": false,
-                    "validate": {
-                        "required": true,
-                        "unique": true
-                    },
-                    "unique": true,
-                    "errorLabel": "Privilege Name",
-                    "key": "name",
-                    "type": "textfield",
-                    "input": true
-                }, {
-                    "label": "Permission",
-                    "optionsLabelPosition": "right",
-                    "tooltip": "Please select the Highest Level of Permissions the Privilege may Have",
-                    "inline": true,
-                    "tableView": false,
-                    "values": [{
-                        "label": "Read",
-                        "value": "1",
-                        "shortcut": ""
-                    }, {
-                        "label": "Write",
-                        "value": "3",
-                        "shortcut": ""
-                    }, {
-                        "label": "Create",
-                        "value": "7",
-                        "shortcut": ""
-                    }, {
-                        "label": "Delete",
-                        "value": "15",
-                        "shortcut": ""
-                    }],
-                    "clearOnHide": false,
-                    "validate": {
-                        "required": true
-                    },
-                    "key": "permission",
-                    "type": "radio",
-                    "input": true
-                }]
-            }]
-        }, {
-            "title": "Business Roles",
-            "theme": "primary",
-            "breadcrumbClickable": true,
-            "buttonSettings": {
-                "previous": true,
-                "cancel": true,
-                "next": true
-            },
-            "collapsible": false,
-            "hidden": true,
-            "key": "businessRolePanel",
-            "type": "panel",
-            "label": "Business Roles",
-            "input": false,
-            "tableView": false,
-            "components": [{
-                "label": "Business Role",
-                "reorder": false,
-                "addAnotherPosition": "bottom",
-                "defaultOpen": false,
-                "layoutFixed": false,
-                "enableRowGroups": false,
-                "initEmpty": false,
-                "tableView": false,
-                "defaultValue": [{
-                    "name": ""
-                }],
-                "key": "businessRole",
-                "type": "datagrid",
-                "input": true,
-                "components": [{
-                    "label": "Name",
-                    "tableView": true,
-                    "key": "name",
-                    "type": "textfield",
-                    "input": true
-                }]
-            }]
-        }, {
-            "title": "Roles",
-            "theme": "primary",
-            "breadcrumbClickable": true,
-            "buttonSettings": {
-                "previous": true,
-                "cancel": true,
-                "next": true
-            },
-            "collapsible": false,
-            "tableView": false,
-            "key": "roles1",
-            "type": "panel",
-            "label": "Panel",
-            "input": false,
-            "components": [{
-                "label": "Roles",
-                "tooltip": "A Role is collection of Privileges that can be given for users.\nEach Role will have a set of Privileges which can associated to different Capabilities of the Application",
-                "reorder": false,
-                "addAnother": "Add Role",
-                "addAnotherPosition": "bottom",
-                "defaultOpen": false,
-                "layoutFixed": false,
-                "enableRowGroups": false,
-                "initEmpty": false,
-                "tableView": false,
-                "defaultValue": [{
-                    "name": "",
-                    "privilegesDuplicate": [{
-                        "privilege_name": {},
-                        "permission": ""
-                    }],
-                    "default": false,
-                    "privileges": [{
-                        "permission": ""
-                    }]
-                }],
-                "clearOnHide": false,
-                "validate": {
-                    "minLength": 1,
-                    "custom": "if (data.role) {\n  if (data.role.length > 0) {\n    valid =\n      data.role.length == new Set(data.role.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same role more than once.\";\n  } else {\n    valid = true;\n  }\n}"
-                },
-                "key": "role",
-                "type": "datagrid",
-                "noFirstRow": false,
-                "input": true,
-                "components": [{
-                    "label": "Name",
-                    "tooltip": "Please enter the Name of the Role",
-                    "tableView": true,
-                    "clearOnHide": false,
-                    "validate": {
-                        "required": true,
-                        "unique": true
-                    },
-                    "unique": true,
-                    "errorLabel": "Role Name",
-                    "key": "name",
-                    "type": "textfield",
-                    "input": true
-                }, {
-                    "label": "Privileges",
-                    "reorder": false,
-                    "addAnother": "Add Privilege",
-                    "addAnotherPosition": "bottom",
-                    "defaultOpen": false,
-                    "layoutFixed": false,
-                    "enableRowGroups": false,
-                    "noFirstRow": false,
-                    "tableView": false,
-                    "clearOnHide": false,
-                    "validate": {
-                        "custom": "try {\n  if (row.privilegesDuplicate) {\n    if (row.privilegesDuplicate.length > 0) {\n      valid =\n        row.privilegesDuplicate.length ==\n        new Set(\n          row.privilegesDuplicate.map((i) =>\n            i.privilege_name.name.replace(/\\s/g, \"\")\n          )\n        ).size\n          ? true\n          : \"You cannot have a same privilege more than once.\";\n    } else {\n      valid = true;\n    }\n  }\n} catch (error) {}"
-                    },
-                    "key": "privilegesDuplicate",
-                    "type": "datagrid",
-                    "input": true,
-                    "components": [{
-                        "label": "Name",
-                        "widget": "choicesjs",
-                        "placeholder": "Please select",
-                        "tooltip": "Select the Privilege which the Role should have",
-                        "tableView": true,
-                        "dataSrc": "custom",
-                        "data": {
-                            "custom": "if(data.privilege){\n  console.log('inside drop down');\n  values = data.privilege.map(item =>item)\n  console.log(values);\n} else {\n  values = [];\n}"
-                        },
-                        "template": "<span>{{ item.name }}</span>",
-                        "clearOnHide": false,
-                        "validate": {
-                            "required": true
-                        },
-                        "errorLabel": "Privilege Name",
-                        "key": "privilege_name",
-                        "type": "select",
-                        "input": true,
-                        "searchThreshold": 0.3
-                    }, {
-                        "label": "Permission",
-                        "optionsLabelPosition": "right",
-                        "tooltip": "Select the Permission for the Privilege which needs to be provided ",
-                        "inline": true,
-                        "disabled": true,
-                        "tableView": false,
-                        "values": [{
-                            "label": "Read",
-                            "value": "1",
-                            "shortcut": ""
-                        }, {
-                            "label": "Write",
-                            "value": "3",
-                            "shortcut": ""
-                        }, {
-                            "label": "Create",
-                            "value": "7",
-                            "shortcut": ""
-                        }, {
-                            "label": "Delete",
-                            "value": "15",
-                            "shortcut": ""
-                        }],
-                        "clearOnHide": false,
-                        "validate": {
-                            "required": true,
-                            "custom": "valid =\n  input <= instance.component.values[instance.component.values.length - 1].value\n    ? true\n    : \"Please select a valid permission level\";"
-                        },
-                        "key": "permission",
-                        "logic": [{
-                            "name": "Check Name",
-                            "trigger": {
-                                "type": "javascript",
-                                "javascript": "if(row.privilege_name){\ntry {\n    result = row.privilege_name.name.length > 0\n  } catch {\n    result = false;\n  }\n} else {\n  result = false;\n}"
-                            },
-                            "actions": [{
-                                "name": "Enable",
-                                "type": "value",
-                                "value": "var set = [\n  {\n    label: \"Read\",\n    value: \"1\",\n    shortcut: \"\"\n  },\n  {\n    label: \"Write\",\n    value: \"3\",\n    shortcut: \"\"\n  },\n  {\n    label: \"Create\",\n    value: \"7\",\n    shortcut: \"\"\n  },\n  {\n    label: \"Delete\",\n    value: \"15\",\n    shortcut: \"\"\n  }\n];\nvar values = false;\nif(row.privilege_name){\ntry {\n  values = set\n    .map((i) => (i.value <= row.privilege_name.permission ? i : false))\n    .filter((i) => (i ? i : false));\n} catch {}\n} else {\n  values = [];\n}\n\nif (values && values.length > 0) {\n  component.values = values;\n  component.disabled = false;\n}"
-                            }]
-                        }],
-                        "type": "radio",
-                        "input": true
-                    }]
-                }, {
-                    "label": "Business Role",
-                    "widget": "choicesjs",
-                    "hidden": true,
-                    "tableView": false,
-                    "dataSrc": "custom",
-                    "defaultValue": {
-                        "name": ""
-                    },
-                    "data": {
-                        "custom": "if(data.privilege){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
-                    },
-                    "template": "<span>{{ item.name }}</span>",
-                    "key": "businessRole",
-                    "type": "select",
-                    "input": true,
-                    "searchThreshold": 0.3
-                }, {
-                    "label": "Actual Privileges Key",
-                    "calculateValue": "try {\n  value = row.privilegesDuplicate.map((i) => {\n    return { privilege_name: i.privilege_name.name, permission: i.permission };\n  });\n} catch (error) {}",
-                    "key": "privileges",
-                    "type": "hidden",
-                    "input": true,
-                    "tableView": false
-                }, {
-                    "label": "Default Role",
-                    "redrawOn": "defaultRole",
-                    "calculateValue": "if(data.defaultRole){\n  value = data.defaultRole == row.name ? true : false;\n} else {\n  value = false;\n}",
-                    "key": "default",
-                    "type": "hidden",
-                    "input": true,
-                    "tableView": false
-                }]
-            }]
-        }]
-    }, {
-        "title": "Form Type",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "tooltip": "An Form Type is a Data Collection inside the Application and Represents what the File Object will contain\nEach Form Type Represents can contain a Form which will modify Data inside the File.",
-        "collapsible": false,
-        "key": "page3",
-        "type": "panel",
-        "label": "Entities",
-        "tableView": false,
-        "input": false,
-        "components": [{
-            "label": "HTML",
-            "tag": "label",
-            "className": "control-label",
-            "attrs": [{
-                "attr": "for",
-                "value": "e2kzst9-entity"
-            }],
-            "content": "Form Types\r\n      <i class=\"fa fa-question-circle text-muted\" ref=\"tooltip\" aria-describedby=\"entity_tooltip\"></i>\r\n<div class=\"tooltip\" style=\"opacity: 1; position: absolute; transform: translate3d(64px, -77px, 0px); top: 0px; left: 0px; will-change: transform;visibility: hidden;\" role=\"tooltip\" id=\"entity_tooltip\" aria-hidden=\"false\" x-placement=\"right\">\r\n            <div class=\"tooltip-arrow\" style=\"top: 86px;\"></div>\r\n            <div class=\"tooltip-inner\">An Form Type is a Data Collection inside the Application and Represents what the File Object will contain<br><br>Each Form Type Represents can contain a Form which will modify Data inside the File.</div>\r\n          </div></label>",
-            "refreshOnChange": false,
-            "key": "html",
-            "type": "htmlelement",
-            "input": false,
-            "tableView": false
-        }, {
-            "label": "Form Types",
-            "reorder": false,
-            "addAnother": "Add Form Type",
-            "addAnotherPosition": "bottom",
-            "defaultOpen": false,
-            "layoutFixed": false,
-            "enableRowGroups": false,
-            "initEmpty": false,
-            "tableView": false,
-            "defaultValue": [{
-                "name": "",
-                "formFieldsValidationExcel": [],
-                "start_date_field": "",
-                "end_date_field": "",
-                "status_field": "",
-                "field": [{
-                    "name": "",
-                    "text": "",
-                    "data_type": "",
-                    "index": false,
-                    "ryg_rule": ""
-                }],
-                "ryg_rule": "",
-                "subscriber_field": "",
-                "title": "",
-                "enable_documents": false,
-                "enable_comments": false,
-                "enable_view": false,
-                "enable_auditlog": false,
-                "pageContent": {}
-            }],
-            "clearOnHide": false,
-            "validate": {
-                "minLength": 0
-            },
-            "key": "entity",
-            "type": "datagrid",
-            "noFirstRow": false,
-            "input": true,
-            "components": [{
-                "theme": "primary",
-                "breadcrumbClickable": true,
-                "buttonSettings": {
-                    "previous": true,
-                    "cancel": true,
-                    "next": true
-                },
-                "collapsible": false,
-                "hideLabel": true,
-                "key": "panel",
-                "type": "panel",
-                "label": "Panel",
-                "input": false,
-                "tableView": false,
-                "components": [{
-                    "label": "entitywell",
-                    "key": "entitywell",
-                    "type": "well",
-                    "input": false,
-                    "tableView": false,
-                    "components": [{
-                        "label": "Columns",
-                        "columns": [{
-                            "components": [{
-                                "label": "Columns",
-                                "columns": [{
-                                    "components": [{
-                                        "label": "Name",
-                                        "tooltip": "The Name for the Form Type used in the Application",
-                                        "showCharCount": true,
-                                        "autofocus": true,
-                                        "tableView": false,
-                                        "clearOnHide": false,
-                                        "key": "name",
-                                        "type": "textfield",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }],
-                                    "width": 6,
-                                    "offset": 0,
-                                    "push": 0,
-                                    "pull": 0,
-                                    "size": "md",
-                                    "currentWidth": 6
-                                }, {
-                                    "components": [{
-                                        "label": "Form Fields Validation Excel",
-                                        "tableView": false,
-                                        "storage": "base64",
-                                        "webcam": false,
-                                        "fileTypes": [{
-                                            "label": "",
-                                            "value": ""
-                                        }],
-                                        "clearOnHide": false,
-                                        "key": "formFieldsValidationExcel",
-                                        "customConditional": "show = false;",
-                                        "type": "file",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }],
-                                    "width": 6,
-                                    "offset": 0,
-                                    "push": 0,
-                                    "pull": 0,
-                                    "size": "md",
-                                    "currentWidth": 6
-                                }],
-                                "tableView": false,
-                                "key": "columns9",
-                                "type": "columns",
-                                "input": false,
-                                "width": 3,
-                                "hideOnChildrenHidden": false
-                            }, {
-                                "label": "Columns",
-                                "columns": [{
-                                    "components": [{
-                                        "label": "Start date field",
-                                        "tooltip": "The Start Date Field which is used in the Form Type",
-                                        "tableView": true,
-                                        "key": "start_date_field",
-                                        "type": "textfield",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }],
-                                    "offset": 0,
-                                    "push": 0,
-                                    "pull": 0,
-                                    "size": "md",
-                                    "width": 6,
-                                    "currentWidth": 6
-                                }, {
-                                    "components": [{
-                                        "label": "End date field",
-                                        "tooltip": "The End Date Field which is used in the Form Type",
-                                        "tableView": true,
-                                        "key": "end_date_field",
-                                        "type": "textfield",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }],
-                                    "offset": 0,
-                                    "push": 0,
-                                    "pull": 0,
-                                    "size": "md",
-                                    "width": 6,
-                                    "currentWidth": 6
-                                }],
-                                "key": "columns10",
-                                "type": "columns",
-                                "tableView": false,
-                                "input": false,
-                                "width": 3,
-                                "hideOnChildrenHidden": false
-                            }, {
-                                "label": "Columns",
-                                "columns": [{
-                                    "components": [{
-                                        "label": "Columns",
-                                        "columns": [{
-                                            "components": [{
-                                                "label": "Status field",
-                                                "tooltip": "The Status Field which is used in the Form Type",
-                                                "tableView": true,
-                                                "key": "status_field",
-                                                "type": "textfield",
-                                                "input": true,
-                                                "hideOnChildrenHidden": false
-                                            }],
-                                            "width": 6,
-                                            "offset": 0,
-                                            "push": 0,
-                                            "pull": 0,
-                                            "size": "md",
-                                            "currentWidth": 6
-                                        }, {
-                                            "components": [{
-                                                "label": "Subscriber field",
-                                                "tooltip": "The Subscriber Field which is used in the Form Type",
-                                                "tableView": true,
-                                                "key": "subscriber_field",
-                                                "logic": [{
-                                                    "name": "If File Comments enabled",
-                                                    "trigger": {
-                                                        "type": "simple",
-                                                        "simple": {
-                                                            "show": true,
-                                                            "when": "app.chat_notification",
-                                                            "eq": "true"
-                                                        }
-                                                    },
-                                                    "actions": [{
-                                                        "name": "Set Mandatory",
-                                                        "type": "property",
-                                                        "property": {
-                                                            "label": "Required",
-                                                            "value": "validate.required",
-                                                            "type": "boolean"
-                                                        },
-                                                        "state": true
-                                                    }]
-                                                }, {
-                                                    "name": "If File Comments not enabled",
-                                                    "trigger": {
-                                                        "type": "simple",
-                                                        "simple": {
-                                                            "show": true,
-                                                            "when": "app.chat_notification",
-                                                            "eq": "false"
-                                                        }
-                                                    },
-                                                    "actions": [{
-                                                        "name": "Set it to Non-mandatory",
-                                                        "type": "property",
-                                                        "property": {
-                                                            "label": "Required",
-                                                            "value": "validate.required",
-                                                            "type": "boolean"
-                                                        },
-                                                        "state": false
-                                                    }]
-                                                }],
-                                                "type": "textfield",
-                                                "input": true,
-                                                "hideOnChildrenHidden": false
-                                            }],
-                                            "width": 6,
-                                            "offset": 0,
-                                            "push": 0,
-                                            "pull": 0,
-                                            "size": "md",
-                                            "currentWidth": 6
-                                        }],
-                                        "key": "columns13",
-                                        "type": "columns",
-                                        "input": false,
-                                        "tableView": false,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Message Title",
-                                        "placeholder": "Ex: ${entity_name}${identifier_field}",
-                                        "tooltip": "Message Title would be displayed at the beginning of a message thread",
-                                        "tableView": true,
-                                        "inputFormat": "raw",
-                                        "key": "title",
-                                        "logic": [{
-                                            "name": "If File Comments enabled",
-                                            "trigger": {
-                                                "type": "simple",
-                                                "javascript": "",
-                                                "simple": {
-                                                    "show": true,
-                                                    "when": "app.chat_notification",
-                                                    "eq": "true"
-                                                }
-                                            },
-                                            "actions": [{
-                                                "name": "Set Mandatory",
-                                                "type": "property",
-                                                "property": {
-                                                    "label": "Required",
-                                                    "value": "validate.required",
-                                                    "type": "boolean"
-                                                },
-                                                "state": true
-                                            }]
-                                        }, {
-                                            "name": "If File comments not enabled",
-                                            "trigger": {
-                                                "type": "simple",
-                                                "simple": {
-                                                    "show": true,
-                                                    "when": "app.chat_notification",
-                                                    "eq": "false"
-                                                }
-                                            },
-                                            "actions": [{
-                                                "name": "Make non mandatory",
-                                                "type": "property",
-                                                "property": {
-                                                    "label": "Required",
-                                                    "value": "validate.required",
-                                                    "type": "boolean"
-                                                },
-                                                "state": false
-                                            }]
-                                        }],
-                                        "type": "textfield",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Attachment Field",
-                                        "tooltip": "Uploaded files from chat will be attached to this field",
-                                        "tableView": true,
-                                        "inputFormat": "raw",
-                                        "key": "chatAttachmentField",
-                                        "customConditional": "show = false;",
-                                        "logic": [{
-                                            "name": "If File Comments enabled",
-                                            "trigger": {
-                                                "type": "simple",
-                                                "javascript": "",
-                                                "simple": {
-                                                    "show": true,
-                                                    "when": "app.chat_notification",
-                                                    "eq": "true"
-                                                }
-                                            },
-                                            "actions": [{
-                                                "name": "Set Mandatory",
-                                                "type": "property",
-                                                "property": {
-                                                    "label": "Required",
-                                                    "value": "validate.required",
-                                                    "type": "boolean"
-                                                },
-                                                "state": true
-                                            }]
-                                        }, {
-                                            "name": "If File comments not enabled",
-                                            "trigger": {
-                                                "type": "simple",
-                                                "simple": {
-                                                    "show": true,
-                                                    "when": "app.chat_notification",
-                                                    "eq": "false"
-                                                }
-                                            },
-                                            "actions": [{
-                                                "name": "Make non mandatory",
-                                                "type": "property",
-                                                "property": {
-                                                    "label": "Required",
-                                                    "value": "validate.required",
-                                                    "type": "boolean"
-                                                },
-                                                "state": false
-                                            }]
-                                        }],
-                                        "type": "textfield",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "RYG Rule",
-                                        "tooltip": "The RYG Rule for the Form Type\nThis is a javascript rule which is used to return the Colour Based on any and all Fields in the Form Type",
-                                        "editor": "ace",
-                                        "autoExpand": false,
-                                        "tableView": true,
-                                        "key": "ryg_rule",
-                                        "type": "textarea",
-                                        "as": "string",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Enable Documents?",
-                                        "tableView": false,
-                                        "defaultValue": false,
-                                        "key": "enable_documents",
-                                        "type": "checkbox",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Enable Comments?",
-                                        "tableView": false,
-                                        "defaultValue": false,
-                                        "key": "enable_comments",
-                                        "type": "checkbox",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Enable View?",
-                                        "tableView": false,
-                                        "defaultValue": false,
-                                        "key": "enable_view",
-                                        "type": "checkbox",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Enable Audit Log?",
-                                        "tableView": false,
-                                        "defaultValue": false,
-                                        "key": "enable_auditlog",
-                                        "type": "checkbox",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Enable Print ?",
-                                        "tableView": false,
-                                        "defaultValue": false,
-                                        "key": "enable_print",
-                                        "type": "checkbox",
-                                        "input": true,
-                                        "hideOnChildrenHidden": false
-                                    }, {
-                                        "label": "Entity View",
-                                        "tableView": false,
-                                        "clearOnHide": false,
-                                        "key": "pageContent",
-                                        "customConditional": "if(row.enable_view == true || row.enable_view == 'true'){\n  show = true;\n} else {\n  show = false;\n}",
-                                        "type": "container",
-                                        "input": true,
-                                        "components": [{
-                                            "label": "data",
-                                            "tableView": false,
-                                            "key": "data",
-                                            "type": "container",
-                                            "input": true,
-                                            "components": [{
-                                                "label": "Content",
-                                                "reorder": false,
-                                                "addAnotherPosition": "bottom",
-                                                "defaultOpen": false,
-                                                "layoutFixed": false,
-                                                "enableRowGroups": false,
-                                                "initEmpty": true,
-                                                "tableView": false,
-                                                "defaultValue": [{
-                                                    "content": "",
-                                                    "type": "HTMLViewer"
-                                                }],
-                                                "clearOnHide": false,
-                                                "key": "content",
-                                                "type": "datagrid",
-                                                "input": true,
-                                                "components": [{
-                                                    "label": "View Template",
-                                                    "editor": "ckeditor",
-                                                    "spellcheck": false,
-                                                    "tableView": false,
-                                                    "key": "content",
-                                                    "type": "textarea",
-                                                    "input": true
-                                                }, {
-                                                    "label": "type",
-                                                    "calculateValue": "value = \"HTMLViewer\"",
-                                                    "key": "type",
-                                                    "type": "hidden",
-                                                    "input": true,
-                                                    "tableView": false
-                                                }]
-                                            }]
-                                        }],
-                                        "hideOnChildrenHidden": false
-                                    }],
-                                    "width": 12,
-                                    "offset": 0,
-                                    "push": 0,
-                                    "pull": 0,
-                                    "size": "md",
-                                    "currentWidth": 12
-                                }, {
-                                    "components": [],
-                                    "width": 6,
-                                    "offset": 0,
-                                    "push": 0,
-                                    "pull": 0,
-                                    "size": "md",
-                                    "currentWidth": 6
-                                }],
-                                "tableView": false,
-                                "key": "columns12",
-                                "type": "columns",
-                                "input": false,
-                                "width": 3,
-                                "hideOnChildrenHidden": false
-                            }, {
-                                "label": "Linked Fields",
-                                "tableView": false,
-                                "modalEdit": true,
-                                "key": "linkedFields",
-                                "type": "well",
-                                "input": false,
-                                "components": [{
-                                    "label": "Linked Fields",
-                                    "reorder": false,
-                                    "addAnother": "Add Field",
-                                    "addAnotherPosition": "bottom",
-                                    "defaultOpen": false,
-                                    "layoutFixed": false,
-                                    "enableRowGroups": false,
-                                    "initEmpty": false,
-                                    "tableView": false,
-                                    "defaultValue": [{
-                                        "name": "",
-                                        "text": "",
-                                        "data_type": "",
-                                        "index": false
-                                    }],
-                                    "key": "field",
-                                    "type": "datagrid",
-                                    "input": true,
-                                    "hideOnChildrenHidden": false,
-                                    "components": [{
-                                        "label": "Name",
-                                        "tooltip": "Name of the fields to be used in the Form Type",
-                                        "tableView": true,
-                                        "clearOnHide": false,
-                                        "key": "name",
-                                        "type": "textfield",
-                                        "input": true
-                                    }, {
-                                        "label": "Label",
-                                        "tooltip": "Label for the Field of the Form Type",
-                                        "tableView": true,
-                                        "clearOnHide": false,
-                                        "key": "text",
-                                        "type": "textfield",
-                                        "input": true
-                                    }, {
-                                        "label": "Data Type",
-                                        "widget": "choicesjs",
-                                        "tooltip": "Data Type of the field",
-                                        "tableView": true,
-                                        "data": {
-                                            "values": [{
-                                                "label": "Text",
-                                                "value": "text"
-                                            }, {
-                                                "label": "Numeric",
-                                                "value": "numeric"
-                                            }, {
-                                                "label": "Date",
-                                                "value": "date"
-                                            }, {
-                                                "label": "Document",
-                                                "value": "document"
-                                            }, {
-                                                "label": "JSON",
-                                                "value": "json"
-                                            }]
-                                        },
-                                        "clearOnHide": false,
-                                        "key": "data_type",
-                                        "type": "select",
-                                        "input": true,
-                                        "searchThreshold": 0.3
-                                    }, {
-                                        "label": "Indexed",
-                                        "tooltip": "Indexed fields can be used in the List Views,For Filtering ,Sorting,Etc",
-                                        "tableView": false,
-                                        "defaultValue": false,
-                                        "clearOnHide": false,
-                                        "key": "index",
-                                        "type": "checkbox",
-                                        "input": true
-                                    }]
-                                }],
-                                "hideOnChildrenHidden": false,
-                                "width": 3
-                            }, {
-                                "label": "Participant Role",
-                                "reorder": false,
-                                "addAnotherPosition": "bottom",
-                                "defaultOpen": false,
-                                "layoutFixed": false,
-                                "enableRowGroups": false,
-                                "initEmpty": false,
-                                "hidden": true,
-                                "tableView": false,
-                                "defaultValue": [{
-                                    "businessRole": {}
-                                }],
-                                "key": "participantRole",
-                                "type": "datagrid",
-                                "input": true,
-                                "components": [{
-                                    "label": "Business Role",
-                                    "widget": "choicesjs",
-                                    "tableView": false,
-                                    "dataSrc": "custom",
-                                    "data": {
-                                        "custom": "if(data.privilege){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
-                                    },
-                                    "template": "<span>{{ item.name }}</span>",
-                                    "key": "businessRole",
-                                    "type": "select",
-                                    "input": true,
-                                    "searchThreshold": 0.3
-                                }],
-                                "hideOnChildrenHidden": false
-                            }],
-                            "width": 12,
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "currentWidth": 12
-                        }, {
-                            "components": [],
-                            "width": 6,
-                            "offset": 0,
-                            "push": 0,
-                            "pull": 0,
-                            "size": "md",
-                            "currentWidth": 6
-                        }],
-                        "key": "columns7",
-                        "type": "columns",
-                        "tableView": false,
-                        "input": false,
-                        "hideOnChildrenHidden": false
-                    }]
-                }]
-            }]
-        }]
-    }, {
-        "title": "Form Configurator",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "collapsible": false,
-        "key": "formsPanel",
-        "type": "panel",
-        "label": "Form Manager",
-        "tableView": false,
-        "input": false,
-        "components": [{
-            "label": "Forms",
-            "reorder": false,
-            "addAnotherPosition": "bottom",
-            "layoutFixed": false,
-            "enableRowGroups": false,
-            "initEmpty": false,
-            "tableView": false,
-            "defaultValue": [{
-                "name": "",
-                "entity": {},
-                "template": [],
-                "template_file": "",
-                "uuid": ""
-            }],
-            "persistent": false,
-            "redrawOn": "entity",
-            "clearOnHide": false,
-            "calculateValue": "value = data.form;",
-            "validate": {
-                "custom": "if (data.formDuplicate) {\n  if (data.formDuplicate.length > 0) {\n    valid =\n      data.formDuplicate.length == new Set(data.formDuplicate.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same form more than once.\";\n  } else {\n    valid = true;\n  }\n}"
-            },
-            "key": "formDuplicate",
-            "type": "datagrid",
-            "defaultOpen": false,
-            "noFirstRow": false,
-            "input": true,
-            "components": [{
-                "label": "Title",
-                "tooltip": "The Form Title",
-                "disabled": true,
-                "tableView": true,
-                "clearOnHide": false,
-                "calculateValue": "try {\n  if (row.template.length > 0) {\n    value =\n      row.template[0].originalName.length > 0\n        ? row.template_file.split(\".\")[0]\n        : \"\";\n  }else{\n    value = \"\";\n  }\n} catch (error) {}",
-                "key": "name",
-                "type": "textfield",
-                "hideOnChildrenHidden": false,
-                "input": true
-            }, {
-                "label": "Entity",
-                "widget": "choicesjs",
-                "tooltip": "The Entity the Form is Associated to",
-                "autofocus": true,
-                "tableView": true,
-                "dataSrc": "custom",
-                "data": {
-                    "custom": "if(data.entity){\nvalues = data.entity.map(item=>item.name)\nif(row[component.key] && !values.includes(row[component.key])){\n  row[component.key] = \"\";\n}\n} else {\nvalues = [];\n}"
-                },
-                "clearOnHide": false,
-                "key": "entity",
-                "logic": [{
-                    "name": "Check if form Uploaded",
-                    "trigger": {
-                        "type": "javascript",
-                        "javascript": "result = (row.template.length > 0);"
-                    },
-                    "actions": [{
-                        "name": "Set Mandatory",
-                        "type": "property",
-                        "property": {
-                            "label": "Required",
-                            "value": "validate.required",
-                            "type": "boolean"
-                        },
-                        "state": true
-                    }]
-                }, {
-                    "name": "Forms Not Uploaded",
-                    "trigger": {
-                        "type": "javascript",
-                        "simple": {
-                            "show": true
-                        },
-                        "javascript": "result = (row.template.length <= 0);"
-                    },
-                    "actions": [{
-                        "name": "Not Mandatory",
-                        "type": "property",
-                        "property": {
-                            "label": "Required",
-                            "value": "validate.required",
-                            "type": "boolean"
-                        },
-                        "state": false
-                    }]
-                }],
-                "type": "select",
-                "input": true
-            }, {
-                "label": "Form File",
-                "tooltip": "The JSON Form which can be obtained from Formio",
-                "tableView": false,
-                "storage": "url",
-                "webcam": true,
-                "fileTypes": [{
-                    "label": "",
-                    "value": ""
-                }],
-                "filePattern": ".json",
-                "fileMaxSize": "10MB",
-                "clearOnHide": false,
-                "key": "template",
-                "properties": {
-                    "absoluteUrl": "true"
-                },
-                "type": "file",
-                "url": "/app/{{data.app.uuid}}/artifact/add/form",
-                "input": true
-            }, {
-                "label": "Template File",
-                "calculateValue": "try {\n    value = row.template[0].originalName.length > 0 ?  row.template[0].originalName : \"\";\n} catch (error) {}",
-                "key": "template_file",
-                "type": "hidden",
-                "input": true,
-                "tableView": false
-            }, {
-                "label": "Form Uuid",
-                "calculateValue": "try {\n  if (\n    !(value.length > 1) &&\n    row.template[0].originalName &&\n    row.template[0].originalName.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
-                "key": "uuid",
-                "type": "hidden",
-                "input": true,
-                "tableView": false,
-                "hideOnChildrenHidden": false
-            }]
-        }, {
-            "label": "Actual Form API Key",
-            "calculateValue": "if(data.formDuplicate){\n  try {\n  value = data.formDuplicate.map((i) => {\n    return { name: i.name, entity: i.entity, template_file: i.template_file,uuid: i.uuid , template:i.template};\n  });\n} catch (error) {}\n}",
-            "key": "form",
-            "type": "hidden",
-            "input": true,
-            "tableView": false
-        }]
-    }, {
-        "title": "Workflow Configurator",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "collapsible": false,
-        "key": "workflowPanel",
-        "type": "panel",
-        "label": "Workflow Manager",
-        "tableView": false,
-        "input": false,
-        "components": [{
-            "label": "Workflows",
-            "reorder": false,
-            "addAnotherPosition": "bottom",
-            "layoutFixed": false,
-            "enableRowGroups": false,
-            "initEmpty": false,
-            "tableView": false,
-            "defaultValue": [{
-                "name": "",
-                "entity": [{}],
-                "template": [],
-                "bpmn_file": "",
-                "uuid": ""
-            }],
-            "persistent": false,
-            "clearOnHide": false,
-            "calculateValue": "value = data.workflow;",
-            "validate": {
-                "custom": "if (data.workflowDuplicate) {\n  if (data.workflowDuplicate.length > 0) {\n  console.log(data.workflowDuplicate);\n  valid =\n      data.workflowDuplicate.length == new Set(data.workflowDuplicate.map((i) => i.bpmn_file.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same workflow more than once.\";\n  } else {\n    valid = true;\n  }\n}"
-            },
-            "key": "workflowDuplicate",
-            "type": "datagrid",
-            "defaultOpen": false,
-            "noFirstRow": false,
-            "input": true,
-            "components": [{
-                "label": "Name",
-                "tooltip": "Name of the Workflow",
-                "autofocus": true,
-                "tableView": true,
-                "clearOnHide": false,
-                "validate": {
-                    "maxLength": 50
-                },
-                "key": "name",
-                "type": "textfield",
-                "input": true
-            }, {
-                "label": "Entity",
-                "widget": "choicesjs",
-                "tooltip": "The Entity/Entities the Workflow is Associated to",
-                "tableView": true,
-                "multiple": true,
-                "dataSrc": "custom",
-                "data": {
-                    "custom": "\nconsole.log(\"WF\");\nconsole.log(row.template.length);\nif(data.entity){\nvalues = data.entity.map(item=>item.name)\n} else {\nvalues = []\n}\nconsole.log(values);"
-                },
-                "clearOnHide": false,
-                "validate": {
-                    "custom": "console.log(\"Validation\");\nconsole.log(valid);",
-                    "multiple": true
-                },
-                "key": "entity",
-                "logic": [{
-                    "name": "Check if form Uploaded",
-                    "trigger": {
-                        "type": "javascript",
-                        "javascript": "result = (row.template.length > 0);"
-                    },
-                    "actions": [{
-                        "name": "Set Mandatory",
-                        "type": "property",
-                        "property": {
-                            "label": "Required",
-                            "value": "validate.required",
-                            "type": "boolean"
-                        },
-                        "state": true
-                    }]
-                }, {
-                    "name": "Forms Not Uploaded",
-                    "trigger": {
-                        "type": "javascript",
-                        "javascript": "result = (row.template.length <= 0);"
-                    },
-                    "actions": [{
-                        "name": "Not Mandatory",
-                        "type": "property",
-                        "property": {
-                            "label": "Required",
-                            "value": "validate.required",
-                            "type": "boolean"
-                        },
-                        "state": false
-                    }]
-                }],
-                "type": "select",
-                "input": true
-            }, {
-                "label": "Workflow BPMN",
-                "tableView": false,
-                "storage": "url",
-                "webcam": true,
-                "fileTypes": [{
-                    "label": "",
-                    "value": ""
-                }],
-                "filePattern": ".bpmn",
-                "fileMaxSize": "10MB",
-                "clearOnHide": false,
-                "key": "template",
-                "properties": {
-                    "absoluteUrl": "true"
-                },
-                "type": "file",
-                "url": "/app/{{data.app.uuid}}/artifact/add/workflow",
-                "input": true
-            }, {
-                "label": "BPMN File",
-                "calculateValue": "if(row.template && row.template.length > 0){\ntry {\n    value = row.template[0].originalName.length > 0 ?  row.template[0].originalName : \"\";\n} catch (error) {}\n}",
-                "key": "bpmn_file",
-                "type": "hidden",
-                "input": true,
-                "tableView": false
-            }, {
-                "label": "Workflow Uuid",
-                "calculateValue": "try {\n  if (\n    !(value.length > 1) &&\n    row.template && row.template.length > 0 && row.template[0].originalName &&\n    row.template[0].originalName.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
-                "key": "uuid",
-                "type": "hidden",
-                "input": true,
-                "tableView": false,
-                "hideOnChildrenHidden": false
-            }]
-        }, {
-            "label": "Actual Workflow API Key",
-            "calculateValue": "if(data.workflowDuplicate){\n  try {\n  value = data.workflowDuplicate.map((i) => {\n    return { name: i.name, entity: i.entity, bpmn_file: i.bpmn_file,uuid: i.uuid, template: i.template };\n  });\n} catch (error) {}\n}",
-            "key": "workflow",
-            "type": "hidden",
-            "input": true,
-            "tableView": false
-        }]
-    }, {
-        "title": "Jobs",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "collapsible": false,
-        "key": "page8",
-        "customConditional": "show = true;",
-        "type": "panel",
-        "label": "Jobs",
-        "input": false,
-        "tableView": false,
-        "components": [{
-            "label": "Jobs",
-            "reorder": false,
-            "addAnotherPosition": "bottom",
-            "defaultOpen": false,
-            "layoutFixed": false,
-            "enableRowGroups": false,
-            "initEmpty": false,
-            "hideLabel": true,
-            "tableView": false,
-            "defaultValue": [{
-                "url": "",
-                "cron": "",
-                "name": "",
-                "uuid": "",
-                "data": {}
-            }],
-            "clearOnHide": false,
-            "key": "job",
-            "type": "datagrid",
-            "input": true,
-            "components": [{
-                "label": "Name",
-                "tooltip": "The Job Name",
-                "tableView": true,
-                "key": "name",
-                "type": "textfield",
-                "input": true,
-                "hideOnChildrenHidden": false
-            }, {
-                "label": "Url",
-                "tooltip": "The URL from where the Job needs to be triggered",
-                "tableView": true,
-                "key": "url",
-                "type": "textfield",
-                "input": true,
-                "hideOnChildrenHidden": false
-            }, {
-                "label": "Cron Expression",
-                "tooltip": "Schedules jobs to run periodically at fixed times, dates, or intervals",
-                "tableView": true,
-                "key": "cron",
-                "type": "textfield",
-                "input": true,
-                "hideOnChildrenHidden": false
-            }, {
-                "label": "UUID",
-                "calculateValue": "try {\n  if (\n    !(value.length > 1) &&\n    row.name &&\n    row.name.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
-                "key": "uuid",
-                "type": "hidden",
-                "input": true,
-                "tableView": false
-            }, {
-                "label": "Job Data",
-                "tooltip": "The Job Data Payload",
-                "keyLabel": "Name",
-                "tableView": false,
-                "calculateValue": "if(Array.isArray(value) && value.length == 0){\n  value = {};\n}",
-                "key": "data",
-                "type": "datamap",
-                "input": true,
-                "valueComponent": {
-                    "label": "Value",
-                    "hideLabel": true,
-                    "tableView": true,
-                    "key": "key",
-                    "type": "textfield",
-                    "input": true
-                }
-            }]
-        }]
-    }, {
-        "title": "Pages And Menus",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "collapsible": false,
-        "tableView": false,
-        "key": "page4",
-        "type": "panel",
-        "label": "Pages And Menus",
-        "input": false,
-        "components": [{
-            "title": "Pages",
-            "theme": "primary",
-            "breadcrumbClickable": true,
-            "buttonSettings": {
-                "previous": true,
-                "cancel": true,
-                "next": true
-            },
-            "collapsible": false,
-            "tableView": false,
-            "key": "pages1",
-            "type": "panel",
-            "label": "Panel",
-            "input": false,
-            "components": [{
-                "label": "Pages",
-                "reorder": false,
-                "addAnother": "Add Page",
-                "addAnotherPosition": "bottom",
-                "defaultOpen": false,
-                "layoutFixed": false,
-                "enableRowGroups": false,
-                "initEmpty": false,
-                "tableView": false,
-                "defaultValue": [{
-                    "name": "",
-                    "uuid": "2e288ca0-5e73-4f19-8510-d80daaa5fa9e",
-                    "description": "",
-                    "content": {
-                        "data": {}
-                    },
-                    "pageContent": {
-                        "data": {}
-                    }
-                }],
-                "clearOnHide": false,
-                "key": "pages",
-                "type": "datagrid",
-                "noFirstRow": false,
-                "input": true,
-                "components": [{
-                    "label": "Columns",
-                    "columns": [{
-                        "components": [{
-                            "label": "Columns",
-                            "columns": [{
-                                "components": [{
-                                    "label": "Name",
-                                    "tooltip": "The Name of the Page",
-                                    "autofocus": true,
-                                    "tableView": true,
-                                    "clearOnHide": false,
-                                    "validate": {
-                                        "required": true,
-                                        "maxLength": 50,
-                                        "unique": true
-                                    },
-                                    "unique": true,
-                                    "errorLabel": "Page Name",
-                                    "key": "name",
-                                    "type": "textfield",
-                                    "input": true,
-                                    "hideOnChildrenHidden": false
-                                }, {
-                                    "label": "Page UUID",
-                                    "calculateValue": "try {\n\tif (!(value.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}",
-                                    "key": "uuid",
-                                    "type": "hidden",
-                                    "input": true,
-                                    "tableView": false,
-                                    "hideOnChildrenHidden": false
-                                }],
-                                "width": 6,
-                                "offset": 0,
-                                "push": 0,
-                                "pull": 0,
-                                "size": "md",
-                                "currentWidth": 6
-                            }, {
-                                "components": [{
-                                    "label": "Description",
-                                    "tooltip": "Description of the Page",
-                                    "tableView": true,
-                                    "clearOnHide": false,
-                                    "key": "description",
-                                    "type": "textfield",
-                                    "input": true,
-                                    "hideOnChildrenHidden": false
-                                }],
-                                "width": 6,
-                                "offset": 0,
-                                "push": 0,
-                                "pull": 0,
-                                "size": "md",
-                                "currentWidth": 6
-                            }],
-                            "tableView": false,
-                            "key": "columns8",
-                            "type": "columns",
-                            "input": false,
-                            "hideOnChildrenHidden": false
-                        }, {
-                            "label": "Page Content Form",
-                            "tableView": false,
-                            "form": "5f21c1bdbba30150d672d0cf",
-                            "revision": 285,
-                            "useOriginalRevision": false,
-                            "calculateValue": "if(data.pagesList){\n  if(value && value.data){\n    value.data.pagesList = data.pagesList\n    value.data.formsList = data.formsList\n  }\n}",
-                            "key": "pageContent",
-                            "type": "form",
-                            "input": true,
-                            "hideOnChildrenHidden": false,
-                            "lazyLoad": false
-                        }, {
-                            "label": "Page Content",
-                            "calculateValue": "value = row.pageContent",
-                            "key": "content",
-                            "logic": [{
-                                "name": "Set Content",
-                                "trigger": {
-                                    "type": "javascript",
-                                    "javascript": "if(row.pageContent){\n  if(row.pageContent.data.content){\n    if(row.pageContent.data.content.length > 0){\n      result = true;\n    } else {\n      result = false;\n    }\n  } else {\n    result = false;\n  }\n} else {\n result = false;\n}"
-                                },
-                                "actions": [{
-                                    "name": "Results",
-                                    "type": "value",
-                                    "value": "value = row.pageContent.data.content;"
-                                }]
-                            }],
-                            "type": "hidden",
-                            "input": true,
-                            "tableView": false,
-                            "hideOnChildrenHidden": false
-                        }],
-                        "width": 12,
-                        "offset": 0,
-                        "push": 0,
-                        "pull": 0,
-                        "size": "md",
-                        "currentWidth": 12
-                    }, {
-                        "components": [],
-                        "width": 6,
-                        "offset": 0,
-                        "push": 0,
-                        "pull": 0,
-                        "size": "md",
-                        "currentWidth": 6
-                    }],
-                    "hideLabel": true,
-                    "tableView": false,
-                    "key": "columns",
-                    "type": "columns",
-                    "input": false,
-                    "hideOnChildrenHidden": false
-                }]
-            }]
-        }, {
-            "title": "Menus",
-            "theme": "primary",
-            "breadcrumbClickable": true,
-            "buttonSettings": {
-                "previous": true,
-                "cancel": true,
-                "next": true
-            },
-            "collapsible": false,
-            "tableView": false,
-            "key": "menuPanel",
-            "type": "panel",
-            "label": "Menus",
-            "input": false,
-            "components": [{
-                "label": "App Menus",
-                "reorder": false,
-                "addAnother": "Add Menu",
-                "addAnotherPosition": "bottom",
-                "defaultOpen": false,
-                "layoutFixed": false,
-                "enableRowGroups": false,
-                "initEmpty": false,
-                "tableView": false,
-                "defaultValue": [{
-                    "name": "",
-                    "icon": "",
-                    "page": {},
-                    "privilege": "",
-                    "parent": {},
-                    "uuid": ""
-                }],
-                "clearOnHide": false,
-                "validate": {
-                    "minLength": 1
-                },
-                "key": "menu",
-                "type": "datagrid",
-                "noFirstRow": false,
-                "input": true,
-                "components": [{
-                    "label": "Name",
-                    "tooltip": "The Menu Item Name",
-                    "tableView": true,
-                    "clearOnHide": false,
-                    "validate": {
-                        "required": true,
-                        "maxLength": 50
-                    },
-                    "errorLabel": "Menu Name",
-                    "key": "name",
-                    "type": "textfield",
-                    "input": true
-                }, {
-                    "label": "Icon Class",
-                    "tooltip": "The Icon for the Menu Item",
-                    "tableView": true,
-                    "clearOnHide": false,
-                    "validate": {
-                        "required": true
-                    },
-                    "errorLabel": "Menu Icon Class",
-                    "key": "icon",
-                    "type": "textfield",
-                    "input": true
-                }, {
-                    "label": "Page",
-                    "widget": "choicesjs",
-                    "tooltip": "The Page which will open from the Menu",
-                    "tableView": true,
-                    "dataSrc": "custom",
-                    "data": {
-                        "custom": "if(data.pages){\nvalues = data.pages.map(item=>item.name)\n} else {\nvalues = [];\n}"
-                    },
-                    "clearOnHide": false,
-                    "validate": {
-                        "required": true
-                    },
-                    "key": "page",
-                    "type": "select",
-                    "input": true,
-                    "searchThreshold": 0.3
-                }, {
-                    "label": "Privilege",
-                    "widget": "choicesjs",
-                    "tooltip": "If a privilege is provided the Menu Item will show up only for the Users who have the Privilege",
-                    "tableView": true,
-                    "dataSrc": "custom",
-                    "data": {
-                        "custom": "var privArray = [];\nif(data.privilege){\ndata.privilege.map((i) => {\n  if (i.permission >= 1) {\n    privArray.push({\n      key: i.name + \"_READ\",\n      name: i.name + \"_READ\",\n    });\n  }\n  if (i.permission >= 3) {\n    privArray.push({\n      key: i.name + \"_WRITE\",\n      name: i.name + \"_WRITE\",\n    });\n  }\n  if (i.permission >= 7) {\n    privArray.push({\n      key: i.name + \"_CREATE\",\n      name: i.name + \"_CREATE\",\n    });\n  }\n  if (i.permission == 15) {\n    privArray.push({\n      key: i.name + \"_DELETE\",\n      name: i.name + \"_DELETE\",\n    });\n  }\n});\n}\nvalues = privArray.length > 0 ? privArray : [];\n"
-                    },
-                    "valueProperty": "key",
-                    "template": "<span>{{ item.name }}</span>",
-                    "clearOnHide": false,
-                    "key": "privilege",
-                    "type": "select",
-                    "input": true,
-                    "searchThreshold": 0.3
-                }, {
-                    "label": "Parent",
-                    "widget": "choicesjs",
-                    "tooltip": "If we want sub menu items inside we may associate each child to a Parent Menu Item",
-                    "tableView": true,
-                    "dataSrc": "custom",
-                    "data": {
-                        "custom": "if(data.menu){\nvalues = data.menu.map(item=>item.name);\n} else {\nvalues = [];\n}"
-                    },
-                    "clearOnHide": false,
-                    "validate": {
-                        "custom": "if(row && input){\n  valid = input == row.name ? \"Cannot Parent the menu to itself!\" : true;\n}"
-                    },
-                    "key": "parent",
-                    "type": "select",
-                    "input": true,
-                    "searchThreshold": 0.3
-                }, {
-                    "label": "Menu UUID",
-                    "key": "uuid",
-                    "type": "hidden",
-                    "input": true,
-                    "tableView": false
-                }]
-            }]
-        }]
-    }, {
-        "title": "Edit CSS",
-        "theme": "primary",
-        "breadcrumbClickable": true,
-        "buttonSettings": {
-            "previous": true,
-            "cancel": true,
-            "next": true
-        },
-        "collapsible": false,
-        "key": "page9",
-        "customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=true;\n}else {\n  show=false;\n}",
-        "type": "panel",
-        "label": "Edit CSS",
-        "input": false,
-        "tableView": false,
-        "components": [{
-            "label": "Edit Index.scss",
-            "action": "event",
-            "showValidations": false,
-            "theme": "info",
-            "tableView": false,
-            "key": "editIndexScss",
-            "properties": {
-                "api": "{ \t\"api\": { \t\t\"method\": \"GET\", \t\t\"url\": \"app/{{data.app.uuid}}/cssFile\" \t} }"
-            },
-            "customConditional": "show = !data.cssContent;",
-            "type": "button",
-            "event": "callApi",
-            "input": true
-        }, {
-            "label": "Text Area",
-            "autoExpand": false,
-            "autocomplete": "off",
-            "hideLabel": true,
-            "tableView": true,
-            "key": "cssContent",
-            "customConditional": "show = data.cssContent;",
-            "type": "textarea",
-            "rows": 10,
-            "input": true
-        }]
-    }],
-    "revisions": "",
-    "_vid": 0,
-    "title": "EOXAppDupl",
-    "display": "wizard",
-    "access": [{
-        "roles": ["5d70a2198e9aff51d0f3c171", "5d70a2198e9afffba0f3c172", "5d70a2198e9affff8af3c173"],
-        "type": "read_all"
-    }],
-    "submissionAccess": [],
-    "controller": "",
-    "properties": {
-        "showBreadcrumbs": "true",
-        "submission_commands": "[{\"command\":\"delegate\",\"delegate\":\"CleanYml\"}]",
-        "clearVariables": "orgId",
-        "theme": "https://stackpath.bootstrapcdn.com/bootswatch/4.1.3/materia/bootstrap.min.css",
-        "commands": "[{ \t\"command\": \"delegate\", \t\"delegate\": \"LoadAppData\" }]"
-    },
-    "settings": {},
-    "name": "eoxApp",
-    "path": "eoxappdupl",
-    "project": "5d70a2198e9aff60caf3c170",
-    "created": "2021-12-02T06:11:21.579Z",
-    "modified": "2021-12-07T16:03:05.729Z",
-    "machineName": "onboarding-eoxvantage:eoxAppDupl"
+	"_id": "5f1dcf1d37629f8f62d14d8a",
+	"type": "resource",
+	"tags": [],
+	"owner": "5d9350b4e2258c22a85c867a",
+	"components": [{
+		"title": "App Info",
+		"theme": "primary",
+		"breadcrumbClickable": false,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"collapsible": false,
+		"key": "page1",
+		"logic": [{
+			"name": "Allow Breadcrums",
+			"trigger": {
+				"type": "javascript",
+				"javascript": "result = data.app.uuid.length > 0;"
+			},
+			"actions": [{
+				"name": "Set Breadcrum",
+				"type": "mergeComponentSchema",
+				"schemaDefinition": "schema = {breadcrumbClickable : true};"
+			}]
+		}],
+		"type": "panel",
+		"label": "App Info",
+		"tableView": false,
+		"input": false,
+		"components": [{
+			"label": "formsList",
+			"calculateValue": "var formsList = [];\nif (data.form !== \"\") {\n  formsList = data.form.map((i) => {\n    return { name: i.name, uuid: i.uuid };\n  });\n}\nvalue = formsList;",
+			"key": "formsList",
+			"type": "hidden",
+			"input": true,
+			"tableView": false
+		}, {
+			"label": "pagesList",
+			"calculateValue": "var pagesList;\nif(data.pages){\n  pagesList = data.pages.map((i) => {\n return { name: i.name, uuid: i.uuid };\n});\nvalue = pagesList;\n}\n",
+			"key": "pagesList",
+			"type": "hidden",
+			"input": true,
+			"tableView": false
+		}, {
+			"label": "Container",
+			"tableView": false,
+			"clearOnHide": false,
+			"key": "app",
+			"type": "container",
+			"input": true,
+			"components": [{
+				"label": "App Uuid",
+				"key": "uuid",
+				"type": "hidden",
+				"input": true,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"label": "Old App Name",
+				"customDefaultValue": "console.log(\"APP NME---\");\nconsole.log(value);",
+				"key": "oldAppName",
+				"type": "hidden",
+				"input": true,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"label": "Columns",
+				"columns": [{
+					"components": [{
+						"label": "Title",
+						"description": "The Title of the Application which will be shown in the Application Menu",
+						"tooltip": "Please enter the Title of the Application which will be shown in the Application Menu",
+						"autofocus": true,
+						"tableView": true,
+						"validate": {
+							"required": true,
+							"maxLength": 25
+						},
+						"errorLabel": "Application Title",
+						"key": "title",
+						"type": "textfield",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}, {
+					"components": [{
+						"label": "Name",
+						"description": "The Name of the Application which will be an Internal Name to Differentiate the Application",
+						"tooltip": "Please enter the Name of the Application which will be an Internal Name to Differentiate the Application",
+						"spellcheck": false,
+						"tableView": false,
+						"clearOnHide": false,
+						"validate": {
+							"required": true,
+							"custom": "if(data.app.name && data.app.name != ''){\n      valid = (data.app.name.match(/^[a-z0-9-]+$/i)) ?  true : 'Application Name must Contain only Alphabets and Numbers.';\n}",
+							"maxLength": 25
+						},
+						"errorLabel": "Application Name",
+						"key": "name",
+						"logic": [{
+							"name": "Readonly on Edit",
+							"trigger": {
+								"type": "javascript",
+								"javascript": "if(data.app.uuid && data.app.uuid != \"\"){\n  result=true;\n}else {\n  result=false;\n}"
+							},
+							"actions": [{
+								"name": "Non Editable",
+								"type": "property",
+								"property": {
+									"label": "Disabled",
+									"value": "disabled",
+									"type": "boolean"
+								},
+								"state": true
+							}]
+						}],
+						"type": "textfield",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}],
+				"tableView": false,
+				"key": "columns1",
+				"type": "columns",
+				"input": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"label": "Columns",
+				"columns": [{
+					"components": [{
+						"label": "Description",
+						"description": "The Description of the Application",
+						"tooltip": "Please enter the Description of the Application",
+						"tableView": true,
+						"clearOnHide": false,
+						"key": "description",
+						"type": "textfield",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}, {
+					"components": [{
+						"label": "Category",
+						"widget": "choicesjs",
+						"tableView": true,
+						"data": {
+							"values": [{
+								"label": "Office",
+								"value": "office"
+							}, {
+								"label": "Utilities",
+								"value": "utilities"
+							}, {
+								"label": "Business",
+								"value": "business"
+							}, {
+								"label": "Finance",
+								"value": "finance"
+							}, {
+								"label": "News",
+								"value": "news"
+							}, {
+								"label": "Medical",
+								"value": "medical"
+							}, {
+								"label": "Entertainment",
+								"value": "entertainment"
+							}, {
+								"label": "Productivity",
+								"value": "productivity"
+							}, {
+								"label": "Education",
+								"value": "education"
+							}, {
+								"label": "Photo & Video",
+								"value": "photoVideo"
+							}, {
+								"label": "Shopping",
+								"value": "shopping"
+							}, {
+								"label": "Travel",
+								"value": "travel"
+							}, {
+								"label": "Dashboard ",
+								"value": "dashboard"
+							}]
+						},
+						"validate": {
+							"required": true
+						},
+						"errorLabel": "Application Category",
+						"key": "category",
+						"type": "select",
+						"input": true,
+						"hideOnChildrenHidden": false,
+						"searchThreshold": 0.3
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}],
+				"tableView": false,
+				"key": "columns2",
+				"type": "columns",
+				"input": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"label": "Columns",
+				"columns": [{
+					"components": [{
+						"label": "Application Icon",
+						"tooltip": "The Application Icon will be visible in the Application Menu",
+						"tableView": false,
+						"storage": "url",
+						"uploadOnly": true,
+						"webcam": true,
+						"fileTypes": [{
+							"label": "",
+							"value": ""
+						}],
+						"filePattern": "image/png",
+						"fileMaxSize": "10MB",
+						"clearOnHide": false,
+						"key": "app_icon",
+						"properties": {
+							"absoluteUrl": "true"
+						},
+						"type": "file",
+						"url": "/app/{{data.app.uuid}}/artifact/add/app_icon",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}, {
+					"components": [{
+						"label": "Application Icon White",
+						"tooltip": "The Application White Icon will be visible in the Window of the Application",
+						"tableView": false,
+						"storage": "url",
+						"uploadOnly": true,
+						"webcam": true,
+						"fileTypes": [{
+							"label": "",
+							"value": ""
+						}],
+						"filePattern": "image/png",
+						"fileMaxSize": "10MB",
+						"clearOnHide": false,
+						"key": "app_icon_white",
+						"properties": {
+							"absoluteUrl": "true"
+						},
+						"type": "file",
+						"url": "/app/{{data.app.uuid}}/artifact/add/app_icon_white",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}],
+				"hideOnChildrenHidden": false,
+				"key": "columns",
+				"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=true;\n}else {\n  show=false;\n}",
+				"type": "columns",
+				"tableView": false,
+				"input": false
+			}, {
+				"label": "Run automatically at startup",
+				"description": "If Enabled will Auto Start the Application Once the User Logs in",
+				"tableView": false,
+				"defaultValue": false,
+				"clearOnHide": false,
+				"key": "autostart",
+				"customConditional": "show = false;",
+				"type": "checkbox",
+				"input": true,
+				"hideOnChildrenHidden": false
+			}, {
+				"title": "Notifications",
+				"theme": "info",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"collapsible": false,
+				"key": "notifications",
+				"type": "panel",
+				"label": "Notifications",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "File Comments on Chat",
+					"tableView": false,
+					"defaultValue": false,
+					"key": "chat_notification",
+					"type": "checkbox",
+					"input": true
+				}, {
+					"title": "Comment would follow the format as shown below:",
+					"breadcrumbClickable": true,
+					"buttonSettings": {
+						"previous": true,
+						"cancel": true,
+						"next": true
+					},
+					"collapsible": false,
+					"key": "panel1",
+					"conditional": {
+						"show": true,
+						"when": "app.chat_notification",
+						"eq": "true"
+					},
+					"type": "panel",
+					"label": "Comment would follow the format as shown below:",
+					"input": false,
+					"tableView": false,
+					"components": [{
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Comment Format",
+								"placeholder": "[fromUsername] has commented on [Message Title]:[Message]",
+								"hideLabel": true,
+								"spellcheck": false,
+								"disabled": true,
+								"tableView": true,
+								"validateOn": "blur",
+								"key": "commentFormat",
+								"attributes": {
+									"style": "color:black"
+								},
+								"type": "textfield",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"width": 12,
+							"currentWidth": 12
+						}, {
+							"components": [],
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"width": 4,
+							"currentWidth": 4
+						}],
+						"key": "columns14",
+						"type": "columns",
+						"input": false,
+						"tableView": false,
+						"hideOnChildrenHidden": false
+					}]
+				}]
+			}]
+		}, {
+			"label": "Create App",
+			"hideLabel": true,
+			"spellcheck": false,
+			"disabled": true,
+			"tableView": true,
+			"defaultValue": "Please click on the Create App button before you proceed",
+			"validateOn": "blur",
+			"validate": {
+				"custom": "if (data.app.name.length > 0 && data.app.category.length > 0) {\n  valid = data.app.uuid.length > 0\n      ? true\n      : \"Create App to proceed further\";\n} else {\n  valid = true;\n}"
+			},
+			"key": "textFieldValidate",
+			"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=false;\n}else {\n  show=true;\n}",
+			"attributes": {
+				"style": "color:black"
+			},
+			"type": "textfield",
+			"input": true
+		}, {
+			"label": "Create Application",
+			"action": "event",
+			"showValidations": false,
+			"theme": "success",
+			"tooltip": "This will Create the Application MetaData",
+			"customClass": "alignCenter",
+			"disabled": true,
+			"tableView": false,
+			"key": "save",
+			"properties": {
+				"commands": "[{\"command\":\"delegate\",\"delegate\":\"CreateAppWithAppDetails\"}]"
+			},
+			"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=false;\n}else {\n  show=true;\n}",
+			"logic": [{
+				"name": "Disable",
+				"trigger": {
+					"type": "javascript",
+					"javascript": "result = data.app.name.length > 0 && data.app.category.length > 0;"
+				},
+				"actions": [{
+					"name": "Disable",
+					"type": "mergeComponentSchema",
+					"property": "",
+					"state": false,
+					"schemaDefinition": "schema = {disabled : false}"
+				}]
+			}],
+			"type": "button",
+			"event": "callPipeline",
+			"input": true
+		}]
+	}, {
+		"title": "Business Roles",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"scrollToTop": false,
+		"collapsible": false,
+		"key": "page10",
+		"type": "panel",
+		"label": "Page 10",
+		"input": false,
+		"tableView": false,
+		"components": [{
+			"title": "Business Roles",
+			"theme": "primary",
+			"breadcrumbClickable": true,
+			"buttonSettings": {
+				"previous": true,
+				"cancel": true,
+				"next": true
+			},
+			"scrollToTop": false,
+			"collapsible": false,
+			"key": "businessRolePanel",
+			"type": "panel",
+			"label": "Business Roles",
+			"input": false,
+			"tableView": false,
+			"components": [{
+				"label": "Business Role",
+				"reorder": false,
+				"addAnotherPosition": "bottom",
+				"defaultOpen": false,
+				"layoutFixed": false,
+				"enableRowGroups": false,
+				"initEmpty": false,
+				"tableView": false,
+				"defaultValue": [{
+					"name": ""
+				}],
+				"key": "businessRole",
+				"type": "datagrid",
+				"input": true,
+				"components": [{
+					"label": "Name",
+					"tableView": true,
+					"key": "name",
+					"type": "textfield",
+					"input": true
+				}]
+			}]
+		}]
+	}, {
+		"title": "Organization Info",
+		"theme": "primary",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"collapsible": false,
+		"tableView": false,
+		"key": "organizationInfo",
+		"type": "panel",
+		"label": "Organization Info",
+		"input": false,
+		"components": [{
+			"label": "Do you want to add organization information",
+			"tooltip": "If selected a new Organization will be Created when the Application is being Deployed",
+			"autofocus": true,
+			"tableView": false,
+			"defaultValue": false,
+			"clearOnHide": false,
+			"key": "checkOrg",
+			"type": "checkbox",
+			"input": true
+		}, {
+			"label": "Container",
+			"tableView": false,
+			"clearOnHide": false,
+			"key": "org",
+			"conditional": {
+				"show": true,
+				"when": "checkOrg",
+				"eq": "true"
+			},
+			"type": "container",
+			"input": true,
+			"components": [{
+				"label": "Columns",
+				"columns": [{
+					"components": [{
+						"label": "Name",
+						"tooltip": "Please enter the Name of the Organization to be created",
+						"autofocus": true,
+						"tableView": true,
+						"clearOnHide": false,
+						"validate": {
+							"required": true
+						},
+						"errorLabel": "Organization Name",
+						"key": "name",
+						"type": "textfield",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}, {
+					"components": [{
+						"label": "Email",
+						"tooltip": "Please enter the Email Id of the Organization to be created",
+						"tableView": true,
+						"clearOnHide": false,
+						"validate": {
+							"required": true
+						},
+						"errorLabel": "Organization Email",
+						"key": "email",
+						"type": "email",
+						"input": true,
+						"hideOnChildrenHidden": false
+					}],
+					"width": 6,
+					"offset": 0,
+					"push": 0,
+					"pull": 0,
+					"size": "md",
+					"currentWidth": 6
+				}],
+				"key": "columns",
+				"type": "columns",
+				"input": false,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"title": "Address Details",
+				"theme": "primary",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"collapsible": false,
+				"key": "addressDetails",
+				"type": "panel",
+				"label": "Panel",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "Columns",
+					"columns": [{
+						"components": [{
+							"label": "Address",
+							"description": "The Address of the Organization",
+							"tooltip": "Please enter the Address of the Organization to be created",
+							"tableView": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "address1",
+							"type": "textfield",
+							"input": true,
+							"lockKey": true,
+							"hideOnChildrenHidden": false
+						}],
+						"width": 4,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 4
+					}, {
+						"components": [{
+							"label": "City",
+							"description": "The City the Organization Resides in",
+							"tooltip": "Please enter the City of the Organization to be created",
+							"tableView": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "city",
+							"type": "textfield",
+							"input": true,
+							"lockKey": true,
+							"hideOnChildrenHidden": false
+						}],
+						"width": 4,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 4
+					}, {
+						"components": [{
+							"label": "Zip Code",
+							"description": "The Zip Code the Organization resides in",
+							"tooltip": "Please enter the Zip Code of the Organization to be created",
+							"tableView": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true,
+								"custom": "if (data.org.zip && data.org.zip != \"\") {\n  if (data.org.zip.length <= 12) {\n    valid = data.org.zip.match(/^[0-9\\s-]*$/)\n      ? true\n      : \"Please enter a valid Zip Code for your region.\";\n  } else {\n    valid =\n      data.org.zip.length > 12\n        ? \"Please enter a valid Zip Code for your region.\"\n        : true;\n  }\n}"
+							},
+							"key": "zip",
+							"type": "textfield",
+							"input": true,
+							"hideOnChildrenHidden": false
+						}],
+						"size": "md",
+						"width": 4,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"currentWidth": 4
+					}],
+					"key": "columns11",
+					"type": "columns",
+					"input": false,
+					"tableView": false,
+					"hideOnChildrenHidden": false
+				}, {
+					"label": "Columns",
+					"columns": [{
+						"components": [{
+							"label": "Country",
+							"widget": "choicesjs",
+							"description": "The Country the Organization resides in",
+							"tooltip": "Please enter the Country of the Organization to be created",
+							"uniqueOptions": true,
+							"tableView": true,
+							"dataSrc": "custom",
+							"data": {
+								"custom": "values = data['countryList'];"
+							},
+							"valueProperty": "country",
+							"template": "<span>{{ item.country }}</span>",
+							"readOnlyValue": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "country",
+							"type": "select",
+							"input": true,
+							"lockKey": true,
+							"source": "5d347da33e9be31e15d3b115",
+							"hideOnChildrenHidden": false,
+							"searchThreshold": 0.3
+						}],
+						"width": 6,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 6
+					}, {
+						"components": [{
+							"label": "State",
+							"widget": "choicesjs",
+							"description": "The State that the Organization Resides in",
+							"tooltip": "Please enter the State of the Organization to be created",
+							"uniqueOptions": true,
+							"tableView": false,
+							"dataSrc": "custom",
+							"data": {
+								"custom": "try {\ncountrylist = JSON.parse(data['countryList']);\n} catch(e) {\ncountrylist = data['countryList'];\n}\nif(countrylist){\nlet obj = countrylist.find(o => o.country === row['country']);\nif(obj){\nvalues = obj.states\n}\n}"
+							},
+							"template": "<span>{{ item }}</span>",
+							"refreshOn": "country",
+							"clearOnRefresh": true,
+							"readOnlyValue": true,
+							"clearOnHide": false,
+							"validate": {
+								"required": true
+							},
+							"key": "state",
+							"type": "select",
+							"input": true,
+							"lockKey": true,
+							"hideOnChildrenHidden": false,
+							"isNew": false,
+							"searchThreshold": 0.3
+						}],
+						"width": 6,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 6
+					}],
+					"key": "columns3",
+					"type": "columns",
+					"input": false,
+					"tableView": false,
+					"hideOnChildrenHidden": false
+				}]
+			}, {
+				"title": "Contact Person",
+				"theme": "primary",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"collapsible": false,
+				"key": "contactPerson",
+				"type": "panel",
+				"label": "Panel",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "Container",
+					"tableView": false,
+					"clearOnHide": false,
+					"key": "contact",
+					"type": "container",
+					"input": true,
+					"components": [{
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Firstname",
+								"tooltip": "Please enter the First Name of the Contact Person",
+								"tableView": true,
+								"clearOnHide": false,
+								"validate": {
+									"required": true
+								},
+								"key": "firstname",
+								"type": "textfield",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}, {
+							"components": [{
+								"label": "Lastname",
+								"tooltip": "Please enter the First Name of the Contact Person",
+								"tableView": true,
+								"clearOnHide": false,
+								"validate": {
+									"required": true
+								},
+								"key": "lastname",
+								"type": "textfield",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}],
+						"tableView": false,
+						"key": "columns5",
+						"type": "columns",
+						"input": false,
+						"hideOnChildrenHidden": false
+					}, {
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Username",
+								"description": "This will be the Username for the Contact Person created",
+								"disabled": true,
+								"tableView": true,
+								"clearOnHide": false,
+								"calculateValue": "if(data.org && data.org.contact && data.org.contact.firstname && data.org.contact.lastname){\n    var username = data.org.contact.firstname.toLowerCase() + data.org.contact.lastname.toLowerCase();\n    value = username.split(\" \").join(\"\");\n}",
+								"allowCalculateOverride": true,
+								"validate": {
+									"required": true
+								},
+								"key": "username",
+								"attributes": {
+									"style": "color:black"
+								},
+								"type": "textfield",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}, {
+							"components": [{
+								"label": "Email",
+								"tooltip": "The Email of the Contact Person",
+								"tableView": true,
+								"clearOnHide": false,
+								"validate": {
+									"required": true
+								},
+								"key": "email",
+								"type": "email",
+								"input": true,
+								"hideOnChildrenHidden": false
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}],
+						"tableView": false,
+						"key": "columns4",
+						"type": "columns",
+						"input": false,
+						"hideOnChildrenHidden": false
+					}]
+				}]
+			}, {
+				"title": "Business Offering",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"scrollToTop": false,
+				"collapsible": false,
+				"key": "businessOffering",
+				"type": "panel",
+				"label": "Panel",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "Business Offering",
+					"reorder": false,
+					"addAnotherPosition": "bottom",
+					"layoutFixed": false,
+					"enableRowGroups": false,
+					"initEmpty": false,
+					"hideLabel": true,
+					"tableView": false,
+					"defaultValue": [{
+						"businessRole": "",
+						"entity": ""
+					}],
+					"key": "dataGrid",
+					"type": "datagrid",
+					"input": true,
+					"components": [{
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Business Role",
+								"widget": "choicesjs",
+								"tableView": true,
+								"key": "businessRole",
+								"type": "select",
+								"input": true
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}, {
+							"components": [{
+								"label": "Entity",
+								"widget": "choicesjs",
+								"tableView": true,
+								"key": "entity",
+								"type": "select",
+								"input": true
+							}],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}],
+						"hideLabel": true,
+						"key": "columns",
+						"type": "columns",
+						"input": false,
+						"tableView": false
+					}]
+				}]
+			}]
+		}]
+	}, {
+		"title": "Roles and Privileges",
+		"theme": "primary",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"collapsible": false,
+		"key": "page2",
+		"type": "panel",
+		"label": "Roles and Privileges",
+		"tableView": false,
+		"input": false,
+		"components": [{
+			"title": "Privileges",
+			"theme": "primary",
+			"breadcrumbClickable": true,
+			"buttonSettings": {
+				"previous": true,
+				"cancel": true,
+				"next": true
+			},
+			"collapsible": false,
+			"tableView": false,
+			"key": "privilegesPanel",
+			"type": "panel",
+			"label": "Privileges",
+			"input": false,
+			"components": [{
+				"label": "Privileges",
+				"tooltip": "Please enter the Privileges to be used\nA Privilege can be used to define or Access different features/Flows within the Application",
+				"reorder": false,
+				"addAnother": "Add Privilege",
+				"addAnotherPosition": "bottom",
+				"defaultOpen": false,
+				"layoutFixed": false,
+				"enableRowGroups": false,
+				"initEmpty": false,
+				"tableView": false,
+				"defaultValue": [{
+					"name": "",
+					"permission": ""
+				}],
+				"clearOnHide": false,
+				"validate": {
+					"minLength": 1,
+					"custom": "if (data.privilege) {\n  if (data.privilege.length > 0) {\n    valid =\n      data.privilege.length == new Set(data.privilege.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same privilege more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+				},
+				"key": "privilege",
+				"type": "datagrid",
+				"noFirstRow": false,
+				"input": true,
+				"components": [{
+					"label": "Name",
+					"tooltip": "Please enter the Privilege Name to be used",
+					"autofocus": true,
+					"tableView": true,
+					"case": "uppercase",
+					"clearOnHide": false,
+					"validate": {
+						"required": true,
+						"unique": true
+					},
+					"unique": true,
+					"errorLabel": "Privilege Name",
+					"key": "name",
+					"type": "textfield",
+					"input": true
+				}, {
+					"label": "Permission",
+					"optionsLabelPosition": "right",
+					"tooltip": "Please select the Highest Level of Permissions the Privilege may Have",
+					"inline": true,
+					"tableView": false,
+					"values": [{
+						"label": "Read",
+						"value": "1",
+						"shortcut": ""
+					}, {
+						"label": "Write",
+						"value": "3",
+						"shortcut": ""
+					}, {
+						"label": "Create",
+						"value": "7",
+						"shortcut": ""
+					}, {
+						"label": "Delete",
+						"value": "15",
+						"shortcut": ""
+					}],
+					"clearOnHide": false,
+					"validate": {
+						"required": true
+					},
+					"key": "permission",
+					"type": "radio",
+					"input": true
+				}]
+			}]
+		}, {
+			"title": "Roles",
+			"theme": "primary",
+			"breadcrumbClickable": true,
+			"buttonSettings": {
+				"previous": true,
+				"cancel": true,
+				"next": true
+			},
+			"collapsible": false,
+			"tableView": false,
+			"key": "roles1",
+			"type": "panel",
+			"label": "Panel",
+			"input": false,
+			"components": [{
+				"label": "Roles",
+				"tooltip": "A Role is collection of Privileges that can be given for users.\nEach Role will have a set of Privileges which can associated to different Capabilities of the Application",
+				"reorder": false,
+				"addAnother": "Add Role",
+				"addAnotherPosition": "bottom",
+				"defaultOpen": false,
+				"layoutFixed": false,
+				"enableRowGroups": false,
+				"initEmpty": false,
+				"tableView": false,
+				"defaultValue": [{
+					"name": "",
+					"privilegesDuplicate": [{
+						"privilege_name": {},
+						"permission": ""
+					}],
+					"default": false,
+					"privileges": [{
+						"permission": ""
+					}]
+				}],
+				"clearOnHide": false,
+				"validate": {
+					"minLength": 1,
+					"custom": "if (data.role) {\n  if (data.role.length > 0) {\n    valid =\n      data.role.length == new Set(data.role.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same role more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+				},
+				"key": "role",
+				"type": "datagrid",
+				"noFirstRow": false,
+				"input": true,
+				"components": [{
+					"label": "Name",
+					"tooltip": "Please enter the Name of the Role",
+					"tableView": true,
+					"clearOnHide": false,
+					"validate": {
+						"required": true,
+						"unique": true
+					},
+					"unique": true,
+					"errorLabel": "Role Name",
+					"key": "name",
+					"type": "textfield",
+					"input": true
+				}, {
+					"label": "Privileges",
+					"reorder": false,
+					"addAnother": "Add Privilege",
+					"addAnotherPosition": "bottom",
+					"defaultOpen": false,
+					"layoutFixed": false,
+					"enableRowGroups": false,
+					"noFirstRow": false,
+					"tableView": false,
+					"clearOnHide": false,
+					"validate": {
+						"custom": "try {\n  if (row.privilegesDuplicate) {\n    if (row.privilegesDuplicate.length > 0) {\n      valid =\n        row.privilegesDuplicate.length ==\n        new Set(\n          row.privilegesDuplicate.map((i) =>\n            i.privilege_name.name.replace(/\\s/g, \"\")\n          )\n        ).size\n          ? true\n          : \"You cannot have a same privilege more than once.\";\n    } else {\n      valid = true;\n    }\n  }\n} catch (error) {}"
+					},
+					"key": "privilegesDuplicate",
+					"type": "datagrid",
+					"input": true,
+					"components": [{
+						"label": "Name",
+						"widget": "choicesjs",
+						"placeholder": "Please select",
+						"tooltip": "Select the Privilege which the Role should have",
+						"tableView": true,
+						"dataSrc": "custom",
+						"data": {
+							"custom": "if(data.privilege){\n  console.log('inside drop down');\n  values = data.privilege.map(item =>item)\n  console.log(values);\n} else {\n  values = [];\n}"
+						},
+						"template": "<span>{{ item.name }}</span>",
+						"clearOnHide": false,
+						"validate": {
+							"required": true
+						},
+						"errorLabel": "Privilege Name",
+						"key": "privilege_name",
+						"type": "select",
+						"input": true,
+						"searchThreshold": 0.3
+					}, {
+						"label": "Permission",
+						"optionsLabelPosition": "right",
+						"tooltip": "Select the Permission for the Privilege which needs to be provided ",
+						"inline": true,
+						"disabled": true,
+						"tableView": false,
+						"values": [{
+							"label": "Read",
+							"value": "1",
+							"shortcut": ""
+						}, {
+							"label": "Write",
+							"value": "3",
+							"shortcut": ""
+						}, {
+							"label": "Create",
+							"value": "7",
+							"shortcut": ""
+						}, {
+							"label": "Delete",
+							"value": "15",
+							"shortcut": ""
+						}],
+						"clearOnHide": false,
+						"validate": {
+							"required": true,
+							"custom": "valid =\n  input <= instance.component.values[instance.component.values.length - 1].value\n    ? true\n    : \"Please select a valid permission level\";"
+						},
+						"key": "permission",
+						"logic": [{
+							"name": "Check Name",
+							"trigger": {
+								"type": "javascript",
+								"javascript": "if(row.privilege_name){\ntry {\n    result = row.privilege_name.name.length > 0\n  } catch {\n    result = false;\n  }\n} else {\n  result = false;\n}"
+							},
+							"actions": [{
+								"name": "Enable",
+								"type": "value",
+								"value": "var set = [\n  {\n    label: \"Read\",\n    value: \"1\",\n    shortcut: \"\"\n  },\n  {\n    label: \"Write\",\n    value: \"3\",\n    shortcut: \"\"\n  },\n  {\n    label: \"Create\",\n    value: \"7\",\n    shortcut: \"\"\n  },\n  {\n    label: \"Delete\",\n    value: \"15\",\n    shortcut: \"\"\n  }\n];\nvar values = false;\nif(row.privilege_name){\ntry {\n  values = set\n    .map((i) => (i.value <= row.privilege_name.permission ? i : false))\n    .filter((i) => (i ? i : false));\n} catch {}\n} else {\n  values = [];\n}\n\nif (values && values.length > 0) {\n  component.values = values;\n  component.disabled = false;\n}"
+							}]
+						}],
+						"type": "radio",
+						"input": true
+					}]
+				}, {
+					"label": "Business Role",
+					"widget": "choicesjs",
+					"placeholder": "Please select",
+					"tooltip": "Select the Business Role which the Role should have",
+					"tableView": false,
+					"dataSrc": "custom",
+					"data": {
+						"custom": "if(data.businessRole){\n  console.log(\"Inside businessRole dropdown\");\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
+					},
+					"template": "<span>{{ item.name }}</span>",
+					"clearOnHide": false,
+					"key": "businessRole",
+					"type": "select",
+					"input": true,
+					"searchThreshold": 0.3
+				}, {
+					"label": "Actual Privileges Key",
+					"calculateValue": "try {\n  value = row.privilegesDuplicate.map((i) => {\n    return { privilege_name: i.privilege_name.name, permission: i.permission };\n  });\n} catch (error) {}",
+					"key": "privileges",
+					"type": "hidden",
+					"input": true,
+					"tableView": false
+				}, {
+					"label": "Default Role",
+					"redrawOn": "defaultRole",
+					"calculateValue": "if(data.defaultRole){\n  value = data.defaultRole == row.name ? true : false;\n} else {\n  value = false;\n}",
+					"key": "default",
+					"type": "hidden",
+					"input": true,
+					"tableView": false
+				}]
+			}]
+		}]
+	}, {
+		"title": "Form Type",
+		"theme": "primary",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"tooltip": "An Form Type is a Data Collection inside the Application and Represents what the File Object will contain\nEach Form Type Represents can contain a Form which will modify Data inside the File.",
+		"collapsible": false,
+		"key": "page3",
+		"type": "panel",
+		"label": "Entities",
+		"tableView": false,
+		"input": false,
+		"components": [{
+			"label": "HTML",
+			"tag": "label",
+			"className": "control-label",
+			"attrs": [{
+				"attr": "for",
+				"value": "e2kzst9-entity"
+			}],
+			"content": "Form Types\r\n      <i class=\"fa fa-question-circle text-muted\" ref=\"tooltip\" aria-describedby=\"entity_tooltip\"></i>\r\n<div class=\"tooltip\" style=\"opacity: 1; position: absolute; transform: translate3d(64px, -77px, 0px); top: 0px; left: 0px; will-change: transform;visibility: hidden;\" role=\"tooltip\" id=\"entity_tooltip\" aria-hidden=\"false\" x-placement=\"right\">\r\n            <div class=\"tooltip-arrow\" style=\"top: 86px;\"></div>\r\n            <div class=\"tooltip-inner\">An Form Type is a Data Collection inside the Application and Represents what the File Object will contain<br><br>Each Form Type Represents can contain a Form which will modify Data inside the File.</div>\r\n          </div></label>",
+			"refreshOnChange": false,
+			"key": "html",
+			"type": "htmlelement",
+			"input": false,
+			"tableView": false
+		}, {
+			"label": "Form Types",
+			"reorder": false,
+			"addAnother": "Add Form Type",
+			"addAnotherPosition": "bottom",
+			"defaultOpen": false,
+			"layoutFixed": false,
+			"enableRowGroups": false,
+			"initEmpty": false,
+			"tableView": false,
+			"defaultValue": [{
+				"name": "",
+				"formFieldsValidationExcel": [],
+				"start_date_field": "",
+				"end_date_field": "",
+				"status_field": "",
+				"field": [{
+					"name": "",
+					"text": "",
+					"data_type": "",
+					"index": false,
+					"ryg_rule": ""
+				}],
+				"ryg_rule": "",
+				"subscriber_field": "",
+				"title": "",
+				"enable_documents": false,
+				"enable_comments": false,
+				"enable_view": false,
+				"enable_auditlog": false,
+				"pageContent": {}
+			}],
+			"clearOnHide": false,
+			"validate": {
+				"minLength": 0
+			},
+			"key": "entity",
+			"type": "datagrid",
+			"noFirstRow": false,
+			"input": true,
+			"components": [{
+				"theme": "primary",
+				"breadcrumbClickable": true,
+				"buttonSettings": {
+					"previous": true,
+					"cancel": true,
+					"next": true
+				},
+				"collapsible": false,
+				"hideLabel": true,
+				"key": "panel",
+				"type": "panel",
+				"label": "Panel",
+				"input": false,
+				"tableView": false,
+				"components": [{
+					"label": "entitywell",
+					"key": "entitywell",
+					"type": "well",
+					"input": false,
+					"tableView": false,
+					"components": [{
+						"label": "Columns",
+						"columns": [{
+							"components": [{
+								"label": "Columns",
+								"columns": [{
+									"components": [{
+										"label": "Name",
+										"tooltip": "The Name for the Form Type used in the Application",
+										"showCharCount": true,
+										"autofocus": true,
+										"tableView": false,
+										"clearOnHide": false,
+										"key": "name",
+										"type": "textfield",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}],
+									"width": 6,
+									"offset": 0,
+									"push": 0,
+									"pull": 0,
+									"size": "md",
+									"currentWidth": 6
+								}, {
+									"components": [{
+										"label": "Form Fields Validation Excel",
+										"tableView": false,
+										"storage": "base64",
+										"webcam": false,
+										"fileTypes": [{
+											"label": "",
+											"value": ""
+										}],
+										"clearOnHide": false,
+										"key": "formFieldsValidationExcel",
+										"customConditional": "show = false;",
+										"type": "file",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}],
+									"width": 6,
+									"offset": 0,
+									"push": 0,
+									"pull": 0,
+									"size": "md",
+									"currentWidth": 6
+								}],
+								"tableView": false,
+								"key": "columns9",
+								"type": "columns",
+								"input": false,
+								"width": 3,
+								"hideOnChildrenHidden": false
+							}, {
+								"label": "Actual Participant ROle Key",
+								"calculateValue": "try {\n  console.log(row);\n  value = row.participantRoleDuplicate.map((i) => {\n    console.log(1111);\n    console.log(i);\n    return { businessRole: i.businessRole.name};\n    console.log(value);\n  });\n} catch (error) {}",
+								"key": "participantRole",
+								"type": "hidden",
+								"input": true,
+								"tableView": false
+							}, {
+								"label": "Columns",
+								"columns": [{
+									"components": [{
+										"label": "Start date field",
+										"tooltip": "The Start Date Field which is used in the Form Type",
+										"tableView": true,
+										"key": "start_date_field",
+										"type": "textfield",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}],
+									"offset": 0,
+									"push": 0,
+									"pull": 0,
+									"size": "md",
+									"width": 6,
+									"currentWidth": 6
+								}, {
+									"components": [{
+										"label": "End date field",
+										"tooltip": "The End Date Field which is used in the Form Type",
+										"tableView": true,
+										"key": "end_date_field",
+										"type": "textfield",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}],
+									"offset": 0,
+									"push": 0,
+									"pull": 0,
+									"size": "md",
+									"width": 6,
+									"currentWidth": 6
+								}],
+								"key": "columns10",
+								"type": "columns",
+								"tableView": false,
+								"input": false,
+								"width": 3,
+								"hideOnChildrenHidden": false
+							}, {
+								"label": "Columns",
+								"columns": [{
+									"components": [{
+										"label": "Columns",
+										"columns": [{
+											"components": [{
+												"label": "Status field",
+												"tooltip": "The Status Field which is used in the Form Type",
+												"tableView": true,
+												"key": "status_field",
+												"type": "textfield",
+												"input": true,
+												"hideOnChildrenHidden": false
+											}],
+											"width": 6,
+											"offset": 0,
+											"push": 0,
+											"pull": 0,
+											"size": "md",
+											"currentWidth": 6
+										}, {
+											"components": [{
+												"label": "Subscriber field",
+												"tooltip": "The Subscriber Field which is used in the Form Type",
+												"tableView": true,
+												"key": "subscriber_field",
+												"logic": [{
+													"name": "If File Comments enabled",
+													"trigger": {
+														"type": "simple",
+														"simple": {
+															"show": true,
+															"when": "app.chat_notification",
+															"eq": "true"
+														}
+													},
+													"actions": [{
+														"name": "Set Mandatory",
+														"type": "property",
+														"property": {
+															"label": "Required",
+															"value": "validate.required",
+															"type": "boolean"
+														},
+														"state": true
+													}]
+												}, {
+													"name": "If File Comments not enabled",
+													"trigger": {
+														"type": "simple",
+														"simple": {
+															"show": true,
+															"when": "app.chat_notification",
+															"eq": "false"
+														}
+													},
+													"actions": [{
+														"name": "Set it to Non-mandatory",
+														"type": "property",
+														"property": {
+															"label": "Required",
+															"value": "validate.required",
+															"type": "boolean"
+														},
+														"state": false
+													}]
+												}],
+												"type": "textfield",
+												"input": true,
+												"hideOnChildrenHidden": false
+											}],
+											"width": 6,
+											"offset": 0,
+											"push": 0,
+											"pull": 0,
+											"size": "md",
+											"currentWidth": 6
+										}],
+										"key": "columns13",
+										"type": "columns",
+										"input": false,
+										"tableView": false,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Message Title",
+										"placeholder": "Ex: ${entity_name}${identifier_field}",
+										"tooltip": "Message Title would be displayed at the beginning of a message thread",
+										"tableView": true,
+										"inputFormat": "raw",
+										"key": "title",
+										"logic": [{
+											"name": "If File Comments enabled",
+											"trigger": {
+												"type": "simple",
+												"javascript": "",
+												"simple": {
+													"show": true,
+													"when": "app.chat_notification",
+													"eq": "true"
+												}
+											},
+											"actions": [{
+												"name": "Set Mandatory",
+												"type": "property",
+												"property": {
+													"label": "Required",
+													"value": "validate.required",
+													"type": "boolean"
+												},
+												"state": true
+											}]
+										}, {
+											"name": "If File comments not enabled",
+											"trigger": {
+												"type": "simple",
+												"simple": {
+													"show": true,
+													"when": "app.chat_notification",
+													"eq": "false"
+												}
+											},
+											"actions": [{
+												"name": "Make non mandatory",
+												"type": "property",
+												"property": {
+													"label": "Required",
+													"value": "validate.required",
+													"type": "boolean"
+												},
+												"state": false
+											}]
+										}],
+										"type": "textfield",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Attachment Field",
+										"tooltip": "Uploaded files from chat will be attached to this field",
+										"tableView": true,
+										"inputFormat": "raw",
+										"key": "chatAttachmentField",
+										"customConditional": "show = false;",
+										"logic": [{
+											"name": "If File Comments enabled",
+											"trigger": {
+												"type": "simple",
+												"javascript": "",
+												"simple": {
+													"show": true,
+													"when": "app.chat_notification",
+													"eq": "true"
+												}
+											},
+											"actions": [{
+												"name": "Set Mandatory",
+												"type": "property",
+												"property": {
+													"label": "Required",
+													"value": "validate.required",
+													"type": "boolean"
+												},
+												"state": true
+											}]
+										}, {
+											"name": "If File comments not enabled",
+											"trigger": {
+												"type": "simple",
+												"simple": {
+													"show": true,
+													"when": "app.chat_notification",
+													"eq": "false"
+												}
+											},
+											"actions": [{
+												"name": "Make non mandatory",
+												"type": "property",
+												"property": {
+													"label": "Required",
+													"value": "validate.required",
+													"type": "boolean"
+												},
+												"state": false
+											}]
+										}],
+										"type": "textfield",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "RYG Rule",
+										"tooltip": "The RYG Rule for the Form Type\nThis is a javascript rule which is used to return the Colour Based on any and all Fields in the Form Type",
+										"editor": "ace",
+										"autoExpand": false,
+										"tableView": true,
+										"key": "ryg_rule",
+										"type": "textarea",
+										"as": "string",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Enable Documents?",
+										"tableView": false,
+										"defaultValue": false,
+										"key": "enable_documents",
+										"type": "checkbox",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Enable Comments?",
+										"tableView": false,
+										"defaultValue": false,
+										"key": "enable_comments",
+										"type": "checkbox",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Enable View?",
+										"tableView": false,
+										"defaultValue": false,
+										"key": "enable_view",
+										"type": "checkbox",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Enable Audit Log?",
+										"tableView": false,
+										"defaultValue": false,
+										"key": "enable_auditlog",
+										"type": "checkbox",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Enable Print ?",
+										"tableView": false,
+										"defaultValue": false,
+										"key": "enable_print",
+										"type": "checkbox",
+										"input": true,
+										"hideOnChildrenHidden": false
+									}, {
+										"label": "Entity View",
+										"tableView": false,
+										"clearOnHide": false,
+										"key": "pageContent",
+										"customConditional": "if(row.enable_view == true || row.enable_view == 'true'){\n  show = true;\n} else {\n  show = false;\n}",
+										"type": "container",
+										"input": true,
+										"components": [{
+											"label": "data",
+											"tableView": false,
+											"key": "data",
+											"type": "container",
+											"input": true,
+											"components": [{
+												"label": "Content",
+												"reorder": false,
+												"addAnotherPosition": "bottom",
+												"defaultOpen": false,
+												"layoutFixed": false,
+												"enableRowGroups": false,
+												"initEmpty": true,
+												"tableView": false,
+												"defaultValue": [{
+													"content": "",
+													"type": "HTMLViewer"
+												}],
+												"clearOnHide": false,
+												"key": "content",
+												"type": "datagrid",
+												"input": true,
+												"components": [{
+													"label": "View Template",
+													"editor": "ckeditor",
+													"spellcheck": false,
+													"tableView": false,
+													"key": "content",
+													"type": "textarea",
+													"input": true
+												}, {
+													"label": "type",
+													"calculateValue": "value = \"HTMLViewer\"",
+													"key": "type",
+													"type": "hidden",
+													"input": true,
+													"tableView": false
+												}]
+											}]
+										}],
+										"hideOnChildrenHidden": false
+									}],
+									"width": 12,
+									"offset": 0,
+									"push": 0,
+									"pull": 0,
+									"size": "md",
+									"currentWidth": 12
+								}, {
+									"components": [],
+									"width": 6,
+									"offset": 0,
+									"push": 0,
+									"pull": 0,
+									"size": "md",
+									"currentWidth": 6
+								}],
+								"tableView": false,
+								"key": "columns12",
+								"type": "columns",
+								"input": false,
+								"width": 3,
+								"hideOnChildrenHidden": false
+							}, {
+								"label": "Linked Fields",
+								"tableView": false,
+								"modalEdit": true,
+								"key": "linkedFields",
+								"type": "well",
+								"input": false,
+								"components": [{
+									"label": "Linked Fields",
+									"reorder": false,
+									"addAnother": "Add Field",
+									"addAnotherPosition": "bottom",
+									"defaultOpen": false,
+									"layoutFixed": false,
+									"enableRowGroups": false,
+									"initEmpty": false,
+									"tableView": false,
+									"defaultValue": [{
+										"name": "",
+										"text": "",
+										"data_type": "",
+										"index": false
+									}],
+									"key": "field",
+									"type": "datagrid",
+									"input": true,
+									"hideOnChildrenHidden": false,
+									"components": [{
+										"label": "Name",
+										"tooltip": "Name of the fields to be used in the Form Type",
+										"tableView": true,
+										"clearOnHide": false,
+										"key": "name",
+										"type": "textfield",
+										"input": true
+									}, {
+										"label": "Label",
+										"tooltip": "Label for the Field of the Form Type",
+										"tableView": true,
+										"clearOnHide": false,
+										"key": "text",
+										"type": "textfield",
+										"input": true
+									}, {
+										"label": "Data Type",
+										"widget": "choicesjs",
+										"tooltip": "Data Type of the field",
+										"tableView": true,
+										"data": {
+											"values": [{
+												"label": "Text",
+												"value": "text"
+											}, {
+												"label": "Numeric",
+												"value": "numeric"
+											}, {
+												"label": "Date",
+												"value": "date"
+											}, {
+												"label": "Document",
+												"value": "document"
+											}, {
+												"label": "JSON",
+												"value": "json"
+											}]
+										},
+										"clearOnHide": false,
+										"key": "data_type",
+										"type": "select",
+										"input": true,
+										"searchThreshold": 0.3
+									}, {
+										"label": "Indexed",
+										"tooltip": "Indexed fields can be used in the List Views,For Filtering ,Sorting,Etc",
+										"tableView": false,
+										"defaultValue": false,
+										"clearOnHide": false,
+										"key": "index",
+										"type": "checkbox",
+										"input": true
+									}]
+								}],
+								"hideOnChildrenHidden": false,
+								"width": 3
+							}, {
+								"label": "Participant Role",
+								"reorder": false,
+								"addAnotherPosition": "bottom",
+								"layoutFixed": false,
+								"enableRowGroups": false,
+								"initEmpty": false,
+								"tableView": false,
+								"defaultValue": [{
+									"businessRole": {}
+								}],
+								"key": "participantRoleDuplicate",
+								"type": "datagrid",
+								"defaultOpen": false,
+								"input": true,
+								"components": [{
+									"label": "Business Role",
+									"widget": "choicesjs",
+									"tableView": false,
+									"dataSrc": "custom",
+									"data": {
+										"custom": "if(data.businessRole){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
+									},
+									"template": "<span>{{ item.name }}</span>",
+									"key": "businessRole",
+									"type": "select",
+									"input": true,
+									"searchThreshold": 0.3
+								}],
+								"hideOnChildrenHidden": false
+							}],
+							"width": 12,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 12
+						}, {
+							"components": [],
+							"width": 6,
+							"offset": 0,
+							"push": 0,
+							"pull": 0,
+							"size": "md",
+							"currentWidth": 6
+						}],
+						"key": "columns7",
+						"type": "columns",
+						"tableView": false,
+						"input": false,
+						"hideOnChildrenHidden": false
+					}]
+				}]
+			}]
+		}]
+	}, {
+		"title": "Form Configurator",
+		"theme": "primary",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"scrollToTop": false,
+		"collapsible": false,
+		"key": "formsPanel",
+		"type": "panel",
+		"label": "Form Configurator",
+		"tableView": false,
+		"input": false,
+		"components": [{
+			"label": "Forms",
+			"reorder": false,
+			"addAnotherPosition": "bottom",
+			"layoutFixed": false,
+			"enableRowGroups": false,
+			"initEmpty": false,
+			"tableView": false,
+			"defaultValue": [{
+				"name": "",
+				"entity": {},
+				"template": [],
+				"template_file": "",
+				"uuid": ""
+			}],
+			"persistent": false,
+			"redrawOn": "entity",
+			"clearOnHide": false,
+			"calculateValue": "value = data.form;",
+			"validate": {
+				"custom": "if (data.formDuplicate) {\n  if (data.formDuplicate.length > 0) {\n    valid =\n      data.formDuplicate.length == new Set(data.formDuplicate.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same form more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+			},
+			"key": "formDuplicate",
+			"type": "datagrid",
+			"defaultOpen": false,
+			"noFirstRow": false,
+			"input": true,
+			"components": [{
+				"label": "Title",
+				"tooltip": "The Form Title",
+				"disabled": true,
+				"tableView": true,
+				"clearOnHide": false,
+				"calculateValue": "try {\n  if (row.template_file.length > 0) {\n    value =\n      row.template_file.length > 0\n        ? row.template_file.split(\".\")[0]\n        : \"\";\n  }else{\n    value = \"\";\n  }\n} catch (error) {}",
+				"key": "name",
+				"type": "textfield",
+				"hideOnChildrenHidden": false,
+				"input": true
+			}, {
+				"label": "Entity",
+				"widget": "choicesjs",
+				"tooltip": "The Entity the Form is Associated to",
+				"autofocus": true,
+				"tableView": true,
+				"dataSrc": "custom",
+				"data": {
+					"custom": "if(data.entity){\nvalues = data.entity.map(item=>item.name)\nif(row[component.key] && !values.includes(row[component.key])){\n  row[component.key] = \"\";\n}\n} else {\nvalues = [];\n}"
+				},
+				"clearOnHide": false,
+				"key": "entity",
+				"logic": [{
+					"name": "Check if form Uploaded",
+					"trigger": {
+						"type": "javascript",
+						"javascript": "result = (row.template.length > 0);"
+					},
+					"actions": [{
+						"name": "Set Mandatory",
+						"type": "property",
+						"property": {
+							"label": "Required",
+							"value": "validate.required",
+							"type": "boolean"
+						},
+						"state": true
+					}]
+				}, {
+					"name": "Forms Not Uploaded",
+					"trigger": {
+						"type": "javascript",
+						"simple": {
+							"show": true
+						},
+						"javascript": "result = (row.template.length <= 0);"
+					},
+					"actions": [{
+						"name": "Not Mandatory",
+						"type": "property",
+						"property": {
+							"label": "Required",
+							"value": "validate.required",
+							"type": "boolean"
+						},
+						"state": false
+					}]
+				}],
+				"type": "select",
+				"input": true
+			}, {
+				"label": "Form Uuid",
+				"calculateValue": "try {\n  if (\n    !(value.length > 1) &&\n    row.template_file &&\n    row.template_file.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
+				"key": "uuid",
+				"type": "hidden",
+				"input": true,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"label": "Form File",
+				"widget": "choicesjs",
+				"tableView": true,
+				"dataSrc": "custom",
+				"data": {
+					"custom": "console.log(\"sleeee0\");\nconsole.log(data);\nif(data.listOFForms){\n  values = data.listOFForms.map(item=>item.name +'.json')\n}else {\nvalues = [];\n}\nconsole.log(values);"
+				},
+				"clearOnHide": false,
+				"key": "template_file",
+				"type": "select",
+				"input": true
+			}]
+		}, {
+			"label": "Actual Form API Key",
+			"calculateValue": "if(data.formDuplicate){\n  try {\n  value = data.formDuplicate.map((i) => {\n    return { name: i.name, entity: i.entity, template_file: i.template_file,uuid: i.uuid , template:i.template};\n  });\n} catch (error) {}\n}",
+			"key": "form",
+			"type": "hidden",
+			"input": true,
+			"tableView": false
+		}]
+	}, {
+		"title": "Workflow Manager",
+		"theme": "primary",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"scrollToTop": false,
+		"collapsible": false,
+		"key": "workflowPanel",
+		"type": "panel",
+		"label": "Workflow Manager",
+		"tableView": false,
+		"input": false,
+		"components": [{
+			"label": "Workflows",
+			"reorder": false,
+			"addAnotherPosition": "bottom",
+			"defaultOpen": false,
+			"layoutFixed": false,
+			"enableRowGroups": false,
+			"initEmpty": false,
+			"tableView": false,
+			"defaultValue": [{
+				"name": "",
+				"entity": [{}],
+				"template": [],
+				"bpmn_file": "",
+				"uuid": ""
+			}],
+			"clearOnHide": false,
+			"validate": {
+				"custom": "if (data.workflowDuplicate) {\n  if (data.workflowDuplicate.length > 0) {\n  console.log(data.workflowDuplicate);\n  valid =\n      data.workflowDuplicate.length == new Set(data.workflowDuplicate.map((i) => i.bpmn_file.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same workflow more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+			},
+			"key": "workflowDuplicate",
+			"type": "datagrid",
+			"noFirstRow": false,
+			"input": true,
+			"components": [{
+				"label": "Name",
+				"tooltip": "Name of the Workflow",
+				"autofocus": true,
+				"tableView": true,
+				"clearOnHide": false,
+				"validate": {
+					"maxLength": 50
+				},
+				"key": "name",
+				"type": "textfield",
+				"input": true
+			}, {
+				"label": "Entity",
+				"widget": "choicesjs",
+				"tooltip": "The Entity/Entities the Workflow is Associated to",
+				"tableView": true,
+				"multiple": true,
+				"dataSrc": "custom",
+				"data": {
+					"custom": "\nconsole.log(\"WF\");\nconsole.log(row.template.length);\nif(data.entity){\nvalues = data.entity.map(item=>item.name)\n} else {\nvalues = []\n}\nconsole.log(values);"
+				},
+				"clearOnHide": false,
+				"validate": {
+					"custom": "console.log(\"Validation\");\nconsole.log(valid);",
+					"multiple": true
+				},
+				"key": "entity",
+				"logic": [{
+					"name": "Check if form Uploaded",
+					"trigger": {
+						"type": "javascript",
+						"javascript": "result = (row.template.length > 0);"
+					},
+					"actions": [{
+						"name": "Set Mandatory",
+						"type": "property",
+						"property": {
+							"label": "Required",
+							"value": "validate.required",
+							"type": "boolean"
+						},
+						"state": true
+					}]
+				}, {
+					"name": "Forms Not Uploaded",
+					"trigger": {
+						"type": "javascript",
+						"javascript": "result = (row.template.length <= 0);"
+					},
+					"actions": [{
+						"name": "Not Mandatory",
+						"type": "property",
+						"property": {
+							"label": "Required",
+							"value": "validate.required",
+							"type": "boolean"
+						},
+						"state": false
+					}]
+				}],
+				"type": "select",
+				"input": true,
+				"searchThreshold": 0.3
+			}, {
+				"label": "Workflow Uuid",
+				"calculateValue": "try {\n  if (\n    !(value.length > 1) && row.template_file &&\n    row.template_file.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
+				"key": "uuid",
+				"type": "hidden",
+				"input": true,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
+				"label": "Workflow BPMN",
+				"widget": "choicesjs",
+				"tableView": true,
+				"dataSrc": "custom",
+				"data": {
+					"custom": "console.log(\"sleeee0\");\nconsole.log(data);\nif(data.listOFWorkflows){\n  values = data.listOFWorkflows.map(item=>item.name +'.bpmn')\n}else {\nvalues = [];\n}\nconsole.log(values);"
+				},
+				"clearOnHide": false,
+				"key": "bpmn_file",
+				"type": "select",
+				"input": true
+			}]
+		}, {
+			"label": "Actual Workflow API Key",
+			"calculateValue": "if(data.workflowDuplicate){\n  try {\n  value = data.workflowDuplicate.map((i) => {\n    return { name: i.name, entity: i.entity, bpmn_file: i.bpmn_file,uuid: i.uuid };\n  });\n} catch (error) {}\n}",
+			"key": "workflow",
+			"type": "hidden",
+			"input": true,
+			"tableView": false
+		}]
+	}, {
+		"title": "Pages",
+		"theme": "primary",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"scrollToTop": false,
+		"collapsible": false,
+		"key": "page4",
+		"type": "panel",
+		"label": "Pages And Menus",
+		"tableView": false,
+		"input": false,
+		"components": [{
+			"title": "Pages",
+			"theme": "primary",
+			"breadcrumbClickable": true,
+			"buttonSettings": {
+				"previous": true,
+				"cancel": true,
+				"next": true
+			},
+			"collapsible": false,
+			"tableView": false,
+			"key": "pages1",
+			"type": "panel",
+			"label": "Panel",
+			"input": false,
+			"components": [{
+				"label": "Pages",
+				"reorder": false,
+				"addAnother": "Add Page",
+				"addAnotherPosition": "bottom",
+				"defaultOpen": false,
+				"layoutFixed": false,
+				"enableRowGroups": false,
+				"initEmpty": false,
+				"tableView": false,
+				"defaultValue": [{
+					"name": "",
+					"uuid": "2e288ca0-5e73-4f19-8510-d80daaa5fa9e",
+					"description": "",
+					"content": {
+						"data": {}
+					},
+					"pageContent": {
+						"data": {}
+					}
+				}],
+				"clearOnHide": false,
+				"key": "pages",
+				"type": "datagrid",
+				"noFirstRow": false,
+				"input": true,
+				"components": [{
+					"label": "Columns",
+					"columns": [{
+						"components": [{
+							"label": "Columns",
+							"columns": [{
+								"components": [{
+									"label": "Name",
+									"tooltip": "The Name of the Page",
+									"autofocus": true,
+									"tableView": true,
+									"clearOnHide": false,
+									"validate": {
+										"required": true,
+										"maxLength": 50,
+										"unique": true
+									},
+									"unique": true,
+									"errorLabel": "Page Name",
+									"key": "name",
+									"type": "textfield",
+									"input": true,
+									"hideOnChildrenHidden": false
+								}, {
+									"label": "Page UUID",
+									"calculateValue": "try {\n\tif (!(value.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}",
+									"key": "uuid",
+									"type": "hidden",
+									"input": true,
+									"tableView": false,
+									"hideOnChildrenHidden": false
+								}],
+								"width": 6,
+								"offset": 0,
+								"push": 0,
+								"pull": 0,
+								"size": "md",
+								"currentWidth": 6
+							}, {
+								"components": [{
+									"label": "Description",
+									"tooltip": "Description of the Page",
+									"tableView": true,
+									"clearOnHide": false,
+									"key": "description",
+									"type": "textfield",
+									"input": true,
+									"hideOnChildrenHidden": false
+								}],
+								"width": 6,
+								"offset": 0,
+								"push": 0,
+								"pull": 0,
+								"size": "md",
+								"currentWidth": 6
+							}],
+							"tableView": false,
+							"key": "columns8",
+							"type": "columns",
+							"input": false,
+							"hideOnChildrenHidden": false
+						}, {
+							"label": "Page Content Form",
+							"tableView": false,
+							"form": "5f21c1bdbba30150d672d0cf",
+							"calculateValue": "if(data.pagesList){\n  if(value && value.data){\n    value.data.pagesList = data.pagesList\n    value.data.formsList = data.formsList\n  }\n}",
+							"key": "pageContent",
+							"type": "form",
+							"input": true,
+							"hideOnChildrenHidden": false,
+							"revision": 293,
+							"formRevision": 293
+						}, {
+							"label": "Page Content",
+							"calculateValue": "value = row.pageContent",
+							"key": "content",
+							"logic": [{
+								"name": "Set Content",
+								"trigger": {
+									"type": "javascript",
+									"javascript": "if(row.pageContent){\n  if(row.pageContent.data.content){\n    if(row.pageContent.data.content.length > 0){\n      result = true;\n    } else {\n      result = false;\n    }\n  } else {\n    result = false;\n  }\n} else {\n result = false;\n}"
+								},
+								"actions": [{
+									"name": "Results",
+									"type": "value",
+									"value": "value = row.pageContent.data.content;"
+								}]
+							}],
+							"type": "hidden",
+							"input": true,
+							"tableView": false,
+							"hideOnChildrenHidden": false
+						}],
+						"width": 12,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 12
+					}, {
+						"components": [],
+						"width": 6,
+						"offset": 0,
+						"push": 0,
+						"pull": 0,
+						"size": "md",
+						"currentWidth": 6
+					}],
+					"hideLabel": true,
+					"tableView": false,
+					"key": "columns",
+					"type": "columns",
+					"input": false,
+					"hideOnChildrenHidden": false
+				}]
+			}]
+		}]
+	}, {
+		"title": "Menus",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"scrollToTop": false,
+		"collapsible": false,
+		"key": "page9",
+		"type": "panel",
+		"label": "Page 9",
+		"components": [{
+			"title": "Menus",
+			"theme": "primary",
+			"breadcrumbClickable": true,
+			"buttonSettings": {
+				"previous": true,
+				"cancel": true,
+				"next": true
+			},
+			"collapsible": false,
+			"tableView": false,
+			"key": "menuPanel",
+			"type": "panel",
+			"label": "Menus",
+			"input": false,
+			"components": [{
+				"label": "App Menus",
+				"reorder": false,
+				"addAnother": "Add Menu",
+				"addAnotherPosition": "bottom",
+				"defaultOpen": false,
+				"layoutFixed": false,
+				"enableRowGroups": false,
+				"initEmpty": false,
+				"tableView": false,
+				"defaultValue": [{
+					"name": "",
+					"icon": "",
+					"page": {},
+					"privilege": "",
+					"parent": {},
+					"uuid": ""
+				}],
+				"clearOnHide": false,
+				"validate": {
+					"minLength": 1
+				},
+				"key": "menu",
+				"type": "datagrid",
+				"noFirstRow": false,
+				"input": true,
+				"components": [{
+					"label": "Name",
+					"tooltip": "The Menu Item Name",
+					"tableView": true,
+					"clearOnHide": false,
+					"validate": {
+						"required": true,
+						"maxLength": 50
+					},
+					"errorLabel": "Menu Name",
+					"key": "name",
+					"type": "textfield",
+					"input": true
+				}, {
+					"label": "Icon Class",
+					"tooltip": "The Icon for the Menu Item",
+					"tableView": true,
+					"clearOnHide": false,
+					"validate": {
+						"required": true
+					},
+					"errorLabel": "Menu Icon Class",
+					"key": "icon",
+					"type": "textfield",
+					"input": true
+				}, {
+					"label": "Page",
+					"widget": "choicesjs",
+					"tooltip": "The Page which will open from the Menu",
+					"tableView": true,
+					"dataSrc": "custom",
+					"data": {
+						"custom": "if(data.pages){\nvalues = data.pages.map(item=>item.name)\n} else {\nvalues = [];\n}"
+					},
+					"clearOnHide": false,
+					"validate": {
+						"required": true
+					},
+					"key": "page",
+					"type": "select",
+					"input": true,
+					"searchThreshold": 0.3
+				}, {
+					"label": "Privilege",
+					"widget": "choicesjs",
+					"tooltip": "If a privilege is provided the Menu Item will show up only for the Users who have the Privilege",
+					"tableView": true,
+					"dataSrc": "custom",
+					"data": {
+						"custom": "var privArray = [];\nif(data.privilege){\ndata.privilege.map((i) => {\n  if (i.permission >= 1) {\n    privArray.push({\n      key: i.name + \"_READ\",\n      name: i.name + \"_READ\",\n    });\n  }\n  if (i.permission >= 3) {\n    privArray.push({\n      key: i.name + \"_WRITE\",\n      name: i.name + \"_WRITE\",\n    });\n  }\n  if (i.permission >= 7) {\n    privArray.push({\n      key: i.name + \"_CREATE\",\n      name: i.name + \"_CREATE\",\n    });\n  }\n  if (i.permission == 15) {\n    privArray.push({\n      key: i.name + \"_DELETE\",\n      name: i.name + \"_DELETE\",\n    });\n  }\n});\n}\nvalues = privArray.length > 0 ? privArray : [];\n"
+					},
+					"valueProperty": "key",
+					"template": "<span>{{ item.name }}</span>",
+					"clearOnHide": false,
+					"key": "privilege",
+					"type": "select",
+					"input": true,
+					"searchThreshold": 0.3
+				}, {
+					"label": "Parent",
+					"widget": "choicesjs",
+					"tooltip": "If we want sub menu items inside we may associate each child to a Parent Menu Item",
+					"tableView": true,
+					"dataSrc": "custom",
+					"data": {
+						"custom": "if(data.menu){\nvalues = data.menu.map(item=>item.name);\n} else {\nvalues = [];\n}"
+					},
+					"clearOnHide": false,
+					"validate": {
+						"custom": "if(row && input){\n  valid = input == row.name ? \"Cannot Parent the menu to itself!\" : true;\n}"
+					},
+					"key": "parent",
+					"type": "select",
+					"input": true,
+					"searchThreshold": 0.3
+				}, {
+					"label": "Menu UUID",
+					"key": "uuid",
+					"type": "hidden",
+					"input": true,
+					"tableView": false
+				}]
+			}]
+		}],
+		"input": false,
+		"tableView": false
+	}, {
+		"title": "Edit CSS",
+		"theme": "primary",
+		"breadcrumbClickable": true,
+		"buttonSettings": {
+			"previous": true,
+			"cancel": true,
+			"next": true
+		},
+		"collapsible": false,
+		"key": "page9",
+		"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=true;\n}else {\n  show=false;\n}",
+		"type": "panel",
+		"label": "Edit CSS",
+		"input": false,
+		"tableView": false,
+		"components": [{
+			"label": "Edit Index.scss",
+			"action": "event",
+			"showValidations": false,
+			"theme": "info",
+			"tableView": false,
+			"key": "editIndexScss",
+			"properties": {
+				"api": "{ \t\"api\": { \t\t\"method\": \"GET\", \t\t\"url\": \"app/{{data.app.uuid}}/cssFile\" \t} }"
+			},
+			"customConditional": "show = !data.cssContent;",
+			"type": "button",
+			"event": "callApi",
+			"input": true
+		}, {
+			"label": "Text Area",
+			"autoExpand": false,
+			"autocomplete": "off",
+			"hideLabel": true,
+			"tableView": true,
+			"key": "cssContent",
+			"customConditional": "show = data.cssContent;",
+			"type": "textarea",
+			"rows": 10,
+			"input": true
+		}]
+	}],
+	"revisions": "current",
+	"_vid": 781,
+	"title": "EOX App",
+	"display": "wizard",
+	"access": [{
+		"roles": [],
+		"type": "create_own"
+	}, {
+		"roles": [],
+		"type": "create_all"
+	}, {
+		"roles": [],
+		"type": "read_own"
+	}, {
+		"roles": ["5d70a2198e9aff51d0f3c171", "5d70a2198e9afffba0f3c172", "5d70a2198e9affff8af3c173"],
+		"type": "read_all"
+	}, {
+		"roles": [],
+		"type": "update_own"
+	}, {
+		"roles": [],
+		"type": "update_all"
+	}, {
+		"roles": [],
+		"type": "delete_own"
+	}, {
+		"roles": [],
+		"type": "delete_all"
+	}, {
+		"roles": [],
+		"type": "team_read"
+	}, {
+		"roles": [],
+		"type": "team_write"
+	}, {
+		"roles": [],
+		"type": "team_admin"
+	}],
+	"submissionAccess": [{
+		"roles": [],
+		"type": "create_own"
+	}, {
+		"roles": [],
+		"type": "create_all"
+	}, {
+		"roles": [],
+		"type": "read_own"
+	}, {
+		"roles": [],
+		"type": "read_all"
+	}, {
+		"roles": [],
+		"type": "update_own"
+	}, {
+		"roles": [],
+		"type": "update_all"
+	}, {
+		"roles": [],
+		"type": "delete_own"
+	}, {
+		"roles": [],
+		"type": "delete_all"
+	}, {
+		"roles": [],
+		"type": "team_read"
+	}, {
+		"roles": [],
+		"type": "team_write"
+	}, {
+		"roles": [],
+		"type": "team_admin"
+	}],
+	"controller": "var s = document.createElement(\"script\");\ns.src = \"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\";\ns.onload = function (e) {\n  var appendCustomButtonTimer = setInterval(() => {\n    if (\n      document.getElementById(\n        \"formio_loader_1fa0d5c0-b428-499a-a490-37e4349c1060\"\n      )\n    ) {\n      var dataGridDeleteIcons = document.getElementsByClassName(\n        \"fa-times-circle-o\"\n      );\n      dataGridDeleteIcons = Array.from(dataGridDeleteIcons);\n      if (dataGridDeleteIcons.length > 0) {\n        dataGridDeleteIcons.map((item) => {\n          item.classList.add(\"fa-times-circle\");\n          item.classList.remove(\"fa-times-circle-o\");\n        });\n      }\n    } else {\n      appendCustomButtonTimer ? clearInterval(appendCustomButtonTimer) : null;\n    }\n  }, 1000);\n};\ndocument.head.appendChild(s);",
+	"properties": {
+		"showBreadcrumbs": "true",
+		"submission_commands": "[{\"command\":\"delegate\",\"delegate\":\"CleanYml\"}]",
+		"clearVariables": "orgId",
+		"theme": "https://stackpath.bootstrapcdn.com/bootswatch/4.1.3/materia/bootstrap.min.css",
+		"commands": "[{ \t\"command\": \"delegate\", \t\"delegate\": \"LoadAppData\" }]"
+	},
+	"settings": {},
+	"name": "eoxApp",
+	"path": "eoxapp",
+	"project": "5d70a2198e9aff60caf3c170",
+	"created": "2020-07-26T18:44:45.687Z",
+	"modified": "2021-12-16T11:12:48.852Z",
+	"machineName": "onboarding-eoxvantage:eoxApp"
 }

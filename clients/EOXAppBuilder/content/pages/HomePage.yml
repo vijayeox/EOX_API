@@ -129,26 +129,27 @@ content:
                                 url: /app/{{uuid}}/removeapp
                                 disableAppId: true
                     icon: 'fas fa-trash-alt'
-                    updateOnly: true 
-            # operations:
-            #     title: "Create Application"
-            #     actions:
-            #         -
-            #             name: Build Application
-            #             icon: 'fa fa-gavel'
-            #             rule: 'true'
-            #             details:
-            #                 -
-            #                     type: Form
-            #                     form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
-            #         -
-            #             name: Import Application
-            #             icon: 'fa fa-cloud-upload'
-            #             rule: 'true'
-            #             details:
-            #                 -
-            #                     type: UploadArtifact
-            #                     entity: app
+                    updateOnly: true
+                -
+                    name: 'Delegate Manager'
+                    icon: 'fa fa-upload'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: '7302ba08-5ea3-11ec-bf63-0242ac130002'
+                                params:
+                                    app_uuid: '{{uuid}}'
+                -
+                    name: 'Template Manager'
+                    icon: 'fa fa-upload'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: '7302bd3c-5ea3-11ec-bf63-0242ac130002'
+                                params:
+                                    app_uuid: '{{uuid}}'
             columnConfig:
                 -
                     title: Name

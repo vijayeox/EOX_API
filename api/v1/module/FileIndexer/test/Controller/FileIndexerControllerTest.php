@@ -144,6 +144,7 @@ class FileIndexerControllerTest extends ControllerTest
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data']['id'], $data['id']);
         $this->arrayHasKey($content['data']['account_id'], 1);
+
         $this->assertEquals($content['data']['entityName'], 'sampleEntity1');
     }
 
@@ -232,7 +233,7 @@ class FileIndexerControllerTest extends ControllerTest
               '_id' => '101',
               'found' => false,
               ))));
-        }
+        } 
         if (enableActiveMQ == 0) {
             $mockMessageProducer = $this->getMockMessageProducer();
             $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), '/topic/elastic')->once()->andReturn();
