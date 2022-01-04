@@ -55,13 +55,18 @@ class AppInstaller extends React.Component {
       "post"
     );
     const succeeded = status === "success";
-    PopupDialog.fire({
-      icon: succeeded,
+    await PopupDialog.fire({
+      icon: status,
       title: succeeded ? "Success" : "Failed",
       text: `${(isInstall && "Installation") || "Uninstallation"} ${
         succeeded ? "completed successfully" : "failed"
       }`,
     });
+    if (succeeded) {
+      this.setState({
+        service: this.state.service.setOrganization(false),
+      });
+    }
   }
   updateType(type) {
     this.setState({
@@ -99,6 +104,18 @@ class AppInstaller extends React.Component {
                 onClick={() => this.updateType("Installed")}
               >
                 Installed
+              </div>
+              <div style={{ flex: 1, padding: 0, border: "unset" }}>
+                <div
+                  style={{ float: "right" }}
+                  onClick={() => {
+                    this.setState({
+                      service: this.state.service.updateOrganizationData(true),
+                    });
+                  }}
+                >
+                  Create Account
+                </div>
               </div>
             </div>
           )}
@@ -151,7 +168,9 @@ class AppInstaller extends React.Component {
                 className="install-manager_submit"
                 onClick={() => this.installOrUninstall()}
               >
-                Install
+                {this.state.service.installationType === "forInstall"
+                  ? "Install"
+                  : "Update"}
               </button>
             )
           // ||
@@ -229,13 +248,46 @@ class AAccount extends React.Component {
     super(props);
     console.log(props);
     this.service = this.props.service;
+    this.setService = this.props.setService;
     this.core = this.service.core;
+    this.api = this.core.make("oxzion/restClient");
     this.state = {
       data: null,
     };
+    this.createOrg = this.createOrg.bind(this);
   }
   componentDidMount() {
-    this.setState({ data: this.props.service.updateOrganization });
+    this.setState({ data: {} });
+  }
+  async createOrg(account) {
+    try {
+      let { status, data } = await this.api.request(
+        "v1",
+        `/account`,
+        account,
+        "post"
+      );
+      const succeeded = status === "success";
+      if (succeeded) {
+        await PopupDialog.fire({
+          icon: "success",
+          title: "Success",
+          text: `Account created successfully`,
+        });
+        this.setService({ service: this.service.goBack() });
+        return;
+      }
+      await PopupDialog.fire({
+        icon: "error",
+        title: "Failed",
+        text: `Failed to create account`,
+      });
+      this.setState({ data: false });
+      await new Promise((r) => setTimeout(r, 100));
+      this.setState({ data: account });
+    } catch (e) {
+      console.error(e);
+    }
   }
   render() {
     return (
@@ -243,9 +295,7 @@ class AAccount extends React.Component {
         <FormRender
           content={accountForm}
           core={this.core}
-          postSubmitCallback={(...args) => {
-            console.log(args);
-          }}
+          postSubmitCallback={this.createOrg}
           updateFormData={true}
           data={this.state.data}
           core={this.props.service.core}
@@ -367,8 +417,7 @@ class Organization extends React.Component {
                     name: "Edit",
                     callback: (data) => {
                       this.props.setService({
-                        service:
-                          this.props.service.updateOrganizationData(data),
+                        service: this.props.service.setOrganization(data),
                       });
                     },
                     rule: "true",
