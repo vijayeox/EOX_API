@@ -1088,6 +1088,20 @@ return [
                     ],
                 ],
             ],
+            'appBusinessRoles' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/appBusinessRoles',
+                    'defaults' => [
+                        'controller' => Controller\AppController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppBusinessRoles',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

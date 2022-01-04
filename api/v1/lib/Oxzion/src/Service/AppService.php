@@ -1785,4 +1785,8 @@ class AppService extends AbstractService implements AppUpgrade
             return $this->accountService->getAccounts($data['filterParams'],null,$data['serviceType']);
         }
     }
+
+    public function getAppBusinessRole($appId){
+        return $this->businessRoleService->getBusinessRoleByName($appId);
+    }
 }
