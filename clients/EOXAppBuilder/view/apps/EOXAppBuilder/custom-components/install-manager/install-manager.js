@@ -98,7 +98,7 @@ class AppInstaller extends React.Component {
                 }
                 onClick={() => this.updateType("Installed")}
               >
-                Uninstall
+                Installed
               </div>
             </div>
           )}
