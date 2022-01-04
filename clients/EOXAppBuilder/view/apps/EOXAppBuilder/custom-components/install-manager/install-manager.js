@@ -1,12 +1,9 @@
 import {
   OX_Grid,
   React,
-  ReactDOM,
-  EOXApplication,
-  ReactBootstrap,
   FormRender,
   KendoReactButtons,
-  KendoReactWindow,
+  PopupDialog,
 } from "oxziongui";
 import * as OxzionGUIComponents from "oxziongui";
 import UploadArtifact from "../../../../gui/UploadArtifact";
@@ -39,23 +36,72 @@ class AppInstaller extends React.Component {
         this.core,
         this.appId
       ),
+      orgReady: true,
     };
   }
-  async installOrUninstall() {
-    await this.helper.request(
+  async installOrUninstall(org) {
+    const isInstall = this.state.service.installationType === "forInstall";
+    const { status } = await this.helper.request(
       "v1",
       `app/${this.state.service.parentData.uuid}/${
-        this.state.service.installationType === "forInstall"
-          ? "install"
-          : "uninstall"
-      }/account/${this.state.service.selectedOrganization.uuid}`,
-      {...this.state.service.parentData, start_options : this.state.service.metaData},
+        isInstall ? "install" : "uninstall"
+      }/account/${(org || this.state.service.selectedOrganization).uuid}`,
+      isInstall
+        ? {
+            ...this.state.service.parentData,
+            start_options: this.state.service.metaData,
+          }
+        : this.state.service.parentData,
       "post"
     );
+    const succeeded = status === "success";
+    PopupDialog.fire({
+      icon: succeeded,
+      title: succeeded ? "Success" : "Failed",
+      text: `${(isInstall && "Installation") || "Uninstallation"} ${
+        succeeded ? "completed successfully" : "failed"
+      }`,
+    });
+  }
+  updateType(type) {
+    this.setState({
+      service: this.state.service.setInstallationType(type),
+      orgReady: false,
+    });
+    setTimeout(() => {
+      this.setState({
+        orgReady: true,
+      });
+    }, 100);
   }
   render() {
     return (
       <div className="install-manager">
+        {!this.state.service.selectedOrganization &&
+          !this.state.service.updateOrganization && (
+            <div className="install-manager--tabs">
+              <div
+                className={
+                  (this.state.service.installationType === "forInstall" &&
+                    `install-manager--tabs_active`) ||
+                  ""
+                }
+                onClick={() => this.updateType("forInstall")}
+              >
+                Install
+              </div>
+              <div
+                className={
+                  (this.state.service.installationType !== "forInstall" &&
+                    `install-manager--tabs_active`) ||
+                  ""
+                }
+                onClick={() => this.updateType("Installed")}
+              >
+                Uninstall
+              </div>
+            </div>
+          )}
         <div className="install-manager_header">
           {this.state.service.selectedOrganization ||
           this.state.service.updateOrganization ? (
@@ -71,7 +117,7 @@ class AppInstaller extends React.Component {
         </div>
         <div className="install-manager_content">
           {this.state.service.updateOrganization ? (
-            <Account
+            <AAccount
               service={this.state.service}
               setService={this.setState.bind(this)}
             />
@@ -79,8 +125,9 @@ class AppInstaller extends React.Component {
             <>
               {(!this.state.service.selectedOrganization && (
                 <Organization
-                  service={this.state.service}
+                  service={this.state.orgReady && this.state.service}
                   setService={this.setState.bind(this)}
+                  installOrUninstall={this.installOrUninstall.bind(this)}
                 />
               )) ||
                 (!this.state.service.metaData && (
@@ -97,13 +144,26 @@ class AppInstaller extends React.Component {
             </>
           )}
         </div>
-        {this.state.service.metaData && (
-          <button className="install-manager_submit" onClick={this.installOrUninstall}>
-            {this.state.service.installationType === "forInstall"
-              ? "Install"
-              : "Uninstall"}
-          </button>
-        )}
+        {
+          this.state.service.metaData &&
+            this.state.service.installationType === "forInstall" && (
+              <button
+                className="install-manager_submit"
+                onClick={() => this.installOrUninstall()}
+              >
+                Install
+              </button>
+            )
+          // ||
+          // (this.state.service.installationType === "Installed" && (
+          //   <button
+          //     className="install-manager_submit"
+          //     onClick={this.installOrUninstall}
+          //   >
+          //     Uninstall
+          //   </button>
+          // ))
+        }
       </div>
     );
   }
@@ -164,23 +224,35 @@ class Template extends React.Component {
     );
   }
 }
-class Account extends React.Component {
+class AAccount extends React.Component {
   constructor(props) {
     super(props);
+    console.log(props);
     this.service = this.props.service;
     this.core = this.service.core;
+    this.state = {
+      data: null,
+    };
+  }
+  componentDidMount() {
+    this.setState({ data: this.props.service.updateOrganization });
   }
   render() {
     return (
-      <FormRender
-        content={accountForm}
-        core={this.core}
-        postSubmitCallback={(...args) => {
-          console.log(args);
-        }}
-        updateFormData={true}
-        data={this.service.updateOrganization}
-      />
+      (this.state.data && (
+        <FormRender
+          content={accountForm}
+          core={this.core}
+          postSubmitCallback={(...args) => {
+            console.log(args);
+          }}
+          updateFormData={true}
+          data={this.state.data}
+          core={this.props.service.core}
+          updateFormData={true}
+        />
+      )) ||
+      null
     );
   }
 }
@@ -227,8 +299,14 @@ class Metadata extends React.Component {
         core={this.core}
         postSubmitCallback={(...args) => {
           let newMetadata = args[0];
-          newMetadata["description"] = { en_EN: newMetadata.description ? `${newMetadata.description}` : '' };
-          newMetadata["title"] = { en_EN: newMetadata.title ? `${newMetadata.title}` : newMetadata.title };
+          newMetadata["description"] = {
+            en_EN: newMetadata.description ? `${newMetadata.description}` : "",
+          };
+          newMetadata["title"] = {
+            en_EN: newMetadata.title
+              ? `${newMetadata.title}`
+              : newMetadata.title,
+          };
           this.setService({ service: this.service.setMetadata(newMetadata) });
         }}
         data={this.state.data}
@@ -240,43 +318,66 @@ class Metadata extends React.Component {
 class Organization extends React.Component {
   constructor(props) {
     super(props);
-    this.service = this.props.service;
-    this.setService = this.props.setService;
-    this.actions = [
-      {
-        icon: "far fa-download",
-        name:
-          (this.service.installationType === "forInstall" && "Install") ||
-          "Uninstall",
-        callback: (data) => {
-          this.setService({ service: this.service.setOrganization(data) });
-        },
-        rule: "true",
-        defaultAction: true,
-      },
-    ];
-  }
-  componentDidMount() {
-    if (this.service.installationType === "forInstall") return;
-    this.actions.push({
-      icon: "far fa-pencil",
-      name: "Edit",
-      callback: (data) => {
-        this.setService({
-          service: this.service.updateOrganizationData(data),
-        });
-      },
-      rule: "true",
-    });
+    // this.service = this.props.service;
+    // this.setService = this.props.setService;
   }
   render() {
     return (
-      <OX_Grid
-        osjsCore={this.service.core}
-        data={`app/${this.service.parentData.uuid}/getAccounts/${this.service.installationType}?filter=[{%22take%22:1000,%22skip%22:0}]`}
-        columnConfig={[{ title: "Account", field: "name" }]}
-        actions={this.actions}
-      />
+      (this.props.service && (
+        <OX_Grid
+          osjsCore={this.props.service.core}
+          data={`app/${this.props.service.parentData.uuid}/getAccounts/${this.props.service.installationType}?filter=[{%22take%22:1000,%22skip%22:0}]`}
+          columnConfig={[{ title: "Account", field: "name" }]}
+          actions={
+            this.props.service.installationType === "forInstall"
+              ? [
+                  {
+                    icon: "far fa-download",
+                    name:
+                      (this.props.service.installationType === "forInstall" &&
+                        "Install") ||
+                      "Uninstall",
+                    callback: (data) => {
+                      this.props.setService({
+                        service: this.props.service.setOrganization(data),
+                      });
+                    },
+                    rule: "true",
+                    defaultAction: true,
+                  },
+                ]
+              : [
+                  {
+                    icon: "far fa-download",
+                    name:
+                      (this.props.service.installationType === "forInstall" &&
+                        "Install") ||
+                      "Uninstall",
+                    callback: (data) => {
+                      // this.props.setService({
+                      //   service: this.props.service.setOrganization(data),
+                      // });
+                      this.props?.installOrUninstall(data);
+                    },
+                    rule: "true",
+                    defaultAction: true,
+                  },
+                  {
+                    icon: "far fa-pencil",
+                    name: "Edit",
+                    callback: (data) => {
+                      this.props.setService({
+                        service:
+                          this.props.service.updateOrganizationData(data),
+                      });
+                    },
+                    rule: "true",
+                  },
+                ]
+          }
+        />
+      )) ||
+      null
     );
   }
 }

@@ -117,14 +117,14 @@ content:
                                 params:
                                     app_uuid: '{{uuid}}'
                     icon: 'far fa-download'
-                # -
-                #     name: For Install
-                #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
-                #     details:
-                #         -
-                #             params:
-                #                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
-                #     icon: 'far fa-download'
+                -
+                    name: Install or Uninstall Application
+                    rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
+                    details:
+                        -
+                            params:
+                                page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
+                    icon: 'far fa-download'
                 # -
                 #     name: Installed
                 #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'

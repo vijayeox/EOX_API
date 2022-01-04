@@ -41,4 +41,8 @@ export class InstallManagerService {
     }
     return this;
   }
+  setInstallationType(type = 'forInstall'){
+    this.installationType = type;
+    return this;
+  }
 }
