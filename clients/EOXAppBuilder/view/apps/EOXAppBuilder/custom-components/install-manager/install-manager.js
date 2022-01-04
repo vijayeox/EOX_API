@@ -456,20 +456,27 @@ class BusinessRoles extends React.Component {
     };
   }
   async componentDidMount() {
-    return;
     try {
-      let { status, data } = await this.api.request(
+      const [entity,roles] = await Promise.all([this.api.request(
         "v1",
         `/app/${this.service.parentData?.uuid}/entity`,
         {},
         "get"
-      );
+      ),this.api.request(
+        "v1",
+        `/app/${this.service.parentData?.uuid}/appBusinessRoles`,
+        {},
+        "get"
+      )])
       // data = JSON.parse(data[0]["start_options"]);
-      if (status === "success") {
+      // if (status === "success") {
         this.setState({
-          data,
-        });
-      }
+          data : {
+            businessRole : roles.data,
+            entity : entity.data,
+          },
+        },console.log);
+      // }
     } catch (e) {
       this.setState({
         data: {},
@@ -478,19 +485,19 @@ class BusinessRoles extends React.Component {
     }
   }
   render() {
-    return this.state.data || 1 ? (
+    return this.state.data ? (
       <FormRender
         content={businessForm}
         core={this.core}
         postSubmitCallback={(data) => {
           this.setService({ service: this.service.setBusinessRoles(data) });
         }}
-        dataUrl={
-          this.service.businessRoles
-            ? null
-            : `/app/${this.service.parentData?.uuid}/entity`
-        }
-        data={this.service.businessRoles}
+        // dataUrl={
+        //   this.service.businessRoles
+        //     ? null
+        //     : `/app/${this.service.parentData?.uuid}/appBusinessRoles`
+        // }
+        data={this.state.data}
         updateFormData={true}
       />
     ) : null;
