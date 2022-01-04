@@ -1,0 +1,6 @@
+Place for Upgrade files
+
+cd to data/appupgrade folder from API docker bash and run
+ln -s ../../../../clients/Dive\ Insurance/data/appupgrade/ ./{{APP_ID}}
+
+Get APP_ID from your database, ox_app table

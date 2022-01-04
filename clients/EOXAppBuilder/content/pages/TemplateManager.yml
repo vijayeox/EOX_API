@@ -35,6 +35,21 @@ content:
                                 disableAppId: true
                     icon: 'fas fa-trash-alt' 
                     updateOnly: true
+                -
+                    name: Download
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            method: "GET"
+                            successMessage: "Template downloaded successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/download/template/{{name}}.tpl'
+                                disableAppId: true
+                                downloadFile: true
+                    icon: 'fa fa-download' 
+                    updateOnly: true
             operations:
                 title: "Import template"
                 actions:

@@ -261,7 +261,7 @@ class AppController extends AbstractApiController
         $serviceType = $data['serviceType'];
         $this->log->info(__CLASS__ . "-> \n Create App Registry- " . print_r($data, true) . "Parameters - " . print_r($params, true));
         try {
-            $count = $this->appService->installAppToOrg($data['appId'], $data['accountId'], $serviceType);
+            $count = $this->appService->installAppToOrg($data['appId'], $data['accountId'], $serviceType, $data);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);

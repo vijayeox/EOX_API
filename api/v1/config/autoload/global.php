@@ -87,6 +87,7 @@ return [
         "tripleDESEncryptedPassword" => "9srGG5hflGT0aDrgsxs3GQ=="
     ],
     'DELEGATE_FOLDER'=>__DIR__.'/../../data/delegate/',
+    'UPGRADE_FOLDER' =>__DIR__.'/../../data/appupgrade/',
     'ENTITY_FOLDER'=>__DIR__.'/../../data/entity/',
     'FORM_FOLDER'=>__DIR__.'/../../data/forms/',
     'PAGE_FOLDER'=>__DIR__.'/../../data/pages/',
