@@ -512,13 +512,13 @@ class AppService extends AbstractService implements AppUpgrade
         }
     }
 
-    public function installAppToOrg($appId, $accountId, $serviceType)
+    public function installAppToOrg($appId, $accountId, $serviceType, $data = null)
     {
         $destination = $this->getAppSourceAndDeployDirectory($appId);
         $ymlData = self::loadAppDescriptor($destination['deployDir']);
         switch ($serviceType) {
             case 'install':
-                $this->installApp($accountId, $ymlData, $destination['deployDir']);
+                $this->installApp($accountId, $ymlData, $destination['deployDir'], $data);
                 break;
             case 'uninstall':
                 $this->uninstallApp($accountId, $ymlData, $destination['deployDir']);
@@ -529,7 +529,7 @@ class AppService extends AbstractService implements AppUpgrade
         }
     }
 
-    private function installApp($accountId, $yamlData, $path)
+    private function installApp($accountId, $yamlData, $path, $data=null)
     {
         try {
             $this->beginTransaction();
@@ -541,7 +541,7 @@ class AppService extends AbstractService implements AppUpgrade
                 $this->userService->addAppRolesToUser($user['accountUserId'], $appId);
             }
             $yamlData['org'] = isset($yamlData['org']) ? $yamlData['org'] : null;
-            $startOptions = $this->getAppStartOptions($appId, $yamlData['org'] );
+            $startOptions = $this->getAppStartOptions($appId, $yamlData['org'], $data);
             $result = $this->appRegistryService->createAppRegistry($appId, $accountId, $startOptions);
             $this->logger->info("PATH--- $path");
             $this->setupAccountFiles($path, $accountId, $appId);
@@ -558,7 +558,7 @@ class AppService extends AbstractService implements AppUpgrade
         }
     }
 
-    public function getAppStartOptions($appId, $yamlOrgData)
+    public function getAppStartOptions($appId, $yamlOrgData,$data)
     {
         $appStartOptions = $this->getDataByParams('ox_app', array('start_options'), array('uuid' => $appId))->toArray();
         if (count($appStartOptions) > 0) {
@@ -582,8 +582,19 @@ class AppService extends AbstractService implements AppUpgrade
         if (!isset($ymlOrgStartOptions)) {
             $ymlOrgStartOptions = [];
         }
+        $startOptions = array_merge($startOptions, $ymlOrgStartOptions);
+        if (isset($data['start_options'])) {
+            if (is_string($data['start_options'])) {
+                $dataStartOptions = json_decode($data['start_options'], true);
+            } else {
+                $dataStartOptions = $data['start_options'];
+            }
+        }
+        if (!isset($dataStartOptions)) {
+            $dataStartOptions = [];
+        }
 
-        return array_merge($startOptions, $ymlOrgStartOptions);
+        return array_merge($startOptions, $dataStartOptions);
     }
 
     public function processJobsForAccount($appId, $accountId)
