@@ -7,6 +7,7 @@ import {
 } from "oxziongui";
 import * as OxzionGUIComponents from "oxziongui";
 import UploadArtifact from "../../../../gui/UploadArtifact";
+import businessForm from "./business-roles-form.json";
 import "./install-manager.scss";
 import form from "./metadata-form.json";
 import accountForm from "./account-form.json";
@@ -63,21 +64,26 @@ class AppInstaller extends React.Component {
       }`,
     });
     if (succeeded) {
-      this.setState({
-        service: this.state.service.setOrganization(false),
-      });
+      this.setState(
+        {
+          service: this.state.service
+            .setOrganization(false)
+            .setMetadata(false)
+            .setBusinessRoles(false),
+        },
+        () => this.updateType(this.state.service.installationType)
+      );
     }
   }
-  updateType(type) {
+  async updateType(type) {
     this.setState({
       service: this.state.service.setInstallationType(type),
       orgReady: false,
     });
-    setTimeout(() => {
-      this.setState({
-        orgReady: true,
-      });
-    }, 100);
+    await new Promise((r) => setTimeout(r, 100));
+    this.setState({
+      orgReady: true,
+    });
   }
   render() {
     return (
@@ -152,6 +158,12 @@ class AppInstaller extends React.Component {
                     service={this.state.service}
                     setService={this.setState.bind(this)}
                   />
+                )) ||
+                (!this.state.service.businessRoles && (
+                  <BusinessRoles
+                    service={this.state.service}
+                    setService={this.setState.bind(this)}
+                  />
                 )) || (
                   <Template
                     service={this.state.service}
@@ -163,6 +175,7 @@ class AppInstaller extends React.Component {
         </div>
         {
           this.state.service.metaData &&
+            this.state.service.businessRoles &&
             this.state.service.installationType === "forInstall" && (
               <button
                 className="install-manager_submit"
@@ -428,5 +441,58 @@ class Organization extends React.Component {
       )) ||
       null
     );
+  }
+}
+
+class BusinessRoles extends React.Component {
+  constructor(props) {
+    super(props);
+    this.service = this.props.service;
+    this.setService = this.props.setService;
+    this.core = this.service.core;
+    this.api = this.core.make("oxzion/restClient");
+    this.state = {
+      data: null,
+    };
+  }
+  async componentDidMount() {
+    return;
+    try {
+      let { status, data } = await this.api.request(
+        "v1",
+        `/app/${this.service.parentData?.uuid}/entity`,
+        {},
+        "get"
+      );
+      // data = JSON.parse(data[0]["start_options"]);
+      if (status === "success") {
+        this.setState({
+          data,
+        });
+      }
+    } catch (e) {
+      this.setState({
+        data: {},
+      });
+      console.error(e);
+    }
+  }
+  render() {
+    return this.state.data || 1 ? (
+      <FormRender
+        content={businessForm}
+        core={this.core}
+        postSubmitCallback={(data) => {
+          this.setService({ service: this.service.setBusinessRoles(data) });
+        }}
+        dataUrl={
+          this.service.businessRoles
+            ? null
+            : `/app/${this.service.parentData?.uuid}/entity`
+        }
+        data={this.service.businessRoles}
+        updateFormData={true}
+      />
+    ) : null;
   }
 }

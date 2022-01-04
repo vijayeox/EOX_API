@@ -116,6 +116,22 @@ content:
                                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
                     icon: 'far fa-download'
                 -
+                    name: Install or Uninstall Application
+                    rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
+                    details:
+                        -
+                            params:
+                                page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
+                    icon: 'far fa-download'
+                # -
+                #     name: Installed
+                #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
+                #     details:
+                #         -
+                #             params:
+                #                 page_id: '83c014a0-54d4-4dd1-9ebf-55680b5e7d71'
+                #     icon: 'far fa-download'
+                -
                     name: Delete
                     rule: '''{{status}}'' !== 1'
                     confirmationMessage: "Are you sure ?."

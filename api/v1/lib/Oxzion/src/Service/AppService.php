@@ -1138,7 +1138,7 @@ class AppService extends AbstractService implements AppUpgrade
                 FileUtils::chmod_r($link, 0777);
                 FileUtils::copyDir($source, $link);
             } else {
-                FileUtils::copyOnlyNewFiles($source, $link);
+                // FileUtils::copyOnlyNewFiles($source, $link);
             }
         }
     }
