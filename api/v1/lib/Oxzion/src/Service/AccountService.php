@@ -595,7 +595,7 @@ class AccountService extends AbstractService
         $cntQuery = "SELECT count(og.id) " . $from;
         if (count($filterParams) > 0 || sizeof($filterParams) > 0) {
             $filterArray = json_decode($filterParams['filter'], true);
-            $where = $this->createWhereClause($filterArray, self::$accountField);
+            $where .= $this->createWhereClause($filterArray, self::$accountField);
             if (isset($filterArray[0]['sort']) && count($filterArray[0]['sort']) > 0) {
                 $sort = $this->createSortClause($filterArray[0]['sort'], self::$accountField);
             }
