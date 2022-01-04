@@ -513,11 +513,13 @@
 			"cancel": true,
 			"next": true
 		},
+		"scrollToTop": false,
 		"collapsible": false,
-		"tableView": false,
 		"key": "organizationInfo",
+		"customConditional": "show = false;",
 		"type": "panel",
 		"label": "Organization Info",
+		"tableView": false,
 		"input": false,
 		"components": [{
 			"label": "Do you want to add organization information",
@@ -1511,6 +1513,71 @@
 										"input": false,
 										"tableView": false,
 										"hideOnChildrenHidden": false
+									}, {
+										"label": "Identifiers",
+										"reorder": false,
+										"addAnotherPosition": "bottom",
+										"layoutFixed": false,
+										"enableRowGroups": false,
+										"initEmpty": false,
+										"hideLabel": true,
+										"tableView": false,
+										"defaultValue": [{
+											"identifier": ""
+										}],
+										"key": "identifiers",
+										"type": "datagrid",
+										"input": true,
+										"components": [{
+											"label": "Identifier field",
+											"tableView": true,
+											"clearOnHide": false,
+											"key": "identifier",
+											"logic": [{
+												"name": "If File Comments enabled",
+												"trigger": {
+													"type": "simple",
+													"simple": {
+														"show": true,
+														"when": "app.chat_notification",
+														"eq": "true"
+													}
+												},
+												"actions": [{
+													"name": "Set Mandatory",
+													"type": "property",
+													"property": {
+														"label": "Required",
+														"value": "validate.required",
+														"type": "boolean"
+													},
+													"state": true
+												}]
+											}, {
+												"name": "If File Comments not enabled",
+												"trigger": {
+													"type": "simple",
+													"simple": {
+														"show": true,
+														"when": "app.chat_notification",
+														"eq": "false"
+													}
+												},
+												"actions": [{
+													"name": "Set it to Non-mandatory",
+													"type": "property",
+													"property": {
+														"label": "Required",
+														"value": "validate.required",
+														"type": "boolean"
+													},
+													"state": false
+												}]
+											}],
+											"type": "textfield",
+											"input": true,
+											"hideOnChildrenHidden": false
+										}]
 									}, {
 										"label": "Message Title",
 										"placeholder": "Ex: ${entity_name}${identifier_field}",
@@ -2511,7 +2578,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 784,
+	"_vid": 788,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2595,6 +2662,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2021-12-23T06:35:28.335Z",
+	"modified": "2022-01-04T10:20:52.843Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
