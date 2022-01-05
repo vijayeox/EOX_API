@@ -4,26 +4,6 @@
 	"tags": [],
 	"owner": "6022c8ed8a3c363aa2fbe5ef",
 	"components": [{
-		"label": "Entity",
-		"widget": "choicesjs",
-		"tableView": true,
-		"dataSrc": "url",
-		"data": {
-			"url": "/entity",
-			"headers": [{
-				"key": "",
-				"value": ""
-			}]
-		},
-		"idPath": "name",
-		"template": "<span style=\"display: flex; align-items: flex-start\">\n  <div style=\"padding-left: 5px\">\n    <div style=\"font-weight: bold\">{{item.name}}</div>\n  </div>\n</span>",
-		"clearOnHide": false,
-		"key": "entity",
-		"type": "select",
-		"selectValues": "name",
-		"input": true,
-		"disableLimit": false
-	}, {
 		"title": "Business Offering",
 		"breadcrumbClickable": true,
 		"buttonSettings": {
@@ -61,13 +41,9 @@
 						"label": "Business Role",
 						"widget": "choicesjs",
 						"tableView": true,
-						"dataSrc": "url",
+						"dataSrc": "custom",
 						"data": {
-							"url": "/appBusinessRoles",
-							"headers": [{
-								"key": "",
-								"value": ""
-							}]
+							"custom": "values=data['businessRole']"
 						},
 						"idPath": "name",
 						"template": "<span style=\"display: flex; align-items: flex-start\">\n  <div style=\"padding-left: 5px\">\n    <div style=\"font-weight: bold\">{{item.name}}</div>\n  </div>\n</span>",
@@ -75,10 +51,7 @@
 						"calculateValue": "console.log(\"BUSINESS FORM\");\nconsole.log(data);",
 						"key": "businessRole",
 						"type": "select",
-						"selectValues": "name",
-						"input": true,
-						"lazyLoad": false,
-						"disableLimit": false
+						"input": true
 					}],
 					"width": 6,
 					"offset": 0,
@@ -91,22 +64,16 @@
 						"label": "Entity",
 						"widget": "choicesjs",
 						"tableView": true,
-						"dataSrc": "url",
+						"dataSrc": "custom",
 						"data": {
-							"url": "/entity",
-							"headers": [{
-								"key": "",
-								"value": ""
-							}]
+							"custom": "values=data['entity']"
 						},
 						"idPath": "name",
 						"template": "<span style=\"display: flex; align-items: flex-start\">\n  <div style=\"padding-left: 5px\">\n    <div style=\"font-weight: bold\">{{item.name}}</div>\n  </div>\n</span>",
 						"clearOnHide": false,
 						"key": "entity",
 						"type": "select",
-						"selectValues": "name",
-						"input": true,
-						"disableLimit": false
+						"input": true
 					}],
 					"width": 6,
 					"offset": 0,
@@ -147,6 +114,6 @@
 	"path": "appbusinessroletoaccountform",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2022-01-05T06:12:19.325Z",
-	"modified": "2022-01-05T07:18:30.159Z",
+	"modified": "2022-01-05T08:24:43.385Z",
 	"machineName": "onboarding-eoxvantage:appBusinessRoleToAccountForm"
 }

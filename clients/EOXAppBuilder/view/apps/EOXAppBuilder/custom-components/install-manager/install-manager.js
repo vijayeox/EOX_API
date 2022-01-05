@@ -51,6 +51,7 @@ class AppInstaller extends React.Component {
         ? {
             ...this.state.service.parentData,
             start_options: this.state.service.metaData,
+            businessOffering: this.state.service.businessRoles
           }
         : this.state.service.parentData,
       "post"
@@ -471,8 +472,8 @@ class BusinessRoles extends React.Component {
       // if (status === "success") {
         this.setState({
           data : {
-            businessRole : roles.data,
-            entity : entity.data,
+              businessRole : roles.data,
+              entity :entity.data
           },
         },console.log);
       // }
@@ -489,7 +490,12 @@ class BusinessRoles extends React.Component {
         content={businessForm}
         core={this.core}
         postSubmitCallback={(data) => {
-          this.setService({ service: this.service.setBusinessRoles(data) });
+          let offering = data.dataGrid.map(({businessRole, entity}) => {
+            return {
+              businessRole : businessRole?.name || '', entity
+            }
+          })
+          this.setService({ service: this.service.setBusinessRoles(offering) });
         }}
         // dataUrl={
         //   this.service.businessRoles
