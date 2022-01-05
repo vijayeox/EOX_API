@@ -174,12 +174,13 @@
 		"label": "Columns",
 		"columns": [{
 			"components": [{
-				"label": "Submit",
+				"label": "Next",
 				"showValidations": false,
 				"tableView": false,
 				"key": "submit",
 				"type": "button",
-				"input": true
+				"input": true,
+				"saveOnEnter": false
 			}],
 			"width": 6,
 			"offset": 0,
@@ -217,6 +218,6 @@
 	"path": "appinstallermetadata",
 	"project": "5dc1489e4f668513e9535090",
 	"created": "2021-12-22T05:33:06.199Z",
-	"modified": "2022-01-04T08:38:52.334Z",
+	"modified": "2022-01-05T06:30:18.267Z",
 	"machineName": "eoxproductsupport:appInstallerMetadata"
 }

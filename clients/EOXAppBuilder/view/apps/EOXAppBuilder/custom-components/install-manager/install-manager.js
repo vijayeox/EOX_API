@@ -7,6 +7,7 @@ import {
 } from "oxziongui";
 import * as OxzionGUIComponents from "oxziongui";
 import UploadArtifact from "../../../../gui/UploadArtifact";
+import businessForm from "./business-roles-form.json";
 import "./install-manager.scss";
 import form from "./metadata-form.json";
 import accountForm from "./account-form.json";
@@ -39,8 +40,8 @@ class AppInstaller extends React.Component {
       orgReady: true,
     };
   }
-  async installOrUninstall(org) {
-    const isInstall = this.state.service.installationType === "forInstall";
+  async installOrUninstall(org, update) {
+    const isInstall = this.state.service.installationType === "forInstall" || update;
     const { status } = await this.helper.request(
       "v1",
       `app/${this.state.service.parentData.uuid}/${
@@ -50,6 +51,7 @@ class AppInstaller extends React.Component {
         ? {
             ...this.state.service.parentData,
             start_options: this.state.service.metaData,
+            businessOffering: this.state.service.businessRoles
           }
         : this.state.service.parentData,
       "post"
@@ -63,21 +65,26 @@ class AppInstaller extends React.Component {
       }`,
     });
     if (succeeded) {
-      this.setState({
-        service: this.state.service.setOrganization(false),
-      });
+      this.setState(
+        {
+          service: this.state.service
+            .setOrganization(false)
+            .setMetadata(false)
+            .setBusinessRoles(false),
+        },
+        () => this.updateType(this.state.service.installationType)
+      );
     }
   }
-  updateType(type) {
+  async updateType(type) {
     this.setState({
       service: this.state.service.setInstallationType(type),
       orgReady: false,
     });
-    setTimeout(() => {
-      this.setState({
-        orgReady: true,
-      });
-    }, 100);
+    await new Promise((r) => setTimeout(r, 100));
+    this.setState({
+      orgReady: true,
+    });
   }
   render() {
     return (
@@ -152,6 +159,12 @@ class AppInstaller extends React.Component {
                     service={this.state.service}
                     setService={this.setState.bind(this)}
                   />
+                )) ||
+                (!this.state.service.businessRoles && (
+                  <BusinessRoles
+                    service={this.state.service}
+                    setService={this.setState.bind(this)}
+                  />
                 )) || (
                   <Template
                     service={this.state.service}
@@ -163,10 +176,10 @@ class AppInstaller extends React.Component {
         </div>
         {
           this.state.service.metaData &&
-            this.state.service.installationType === "forInstall" && (
+            this.state.service.businessRoles && (
               <button
                 className="install-manager_submit"
-                onClick={() => this.installOrUninstall()}
+                onClick={() => this.installOrUninstall(null, true)}
               >
                 {this.state.service.installationType === "forInstall"
                   ? "Install"
@@ -428,5 +441,75 @@ class Organization extends React.Component {
       )) ||
       null
     );
+  }
+}
+
+class BusinessRoles extends React.Component {
+  constructor(props) {
+    super(props);
+    this.service = this.props.service;
+    this.setService = this.props.setService;
+    this.core = this.service.core;
+    this.api = this.core.make("oxzion/restClient");
+    this.state = {
+      data: null,
+    };
+  }
+  async componentDidMount() {
+    try {
+      const [entity,roles] = await Promise.all([this.api.request(
+        "v1",
+        `/app/${this.service.parentData?.uuid}/entity`,
+        {},
+        "get"
+      ),this.api.request(
+        "v1",
+        `/app/${this.service.parentData?.uuid}/appBusinessRoles`,
+        {},
+        "get"
+      )])
+      // data = JSON.parse(data[0]["start_options"]);
+      // if (status === "success") {
+        this.setState({
+          data : {
+              businessRole : roles.data,
+              entity :entity.data
+          },
+        },console.log);
+      // }
+    } catch (e) {
+      this.setState({
+        data: {},
+      });
+      console.error(e);
+    }
+  }
+  render() {
+    return this.state.data ? (
+      <FormRender
+        content={businessForm}
+        core={this.core}
+        postSubmitCallback={(data) => {
+          let offering = data.dataGrid.map(({businessRole, dataGridOld}) => {
+            const entity = {};
+            const entities = dataGridOld.forEach((v,i) => {
+              // return {[i] : v.entity}
+              entity[i] = v.entity;
+            })
+            return {
+              businessRole : businessRole? businessRole : '', entity
+            }
+          })
+          this.setService({ service: this.service.setBusinessRoles(offering) });
+        }}
+        // dataUrl={
+        //   this.service.businessRoles
+        //     ? null
+        //     : `/app/${this.service.parentData?.uuid}/appBusinessRoles`
+        // }
+        data={this.state.data}
+        updateFormData={true}
+      />
+    ) : null;
   }
 }

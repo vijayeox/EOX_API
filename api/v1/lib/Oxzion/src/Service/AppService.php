@@ -534,6 +534,9 @@ class AppService extends AbstractService implements AppUpgrade
         try {
             $this->beginTransaction();
             $appId = $yamlData['app']['uuid'];
+            if( !isset($yamlData['org']) && isset($data['businessOffering'])){
+                $yamlData['org']['businessOffering'] = $data['businessOffering'];
+            }
             $bRoleResult = ((isset($yamlData['org']))) ? $this->accountService->setupBusinessOfferings($yamlData['org'], $accountId, $appId) : null;
             $this->createRole($yamlData, false, $accountId, $bRoleResult);
             $user = $this->accountService->getContactUserForAccount($accountId);
@@ -1784,5 +1787,9 @@ class AppService extends AbstractService implements AppUpgrade
         }else{
             return $this->accountService->getAccounts($data['filterParams'],null,$data['serviceType']);
         }
+    }
+
+    public function getAppBusinessRole($appId){
+        return $this->businessRoleService->getBusinessRoleByName($appId);
     }
 }

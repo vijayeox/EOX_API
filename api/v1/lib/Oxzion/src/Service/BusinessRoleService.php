@@ -69,12 +69,16 @@ class BusinessRoleService extends AbstractService
         return $businessRole->toArray();
     }
 
-    public function getBusinessRoleByName($appId, $name)
+    public function getBusinessRoleByName($appId, $name=null)
     {
         $query = "select br.* from ox_business_role br 
                     inner join ox_app a on a.id = br.app_id 
-                    where a.uuid = :appId and br.name = :name";
-        $params = ["appId" => $appId, "name" => $name];
+                    where a.uuid = :appId";
+        $params = ["appId" => $appId];
+        if(isset($name)){
+            $query .= " and br.name = :name";
+            $params['name'] = $name;
+        }  
         $result = $this->executeQueryWithBindParameters($query, $params)->toArray();
         return $result;
     }
