@@ -294,9 +294,13 @@ class AppArtifactService extends AbstractService
         $files = array();
         if ($handle = opendir($targetDir)) {
             while (false !== ($entry = readdir($handle))) {
+                //echo "TEST WHILE";
                 if ($entry != "." && $entry != "..") {
+                    //echo "TEST FOLDER";
                     $ext = pathinfo($entry, PATHINFO_EXTENSION);
+                    //echo $ext;
                     if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && $artifactType == 'delegate') || ($ext == 'tpl' && $artifactType == 'template')) {
+                        //echo "TEST";
                         $files[] = array(
                             'name' => substr($entry, 0, strrpos($entry, '.')) ,
                             'content'=> file_get_contents($targetDir.$entry)
@@ -306,6 +310,7 @@ class AppArtifactService extends AbstractService
             }
             closedir($handle);
         }
+        //print_r($files);
         return $files;
     }
 
