@@ -40,8 +40,8 @@ class AppInstaller extends React.Component {
       orgReady: true,
     };
   }
-  async installOrUninstall(org) {
-    const isInstall = this.state.service.installationType === "forInstall";
+  async installOrUninstall(org, update) {
+    const isInstall = this.state.service.installationType === "forInstall" || update;
     const { status } = await this.helper.request(
       "v1",
       `app/${this.state.service.parentData.uuid}/${
@@ -175,11 +175,10 @@ class AppInstaller extends React.Component {
         </div>
         {
           this.state.service.metaData &&
-            this.state.service.businessRoles &&
-            this.state.service.installationType === "forInstall" && (
+            this.state.service.businessRoles && (
               <button
                 className="install-manager_submit"
-                onClick={() => this.installOrUninstall()}
+                onClick={() => this.installOrUninstall(null, true)}
               >
                 {this.state.service.installationType === "forInstall"
                   ? "Install"
