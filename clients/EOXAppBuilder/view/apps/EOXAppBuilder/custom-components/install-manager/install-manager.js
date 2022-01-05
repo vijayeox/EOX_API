@@ -490,9 +490,9 @@ class BusinessRoles extends React.Component {
         content={businessForm}
         core={this.core}
         postSubmitCallback={(data) => {
-          let offering = data.dataGrid.map(({businessRole, entity}) => {
+          let offering = data.dataGrid.map(({businessRole, dataGridOld}) => {
             return {
-              businessRole : businessRole?.name || '', entity
+              businessRole : businessRole ? businessRole : '' , entity : dataGridOld
             }
           })
           this.setService({ service: this.service.setBusinessRoles(offering) });

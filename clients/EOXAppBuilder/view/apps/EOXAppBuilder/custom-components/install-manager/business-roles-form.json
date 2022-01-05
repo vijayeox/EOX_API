@@ -46,6 +46,7 @@
 							"custom": "values=data['businessRole']"
 						},
 						"idPath": "name",
+						"valueProperty": "name",
 						"template": "<span style=\"display: flex; align-items: flex-start\">\n  <div style=\"padding-left: 5px\">\n    <div style=\"font-weight: bold\">{{item.name}}</div>\n  </div>\n</span>",
 						"clearOnHide": false,
 						"calculateValue": "console.log(\"BUSINESS FORM\");\nconsole.log(data);",
@@ -61,19 +62,36 @@
 					"currentWidth": 6
 				}, {
 					"components": [{
-						"label": "Entity",
-						"widget": "choicesjs",
-						"tableView": true,
-						"dataSrc": "custom",
-						"data": {
-							"custom": "values=data['entity']"
-						},
-						"idPath": "name",
-						"template": "<span style=\"display: flex; align-items: flex-start\">\n  <div style=\"padding-left: 5px\">\n    <div style=\"font-weight: bold\">{{item.name}}</div>\n  </div>\n</span>",
-						"clearOnHide": false,
-						"key": "entity",
-						"type": "select",
-						"input": true
+						"label": "Data Grid",
+						"reorder": false,
+						"addAnotherPosition": "bottom",
+						"layoutFixed": false,
+						"enableRowGroups": false,
+						"initEmpty": false,
+						"hideLabel": true,
+						"tableView": false,
+						"defaultValue": [{
+							"entity": ""
+						}],
+						"key": "dataGridOld",
+						"type": "datagrid",
+						"input": true,
+						"components": [{
+							"label": "Entity",
+							"widget": "choicesjs",
+							"tableView": true,
+							"dataSrc": "custom",
+							"data": {
+								"custom": "values=data['entity']"
+							},
+							"idPath": "name",
+							"valueProperty": "name",
+							"template": "<span style=\"display: flex; align-items: flex-start\">\n  <div style=\"padding-left: 5px\">\n    <div style=\"font-weight: bold\">{{item.name}}</div>\n  </div>\n</span>",
+							"clearOnHide": false,
+							"key": "entity",
+							"type": "select",
+							"input": true
+						}]
 					}],
 					"width": 6,
 					"offset": 0,
@@ -114,6 +132,6 @@
 	"path": "appbusinessroletoaccountform",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2022-01-05T06:12:19.325Z",
-	"modified": "2022-01-05T08:24:43.385Z",
+	"modified": "2022-01-05T11:02:54.021Z",
 	"machineName": "onboarding-eoxvantage:appBusinessRoleToAccountForm"
 }
