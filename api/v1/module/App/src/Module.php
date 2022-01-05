@@ -129,7 +129,8 @@ class Module implements ConfigProviderInterface
                     return new Controller\AppRegisterController(
                         $container->get(\Oxzion\Model\AppTable::class),
                         $container->get(\Oxzion\Service\AppService::class),
-                        $container->get(AdapterInterface::class)
+                        $container->get(AdapterInterface::class),
+                        $container->get(\Oxzion\Service\AppRegistryService::class)
                     );
                 },
                 Controller\AppDelegateController::class => function ($container) {

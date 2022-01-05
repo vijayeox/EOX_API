@@ -1,6 +1,10 @@
 name: 'Account Installer'
 description: 'Shows a list of Accounts to install the Application'
 content:
+        # -
+        #     type: ReactComponent
+        #     content:
+        #         reactId: 'installManager'
         -
             type: List
             content:

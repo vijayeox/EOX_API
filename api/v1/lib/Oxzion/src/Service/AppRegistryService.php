@@ -48,4 +48,22 @@ class AppRegistryService extends AbstractService
         $this->executeUpdateWithBindParameters($updateQuery, $params);
         return 0;
     }
+
+    public function getAppProperties($data){
+        $queryString = "SELECT oar.start_options
+                    FROM ox_app_registry oar
+                    INNER JOIN ox_app oa ON oa.id = oar.app_id
+                    INNER JOIN ox_account oxa ON oxa.id = oar.account_id
+                    WHERE oa.uuid =:appId AND oxa.uuid =:accountId";
+        $params = ['appId' => $data['appId'],'accountId' => $data['accountId']];
+        $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
+        if (count($resultSet) == 0) {
+            $queryString = "SELECT oa.start_options
+                            FROM ox_app oa
+                            WHERE oa.uuid =:appId";
+            $params = ['appId' => $data['appId']];
+            $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
+        }
+        return $resultSet;
+    }
 }
