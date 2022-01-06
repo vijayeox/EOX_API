@@ -49,6 +49,16 @@ class AppArtifactControllerTest extends ControllerTest
         $this->assertTrue(preg_match($contentTypeRegex, $contentTypeHeader) ? true : false);
     }
 
+    protected function runDefaultAssertsDownload()
+    {
+        $this->assertModuleName('App');
+        $this->assertControllerClass('AppArtifactController');
+        $this->assertControllerName('App\Controller\AppArtifactController');
+        $contentTypeHeader = $this->getResponseHeader('content-type')->toString();
+        $contentTypeRegex = '/application\/octet-stream(;? *?charset=utf-8)?/i';
+        //$this->assertTrue(preg_match($contentTypeRegex, $contentTypeHeader) ? true : false);
+    }
+
     private function setupAppSourceDir($ymlData)
     {
         $appService = $this->getApplicationServiceLocator()->get(AppService::class);
@@ -150,7 +160,7 @@ class AppArtifactControllerTest extends ControllerTest
     }
 
 
-    /* HARI */
+    
 
     public function testArtifactAddAppIcon()
     {
@@ -813,7 +823,7 @@ class AppArtifactControllerTest extends ControllerTest
         $this->assertEquals('Application source directory is not found.', $content['message']);
         $this->assertEquals($appSourceDir, $content['data']['directory']);
     }
-    /* HARI */
+    
 
     /* COMMENTING THIS FOR NOW AS THE ADD FORM LOGIC ALLOWS DUPLICATES
      public function testArtifactAddFormWithDuplicateFileName() {
@@ -1185,7 +1195,7 @@ class AppArtifactControllerTest extends ControllerTest
         $this->assertEquals($artifactFile, $content['data']['file']);
     }
 
-    /* HARI */
+    
 
     public function testArtifactDeleteDelegate()
     {
@@ -1399,7 +1409,184 @@ class AppArtifactControllerTest extends ControllerTest
         $this->assertEquals($artifactFile, $content['data']['file']);
     }
 
-    /* HARI */
+    public function testArtifactDownloadDelegate()
+    {
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        //Setup data and application source directory.
+        $data = [
+            'app' => [
+                'name' => 'Test Application',
+                'uuid' => $uuid,
+                'type' => 2,
+                'category' => 'TestCategory',
+                'logo' => 'app.png'
+            ]
+        ];
+        $this->setupAppSourceDir($data);
+        $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
+        $fileName = 'AddDelegateTest.php';
+        $filePath = __DIR__ . '/../../Dataset/' . $fileName;
+        $targetPath = $appSourceDir . '/data/delegate/' . $fileName;
+        if (!copy($filePath, $targetPath)) {
+            throw new Exception("Failed to copy file ${filePath} to ${targetPath}.");
+        }
+
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/download/delegate/${fileName}", 'GET');
+        $this->runDefaultAssertsDownload();
+        //$content = $this->getResponse();
+        $response = $this->getResponse();
+        $headers = $response->getHeaders();
+        $this->assertEquals(
+            'application/octet-stream',
+            $headers->get('content-type')->getFieldValue()
+        );
+        $this->assertEquals(
+            'attachment; filename="' . $fileName . '"',
+            $headers->get('content-disposition')->getFieldValue()
+        );
+
+        //print_r($content);
+        //die;
+        //$this->assertEquals('success', $content['status']);
+        //$this->assertTrue($content->headers->headers[1]->get('content-disposition') == 'attachment; filename=' . $fileName . '');
+        //Ensure file is NOT found in the location.
+        $this->assertTrue(file_exists($targetPath));
+    }
+
+    public function testArtifactDownloadDelegateWrongUuid()
+    {
+        $uuid = '11111111-1111-1111-1111-111111111112';
+        $fileName = 'AddDelegateTest.php';
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/download/delegate/${fileName}", 'GET');
+        $this->runDefaultAssertsDownload();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals('error', $content['status']);
+        $this->assertEquals(404, $content['errorCode']);
+        $this->assertEquals('ox_app', $content['data']['entity']);
+        $this->assertEquals($uuid, $content['data']['uuid']);
+    }
+
+    public function testArtifactDownloadDelegateWithoutAppSourceDir()
+    {
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $fileName = 'AddDelegateTest.php';
+        //Setup data.
+        $data = [
+            'app' => [
+                'name' => 'Test Application',
+                'uuid' => $uuid,
+                'type' => 2,
+                'category' => 'TestCategory',
+                'logo' => 'app.png'
+            ]
+        ];
+        //Ensure app source dir does not exist.
+        $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
+        try {
+            FileUtils::rmDir($appSourceDir);
+        } catch (Exception $ignored) {
+        }
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/download/delegate/${fileName}", 'GET');
+        $this->runDefaultAssertsDownload();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals('error', $content['status']);
+        $this->assertEquals(404, $content['errorCode']);
+        $this->assertEquals('Application source directory is not found.', $content['message']);
+        $this->assertEquals($appSourceDir, $content['data']['directory']);
+    }
+
+    public function testArtifactDownloadTemplate()
+    {
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        //Setup data and application source directory.
+        $data = [
+            'app' => [
+                'name' => 'Test Application',
+                'uuid' => $uuid,
+                'type' => 2,
+                'category' => 'TestCategory',
+                'logo' => 'app.png'
+            ]
+        ];
+        $this->setupAppSourceDir($data);
+        $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
+        $fileName = 'AddTemplateTest.tpl';
+        $filePath = __DIR__ . '/../../Dataset/' . $fileName;
+        $targetPath = $appSourceDir . '/data/template/' . $fileName;
+        if (!copy($filePath, $targetPath)) {
+            throw new Exception("Failed to copy file ${filePath} to ${targetPath}.");
+        }
+
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/download/template/${fileName}", 'GET');
+        $this->runDefaultAssertsDownload();
+        //$content = $this->getResponse();
+        $response = $this->getResponse();
+        $headers = $response->getHeaders();
+        $this->assertEquals(
+            'application/octet-stream',
+            $headers->get('content-type')->getFieldValue()
+        );
+        $this->assertEquals(
+            'attachment; filename="' . $fileName.'"',
+            $headers->get('content-disposition')->getFieldValue()
+        );
+        //print_r($content);
+        //die;
+        //$this->assertEquals('success', $content['status']);
+        //$this->assertTrue($content->headers->headers[1]->get('content-disposition') == 'attachment; filename=' . $fileName . '');
+        //Ensure file is NOT found in the location.
+        $this->assertTrue(file_exists($targetPath));
+    }
+
+    public function testArtifactDownloadTemplateWrongUuid()
+    {
+        $uuid = '11111111-1111-1111-1111-111111111112';
+        $fileName = 'AddTemplateTest.tpl';
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/download/template/${fileName}", 'GET');
+        $this->runDefaultAssertsDownload();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals('error', $content['status']);
+        $this->assertEquals(404, $content['errorCode']);
+        $this->assertEquals('ox_app', $content['data']['entity']);
+        $this->assertEquals($uuid, $content['data']['uuid']);
+    }
+
+    public function testArtifactDownloadTemplateWithoutAppSourceDir()
+    {
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $fileName = 'AddTemplateTest.tpl';
+        //Setup data.
+        $data = [
+            'app' => [
+                'name' => 'Test Application',
+                'uuid' => $uuid,
+                'type' => 2,
+                'category' => 'TestCategory',
+                'logo' => 'app.png'
+            ]
+        ];
+        //Ensure app source dir does not exist.
+        $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
+        try {
+            FileUtils::rmDir($appSourceDir);
+        } catch (Exception $ignored) {
+        }
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/download/template/${fileName}", 'GET');
+        $this->runDefaultAssertsDownload();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals('error', $content['status']);
+        $this->assertEquals(404, $content['errorCode']);
+        $this->assertEquals('Application source directory is not found.', $content['message']);
+        $this->assertEquals($appSourceDir, $content['data']['directory']);
+    }
+
+    
 
     public function testUploadArchive()
     {
