@@ -1,6 +1,20 @@
 name: 'Templates'
 description: 'Shows a list of templates'
 content:
+    -
+        type: ReactComponent
+        content:
+                reactId: 'headerActions'
+                params:
+                    operations:
+                        -
+                            name: Import template
+                            rule: 'true'
+                            icon: 'fa fa-cloud-upload'
+                            details:
+                                -
+                                    type: UploadArtifact
+                                    entity: template
     # -
     #     type: RenderButtons
     #     content:
@@ -50,19 +64,19 @@ content:
                                 downloadFile: true
                     icon: 'fa fa-download' 
                     updateOnly: true
-            operations:
-                title: "Import template"
-                actions:
-                    -
-                        name: Import template
-                        rule: 'true'
-                        icon: 'fa fa-cloud-upload'
-                        details:
-                            -
-                                type: UploadArtifact
-                                entity: template
-                                params:
-                                    app_uuid: '{{app_uuid}}'
+            # operations:
+            #     title: "Import template"
+            #     actions:
+            #         -
+            #             name: Import template
+            #             rule: 'true'
+            #             icon: 'fa fa-cloud-upload'
+            #             details:
+            #                 -
+            #                     type: UploadArtifact
+            #                     entity: template
+            #                     params:
+            #                         app_uuid: '{{app_uuid}}'
             columnConfig:
                 -
                     title: Name

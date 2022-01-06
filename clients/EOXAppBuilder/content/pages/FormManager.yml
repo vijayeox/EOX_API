@@ -2,28 +2,50 @@ name: 'Form Manager'
 description: 'Shows a list of forms'
 content:
     -
-        type: RenderButtons
+        type: ReactComponent
         content:
-                buttonList:
-                    -
-                        name: Build Form
-                        icon: 'fa fa-gavel'
-                        rule: 'true'
-                        details:
+                reactId: 'headerActions'
+                params:
+                    operations:
                             -
-                                type: FormManager
-                                params:
-                                    app_uuid: '{{appId}}'
-                    -
-                        name: Import Form
-                        rule: 'true'
-                        icon: 'fa fa-cloud-upload'
-                        details:
+                                name: Build Form
+                                icon: 'fa fa-gavel'
+                                rule: 'true'
+                                details:
+                                    -
+                                        type: FormManager
                             -
-                                type: UploadArtifact
-                                entity: form
-                                params:
-                                    app_uuid: '{{appId}}'
+                                name: Import Form
+                                rule: 'true'
+                                icon: 'fa fa-cloud-upload'
+                                details:
+                                    -
+                                        type: UploadArtifact
+                                        entity: form
+                
+    # -
+    #     type: RenderButtons
+    #     content:
+    #             buttonList:
+    #                 -
+    #                     name: Build Form
+    #                     icon: 'fa fa-gavel'
+    #                     rule: 'true'
+    #                     details:
+    #                         -
+    #                             type: FormManager
+    #                             params:
+    #                                 app_uuid: '{{appId}}'
+    #                 -
+    #                     name: Import Form
+    #                     rule: 'true'
+    #                     icon: 'fa fa-cloud-upload'
+    #                     details:
+    #                         -
+    #                             type: UploadArtifact
+    #                             entity: form
+    #                             params:
+    #                                 app_uuid: '{{appId}}'
     -
         type: List
         content:
