@@ -97,4 +97,18 @@ class BusinessParticipantService extends AbstractService
        $this->logger->info("Result---".print_r(count($result),true));
        return count($result) > 0;
     }
+
+    public function checkIfAccountOfferingExists($appId){
+        $select = "SELECT oxao.account_business_role_id , oxao.entity_id
+                    FROM ox_account_offering oxao
+                    INNER JOIN ox_app_entity oxae ON oxae.id = oxao.entity_id
+                    INNER JOIN ox_account_business_role oxabr ON oxabr.id = oxao.account_business_role_id
+                    INNER JOIN ox_business_role oxbr ON oxbr.id = oxabr.business_role_id
+                    INNER JOIN ox_app oxap ON oxap.id = oxbr.app_id
+                    WHERE oxap.uuid =:appId";
+        $params = ['appId' => $appId] ;
+        $this->logger->info("Query --- $select with Params--".print_r($params,true));
+        return $this->executeQueryWithBindParameters($select, $params)->toArray();
+                   
+    }
 }
