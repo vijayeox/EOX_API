@@ -31,6 +31,7 @@ class AppControllerTest extends ControllerTest
     public function setUp(): void
     {
         parent::setUp();
+        
         if ($this->getName() == 'testCopyOnlyNewTemplatesOnDeploy') {
             $this->cleanFile();
         }
@@ -55,6 +56,15 @@ class AppControllerTest extends ControllerTest
             case 'testCreateWithoutRequiredData':
                 //Return empty data set to keep framework happy!
                 return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/EmptyDataSet.yml");;
+            break;
+        }
+
+        switch ($this->getName()) {
+            case 'testGetAccountOnForInstall':
+            case 'testGetAccountOnInstalled':
+            case 'testGetAccountProperties':
+                //Return empty data set to keep framework happy!
+                return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/fileattachment.yaml");;
             break;
         }
 
@@ -118,6 +128,16 @@ class AppControllerTest extends ControllerTest
         $this->assertModuleName('App');
         $this->assertControllerName(AppController::class); // as specified in router's controller name alias
         $this->assertControllerClass('AppController');
+        $contentTypeHeader = $this->getResponseHeader('content-type')->toString();
+        $contentTypeRegex = '/application\/json(;? *?charset=utf-8)?/i';
+        $this->assertTrue(preg_match($contentTypeRegex, $contentTypeHeader) ? true : false);
+    }
+
+    protected function setDefaultAssertsRegister()
+    {
+        $this->assertModuleName('App');
+        $this->assertControllerName(AppRegisterController::class); // as specified in router's controller name alias
+        $this->assertControllerClass('AppRegisterController');
         $contentTypeHeader = $this->getResponseHeader('content-type')->toString();
         $contentTypeRegex = '/application\/json(;? *?charset=utf-8)?/i';
         $this->assertTrue(preg_match($contentTypeRegex, $contentTypeHeader) ? true : false);
@@ -1591,7 +1611,7 @@ class AppControllerTest extends ControllerTest
     private function performAssertions($data)
     {
         // Role privilege check
-        $sqlQuery = 'SELECT u.id, up.firstname, up.lastname, up.email, u.account_id FROM ox_user u inner join ox_person up on up.id = u.person_id order by u.id DESC LIMIT 1';
+        $sqlQuery = 'SELECT u.id, up.fdocker exec -it setup_eox_1 bashirstname, up.lastname, up.email, u.account_id FROM ox_user u inner join ox_person up on up.id = u.person_id order by u.id DESC LIMIT 1';
         $newQueryResult = $this->executeQueryTest($sqlQuery);
         $accountId = $newQueryResult[0]['account_id'];
         $sqlQuery = 'SELECT * FROM ox_account where id = '.$accountId;
@@ -1624,7 +1644,7 @@ class AppControllerTest extends ControllerTest
         } else {
             $this->assertEquals($data['name'], $acctResult[0]['name']);
         }
-        $this->assertEquals($data['type'], $acctResult[0]['type']);
+        $this->assertEquals($data['type'], $acctResult[0]['t1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4ype']);
         $this->assertEquals($newQueryResult[0]['id'], $acctResult[0]['contactid']);
         if (isset($data['identifier_field'])) {
             $sqlQuery = "SELECT * FROM ox_wf_user_identifier where identifier_name = '".$data['identifier_field']."' AND identifier = '".$data[$data['identifier_field']]."'";
@@ -1750,4 +1770,44 @@ class AppControllerTest extends ControllerTest
     //         }
     //     }
     // }
+
+    /* HARI */
+    public function testGetAccountOnForInstall()
+    {
+        //$uuid = 'b0971de7-0387-48ea-8f29-5d3704d96a46';
+        $uuid = '11111111-1111-1111-1111-111111111112';
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/getAccounts/forInstall", 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAssertsRegister();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        //print_r($content);  
+        $this->assertEquals($content['status'], 'success'); 
+    }
+
+    public function testGetAccountOnInstalled()
+    {
+        //$uuid = 'b0971de7-0387-48ea-8f29-5d3704d96a46';
+        $uuid = '11111111-1111-1111-1111-111111111112';
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/getAccounts/Installed", 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAssertsRegister();
+        $content = json_decode($this->getResponse()->getContent(), true); 
+        //print_r($content); 
+        $this->assertEquals($content['status'], 'success'); 
+    }
+
+    public function testGetAccountProperties()
+    {
+        $accountid = 'b6499a34-c100-4e41-bece-5822adca3844';
+        $uuid='1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/account/${accountid}/appProperties", 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAssertsRegister();
+        $content = json_decode($this->getResponse()->getContent(), true); 
+        //print_r($content); 
+        $this->assertEquals($content['status'], 'success'); 
+    }
 }

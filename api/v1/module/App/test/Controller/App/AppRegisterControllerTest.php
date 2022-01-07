@@ -18,6 +18,16 @@ class AppRegisterContollerTest extends ControllerTest
 
     public function getDataSet()
     {
+        switch ($this->getName()) {
+            case 'testGetAccountOnForInstall':
+            case 'testGetAccountOnInstalled':
+            //case 'testCreateWithoutRequiredData':
+                //Return empty data set to keep framework happy!
+                echo "TESTING";
+                return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/fileattachment.yml");;
+            break;
+        }
+
         $dataset = new YamlDataSet(dirname(__FILE__) . "/../../Dataset/Workflow.yml");
         if ($this->getName() == 'testDeployAppWithWrongUuidInDatabase' || $this->getName() == 'testDeployAppWithWrongNameInDatabase' || $this->getName() == 'testDeployAppWithNameAndNoUuidInYMLButNameandUuidInDatabase' || $this->getName() == 'testDeployAppAddExtraPrivilegesInDatabaseFromYml' || $this->getName() == 'testDeployAppDeleteExtraPrivilegesInDatabaseNotInYml') {
             $dataset->addYamlFile(dirname(__FILE__) . "/../../Dataset/App2.yml");
@@ -81,4 +91,26 @@ class AppRegisterContollerTest extends ControllerTest
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'error');
     }
+
+     /* HARI */
+     public function testGetAccountOnForInstall()
+     {
+         $this->initAuthToken($this->adminUser);
+         $this->dispatch('/app/53012471-2863-4949-afb1-e69b0891c98a/getAccounts/forInstall', 'GET');
+         $this->assertResponseStatusCode(200);
+         $this->setDefaultAsserts();
+         $content = json_decode($this->getResponse()->getContent(), true);
+         print_r($content);   
+         die;
+     }
+ 
+     public function testGetAccountOnInstalled()
+     {
+         $this->initAuthToken($this->adminUser);
+         $this->dispatch('/app/53012471-2863-4949-afb1-e69b0891c98a/getAccounts/Installed', 'GET');
+         $this->assertResponseStatusCode(200);
+         $this->setDefaultAsserts();
+         $content = json_decode($this->getResponse()->getContent(), true); 
+         print_r($content);  
+     }
 }

@@ -612,6 +612,7 @@ class AccountService extends AbstractService
         $query = $select . " " . $from . " " . $where . " " . $sort . " " . $limit;
         $resultSet = $this->executeQuerywithParams($query)->toArray();
         for ($x = 0; $x < sizeof($resultSet); $x++) {
+            //echo $resultSet[$x]['uuid'];
             $resultSet[$x]['contactid'] = $this->getAccountContactPersonDetails($resultSet[$x]['uuid']);
         }
         
