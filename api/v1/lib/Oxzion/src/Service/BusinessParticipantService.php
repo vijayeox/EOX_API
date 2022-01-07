@@ -99,7 +99,7 @@ class BusinessParticipantService extends AbstractService
     }
 
     public function checkIfAccountOfferingExists($appId){
-        $select = "SELECT oxao.account_business_role_id , oxao.entity_id
+        $select = "SELECT oxabr.business_role_id as account_business_role_id , oxao.entity_id
                     FROM ox_account_offering oxao
                     INNER JOIN ox_app_entity oxae ON oxae.id = oxao.entity_id
                     INNER JOIN ox_account_business_role oxabr ON oxabr.id = oxao.account_business_role_id
