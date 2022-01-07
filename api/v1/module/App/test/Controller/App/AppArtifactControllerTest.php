@@ -354,7 +354,6 @@ class AppArtifactControllerTest extends ControllerTest
         $_FILES = [
             'artifactFile' => [
                 'name' => $fileName,
-                //'type' => 'application/json',
                 'tmp_name' => $this->createTemporaryFile($filePath),
                 'error' => UPLOAD_ERR_OK,
                 'size' => $fileSize
@@ -369,7 +368,6 @@ class AppArtifactControllerTest extends ControllerTest
         $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
         $artifactFile = $appSourceDir . '/data/delegate/' . $fileName;
         $this->assertTrue(file_exists($artifactFile));
-        //$this->assertTrue(filesize($artifactFile) == 74665 || filesize($artifactFile) == 76653);
     }
 
     public function testArtifactAddDelegateWrongUuid()
@@ -438,7 +436,6 @@ class AppArtifactControllerTest extends ControllerTest
         $_FILES = [
             'artifactFile' => [
                 'name' => $fileName,
-                //'type' => 'application/json',
                 'tmp_name' => $this->createTemporaryFile($filePath),
                 'error' => UPLOAD_ERR_OK,
                 'size' => $fileSize
@@ -453,7 +450,6 @@ class AppArtifactControllerTest extends ControllerTest
         $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
         $artifactFile = $appSourceDir . '/data/template/' . $fileName;
         $this->assertTrue(file_exists($artifactFile));
-        //$this->assertTrue(filesize($artifactFile) == 74665 || filesize($artifactFile) == 76653);
     }
 
     public function testArtifactAddTemplateWrongUuid()
@@ -528,13 +524,10 @@ class AppArtifactControllerTest extends ControllerTest
         }
         
         $actual_content=file_get_contents($targetPath);
-        //echo $actual_content;
         $this->initAuthToken($this->adminUser);
         $this->dispatch("/app/${uuid}/artifact/list/form", 'GET');
         $this->runDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
-        //print_r($content);
-        //die;
         $this->assertEquals('success', $content['status']);
         $this->assertTrue(file_exists($targetPath));
         $this->assertTrue(filesize($targetPath) == 74665 || filesize($targetPath) == 76653);
@@ -612,7 +605,6 @@ class AppArtifactControllerTest extends ControllerTest
         }
         
         $actual_content=file_get_contents($targetPath);
-        //echo $actual_content;
         $this->initAuthToken($this->adminUser);
         $this->dispatch("/app/${uuid}/artifact/list/workflow", 'GET');
         $this->runDefaultAsserts();
@@ -1083,8 +1075,6 @@ class AppArtifactControllerTest extends ControllerTest
         $this->dispatch("/app/${uuid}/artifact/delete/form/${fileName}", 'DELETE');
         $this->runDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
-        //print_r($content);
-        //die;
         $this->assertEquals('error', $content['status']);
         $this->assertEquals(404, $content['errorCode']);
         $this->assertEquals('Artifact file is not found.', $content['message']);
@@ -1295,8 +1285,6 @@ class AppArtifactControllerTest extends ControllerTest
         $this->dispatch("/app/${uuid}/artifact/delete/delegate/${fileName}", 'DELETE');
         $this->runDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
-        //print_r($content);
-        //die;
         $this->assertEquals('error', $content['status']);
         $this->assertEquals(404, $content['errorCode']);
         $this->assertEquals('Artifact file is not found.', $content['message']);
@@ -1445,12 +1433,6 @@ class AppArtifactControllerTest extends ControllerTest
             'attachment; filename="' . $fileName . '"',
             $headers->get('content-disposition')->getFieldValue()
         );
-
-        //print_r($content);
-        //die;
-        //$this->assertEquals('success', $content['status']);
-        //$this->assertTrue($content->headers->headers[1]->get('content-disposition') == 'attachment; filename=' . $fileName . '');
-        //Ensure file is NOT found in the location.
         $this->assertTrue(file_exists($targetPath));
     }
 
@@ -1523,7 +1505,6 @@ class AppArtifactControllerTest extends ControllerTest
         $this->initAuthToken($this->adminUser);
         $this->dispatch("/app/${uuid}/download/template/${fileName}", 'GET');
         $this->runDefaultAssertsDownload();
-        //$content = $this->getResponse();
         $response = $this->getResponse();
         $headers = $response->getHeaders();
         $this->assertEquals(
@@ -1534,11 +1515,6 @@ class AppArtifactControllerTest extends ControllerTest
             'attachment; filename="' . $fileName.'"',
             $headers->get('content-disposition')->getFieldValue()
         );
-        //print_r($content);
-        //die;
-        //$this->assertEquals('success', $content['status']);
-        //$this->assertTrue($content->headers->headers[1]->get('content-disposition') == 'attachment; filename=' . $fileName . '');
-        //Ensure file is NOT found in the location.
         $this->assertTrue(file_exists($targetPath));
     }
 

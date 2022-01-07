@@ -294,13 +294,9 @@ class AppArtifactService extends AbstractService
         $files = array();
         if ($handle = opendir($targetDir)) {
             while (false !== ($entry = readdir($handle))) {
-                //echo "TEST WHILE";
                 if ($entry != "." && $entry != "..") {
-                    //echo "TEST FOLDER";
                     $ext = pathinfo($entry, PATHINFO_EXTENSION);
-                    //echo $ext;
                     if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && $artifactType == 'delegate') || ($ext == 'tpl' && $artifactType == 'template')) {
-                        //echo "TEST";
                         $files[] = array(
                             'name' => substr($entry, 0, strrpos($entry, '.')) ,
                             'content'=> file_get_contents($targetDir.$entry)
@@ -310,7 +306,6 @@ class AppArtifactService extends AbstractService
             }
             closedir($handle);
         }
-        //print_r($files);
         return $files;
     }
 
@@ -372,31 +367,9 @@ class AppArtifactService extends AbstractService
         $this->logger->info("DOWNLOAD Appsource----".print_r($appSourceDir,true));
         $filePath = $appSourceDir . $this->dataFolder . $artifactType . DIRECTORY_SEPARATOR. $artifactNamer;
         $this->logger->info("DOWNLOAD PATH----".print_r($filePath,true));
-        // $file = FileUtils::createTempFileName();
-        // FileUtils::downloadFile($filePath, $file);
-        // $this->logger->info("DOWNLOAD File----".print_r($file,true));
-        // return $file;
         //Check the file exists or not
         if(file_exists($filePath)) {
-
-        // //Define header information
-        // header('Content-Description: File Transfer');
-        // header('Content-Type: application/octet-stream');
-        // header("Cache-Control: no-cache, must-revalidate");
-        // header("Expires: 0");
-        // header('Content-Disposition: attachment; filename="'.basename($filePath).'"');
-        // header('Content-Length: ' . filesize($filePath));
-        // header('Pragma: public');
-
-        // //Clear system output buffer
-        // flush();
-
-        // //Read the size of the file
-        // readfile($filename);
-
-        //Terminate from the script
-        // die();
-        return $filePath;
+            return $filePath;
         }
         else{
             echo "File does not exist.";
