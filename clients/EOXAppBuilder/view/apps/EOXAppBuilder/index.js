@@ -2,6 +2,7 @@ import osjs from "osjs";
 import { name as applicationName, icon_white, appId } from "./metadata.json";
 import { React, ReactDOM, EOXApplication } from "oxziongui";
 import InstallManager from './custom-components/install-manager/install-manager'
+import HeaderActions from "./custom-components/header-actions/header-actions";
 // Our launcher
 const register = (core, args, options, metadata) => {
   // Create a new Application instance
@@ -54,7 +55,7 @@ const register = (core, args, options, metadata) => {
           application_id={appId}
           params={args}
           proc={proc}
-          childrenComponents={{installManager : InstallManager}}
+          childrenComponents={{installManager : InstallManager, headerActions: HeaderActions}}
         />,
         $content
       )

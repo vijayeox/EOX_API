@@ -3,17 +3,20 @@ namespace Oxzion\Service;
 
 use Exception;
 use Oxzion\Service\AbstractService;
+use Oxzion\Service\BusinessParticipantService;
 
 class AppRegistryService extends AbstractService
 {
     protected $table;
     protected $modelClass;
+    protected $businessParticipantService;
     /**
      * @ignore __construct
      */
-    public function __construct($config, $dbAdapter)
+    public function __construct($config, $dbAdapter, BusinessParticipantService $businessParticipantService)
     {
         parent::__construct($config, $dbAdapter);
+        $this->businessParticipantService = $businessParticipantService;
     }
 
     public function createAppRegistry($appId, $accountId, $startOptions = [])
@@ -64,6 +67,8 @@ class AppRegistryService extends AbstractService
             $params = ['appId' => $data['appId']];
             $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
         }
-        return $resultSet;
+        $accountOfferings = $this->businessParticipantService->checkIfAccountOfferingExists($data['appId']);
+        $result =['accountOffering' => $accountOfferings , 'start_options' => $resultSet[0]['start_options']];   
+        return $result;
     }
 }
