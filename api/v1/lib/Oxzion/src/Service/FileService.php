@@ -2750,7 +2750,7 @@ class FileService extends AbstractService
     }
     $whereQuery .= 'of.is_active = 1  AND COALESCE(of.is_snoozed,0) !=1 ';
     $pageSize = "LIMIT " . (isset($pageSize) ? ltrim($pageSize, " LIMIT ") : 20);
-    $offset = "OFFSET " . (isset($filterParamsArray[0]['skip']) ? $filterParamsArray[0]['skip'] : 0);
+    $offset = "OFFSET " . (isset($offset) ? ltrim($offset, ' OFFSET ') : 0);
     $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date as startDate,`of`.end_date as endDate,`of`.status as fileStatus,ou.name as created_by,`of`.rygStatus,`of`.version,
     NULL as activityInstanceId,NULL as workflowInstanceId, `of`.date_created as created_date,en.name as entity_name,
     NULL as activityName, `of`.date_created,
