@@ -338,7 +338,7 @@ class Metadata extends React.Component {
         {},
         "get"
       );
-      data = JSON.parse(data[0]["start_options"]);
+      data = JSON.parse(data?.[0]?.["start_options"] || data?.["start_options"]);
       if (status === "success") {
         this.setState({
           data: {
@@ -457,26 +457,66 @@ class BusinessRoles extends React.Component {
   }
   async componentDidMount() {
     try {
-      const [entity,roles] = await Promise.all([this.api.request(
-        "v1",
-        `/app/${this.service.parentData?.uuid}/entity`,
-        {},
-        "get"
-      ),this.api.request(
-        "v1",
-        `/app/${this.service.parentData?.uuid}/appBusinessRoles`,
-        {},
-        "get"
-      )])
-      // data = JSON.parse(data[0]["start_options"]);
-      // if (status === "success") {
-        this.setState({
-          data : {
-              businessRole : roles.data,
-              entity :entity.data
+      const [entityData, rolesData] = await Promise.all([
+        this.api.request(
+          "v1",
+          `/app/${this.service.parentData?.uuid}/entity`,
+          {},
+          "get"
+        ),
+        this.api.request(
+          "v1",
+          `/app/${this.service.parentData?.uuid}/appBusinessRoles`,
+          {},
+          "get"
+        ),
+      ]);
+      let roles = rolesData?.data || []; //[{id : 8, name : ''},{id : 9, name : ''}]
+      let entity = entityData?.data || []; //[{id : 8, name : ''},{id : 9, name : ''}]
+      const dataGrid = [];
+      if (this.service.installationType != "forInstall") {
+        try{
+          const properties = await this.api.request(
+            "v1",
+            `app/${this.service.parentData.uuid}/account/${this.service.selectedOrganization.uuid}/appProperties`,
+            {},
+            "get"
+          );
+          (properties?.data?.accountOffering || []).forEach(
+            ({ account_business_role_id, entity_id }) => {
+              const businessRole = roles.find(
+                ({ id }) => id == account_business_role_id
+              )?.name;
+              const entityName = entity.find(({ id }) => id == entity_id)?.name;
+              const index = dataGrid.findIndex(
+                ({ id }) => id == account_business_role_id
+              );
+              if (index > -1) {
+                dataGrid[index]["dataGridOld"].push({ entity: entityName });
+              } else {
+                dataGrid.push({
+                  id: account_business_role_id,
+                  businessRole,
+                  dataGridOld: [{ entity: entityName }],
+                });
+              }
+            }
+          );
+          dataGrid.forEach((data) => delete data.id);
+        }catch(e){
+          console.error('roles-parsing-err ',e)
+        }
+      }
+      this.setState(
+        {
+          data: {
+            businessRole: roles,
+            entity: entity,
           },
-        },console.log);
-      // }
+          dataGrid,
+        },
+        console.log
+      );
     } catch (e) {
       this.setState({
         data: {},
@@ -490,16 +530,17 @@ class BusinessRoles extends React.Component {
         content={businessForm}
         core={this.core}
         postSubmitCallback={(data) => {
-          let offering = data.dataGrid.map(({businessRole, dataGridOld}) => {
+          let offering = data.dataGrid.map(({ businessRole, dataGridOld }) => {
             const entity = {};
-            const entities = dataGridOld.forEach((v,i) => {
+            const entities = dataGridOld.forEach((v, i) => {
               // return {[i] : v.entity}
               entity[i] = v.entity;
-            })
+            });
             return {
-              businessRole : businessRole? businessRole : '', entity
-            }
-          })
+              businessRole: businessRole ? businessRole : "",
+              entity,
+            };
+          });
           this.setService({ service: this.service.setBusinessRoles(offering) });
         }}
         // dataUrl={
@@ -507,7 +548,7 @@ class BusinessRoles extends React.Component {
         //     ? null
         //     : `/app/${this.service.parentData?.uuid}/appBusinessRoles`
         // }
-        data={this.state.data}
+        data={{ ...this.state.data, dataGrid: this.state.dataGrid }}
         updateFormData={true}
       />
     ) : null;

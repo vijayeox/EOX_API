@@ -531,7 +531,8 @@ class Module
                 Service\AppRegistryService::class => function ($container) {
                     $config = $container->get('config');
                     $dbAdapter = $container->get(AdapterInterface::class);
-                    return new Service\AppRegistryService($config, $dbAdapter);
+                    $businessParticipantService = $container->get(\Oxzion\Service\BusinessParticipantService::class);                    
+                    return new Service\AppRegistryService($config, $dbAdapter, $businessParticipantService);
                 },
                 Service\BusinessParticipantService::class => function ($container) {
                     $config = $container->get('config');

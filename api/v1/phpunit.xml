@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit colors="true" printerClass="Sempro\PHPUnitPrettyPrinter\PrettyPrinter">
     <testsuites>
-        <!--<testsuite name="Messaging Fixtures Fixtures">
+        <testsuite name="Messaging Fixtures Fixtures">
             <directory>./module/Auth/test</directory>
         </testsuite>
         <testsuite name="Messaging Fixtures Fixtures">
@@ -27,10 +27,10 @@
         </testsuite>
         <testsuite name="Profile Fixtures">
             <directory>./module/Profile/test</directory>
-        </testsuite>-->
+        </testsuite>
         <testsuite name="App Fixtures">
             <directory>./module/App/test/Controller/App/AppArtifactControllerTest.php</directory>
-            <!--<directory>./module/App/test/Controller/App/AppControllerTest.php</directory>
+            <directory>./module/App/test/Controller/App/AppControllerTest.php</directory>
             <directory>./module/App/test/Controller/AppView</directory>
             <directory>./module/App/test/Controller/Cache</directory>
             <directory>./module/App/test/Controller/Delegate</directory>
@@ -41,9 +41,9 @@
             <directory>./module/App/test/Controller/Entity/FormControllerTest.php</directory>
             <directory>./module/App/test/Controller/Job</directory>
             <directory>./module/App/test/Controller/Pipeline</directory>
-            <directory>./module/App/test/Controller/Workflow</directory>--> 
+            <directory>./module/App/test/Controller/Workflow</directory>
         </testsuite>
-        <!--<testsuite name="App Fixtures">
+        <testsuite name="App Fixtures">
             <directory>./module/Workflow/test/Controller/ActivityInstanceControllerTest.php</directory>
             <directory>./module/Workflow/test/Controller/ServiceTaskControllerTest.php</directory>
             <directory>./module/Workflow/test/Controller/WorkflowInstanceCallbackControllerTest.php</directory>
@@ -95,7 +95,7 @@
         </testsuite>    
         <testsuite name="Form File Fixtures">
             <directory>./module/File/test</directory>
-        </testsuite>--> 
+        </testsuite>
     </testsuites> 
     <php>
         <ini name="memory_limit" value="500M" />

@@ -121,6 +121,7 @@ class AppArtifactController extends AbstractApiController
                     ->addHeaderLine('Access-Control-Expose-Headers: Content-Disposition')
                     ->addHeaderLine('Content-Length', filesize($fileData));
             $response->setHeaders($headers);
+            
             return $response;
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
