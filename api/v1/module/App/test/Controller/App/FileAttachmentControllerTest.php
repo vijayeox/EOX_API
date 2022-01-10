@@ -36,27 +36,34 @@ class FileAttachmentControllerTest extends ControllerTest
 
     public function getDataSet()
     {
-        return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/Workflow.yml");
+        switch ($this->getName()) {
+            case 'testFileAttachmentAdd':
+                //return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/BusinessRelationship.yml");
+                return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/fileattachment.yaml");
+                break;
+            case 'testFileAttachmentRename':
+            case 'testFileAttachmentDelete':
+            case 'testFileAttachmentDeleteWrongAttachmentid':
+            case 'testFileAttachmentDeleteWrongFileid':
+            case 'testFileAttachmentRenameWrongAttachmentid':
+            case 'testFileAttachmentRenameWrongFileid':
+            //case 'testFileAttachmentDeleteNoFile':
+                //Return empty data set to keep framework happy!
+                return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/addattachment.yaml");
+            break;
+        }
+
+        //return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/fileattachment.yaml");
     }
 
     protected function runDefaultAsserts()
     {
         $this->assertModuleName('App');
-        $this->assertControllerClass('AppArtifactController');
-        $this->assertControllerName('App\Controller\AppArtifactController');
+        $this->assertControllerClass('FileAttachmentController');
+        $this->assertControllerName('App\Controller\FileAttachmentController');
         $contentTypeHeader = $this->getResponseHeader('content-type')->toString();
         $contentTypeRegex = '/application\/json(;? *?charset=utf-8)?/i';
         $this->assertTrue(preg_match($contentTypeRegex, $contentTypeHeader) ? true : false);
-    }
-
-    protected function runDefaultAssertsDownload()
-    {
-        $this->assertModuleName('App');
-        $this->assertControllerClass('AppArtifactController');
-        $this->assertControllerName('App\Controller\AppArtifactController');
-        $contentTypeHeader = $this->getResponseHeader('content-type')->toString();
-        $contentTypeRegex = '/application\/octet-stream(;? *?charset=utf-8)?/i';
-        //$this->assertTrue(preg_match($contentTypeRegex, $contentTypeHeader) ? true : false);
     }
 
     private function setupAppSourceDir($ymlData)
@@ -75,20 +82,11 @@ class FileAttachmentControllerTest extends ControllerTest
         return $tempFilePath;
     }
 
-    public function testArtifactAddForm()
+    public function testFileAttachmentAdd()
     {
         $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
         //Setup data and application source directory.
-        $data = [
-            'app' => [
-                'name' => 'Test Application',
-                'uuid' => $uuid,
-                'type' => 2,
-                'category' => 'TestCategory',
-                'logo' => 'app.png'
-            ]
-        ];
-        $this->setupAppSourceDir($data);
+        
         $fileName = 'AddFormTest.json';
         if (PHP_OS == 'Linux') {
             $fileSize = 74665;
@@ -97,7 +95,7 @@ class FileAttachmentControllerTest extends ControllerTest
         }
         $filePath = __DIR__ . '/../../Dataset/' . $fileName;
         $_FILES = [
-            'artifactFile' => [
+            'file' => [
                 'name' => $fileName,
                 'type' => 'application/json',
                 'tmp_name' => $this->createTemporaryFile($filePath),
@@ -106,61 +104,136 @@ class FileAttachmentControllerTest extends ControllerTest
             ]
         ];
         $this->initAuthToken($this->adminUser);
-        $this->dispatch("/app/${uuid}/artifact/add/form", 'POST');
+        $this->dispatch("/app/${uuid}/file/attachment", 'POST');
+        $this->runDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $targetFile=$content['data']['path'];
+        $this->assertEquals('success', $content['status']);
+        $this->assertTrue(file_exists($targetFile));
+        $this->assertTrue(filesize($targetFile) == 74665 || filesize($targetFile) == 76653);
+        
+    }
+
+    public function testFileAttachmentDelete()
+    {
+        $account_uuid='53012471-2863-4949-afb1-e69b0891c98a';
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $fileid='e0517075-39f9-438e-861c-1a80ab05b8da';
+        $attachmentid='e0517075-39f9-438e-861c-1a80ab05b8da';
+        
+        //Setup data and application source directory.
+        
+        $fileName = 'AddFormTest.json';
+        if (PHP_OS == 'Linux') {
+            $fileSize = 74665;
+        } else {
+            $fileSize = 76653;
+        }
+        $filePath = __DIR__ . '/../../Dataset/' . $fileName;
+        $targetPath = $this->config['APP_DOCUMENT_FOLDER'].$account_uuid.'/temp/'.$fileid."/".$fileName;
+        if (!copy($filePath, $targetPath)) {
+            throw new Exception("Failed to copy file ${filePath} to ${targetPath}.");
+        }
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/file/${fileid}/attachment/${attachmentid}/remove", 'DELETE');
         $this->runDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals('success', $content['status']);
-        //Ensure file is found in the correct location
-        $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
-        $artifactFile = $appSourceDir . '/content/forms/' . $fileName;
-        $this->assertTrue(file_exists($artifactFile));
-        $this->assertTrue(filesize($artifactFile) == 74665 || filesize($artifactFile) == 76653);
+        $this->assertFalse(file_exists($targetPath));
     }
 
-    public function testArtifactAddFormWrongUuid()
+
+    public function testFileAttachmentDeleteWrongAttachmentid()
     {
-        $uuid = '11111111-1111-1111-1111-111111111112';
+        $account_uuid='53012471-2863-4949-afb1-e69b0891c98a';
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $fileid='c6276b23-fa51-4363-adc7-753a9235a2d1';
+        $attachmentid='1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        
         $this->initAuthToken($this->adminUser);
-        $this->dispatch("/app/${uuid}/artifact/add/form", 'POST');
+        $this->dispatch("/app/${uuid}/file/${fileid}/attachment/${attachmentid}/remove", 'DELETE');
         $this->runDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals('error', $content['status']);
-        $this->assertEquals(404, $content['errorCode']);
-        $this->assertEquals('ox_app', $content['data']['entity']);
-        $this->assertEquals($uuid, $content['data']['uuid']);
+        $this->assertEquals('Incorrect attachment uuid specified', $content['message']);
     }
 
-    public function testArtifactAddFormWithoutAppSourceDir()
+
+    public function testFileAttachmentDeleteWrongFileid()
     {
+        $account_uuid='53012471-2863-4949-afb1-e69b0891c98a';
         $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
-        //Setup data.
-        $data = [
-            'app' => [
-                'name' => 'Test Application',
-                'uuid' => $uuid,
-                'type' => 2,
-                'category' => 'TestCategory',
-                'logo' => 'app.png'
-            ]
-        ];
-        //Ensure app source dir does not exist.
-        $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data['app']);
-        try {
-            FileUtils::rmDir($appSourceDir);
-        } catch (Exception $ignored) {
+        $fileid='1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $attachmentid='e0517075-39f9-438e-861c-1a80ab05b8da';
+        
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/file/${fileid}/attachment/${attachmentid}/remove", 'DELETE');
+        $this->runDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals('error', $content['status']);
+        $this->assertEquals('Incorrect file uuid specified', $content['message']);
+    }
+
+    public function testFileAttachmentRename()
+    {
+        $account_uuid='53012471-2863-4949-afb1-e69b0891c98a';
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $fileid='e0517075-39f9-438e-861c-1a80ab05b8da';
+        $attachmentid='e0517075-39f9-438e-861c-1a80ab05b8da';
+        
+        //Setup data and application source directory.
+        $fileName_orig='AddFormTest.json';
+        $fileName = 'AddFormTest_New3.json';
+        if (PHP_OS == 'Linux') {
+            $fileSize = 74665;
+        } else {
+            $fileSize = 76653;
+        }
+        $filePath = __DIR__ . '/../../Dataset/' . $fileName_orig;
+        $targetPath = $this->config['APP_DOCUMENT_FOLDER'].$account_uuid.'/temp/'.$fileid."/".$fileName;
+        if (!copy($filePath, $targetPath)) {
+            throw new Exception("Failed to copy file ${filePath} to ${targetPath}.");
         }
         $this->initAuthToken($this->adminUser);
-        $this->dispatch("/app/${uuid}/artifact/add/form", 'POST');
+        $data = ['name' => $fileName];
+        $this->dispatch("/app/${uuid}/file/${fileid}/attachment/${attachmentid}", 'POST',$data);
+        $this->runDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals('success', $content['status']);
+        $this->assertTrue(file_exists($targetPath));
+        $this->assertTrue(filesize($targetPath) == 74665 || filesize($targetPath) == 76653);
+        
+    }
+    
+    public function testFileAttachmentRenameWrongAttachmentid()
+    {
+        $account_uuid='53012471-2863-4949-afb1-e69b0891c98a';
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $fileid='c6276b23-fa51-4363-adc7-753a9235a2d1';
+        $attachmentid='1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/file/${fileid}/attachment/${attachmentid}/remove", 'DELETE');
         $this->runDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals('error', $content['status']);
-        $this->assertEquals(404, $content['errorCode']);
-        $this->assertEquals('Application source directory is not found.', $content['message']);
-        $this->assertEquals($appSourceDir, $content['data']['directory']);
+        $this->assertEquals('Incorrect attachment uuid specified', $content['message']);
     }
 
-
-    
+    public function testFileAttachmentRenameWrongFileid()
+    {
+        $account_uuid='53012471-2863-4949-afb1-e69b0891c98a';
+        $uuid = '1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $fileid='1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4';
+        $attachmentid='e0517075-39f9-438e-861c-1a80ab05b8da';
+        
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch("/app/${uuid}/file/${fileid}/attachment/${attachmentid}/remove", 'DELETE');
+        $this->runDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals('error', $content['status']);
+        $this->assertEquals('Incorrect file uuid specified', $content['message']);
+    }
 
     
 }

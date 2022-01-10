@@ -1611,7 +1611,7 @@ class AppControllerTest extends ControllerTest
     private function performAssertions($data)
     {
         // Role privilege check
-        $sqlQuery = 'SELECT u.id, up.fdocker exec -it setup_eox_1 bashirstname, up.lastname, up.email, u.account_id FROM ox_user u inner join ox_person up on up.id = u.person_id order by u.id DESC LIMIT 1';
+        $sqlQuery = 'SELECT u.id, up.firstname, up.lastname, up.email, u.account_id FROM ox_user u inner join ox_person up on up.id = u.person_id order by u.id DESC LIMIT 1';
         $newQueryResult = $this->executeQueryTest($sqlQuery);
         $accountId = $newQueryResult[0]['account_id'];
         $sqlQuery = 'SELECT * FROM ox_account where id = '.$accountId;
