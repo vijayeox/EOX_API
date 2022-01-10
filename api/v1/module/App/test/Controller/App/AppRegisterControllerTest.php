@@ -92,25 +92,5 @@ class AppRegisterContollerTest extends ControllerTest
         $this->assertEquals($content['status'], 'error');
     }
 
-     /* HARI */
-     public function testGetAccountOnForInstall()
-     {
-         $this->initAuthToken($this->adminUser);
-         $this->dispatch('/app/53012471-2863-4949-afb1-e69b0891c98a/getAccounts/forInstall', 'GET');
-         $this->assertResponseStatusCode(200);
-         $this->setDefaultAsserts();
-         $content = json_decode($this->getResponse()->getContent(), true);
-         print_r($content);   
-         die;
-     }
- 
-     public function testGetAccountOnInstalled()
-     {
-         $this->initAuthToken($this->adminUser);
-         $this->dispatch('/app/53012471-2863-4949-afb1-e69b0891c98a/getAccounts/Installed', 'GET');
-         $this->assertResponseStatusCode(200);
-         $this->setDefaultAsserts();
-         $content = json_decode($this->getResponse()->getContent(), true); 
-         print_r($content);  
-     }
+     
 }
