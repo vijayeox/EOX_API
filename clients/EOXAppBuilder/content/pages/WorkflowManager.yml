@@ -1,41 +1,55 @@
 name: 'Workflow Manager'
 description: 'Shows a list of Workflows'
 content:
-        -
-            type: List
-            content:
-                route: 'app/{{app_uuid}}/artifact/list/workflow'
-                disableAppId: true    
-                resizable: true
-                actions:
-                    -
-                        name: Delete
-                        rule: "true"
-                        details:
-                            -
-                                type: Update
-                                successMessage: "Workflow deleted successfully!"
-                                params:
-                                    app_uuid: '{{app_uuid}}'
-                                    url: 'app/{{app_uuid}}/artifact/delete/workflow/{{name}}.bpmn'
-                                    disableAppId: true
-                        icon: 'fas fa-trash-alt' 
-                        updateOnly: true   
-                operations:
-                    title: "Create New Workflow"
-                    icon: 'fa fa-gavel'
-                    actions:
+    -
+        type: ReactComponent
+        content:
+                reactId: 'headerActions'
+                params:
+                    operations:
                         -
                             name: Import Workflow
-                            icon: 'fa fa-cloud-upload'
                             rule: 'true'
+                            icon: 'fa fa-cloud-upload'
                             details:
                                 -
                                     type: UploadArtifact
                                     entity: workflow
-                                    params:
-                                        app_uuid: '{{app_uuid}}'
-                columnConfig:
-                    -
-                        title: Name
-                        field: name
+    # -
+    #     type: RenderButtons
+    #     content:
+    #             buttonList:
+    #                 -
+    #                     name: Import Workflow
+    #                     icon: 'fa fa-cloud-upload'
+    #                     rule: 'true'
+    #                     details:
+    #                         -
+    #                             type: UploadArtifact
+    #                             entity: workflow
+    #                             params:
+    #                                 app_uuid: '{{appId}}'
+    -
+        type: List
+        content:
+            route: 'app/{{app_uuid}}/artifact/list/workflow'
+            disableAppId: true    
+            resizable: true
+            actions:
+                -
+                    name: Delete
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            successMessage: "Workflow deleted successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/artifact/delete/workflow/{{name}}.bpmn'
+                                disableAppId: true
+                    icon: 'fas fa-trash-alt' 
+                    updateOnly: true   
+            columnConfig:
+                -
+                    title: Name
+                    field: name

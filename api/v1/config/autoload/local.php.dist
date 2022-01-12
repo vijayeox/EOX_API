@@ -79,6 +79,7 @@ return [
         "callbackUrl" => 'https://qa3.eoxvantage.com/esign/event'
     ],
     'DELEGATE_FOLDER'=>__DIR__.'/../../data/delegate/',
+    'UPGRADE_FOLDER' =>__DIR__.'/../../data/appupgrade/',
     'FORM_FOLDER'=>__DIR__.'/../../data/forms/',
     'apiUrl' => 'http://'.$host.':8080',
     'applicationUrl' => 'http://'.$host.':8081',

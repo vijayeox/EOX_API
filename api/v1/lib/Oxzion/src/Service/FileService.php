@@ -166,8 +166,10 @@ class FileService extends AbstractService
             // IF YOU DELETE THE BELOW TWO LINES MAKE SURE YOU ARE PREPARED TO CHECK THE ENTIRE INDEXER FLOW
 
             if (isset($result['id'])) {
-                $this->logger->info("THE FILE ID TO BE INDEXED IS ".$result['uuid']);
-                $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED');
+                $this->logger->info("THE FILE ID TO BE INDEXED IS ".$result['id']);
+                $this->logger->info("THE FILE UUID TO BE INDEXED IS ".$result['uuid']);
+                $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED_WITH_UUID');
+                $this->messageProducer->sendQueue(json_encode(array('id' => $result['id'])), 'FILE_ADDED');
             }
         } catch (Exception $e) {
             $this->rollback();
@@ -353,7 +355,7 @@ class FileService extends AbstractService
             // Added inner joins on ox_user and ox_employee
             // Rather than doing a inner join on file and employee table
             // As the User ID and Employee ID are not the same.
-            $manager = $this->executeQuerywithParams("SELECT oem.manager_id 
+            $manager = $this->executeQuerywithParams("SELECT oem.manager_id , ou.id
             FROM ox_employee_manager oem
             inner join ox_employee oe on oem.employee_id=oe.id
             inner join ox_user ou on oe.person_id = ou.person_id 
@@ -362,7 +364,16 @@ class FileService extends AbstractService
             $this->logger->info("The Manager Assignment Query ------ ".print_r($manager,true));
 
             if (isset($manager) && count($manager) > 0) {
-                $userId = $manager[0]['manager_id'];
+                $managerEmployeeId = $manager[0]['manager_id'];
+                $managerUserId = $this->executeQuerywithParams("SELECT ou.id from ox_user ou 
+                inner join ox_employee oe on oe.person_id = ou.person_id
+                WHERE oe.id = " . $managerEmployeeId . ";")->toArray();
+                $this->logger->info("The Manager User Id ------ ".print_r($managerUserId,true));
+                if(isset($managerUserId) && count($managerUserId) > 0) {
+                    $userId = $managerUserId[0]['id'];
+                } else {
+                    return;
+                }
             } else {
                 return;
             }
@@ -2738,8 +2749,8 @@ class FileService extends AbstractService
         $whereQuery = "WHERE ";
     }
     $whereQuery .= 'of.is_active = 1  AND COALESCE(of.is_snoozed,0) !=1 ';
-    $pageSize = "LIMIT " . (isset($filterParamsArray[0]['take']) ? $filterParamsArray[0]['take'] : 20);
-    $offset = "OFFSET " . (isset($filterParamsArray[0]['skip']) ? $filterParamsArray[0]['skip'] : 0);
+    $pageSize = "LIMIT " . (isset($pageSize) ? ltrim($pageSize, " LIMIT ") : 20);
+    $offset = "OFFSET " . (isset($offset) ? ltrim($offset, ' OFFSET ') : 0);
     $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date as startDate,`of`.end_date as endDate,`of`.status as fileStatus,ou.name as created_by,`of`.rygStatus,`of`.version,
     NULL as activityInstanceId,NULL as workflowInstanceId, `of`.date_created as created_date,en.name as entity_name,
     NULL as activityName, `of`.date_created,

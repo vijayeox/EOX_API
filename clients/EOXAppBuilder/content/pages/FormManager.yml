@@ -1,59 +1,104 @@
 name: 'Form Manager'
 description: 'Shows a list of forms'
 content:
-        -
-            type: List
-            content:
-                route: 'app/{{app_uuid}}/artifact/list/form'
-                disableAppId: true    
-                resizable: true
-                actions:
-                    -
-                        name: Edit
-                        rule: "true"
-                        details:
+    -
+        type: ReactComponent
+        content:
+                reactId: 'headerActions'
+                params:
+                    operations:
                             -
-                                type: FormManager
-                                params:
-                                    app_uuid: '{{app_uuid}}'
-                                    content: '{{content}}'
-                        icon: 'far fa-pencil-alt'
-                    -
-                        name: Delete
-                        rule: "true"
-                        details:
+                                name: Build Form
+                                icon: 'fa fa-gavel'
+                                rule: 'true'
+                                details:
+                                    -
+                                        type: FormManager
                             -
-                                type: Update
-                                successMessage: "Form deleted successfully!"
-                                params:
-                                    app_uuid: '{{app_uuid}}'
-                                    url: 'app/{{app_uuid}}/artifact/delete/form/{{name}}.json'
-                                    disableAppId: true
-                        icon: 'fas fa-trash-alt' 
-                        updateOnly: true
-                operations:
-                    title: "Create New Form"
-                    actions:
+                                name: Import Form
+                                rule: 'true'
+                                icon: 'fa fa-cloud-upload'
+                                details:
+                                    -
+                                        type: UploadArtifact
+                                        entity: form
+                
+    # -
+    #     type: RenderButtons
+    #     content:
+    #             buttonList:
+    #                 -
+    #                     name: Build Form
+    #                     icon: 'fa fa-gavel'
+    #                     rule: 'true'
+    #                     details:
+    #                         -
+    #                             type: FormManager
+    #                             params:
+    #                                 app_uuid: '{{appId}}'
+    #                 -
+    #                     name: Import Form
+    #                     rule: 'true'
+    #                     icon: 'fa fa-cloud-upload'
+    #                     details:
+    #                         -
+    #                             type: UploadArtifact
+    #                             entity: form
+    #                             params:
+    #                                 app_uuid: '{{appId}}'
+    -
+        type: List
+        content:
+            route: 'app/{{app_uuid}}/artifact/list/form'
+            disableAppId: true    
+            resizable: true
+            actions:
+                -
+                    name: Edit
+                    rule: "true"
+                    details:
                         -
-                            name: Build Form
-                            icon: 'fa fa-gavel'
-                            rule: 'true'
-                            details:
-                                -
-                                    type: FormManager
-                                    params:
-                                        app_uuid: '{{app_uuid}}'
+                            type: FormManager
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                content: '{{content}}'
+                    icon: 'far fa-pencil-alt'
+                -
+                    name: Delete
+                    rule: "true"
+                    details:
                         -
-                            name: Import Form
-                            rule: 'true'
-                            icon: 'fa fa-cloud-upload'
-                            details:
-                                -
-                                    type: UploadArtifact
-                                    entity: form
-                                    params:
-                                        app_uuid: '{{app_uuid}}'
-                columnConfig:
-                    -
-                        title: Name
-                        field: name
+                            type: Update
+                            successMessage: "Form deleted successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/artifact/delete/form/{{name}}.json'
+                                disableAppId: true
+                    icon: 'fas fa-trash-alt' 
+                    updateOnly: true
+            # operations:
+            #     title: "Create New Form"
+            #     actions:
+            #         -
+            #             name: Build Form
+            #             icon: 'fa fa-gavel'
+            #             rule: 'true'
+            #             details:
+            #                 -
+            #                     type: FormManager
+            #                     params:
+            #                         app_uuid: '{{app_uuid}}'
+            #         -
+            #             name: Import Form
+            #             rule: 'true'
+            #             icon: 'fa fa-cloud-upload'
+            #             details:
+            #                 -
+            #                     type: UploadArtifact
+            #                     entity: form
+            #                     params:
+            #                         app_uuid: '{{app_uuid}}'
+            columnConfig:
+                -
+                    title: Name
+                    field: name

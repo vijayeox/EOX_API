@@ -3,17 +3,20 @@ namespace Oxzion\Service;
 
 use Exception;
 use Oxzion\Service\AbstractService;
+use Oxzion\Service\BusinessParticipantService;
 
 class AppRegistryService extends AbstractService
 {
     protected $table;
     protected $modelClass;
+    protected $businessParticipantService;
     /**
      * @ignore __construct
      */
-    public function __construct($config, $dbAdapter)
+    public function __construct($config, $dbAdapter, BusinessParticipantService $businessParticipantService)
     {
         parent::__construct($config, $dbAdapter);
+        $this->businessParticipantService = $businessParticipantService;
     }
 
     public function createAppRegistry($appId, $accountId, $startOptions = [])
@@ -47,5 +50,25 @@ class AppRegistryService extends AbstractService
         $this->logger->info("UPDATEREGISTRY STARTOPTIONS $$updateQuery with params---" . print_r($params, true));
         $this->executeUpdateWithBindParameters($updateQuery, $params);
         return 0;
+    }
+
+    public function getAppProperties($data){
+        $queryString = "SELECT oar.start_options
+                    FROM ox_app_registry oar
+                    INNER JOIN ox_app oa ON oa.id = oar.app_id
+                    INNER JOIN ox_account oxa ON oxa.id = oar.account_id
+                    WHERE oa.uuid =:appId AND oxa.uuid =:accountId";
+        $params = ['appId' => $data['appId'],'accountId' => $data['accountId']];
+        $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
+        if (count($resultSet) == 0) {
+            $queryString = "SELECT oa.start_options
+                            FROM ox_app oa
+                            WHERE oa.uuid =:appId";
+            $params = ['appId' => $data['appId']];
+            $resultSet = $this->executeQueryWithBindParameters($queryString, $params)->toArray();
+        }
+        $accountOfferings = $this->businessParticipantService->checkIfAccountOfferingExists($data['appId']);
+        $result =['accountOffering' => $accountOfferings , 'start_options' => $resultSet[0]['start_options']];   
+        return $result;
     }
 }

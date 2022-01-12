@@ -1,0 +1,83 @@
+name: 'Templates'
+description: 'Shows a list of templates'
+content:
+    -
+        type: ReactComponent
+        content:
+                reactId: 'headerActions'
+                params:
+                    operations:
+                        -
+                            name: Import template
+                            rule: 'true'
+                            icon: 'fa fa-cloud-upload'
+                            details:
+                                -
+                                    type: UploadArtifact
+                                    entity: template
+    # -
+    #     type: RenderButtons
+    #     content:
+    #             buttonList:
+                    # -
+                    #     name: Import Template
+                    #     rule: 'true'
+                    #     icon: 'fa fa-cloud-upload'
+                    #     details:
+                    #         -
+                    #             type: UploadArtifact
+                    #             entity: template
+                    #             params:
+                    #                 app_uuid: '{{app_uuid}}'
+    -
+        type: List
+        content:
+            route: 'app/{{app_uuid}}/artifact/list/template'
+            disableAppId: true    
+            resizable: true
+            actions:
+                -
+                    name: Delete
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            successMessage: "Template deleted successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/artifact/delete/template/{{name}}.tpl'
+                                disableAppId: true
+                    icon: 'fas fa-trash-alt' 
+                    updateOnly: true
+                -
+                    name: Download
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            method: "GET"
+                            successMessage: "Template downloaded successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/download/template/{{name}}.tpl'
+                                disableAppId: true
+                                downloadFile: true
+                    icon: 'fa fa-download' 
+                    updateOnly: true
+            # operations:
+            #     title: "Import template"
+            #     actions:
+            #         -
+            #             name: Import template
+            #             rule: 'true'
+            #             icon: 'fa fa-cloud-upload'
+            #             details:
+            #                 -
+            #                     type: UploadArtifact
+            #                     entity: template
+            #                     params:
+            #                         app_uuid: '{{app_uuid}}'
+            columnConfig:
+                -
+                    title: Name
+                    field: name

@@ -2,6 +2,26 @@ name: 'Home Page'
 description: 'Shows a list of users'
 content:
     -
+        type: RenderButtons
+        content:
+                buttonList:
+                    -
+                        name: Build Application
+                        icon: 'fa fa-gavel'
+                        rule: 'true'
+                        details:
+                            -
+                                type: Form
+                                form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
+                    -
+                        name: Import Application
+                        icon: 'fa fa-cloud-upload'
+                        rule: 'true'
+                        details:
+                            -
+                                type: UploadArtifact
+                                entity: app
+    -
         type: List
         content:
             route: 'app'
@@ -86,17 +106,31 @@ content:
                                 disableAppId: true
                                 successNotification: "Application exported successfully!"
                     icon: 'far fa-cloud-download'
-                    updateOnly: true      
+                    updateOnly: true   
+                # -
+                #     name: Install or Uninstall Application
+                #     rule: 'true'
+                #     details:
+                #         -
+                #             params:
+                #                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
+                #     icon: 'far fa-download'
                 -
-                    name: Install
+                    name: Install or Uninstall Application
                     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
                     details:
                         -
                             params:
-                                page_id: '96953fc8-7269-494d-b126-6ea45a07a007'
-                                params:
-                                    app_uuid: '{{uuid}}'
+                                page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
                     icon: 'far fa-download'
+                # -
+                #     name: Installed
+                #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
+                #     details:
+                #         -
+                #             params:
+                #                 page_id: '83c014a0-54d4-4dd1-9ebf-55680b5e7d71'
+                #     icon: 'far fa-download'
                 -
                     name: Delete
                     rule: '''{{status}}'' !== 1'
@@ -109,26 +143,27 @@ content:
                                 url: /app/{{uuid}}/removeapp
                                 disableAppId: true
                     icon: 'fas fa-trash-alt'
-                    updateOnly: true 
-            operations:
-                title: "Create Application"
-                actions:
-                    -
-                        name: Build Application
-                        icon: 'fa fa-gavel'
-                        rule: 'true'
-                        details:
-                            -
-                                type: Form
-                                form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
-                    -
-                        name: Import Application
-                        icon: 'fa fa-cloud-upload'
-                        rule: 'true'
-                        details:
-                            -
-                                type: UploadArtifact
-                                entity: app
+                    updateOnly: true
+                -
+                    name: 'Delegate Manager'
+                    icon: 'fa fa-upload'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: '7302ba08-5ea3-11ec-bf63-0242ac130002'
+                                params:
+                                    app_uuid: '{{uuid}}'
+                -
+                    name: 'Template Manager'
+                    icon: 'fa fa-upload'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: '7302bd3c-5ea3-11ec-bf63-0242ac130002'
+                                params:
+                                    app_uuid: '{{uuid}}'
             columnConfig:
                 -
                     title: Name

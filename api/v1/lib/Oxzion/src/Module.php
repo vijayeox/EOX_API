@@ -531,7 +531,8 @@ class Module
                 Service\AppRegistryService::class => function ($container) {
                     $config = $container->get('config');
                     $dbAdapter = $container->get(AdapterInterface::class);
-                    return new Service\AppRegistryService($config, $dbAdapter);
+                    $businessParticipantService = $container->get(\Oxzion\Service\BusinessParticipantService::class);                    
+                    return new Service\AppRegistryService($config, $dbAdapter, $businessParticipantService);
                 },
                 Service\BusinessParticipantService::class => function ($container) {
                     $config = $container->get('config');
@@ -557,7 +558,9 @@ class Module
                         $container->get(Service\BusinessParticipantService::class),
                         $container->get(\Analytics\Service\QueryService::class),
                         $container->get(Insurance\InsuranceService::class),
-                        $container->get(\Team\Service\TeamService::class)
+                        $container->get(\Team\Service\TeamService::class),
+                        $container->get(Service\AppService::class),
+                        $container->get(\App\Service\AppArtifactService::class)
                 );
                 },
                 Document\DocumentBuilder::class => function ($container) {

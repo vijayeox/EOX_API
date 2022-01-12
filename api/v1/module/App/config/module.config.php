@@ -955,7 +955,7 @@ return [
                     'route' => '/app/:appUuid/artifact/list/:artifactType',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow',
+                        'artifactType' => 'form|workflow|delegate|template',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -973,7 +973,7 @@ return [
                     'route' => '/app/:appUuid/artifact/add/:artifactType',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow|app_icon|app_icon_white',
+                        'artifactType' => 'form|workflow|app_icon|app_icon_white|delegate|template',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -991,7 +991,7 @@ return [
                     'route' => '/app/:appUuid/artifact/delete/:artifactType/:artifactName',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow',
+                        'artifactType' => 'form|workflow|delegate|template',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -1028,6 +1028,74 @@ return [
                         'controller' => Controller\AppArtifactController::class,
                         'method' => 'POST',
                         'action' => 'uploadAppArchive',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
+            'getAppProperties' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/account/:accountId/appProperties',
+                    'constraints' => [
+                        'appId' => UuidUtil::UUID_PATTERN,
+                        'accountId' => UuidUtil::UUID_PATTERN,
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\AppRegisterController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppProperties',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
+            'getAccountOnServiceType' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/getAccounts/:serviceType',
+                    'constraints' => [
+                        'appId' => UuidUtil::UUID_PATTERN,
+                        'serviceType' => 'forInstall|Installed',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\AppRegisterController::class,
+                        'method' => 'GET',
+                        'action' => 'getAccountOnServiceType',
+                        'access' => [
+                            // 'get' => ['MANAGE_ACCOUNT_READ','MANAGE_INSTALL_APP_READ'],
+                        ],
+                    ],
+                ],
+            ],
+            'downloadAppFile' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appUuid/download/:artifactType/:artifactName',
+                    'constraints' => [
+                        'appUuid' => UuidUtil::UUID_PATTERN,
+                        'artifactType' => 'delegate|template',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\AppArtifactController::class,
+                        'method' => 'GET',
+                        'action' => 'downloadAppFile',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
+            'appBusinessRoles' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/appBusinessRoles',
+                    'defaults' => [
+                        'controller' => Controller\AppController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppBusinessRoles',
                         'access' => [
                             // SET ACCESS CONTROL
                         ],

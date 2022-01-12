@@ -2,17 +2,17 @@
 namespace Oxzion\Service;
 
 use Exception;
-use Oxzion\Model\Employee;
-use Oxzion\Model\EmployeeTable;
-use Oxzion\ServiceException;
-use Oxzion\OxServiceException;
-use Oxzion\EntityNotFoundException;
-use Oxzion\ValidationException;
-use Oxzion\Service\AbstractService;
-use Oxzion\Utils\UuidUtil;
 use Oxzion\Auth\AuthConstants;
 use Oxzion\Auth\AuthContext;
+use Oxzion\EntityNotFoundException;
 use Oxzion\Model\Account;
+use Oxzion\Model\Employee;
+use Oxzion\Model\EmployeeTable;
+use Oxzion\OxServiceException;
+use Oxzion\ServiceException;
+use Oxzion\Service\AbstractService;
+use Oxzion\Utils\UuidUtil;
+use Oxzion\ValidationException;
 
 class EmployeeService extends AbstractService
 {
@@ -49,7 +49,7 @@ class EmployeeService extends AbstractService
         if (!isset($EmpData['designation'])) {
             $EmpData['designation'] = "Staff";
         }
-        
+
         $form = new Employee($this->table);
         $form->assign($EmpData);
         try {
@@ -64,8 +64,7 @@ class EmployeeService extends AbstractService
 
     public function updateEmployeeDetails($data)
     {
-        $this->logger->info("Employee data--------\n".print_r($data, true));
-
+        $this->logger->info("Employee data--------\n" . print_r($data, true));
         if (isset($data['managerId'])) {
             $queryString = "SELECT e.id from ox_employee e
                             inner join ox_user u on u.person_id = e.person_id
@@ -134,7 +133,7 @@ class EmployeeService extends AbstractService
         }
         $manId = $resultSet[0]['id'];
         return ['employee_id' => $employeeId,
-                'manager_id' => $manId];
+            'manager_id' => $manId];
     }
     /**
      * @method assignManagerToUser

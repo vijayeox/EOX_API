@@ -28,6 +28,7 @@ class AppArtifactService extends AbstractService
     private $table;
     private $appService;
     private $contentFolder = DIRECTORY_SEPARATOR . 'content' . DIRECTORY_SEPARATOR;
+    private $dataFolder = DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR;
 
     public function __construct($config, $dbAdapter, AppTable $table, AppService $appService)
     {
@@ -62,13 +63,21 @@ class AppArtifactService extends AbstractService
                 }
                 return $this->uploadAppIcon($targetDir, $artifactType);
             break;
+            case 'delegate':
+                return $this->uploadContents($appSourceDir, 'delegate', $descriptorPath, $artifactType);
+            case 'template':
+                return $this->uploadContents($appSourceDir, 'template', $descriptorPath, $artifactType);
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
     }
     private function uploadContents($appSourceDir, $contentType, $descriptorPath, $artifactType)
     {
-        $targetDir = $appSourceDir . $this->contentFolder . $contentType . DIRECTORY_SEPARATOR;
+        if ($contentType == 'forms' || $contentType == 'workflows') {
+            $targetDir = $appSourceDir . $this->contentFolder . $contentType . DIRECTORY_SEPARATOR;
+        }else{
+            $targetDir = $appSourceDir . $this->dataFolder . $contentType . DIRECTORY_SEPARATOR;
+        }
         //Check whether any of the uploaded file(s) already exist(s) on the server.
         foreach ($_FILES as $key => $fileData) {
             if (UPLOAD_ERR_OK != $fileData['error']) {
@@ -118,7 +127,11 @@ class AppArtifactService extends AbstractService
     {
         $appSourceDir = $this->getAppSourceDirPath($appUuid);
         $descriptorPath = $appSourceDir . DIRECTORY_SEPARATOR . "application.yml";
-        $filePath = $appSourceDir . $this->contentFolder;
+        if ($artifactType == 'form' || $artifactType == 'workflow') {            
+            $filePath = $appSourceDir . $this->contentFolder;
+        }else{
+            $filePath = $appSourceDir . $this->dataFolder;
+        }
         switch ($artifactType) {
             case 'workflow':
                 $filePath = $filePath . 'workflows';
@@ -126,9 +139,16 @@ class AppArtifactService extends AbstractService
             case 'form':
                 $filePath = $filePath . 'forms';
             break;
+            case 'delegate':
+                $filePath = $filePath . 'delegate';
+            break;
+            case 'template':
+                $filePath = $filePath . 'template';
+            break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
+        $fileDirectory = $filePath;
         $filePath = $filePath . DIRECTORY_SEPARATOR . $artifactName;
         if (!file_exists($filePath)) {
             throw new FileNotFoundException("Artifact file is not found.", ['file' => $filePath]);
@@ -136,7 +156,13 @@ class AppArtifactService extends AbstractService
         if (!unlink($filePath)) {
             throw new Exception("Failed to delete artifact type=${artifactType}, file ${artifactName}.");
         }
-        $this->updateAppDescriptor("delete", $descriptorPath, $artifactType, $artifactName);
+        if ($artifactType == 'form' || $artifactType == 'workflow') {  
+            $this->updateAppDescriptor("delete", $descriptorPath, $artifactType, $artifactName);
+        } else{
+            if (file_exists($fileDirectory . $artifactName)) {
+                FileUtils::deleteFile($artifactName, $fileDirectory);
+            }
+        }
     }
 
     public function uploadAppArchive()
@@ -243,13 +269,23 @@ class AppArtifactService extends AbstractService
                 ['directory' => $appSourceDir]
             );
         }
-        $contentDir = $appSourceDir . $this->contentFolder;
+        if ($artifactType == 'form' || $artifactType == 'workflow') {
+            $contentDir = $appSourceDir . $this->contentFolder;
+        } else{
+            $contentDir = $appSourceDir . $this->dataFolder;
+        }
         switch ($artifactType) {
             case 'workflow':
                 $targetDir = $contentDir . 'workflows';
             break;
             case 'form':
                 $targetDir = $contentDir . 'forms';
+            break;
+            case 'delegate':
+                $targetDir = $contentDir . 'delegate';
+            break;
+            case 'template':
+                $targetDir = $contentDir . 'template';
             break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
@@ -260,7 +296,7 @@ class AppArtifactService extends AbstractService
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
                     $ext = pathinfo($entry, PATHINFO_EXTENSION);
-                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow')) {
+                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && $artifactType == 'delegate') || ($ext == 'tpl' && $artifactType == 'template')) {
                         $files[] = array(
                             'name' => substr($entry, 0, strrpos($entry, '.')) ,
                             'content'=> file_get_contents($targetDir.$entry)
@@ -324,5 +360,19 @@ class AppArtifactService extends AbstractService
             );
         }
         return $appSourceDir;
+    }
+
+    public function createDownload($appUuid,$artifactType,$artifactNamer){
+        $appSourceDir = $this->getAppSourceDirPath($appUuid);
+        $this->logger->info("DOWNLOAD Appsource----".print_r($appSourceDir,true));
+        $filePath = $appSourceDir . $this->dataFolder . $artifactType . DIRECTORY_SEPARATOR. $artifactNamer;
+        $this->logger->info("DOWNLOAD PATH----".print_r($filePath,true));
+        //Check the file exists or not
+        if(file_exists($filePath)) {
+            return $filePath;
+        }
+        else{
+            echo "File does not exist.";
+        }
     }
 }

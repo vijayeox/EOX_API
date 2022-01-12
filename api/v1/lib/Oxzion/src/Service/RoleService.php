@@ -394,7 +394,7 @@ class RoleService extends AbstractService
         } else {
             $roleId = $role['id'];
         }
-        $query = "INSERT into ox_role_privilege (role_id, privilege_name, permission, account_id, app_id)
+        $query = "INSERT IGNORE into ox_role_privilege (role_id, privilege_name, permission, account_id, app_id)
                     SELECT $roleId, rp.privilege_name,rp.permission," . $role['account_id'] .
             ",rp.app_id from ox_role_privilege rp 
                         left join ox_role r on rp.role_id = r.id
