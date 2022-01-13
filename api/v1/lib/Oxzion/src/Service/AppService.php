@@ -299,13 +299,17 @@ class AppService extends AbstractService implements AppUpgrade
 
     public function deployApp($path, $params = null)
     {
+        
         $ymlData = $this->cleanApplicationDescriptorData(self::loadAppDescriptor($path));
+        
         $this->logger->info("\n Yaml Data " . print_r($ymlData, true));
         if (!isset($params)) {
             $params = $this->appDeployOptions;
         }
         try {
-            if (isset($ymlData['appVersion'])) {                
+            
+            if (isset($ymlData['appVersion'])) { 
+                         
                 if ($ymlData['appVersion'] != $ymlData['app']['previousVersion']) {
                     $updatedYml = $this->upgrade($ymlData);
                     $yamlText = Yaml::dump($updatedYml, 20);
@@ -314,12 +318,15 @@ class AppService extends AbstractService implements AppUpgrade
                     file_put_contents($deployPath, $yamlText);
                     file_put_contents($sourcePath, $yamlText);
                     $ymlData = Yaml::parse(file_get_contents($sourcePath));
+                    
                 }
             }
+            
             foreach ($this->appDeployOptions as $key => $value) {
                 if (!in_array($value, $params)) {
                     continue;
                 }
+                
                 $this->logger->info("\n App Data processing - " . print_r($value, true));
                 switch ($value) {
                     case 'initialize':
@@ -341,6 +348,8 @@ class AppService extends AbstractService implements AppUpgrade
                         $this->performMigration($ymlData, $path);
                         break;
                     case 'workflow':
+                        //print_r($this->processWorkflow($ymlData, $path));
+                        //die;//
                         $this->processWorkflow($ymlData, $path);
                         break;
                     case 'form':
@@ -367,7 +376,7 @@ class AppService extends AbstractService implements AppUpgrade
                         break;
                 }
             }
-
+            
             $this->setupOrg($ymlData, $path);
             $appData = &$ymlData['app'];
             $appData['status'] = App::PUBLISHED;
@@ -375,6 +384,7 @@ class AppService extends AbstractService implements AppUpgrade
             $this->processInstalledTemplates($appData['uuid'], $path);
             $this->updateApp($appData['uuid'], $ymlData); //Update is needed because app status changed to PUBLISHED.
         } catch (Exception $e) {
+            
             $this->logger->error($e->getMessage(), $e);
             $this->removeViewAppOnError($path);
             throw $e;
@@ -384,6 +394,7 @@ class AppService extends AbstractService implements AppUpgrade
                 $this->createOrUpdateApplicationDescriptor($originalPath, $ymlData);
             }
         }
+        
         return $ymlData;
     }
 
@@ -904,9 +915,11 @@ class AppService extends AbstractService implements AppUpgrade
         if (!is_dir($path . 'view/apps/')) {
             FileUtils::createDirectory($path . 'view/apps/');
         }
+        
         $this->logger->info("ppp--" . print_r($path, true));
         if (isset($yamlData['app']['oldAppName']) && !empty($yamlData['app']['oldAppName']) && $yamlData['app']['name'] != $yamlData['app']['oldAppName']) {
             $this->logger->info("OLDNME---" . print_r($path . 'view/apps/' . $yamlData['app']['oldAppName'], true));
+            
             if (is_dir($path . 'view/apps/' . $yamlData['app']['oldAppName'])) {
                 FileUtils::rmDir($path . 'view/apps/' . $yamlData['app']['oldAppName']);
             }
@@ -916,10 +929,15 @@ class AppService extends AbstractService implements AppUpgrade
             }
         }
         $appName = $path . 'view/apps/' . $yamlData['app']['name'];
+        
         $metadataPath = $appName . '/metadata.json';
+        
         $eoxapp = $this->config['DATA_FOLDER'] . 'eoxapps';
         if (!FileUtils::fileExists($appName) && !FileUtils::fileExists($metadataPath)) {
             FileUtils::renameFile($path . 'view/apps/eoxapps', $path . 'view/apps/' . $yamlData['app']['name']);
+            copy($eoxapp.'/view/apps/eoxapps/metadata.json', $path . '/view/apps/' . $yamlData['app']['name'].'/metadata.json');
+            copy($eoxapp.'/view/apps/eoxapps/package.json', $path . '/view/apps/' . $yamlData['app']['name'].'/package.json');
+            copy($eoxapp.'/view/apps/eoxapps/index.scss', $path . '/view/apps/' . $yamlData['app']['name'].'/index.scss');
         } else {
             if (is_dir($path . 'view/apps/eoxapps')) {
                 FileUtils::rmDir($path . 'view/apps/eoxapps');
@@ -931,23 +949,30 @@ class AppService extends AbstractService implements AppUpgrade
                 FileUtils::copy($srcIconPath . 'index.scss', "index.scss", $appName); // Copy css from Source to Deploy directory
             }
         }
+        
         $jsonData = json_decode(file_get_contents($metadataPath), true);
+        
+        
         $jsonData['name'] = $yamlData['app']['name'];
         $jsonData['appId'] = $yamlData['app']['uuid'];
         $jsonData['category'] = isset($yamlData['app']['category']) ? $yamlData['app']['category'] : null;
         $displayName = $jsonData['title']['en_EN'] = ($yamlData['app']['name'] == 'EOXAppBuilder') ? 'AppBuilder' : (isset($yamlData['app']['title']) ? $yamlData['app']['title'] : $yamlData['app']['name']);
+        
         if (isset($yamlData['app']['description'])) {
             $jsonData['description']['en_EN'] = $yamlData['app']['description'];
         }
         if (isset($yamlData['app']['autostart'])) {
             $jsonData['autostart'] = $yamlData['app']['autostart'];
         }
+        
         $jsonData['singleton'] = true;
         file_put_contents($appName . '/metadata.json', json_encode($jsonData, JSON_PRETTY_PRINT));
+        
         $packagePath = $appName . '/package.json';
         $jsonData = json_decode(file_get_contents($packagePath), true);
         $jsonData['name'] = $yamlData['app']['name'];
         file_put_contents($appName . '/package.json', json_encode($jsonData));
+        
         $indexScssPath = $appName . '/index.scss';
         $indexfileData = file_get_contents($indexScssPath);
         $indexfileData2 = str_replace('{AppName}', $yamlData['app']['name'], $indexfileData);
@@ -955,6 +980,7 @@ class AppService extends AbstractService implements AppUpgrade
         FileUtils::chmod_r($path . 'view', 0777);
         $this->logger->info("\n View json data " . print_r($displayName, true));
         $chatNotification = "";
+        
         if (isset($yamlData['app']['app_properties'])) {
             $appProperties = json_decode($yamlData['app']['app_properties'], true);
             $chatNotification = $appProperties['chat_notification'];
@@ -966,6 +992,7 @@ class AppService extends AbstractService implements AppUpgrade
         if ($chatNotification === false) {
             $this->messageProducer->sendTopic(json_encode(array('appName' => $jsonData['name'])), 'DISABLE_CHAT_BOT');
         }
+        
     }
 
     public function processWorkflow(&$yamlData, $path)
@@ -980,6 +1007,7 @@ class AppService extends AbstractService implements AppUpgrade
                 }
                 $result = 0;
                 $result = $this->checkWorkflowData($value, $appUuid);
+                
                 if ($result == 0) {
                     $entity = $this->entityService->getEntityByName($yamlData['app']['uuid'], $entityName);
                     if (!$entity) {
@@ -995,6 +1023,7 @@ class AppService extends AbstractService implements AppUpgrade
                     }
                 }
             }
+            //return;
         }
     }
 
@@ -1010,6 +1039,8 @@ class AppService extends AbstractService implements AppUpgrade
             $data['name'] = str_replace(' ', '_', $data['bpmn_file']); // Replaces all spaces
             $data['name'] = preg_replace('/[^A-Za-z0-9_]/', '', $data['name'], -1); // Removes special chars.
         }
+        //print_r($data);
+        //return $data;
     }
 
     private function setLinkAndRunBuild($appPath, $appId)
