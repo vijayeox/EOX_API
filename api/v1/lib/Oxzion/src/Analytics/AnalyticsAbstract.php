@@ -37,6 +37,8 @@ abstract class AnalyticsAbstract implements AnalyticsEngine
             $parameters['inline_filter'][]=json_decode($filtergrid);
         }
 
+        // print_r($parameters);
+        $keyword = '';
         if (isset($parameters['orderby'])) {
             $sortpara = explode(" ",$parameters['orderby']);
             if (isset($parameters['columns'][$sortpara[0]])) {
