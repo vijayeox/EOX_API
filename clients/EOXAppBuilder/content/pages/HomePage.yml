@@ -106,25 +106,23 @@ content:
                                 disableAppId: true
                                 successNotification: "Application exported successfully!"
                     icon: 'far fa-cloud-download'
-                    updateOnly: true      
-                -
-                    name: Install
-                    rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
-                    details:
-                        -
-                            params:
-                                page_id: '96953fc8-7269-494d-b126-6ea45a07a007'
-                                params:
-                                    app_uuid: '{{uuid}}'
-                    icon: 'far fa-download'
+                    updateOnly: true   
                 # -
                 #     name: Install or Uninstall Application
-                #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
+                #     rule: 'true'
                 #     details:
                 #         -
                 #             params:
                 #                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
                 #     icon: 'far fa-download'
+                -
+                    name: Install or Uninstall Application
+                    rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
+                    details:
+                        -
+                            params:
+                                page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
+                    icon: 'far fa-download'
                 # -
                 #     name: Installed
                 #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'

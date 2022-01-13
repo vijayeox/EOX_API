@@ -2,19 +2,33 @@ name: 'Workflow Manager'
 description: 'Shows a list of Workflows'
 content:
     -
-        type: RenderButtons
+        type: ReactComponent
         content:
-                buttonList:
-                    -
-                        name: Import Workflow
-                        icon: 'fa fa-cloud-upload'
-                        rule: 'true'
-                        details:
-                            -
-                                type: UploadArtifact
-                                entity: workflow
-                                params:
-                                    app_uuid: '{{appId}}'
+                reactId: 'headerActions'
+                params:
+                    operations:
+                        -
+                            name: Import Workflow
+                            rule: 'true'
+                            icon: 'fa fa-cloud-upload'
+                            details:
+                                -
+                                    type: UploadArtifact
+                                    entity: workflow
+    # -
+    #     type: RenderButtons
+    #     content:
+    #             buttonList:
+    #                 -
+    #                     name: Import Workflow
+    #                     icon: 'fa fa-cloud-upload'
+    #                     rule: 'true'
+    #                     details:
+    #                         -
+    #                             type: UploadArtifact
+    #                             entity: workflow
+    #                             params:
+    #                                 app_uuid: '{{appId}}'
     -
         type: List
         content:

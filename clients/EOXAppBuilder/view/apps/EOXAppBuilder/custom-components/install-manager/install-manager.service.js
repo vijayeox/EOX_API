@@ -3,6 +3,7 @@ export class InstallManagerService {
   selectedOrganization = null;
   orgTemplateSelected = null;
   metaData = null;
+  businessRoles = null;
   constructor(parentData, type, core, appId) {
     this.parentData = parentData;
     this.installationType = type;
@@ -31,6 +32,10 @@ export class InstallManagerService {
       this.updateOrganization = null;
       return this;
     }
+    if (this.businessRoles) {
+      this.businessRoles = null;
+      return this;
+    }
     if (this.metaData) {
       this.metaData = null;
       return this;
@@ -41,8 +46,12 @@ export class InstallManagerService {
     }
     return this;
   }
-  setInstallationType(type = 'forInstall'){
+  setInstallationType(type = "forInstall") {
     this.installationType = type;
+    return this;
+  }
+  setBusinessRoles(businessRoles) {
+    this.businessRoles = businessRoles;
     return this;
   }
 }

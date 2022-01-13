@@ -534,6 +534,9 @@ class AppService extends AbstractService implements AppUpgrade
         try {
             $this->beginTransaction();
             $appId = $yamlData['app']['uuid'];
+            if( !isset($yamlData['org']) && isset($data['businessOffering'])){
+                $yamlData['org']['businessOffering'] = $data['businessOffering'];
+            }
             $bRoleResult = ((isset($yamlData['org']))) ? $this->accountService->setupBusinessOfferings($yamlData['org'], $accountId, $appId) : null;
             $this->createRole($yamlData, false, $accountId, $bRoleResult);
             $user = $this->accountService->getContactUserForAccount($accountId);
@@ -1769,11 +1772,13 @@ class AppService extends AbstractService implements AppUpgrade
 
 
     public function getAccountOnServiceType($data){
+        
         $select = "SELECT acct.uuid as accountId
                    FROM ox_app_registry oxar
                    INNER JOIN ox_app oxa ON oxa.id = oxar.app_id
                    INNER JOIN ox_account acct ON acct.id = oxar.account_id
                    WHERE oxa.uuid =:appId";
+        
         $params = ['appId' => $data['appId']];           
         $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
         if (count($result) > 0) {                
@@ -1784,5 +1789,9 @@ class AppService extends AbstractService implements AppUpgrade
         }else{
             return $this->accountService->getAccounts($data['filterParams'],null,$data['serviceType']);
         }
+    }
+
+    public function getAppBusinessRole($appId){
+        return $this->businessRoleService->getBusinessRoleByName($appId);
     }
 }

@@ -427,4 +427,25 @@ class AppController extends AbstractApiController
             return $this->getErrorResponse("Css File not Found", 404);
         }
     }
+
+     /**
+     * GET List of BusinessRoles for an App API
+     * @api
+     * @link /app/appId/appBusinessRoles
+     * @method GET
+     * @return array Returns a JSON Response list of BusinessRoles based on Access.
+     */
+    public function getAppBusinessRolesAction()
+    {
+        $data = $this->params()->fromRoute();
+        $this->log->info(__CLASS__ . "-> \n Get BusinessRole List- " . print_r($data, true));
+        try {
+            $appUuid = $this->params()->fromRoute()['appId'];
+            $result = $this->appService->getAppBusinessRole($appUuid);
+            return $this->getSuccessResponseWithData($result);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+    }
 }

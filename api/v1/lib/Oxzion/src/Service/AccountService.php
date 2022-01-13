@@ -209,7 +209,8 @@ class AccountService extends AbstractService
         $response['businessRole'] = array();
         foreach ($offerings as $offering) {
             $result = $this->setupBusinessRole($offering, $accountId, $appId);
-            if (isset($appId) && isset($result['account_business_role_id'])) {
+            $this->logger->info("Executing query result-- ".json_encode($result));
+            if (isset($appId) && !empty($result['account_business_role_id'])) {
                 $acctBusinessRoleId = $result['account_business_role_id'];
                 $this->setupAcctOffering($appId, $acctBusinessRoleId, $offering['entity']);
                 $response['businessRole'][] = $offering['businessRole'];
@@ -232,6 +233,7 @@ class AccountService extends AbstractService
                 continue;
             }
             $params['entityId'] = $entity['id'];
+            $this->logger->info("Executing query setupAcctOffering- $query with params - ".json_encode($params));
             $this->executeUpdateWithBindParameters($query, $params);
         }
     }
@@ -610,6 +612,7 @@ class AccountService extends AbstractService
         $query = $select . " " . $from . " " . $where . " " . $sort . " " . $limit;
         $resultSet = $this->executeQuerywithParams($query)->toArray();
         for ($x = 0; $x < sizeof($resultSet); $x++) {
+            //echo $resultSet[$x]['uuid'];
             $resultSet[$x]['contactid'] = $this->getAccountContactPersonDetails($resultSet[$x]['uuid']);
         }
         
