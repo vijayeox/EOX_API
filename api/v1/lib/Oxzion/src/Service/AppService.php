@@ -1772,11 +1772,13 @@ class AppService extends AbstractService implements AppUpgrade
 
 
     public function getAccountOnServiceType($data){
+        
         $select = "SELECT acct.uuid as accountId
                    FROM ox_app_registry oxar
                    INNER JOIN ox_app oxa ON oxa.id = oxar.app_id
                    INNER JOIN ox_account acct ON acct.id = oxar.account_id
                    WHERE oxa.uuid =:appId";
+        
         $params = ['appId' => $data['appId']];           
         $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
         if (count($result) > 0) {                

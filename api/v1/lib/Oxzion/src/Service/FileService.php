@@ -2140,7 +2140,7 @@ class FileService extends AbstractService
                 $fileFilter['uuid'] = $params['fileId'];
                 $fileRecord = $this->getDataByParams('ox_file', array("entity_id","data"), $fileFilter, null)->toArray();
                 if (!empty($fileRecord) && !is_null($fileRecord)) {
-                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'].AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/' . $params['fileId'].'/';
+                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'].AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/temp/' . $params['fileId'].'/';
                     if (is_dir($folderPath.$attachmentName)) {
                         FileUtils::rmDir($folderPath.$attachmentName);
                     } elseif (file_exists($folderPath.$attachmentName)) {

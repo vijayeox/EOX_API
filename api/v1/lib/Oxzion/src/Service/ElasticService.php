@@ -200,12 +200,12 @@ class ElasticService
             $results['type'] = 'value';
         } else {
             $results = array();
-            $results['total_count']=$result_obj['data']['hits']['total']['value'];
+            $results['total_count'] = $result_obj['data']['hits']['total']['value'];
             foreach ($result_obj['data']['hits']['hits'] as $key => $value) {
                 $results['data'][$key] = $value['_source'];
                 //    $results['data'][$key]['id'] = $value['_source']['_id'];
             }
-            
+
             $results['type'] = 'list';
         }
         $results['query'] = $result_obj['query'];
@@ -220,22 +220,28 @@ class ElasticService
     protected function createFilter($filter, $type = '')
     {
         $subQuery = null;
-        $symMapping = ['>' => 'gt', '>=' => 'gte', '<' => 'lt', '<=' => 'lte','gt'=>'gt','lt'=>'lt'];
+        $symMapping = ['>' => 'gt', '>=' => 'gte', '<' => 'lt', '<=' => 'lte', 'gt' => 'gt', 'lt' => 'lt'];
         $boolMapping = ['OR' => 'should', 'AND' => 'must'];
         if (!isset($filter[1]) && is_array($filter)) {
             $filter = $filter[0];
         }
         $column = $filter[0];
         if (isset($filter[2])) {
+            // echo "<pre/>1";
+            // print_r($filter);exit;
             $value = $filter[2];
             $condition = $filter[1];
         } else {
+            // echo "<pre/>2";
+            // print_r($filter);
             $condition = "==";
             $value = $filter[1];
         }
         if (isset($filter[3])) {
             $type = $filter[3];
         }
+        // echo "<pre/>Filter";
+        // print_r($value);exit;
         if (strtoupper($condition) == 'OR' or strtoupper($condition) == 'AND') {
             $tempQuery1 = $this->createFilter($column, $type);
             $tempQuery2 = $this->createFilter($value, $type);
@@ -268,7 +274,7 @@ class ElasticService
                 } elseif (strtoupper($condition == "STARTSWITH")) {
                     $subQuery["match_phrase_prefix"] = [$column => $value];
                 } elseif (strtoupper($condition == "LIKE")) {
-                    $subQuery["wildcard"] = [$column => "*".$value."*"];
+                    $subQuery["wildcard"] = [$column => "*" . $value . "*"];
                 } else {
                     if (strtolower(substr($value, 0, 5)) == "date:") {
                         $value = date("Y-m-d", strtotime(substr($value, 5)));
@@ -374,12 +380,11 @@ class ElasticService
     {
         $mustquery = null;
         if (isset($searchconfig['use_participants'])) {
-            $mustquery['must'][] = ['term' => ['participants' => $accountId]]; 
+            $mustquery['must'][] = ['term' => ['participants' => $accountId]];
         } else {
             $mustquery['must'][] = ['term' => ['account_id' => $accountId]];
         }
-        
-       
+
         if (!empty($searchconfig['aggregates'])) {
             $aggregates = $searchconfig['aggregates'];
             $mustquery['must'][] = array('exists' => array('field' => $aggregates[key($aggregates)]));
@@ -387,7 +392,9 @@ class ElasticService
         $this->filterFields = array();
         if (!empty($searchconfig['filter'])) {
             foreach ($searchconfig['filter'] as $filter) {
-                //     echo 'filter:';print_r($filter); echo '--';
+                // echo 'filter:';
+                // print_r($filter);
+                // echo '--';
                 $this->filterTmpFields = array();
                 $filterArry = $this->createFilter($filter);
                 if ($filterArry) {
@@ -445,7 +452,7 @@ class ElasticService
         if ($this->core) {
             $q['index'] = $this->core . '_' . $q['index'];
         }
-        $q['track_total_hits']=true;
+        $q['track_total_hits'] = true;
         $this->logger->debug('Elastic query:');
         $this->logger->debug(json_encode($q, JSON_PRETTY_PRINT));
         $this->elasticQuery = json_encode($q);
