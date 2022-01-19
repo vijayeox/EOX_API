@@ -389,17 +389,22 @@ class AccountService extends AbstractService
         if (isset($accountData['uuid'])) {
             
             try {
-                $this->updateAccount($accountData['uuid'], $accountData, null);
-                return;
+                if(empty($this->getAccountIdByUuid($accountData['uuid'])))
+                {
+                    $this->createAccount($accountData, null);
+                }
+                else
+                {
+                    $this->updateAccount($accountData['uuid'], $accountData, null);
+                    return;
+                }
+                
             } catch (Exception $e) {
                 if (!$e instanceof EntityNotFoundException) {
                     throw $e;
                 }
             }
-            if(empty($this->getAccountIdByUuid($accountData['uuid'])))
-            {
-                $this->createAccount($accountData, null);
-            }
+            
         } else {
             $this->createAccount($accountData, null);
         }
@@ -421,18 +426,21 @@ class AccountService extends AbstractService
             $data['preferences'] = json_encode($data['preferences']);
         }
         
-        $form = new Account($this->table);
-        $form->loadByUuid($id);
-        $organizationId = $form->getProperty('organization_id');
-        $organizationOldName = $form->getProperty('name');
-        if (isset($organizationId)) {
-            $this->organizationService->updateOrganization($organizationId, $data);
-        }
-        $changedArray = $data;
-        $changedArray['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
-        $changedArray['date_modified'] = date('Y-m-d H:i:s');
-        $form->assign($changedArray);
+        
         try {
+            $form = new Account($this->table);
+            $form->loadByUuid($id);
+            $organizationId = $form->getProperty('organization_id');
+            $organizationOldName = $form->getProperty('name');
+            
+            
+            if (isset($organizationId)) {
+                $this->organizationService->updateOrganization($organizationId, $data);
+            }
+            $changedArray = $data;
+            $changedArray['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
+            $changedArray['date_modified'] = date('Y-m-d H:i:s');
+            $form->assign($changedArray);
             $this->beginTransaction();
             $form->save();
             if (isset($files)) {
