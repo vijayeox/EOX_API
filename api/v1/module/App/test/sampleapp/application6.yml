@@ -5,7 +5,7 @@ app:
   category: EXAMPLE_CATEGORY
 org:
   name: Vincencia & Buckley
-  #uuid: faffaf17-00b1-4a92-9ae6-7d04545457fe
+  uuid: faffaf17-00b1-4a92-9ae6-7d04545457fe
   email: testhub07@gmail.com
   contact:
     username: csradmin

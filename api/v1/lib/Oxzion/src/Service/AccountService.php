@@ -387,6 +387,7 @@ class AccountService extends AbstractService
     public function saveAccount(&$accountData)
     {
         if (isset($accountData['uuid'])) {
+            
             try {
                 $this->updateAccount($accountData['uuid'], $accountData, null);
                 return;
@@ -394,6 +395,10 @@ class AccountService extends AbstractService
                 if (!$e instanceof EntityNotFoundException) {
                     throw $e;
                 }
+            }
+            if(empty($this->getAccountIdByUuid($accountData['uuid'])))
+            {
+                $this->createAccount($accountData, null);
             }
         } else {
             $this->createAccount($accountData, null);

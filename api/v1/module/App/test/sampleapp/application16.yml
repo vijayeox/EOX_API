@@ -1,4 +1,4 @@
-cssContent: "body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {\n  height: 50% !important;\n  overflow-y: visible !important;\n}\n"
+cssContent: ""
 app:
   name: DiveInsuranceSample
   uuid: 6f6c35fe-2e3e-4c6f-ad15-a61d98e8d641
