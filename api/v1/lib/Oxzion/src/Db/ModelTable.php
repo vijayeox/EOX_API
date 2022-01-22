@@ -136,12 +136,14 @@ abstract class ModelTable
             $id = $data[Entity::COLUMN_ID];
         }
         try {
+        
             if (is_null($id) || $id === 0 || empty($id)) {
                 $rows = $this->tableGateway->insert($data);
                 if (!isset($rows)) {
                     return 0;
                 }
                 $this->lastInsertValue = $this->tableGateway->getLastInsertValue();
+                
                 return $rows;
             }
             return $this->tableGateway->update($data, [Entity::COLUMN_ID => $id]);

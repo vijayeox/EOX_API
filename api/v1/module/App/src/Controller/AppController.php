@@ -320,14 +320,18 @@ class AppController extends AbstractApiController
         }
 
         try {
+            
             $path = $params['path'];
             $path .= substr($path, -1) == '/' ? '' : '/';
             if (isset($params['parameters']) && !empty($params['parameters'])) {
+                
                 $params = $this->processDeploymentParams($params);
             } else {
+                
                 $params = null;
             }
             $appData = $this->appService->deployApp($path, $params);
+            
             return $this->getSuccessResponseWithData($appData);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);

@@ -8,11 +8,11 @@ org:
     name: 'Vincencia & Buckley'
     uuid: faffaf17-00b1-4a92-9ae6-7d04545457fe
     email: testhub07@gmail.com
-    address1: '6 bCenterpoint'
-    address2: Dr.
-    city: 'La Palma'
-    state: CA
-    zip: 90623
+    address1: 'Test Address 1' 
+    address2: 'Test Address 2'
+    city: 'BOise'
+    state: 'TX'
+    zip: 90624
     country: 'United States'
     contact:
         username: csradmin
