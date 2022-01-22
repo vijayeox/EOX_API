@@ -1386,7 +1386,9 @@ class AppService extends AbstractService implements AppUpgrade
         $appDeployDir = AppArtifactNamingStrategy::getDeployAppDirectory($this->config, $appData);
         if (file_exists($appDeployDir)) {
             $metadataPath = $appDeployDir . '/view/apps/'.$appData['name'].'/metadata.json';
-            $appData['start_options'] = file_get_contents($metadataPath);
+            if (file_exists($metadataPath)) {
+                $appData['start_options'] = file_get_contents($metadataPath);
+            }
         }
         $app = new App($this->table);
         $app->loadByUuid($uuid);
