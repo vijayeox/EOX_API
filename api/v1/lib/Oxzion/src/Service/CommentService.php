@@ -192,7 +192,7 @@ class CommentService extends AbstractService
         if (count($resultSet) >0) {
             for ($i=0; $i < count($resultSet); $i++) {                 
                 $attachment = json_decode($resultSet[$i]['attachments'],true);
-                $resultSet[$i]['attachments'] = $attachment['attachments'];
+                $resultSet[$i]['attachments'] = isset($attachment['attachments']) ? $attachment['attachments'] : null;
             }
         }
         return $resultSet;
