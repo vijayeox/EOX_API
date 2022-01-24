@@ -209,7 +209,8 @@ class AccountService extends AbstractService
         $response['businessRole'] = array();
         foreach ($offerings as $offering) {
             $result = $this->setupBusinessRole($offering, $accountId, $appId);
-            if (isset($appId) && isset($result['account_business_role_id'])) {
+            $this->logger->info("Executing query result-- ".json_encode($result));
+            if (isset($appId) && !empty($result['account_business_role_id'])) {
                 $acctBusinessRoleId = $result['account_business_role_id'];
                 $this->setupAcctOffering($appId, $acctBusinessRoleId, $offering['entity']);
                 $response['businessRole'][] = $offering['businessRole'];
@@ -232,6 +233,7 @@ class AccountService extends AbstractService
                 continue;
             }
             $params['entityId'] = $entity['id'];
+            $this->logger->info("Executing query setupAcctOffering- $query with params - ".json_encode($params));
             $this->executeUpdateWithBindParameters($query, $params);
         }
     }
@@ -385,6 +387,7 @@ class AccountService extends AbstractService
     public function saveAccount(&$accountData)
     {
         if (isset($accountData['uuid'])) {
+            
             try {
                 if(empty($this->getAccountIdByUuid($accountData['uuid']))) {
                     $this->createAccount($accountData, null);
@@ -397,6 +400,7 @@ class AccountService extends AbstractService
                     throw $e;
                 }
             }
+            
         } else {
             $this->createAccount($accountData, null);
         }
@@ -418,18 +422,21 @@ class AccountService extends AbstractService
             $data['preferences'] = json_encode($data['preferences']);
         }
         
-        $form = new Account($this->table);
-        $form->loadByUuid($id);
-        $organizationId = $form->getProperty('organization_id');
-        $organizationOldName = $form->getProperty('name');
-        if (isset($organizationId)) {
-            $this->organizationService->updateOrganization($organizationId, $data);
-        }
-        $changedArray = $data;
-        $changedArray['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
-        $changedArray['date_modified'] = date('Y-m-d H:i:s');
-        $form->assign($changedArray);
+        
         try {
+            $form = new Account($this->table);
+            $form->loadByUuid($id);
+            $organizationId = $form->getProperty('organization_id');
+            $organizationOldName = $form->getProperty('name');
+            
+            
+            if (isset($organizationId)) {
+                $this->organizationService->updateOrganization($organizationId, $data);
+            }
+            $changedArray = $data;
+            $changedArray['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
+            $changedArray['date_modified'] = date('Y-m-d H:i:s');
+            $form->assign($changedArray);
             $this->beginTransaction();
             $form->save();
             if (isset($files)) {
@@ -569,26 +576,37 @@ class AccountService extends AbstractService
      *   } </code>
      * @return array Returns a JSON Response with Status Code and Created Account.
      */
-    public function getAccounts($filterParams = null)
+    public function getAccounts($filterParams = null,$accountIdList = null ,$serviceType = null)
     {
         $where = "";
         $pageSize = 20;
         $offset = 0;
         $sort = "name";
-        $select = "SELECT og.uuid,og.name,og.subdomain,oa.address1,oa.address2,oa.city,oa.state,oa.country,oa.zip,og.preferences, porg.uuid as parentId, pacct.name as parentName";
+        $select = "SELECT DISTINCT og.uuid,og.name,og.subdomain,oa.address1,oa.address2,oa.city,oa.state,oa.country,oa.zip,og.preferences, porg.uuid as parentId, pacct.name as parentName";
         $from = " from ox_account as og 
                     left join ox_organization as org on org.id = og.organization_id 
                     left join ox_organization as porg on porg.id = org.parent_id
                     left join ox_account as pacct on pacct.organization_id = porg.id
                     left join ox_address as oa on org.address_id = oa.id";
-        if (!SecurityManager::isGranted('MANAGE_ACCOUNT_WRITE')) {
+        if (!SecurityManager::isGranted('MANAGE_ACCOUNT_WRITE') && is_null($accountIdList) && is_null($serviceType)) {
             $from .= " JOIN ox_account_user as oxuo on oxuo.account_id = og.id ";
             $where = " WHERE oxuo.user_id =". AuthContext::get(AuthConstants::USER_ID);
+        }          
+        if (isset($accountIdList)) {
+            if (isset($serviceType) && $serviceType == 'Installed') {
+                $where .= " WHERE og.uuid IN ('" . implode("','", $accountIdList) . "')";
+            }else{
+                $where .= " WHERE og.uuid NOT IN ('" . implode("','", $accountIdList) . "')";
+            }
+        }else{
+            if (isset($serviceType) && $serviceType == 'Installed') {
+                return array('data' => [], 'total' => 0); 
+            }
         }
         $cntQuery = "SELECT count(og.id) " . $from;
         if (count($filterParams) > 0 || sizeof($filterParams) > 0) {
             $filterArray = json_decode($filterParams['filter'], true);
-            $where = $this->createWhereClause($filterArray, self::$accountField);
+            $where .= $this->createWhereClause($filterArray, self::$accountField);
             if (isset($filterArray[0]['sort']) && count($filterArray[0]['sort']) > 0) {
                 $sort = $this->createSortClause($filterArray[0]['sort'], self::$accountField);
             }
@@ -603,6 +621,7 @@ class AccountService extends AbstractService
         $query = $select . " " . $from . " " . $where . " " . $sort . " " . $limit;
         $resultSet = $this->executeQuerywithParams($query)->toArray();
         for ($x = 0; $x < sizeof($resultSet); $x++) {
+            //echo $resultSet[$x]['uuid'];
             $resultSet[$x]['contactid'] = $this->getAccountContactPersonDetails($resultSet[$x]['uuid']);
         }
         

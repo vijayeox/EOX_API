@@ -269,7 +269,7 @@ class AppArtifactService extends AbstractService
                 ['directory' => $appSourceDir]
             );
         }
-        if ($artifactType == 'form' && $artifactType == 'workflow') {
+        if ($artifactType == 'form' || $artifactType == 'workflow') {
             $contentDir = $appSourceDir . $this->contentFolder;
         } else{
             $contentDir = $appSourceDir . $this->dataFolder;
@@ -360,5 +360,19 @@ class AppArtifactService extends AbstractService
             );
         }
         return $appSourceDir;
+    }
+
+    public function createDownload($appUuid,$artifactType,$artifactNamer){
+        $appSourceDir = $this->getAppSourceDirPath($appUuid);
+        $this->logger->info("DOWNLOAD Appsource----".print_r($appSourceDir,true));
+        $filePath = $appSourceDir . $this->dataFolder . $artifactType . DIRECTORY_SEPARATOR. $artifactNamer;
+        $this->logger->info("DOWNLOAD PATH----".print_r($filePath,true));
+        //Check the file exists or not
+        if(file_exists($filePath)) {
+            return $filePath;
+        }
+        else{
+            echo "File does not exist.";
+        }
     }
 }

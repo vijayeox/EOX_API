@@ -1034,6 +1034,74 @@ return [
                     ],
                 ],
             ],
+            'getAppProperties' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/account/:accountId/appProperties',
+                    'constraints' => [
+                        'appId' => UuidUtil::UUID_PATTERN,
+                        'accountId' => UuidUtil::UUID_PATTERN,
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\AppRegisterController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppProperties',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
+            'getAccountOnServiceType' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/getAccounts/:serviceType',
+                    'constraints' => [
+                        'appId' => UuidUtil::UUID_PATTERN,
+                        'serviceType' => 'forInstall|Installed',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\AppRegisterController::class,
+                        'method' => 'GET',
+                        'action' => 'getAccountOnServiceType',
+                        'access' => [
+                            // 'get' => ['MANAGE_ACCOUNT_READ','MANAGE_INSTALL_APP_READ'],
+                        ],
+                    ],
+                ],
+            ],
+            'downloadAppFile' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appUuid/download/:artifactType/:artifactName',
+                    'constraints' => [
+                        'appUuid' => UuidUtil::UUID_PATTERN,
+                        'artifactType' => 'delegate|template',
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\AppArtifactController::class,
+                        'method' => 'GET',
+                        'action' => 'downloadAppFile',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
+            'appBusinessRoles' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/appBusinessRoles',
+                    'defaults' => [
+                        'controller' => Controller\AppController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppBusinessRoles',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

@@ -59,6 +59,14 @@
 				"tableView": false,
 				"hideOnChildrenHidden": false
 			}, {
+				"label": "Previous Version of the App",
+				"calculateValue": "if(!value){\n  value = '1.0';\n}",
+				"key": "previousVersion",
+				"type": "hidden",
+				"input": true,
+				"tableView": false,
+				"hideOnChildrenHidden": false
+			}, {
 				"label": "Old App Name",
 				"customDefaultValue": "console.log(\"APP NME---\");\nconsole.log(value);",
 				"key": "oldAppName",
@@ -505,11 +513,13 @@
 			"cancel": true,
 			"next": true
 		},
+		"scrollToTop": false,
 		"collapsible": false,
-		"tableView": false,
 		"key": "organizationInfo",
+		"customConditional": "show = false;",
 		"type": "panel",
 		"label": "Organization Info",
+		"tableView": false,
 		"input": false,
 		"components": [{
 			"label": "Do you want to add organization information",
@@ -1504,6 +1514,71 @@
 										"tableView": false,
 										"hideOnChildrenHidden": false
 									}, {
+										"label": "Identifiers",
+										"reorder": false,
+										"addAnotherPosition": "bottom",
+										"layoutFixed": false,
+										"enableRowGroups": false,
+										"initEmpty": false,
+										"hideLabel": true,
+										"tableView": false,
+										"defaultValue": [{
+											"identifier": ""
+										}],
+										"key": "identifiers",
+										"type": "datagrid",
+										"input": true,
+										"components": [{
+											"label": "Identifier field",
+											"tableView": true,
+											"clearOnHide": false,
+											"key": "identifier",
+											"logic": [{
+												"name": "If File Comments enabled",
+												"trigger": {
+													"type": "simple",
+													"simple": {
+														"show": true,
+														"when": "app.chat_notification",
+														"eq": "true"
+													}
+												},
+												"actions": [{
+													"name": "Set Mandatory",
+													"type": "property",
+													"property": {
+														"label": "Required",
+														"value": "validate.required",
+														"type": "boolean"
+													},
+													"state": true
+												}]
+											}, {
+												"name": "If File Comments not enabled",
+												"trigger": {
+													"type": "simple",
+													"simple": {
+														"show": true,
+														"when": "app.chat_notification",
+														"eq": "false"
+													}
+												},
+												"actions": [{
+													"name": "Set it to Non-mandatory",
+													"type": "property",
+													"property": {
+														"label": "Required",
+														"value": "validate.required",
+														"type": "boolean"
+													},
+													"state": false
+												}]
+											}],
+											"type": "textfield",
+											"input": true,
+											"hideOnChildrenHidden": false
+										}]
+									}, {
 										"label": "Message Title",
 										"placeholder": "Ex: ${entity_name}${identifier_field}",
 										"tooltip": "Message Title would be displayed at the beginning of a message thread",
@@ -2490,10 +2565,20 @@
 			"type": "textarea",
 			"rows": 10,
 			"input": true
+		}, {
+			"label": "App Version",
+			"mask": false,
+			"tableView": false,
+			"delimiter": false,
+			"requireDecimal": false,
+			"inputFormat": "plain",
+			"key": "appVersion",
+			"type": "number",
+			"input": true
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 781,
+	"_vid": 788,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2577,6 +2662,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2021-12-16T11:12:48.852Z",
+	"modified": "2022-01-04T10:20:52.843Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }

@@ -601,7 +601,6 @@ class UserController extends AbstractApiController
      */
     public function setUserBrowserCacheAction()
     {
-
         if (AuthContext::get(AuthConstants::USER_ID)) {
             $userId = AuthContext::get(AuthConstants::USER_ID);
             $this->log->info(__CLASS__ . "-> \n Setting User Session Cache By User - " . print_r($userId, true));

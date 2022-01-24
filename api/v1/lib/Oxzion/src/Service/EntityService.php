@@ -56,6 +56,7 @@ class EntityService extends AbstractService
             $temp = $entity->getGenerated(true);
             $inputData['id'] = $temp['id'];
             $inputData['uuid'] = $temp['uuid'];
+            
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), $e);
             $this->rollback();

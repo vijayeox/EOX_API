@@ -261,7 +261,7 @@ class AppController extends AbstractApiController
         $serviceType = $data['serviceType'];
         $this->log->info(__CLASS__ . "-> \n Create App Registry- " . print_r($data, true) . "Parameters - " . print_r($params, true));
         try {
-            $count = $this->appService->installAppToOrg($data['appId'], $data['accountId'], $serviceType);
+            $count = $this->appService->installAppToOrg($data['appId'], $data['accountId'], $serviceType, $data);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
@@ -320,14 +320,18 @@ class AppController extends AbstractApiController
         }
 
         try {
+            
             $path = $params['path'];
             $path .= substr($path, -1) == '/' ? '' : '/';
             if (isset($params['parameters']) && !empty($params['parameters'])) {
+                
                 $params = $this->processDeploymentParams($params);
             } else {
+                
                 $params = null;
             }
             $appData = $this->appService->deployApp($path, $params);
+            
             return $this->getSuccessResponseWithData($appData);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
@@ -425,6 +429,27 @@ class AppController extends AbstractApiController
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->getErrorResponse("Css File not Found", 404);
+        }
+    }
+
+     /**
+     * GET List of BusinessRoles for an App API
+     * @api
+     * @link /app/appId/appBusinessRoles
+     * @method GET
+     * @return array Returns a JSON Response list of BusinessRoles based on Access.
+     */
+    public function getAppBusinessRolesAction()
+    {
+        $data = $this->params()->fromRoute();
+        $this->log->info(__CLASS__ . "-> \n Get BusinessRole List- " . print_r($data, true));
+        try {
+            $appUuid = $this->params()->fromRoute()['appId'];
+            $result = $this->appService->getAppBusinessRole($appUuid);
+            return $this->getSuccessResponseWithData($result);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
         }
     }
 }

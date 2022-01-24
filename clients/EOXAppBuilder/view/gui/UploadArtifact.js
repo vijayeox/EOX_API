@@ -140,6 +140,10 @@ class UploadArtifact extends React.Component {
                     "You can now Edit or Deploy the application.",
                     "success"
                   );
+                  if(this.props.postSubmitCallback){
+                    this.props.postSubmitCallback?.()
+                    return;
+                  }
                   this.stepDownPage();
                 } else {
                   this.notif.current.notify(

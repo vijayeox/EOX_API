@@ -58,10 +58,12 @@ class LoadAppData extends AbstractAppDelegate
             $valuePartiRole = [];
             if (!empty($data['entity'])) {
                 foreach ($data['entity'] as $key => &$value) {
-                    foreach ($value['participantRole'] as $keyParticipantRole => $valueParticipantRole) {
-                        if (!empty($valueParticipantRole['businessRole'])) {
-                            $valuePartiRole['businessRole']['name'] = $valueParticipantRole['businessRole'];
-                            $value['participantRoleDuplicate'][] = $valuePartiRole;
+                    if (!empty($value['participantRole'])) {
+                        foreach ($value['participantRole'] as $keyParticipantRole => $valueParticipantRole) {
+                            if (!empty($valueParticipantRole['businessRole'])) {
+                                $valuePartiRole['businessRole']['name'] = $valueParticipantRole['businessRole'];
+                                $value['participantRoleDuplicate'][] = $valuePartiRole;
+                            }
                         }
                     }
                 }

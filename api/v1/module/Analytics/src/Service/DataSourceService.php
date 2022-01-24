@@ -1,18 +1,15 @@
 <?php
 namespace Analytics\Service;
 
-use Oxzion\Service\AbstractService;
-use Analytics\Model\DataSourceTable;
 use Analytics\Model\DataSource;
-use Oxzion\Auth\AuthContext;
-use Oxzion\Auth\AuthConstants;
-use Oxzion\ValidationException;
-use Zend\Db\Sql\Expression;
-use Oxzion\Utils\FilterUtils;
-use Ramsey\Uuid\Uuid;
+use Analytics\Model\DataSourceTable;
 use Exception;
-
 use function GuzzleHttp\json_decode;
+use Oxzion\Auth\AuthConstants;
+use Oxzion\Auth\AuthContext;
+use Oxzion\Service\AbstractService;
+use Oxzion\Utils\FilterUtils;
+use Zend\Db\Sql\Expression;
 
 class DataSourceService extends AbstractService
 {
@@ -64,7 +61,7 @@ class DataSourceService extends AbstractService
         $dataSource->loadByUuid($uuid);
         $dataSource->assign([
             'version' => $version,
-            'isdeleted' => 1
+            'isdeleted' => 1,
         ]);
         try {
             $this->beginTransaction();
@@ -81,8 +78,8 @@ class DataSourceService extends AbstractService
         $sql = $this->getSqlObject();
         $select = $sql->select();
         $select->from('ox_datasource')
-            ->columns(array('name','type','configuration', 'is_owner' => (new Expression('IF(created_by = '.AuthContext::get(AuthConstants::USER_ID).', "true", "false")')),'account_id','version','isdeleted','uuid'))
-            ->where(array('ox_datasource.uuid' => $uuid,'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID),'isdeleted' => 0));
+            ->columns(array('name', 'type', 'configuration', 'is_owner' => (new Expression('IF(created_by = ' . AuthContext::get(AuthConstants::USER_ID) . ', "true", "false")')), 'account_id', 'version', 'isdeleted', 'uuid'))
+            ->where(array('ox_datasource.uuid' => $uuid, 'account_id' => AuthContext::get(AuthConstants::ACCOUNT_ID), 'isdeleted' => 0));
         $response = $this->executeQuery($select)->toArray();
         if (count($response) == 0) {
             return 0;
@@ -94,22 +91,22 @@ class DataSourceService extends AbstractService
     {
         $paginateOptions = FilterUtils::paginateLikeKendo($params);
         $where = $paginateOptions['where'];
-        if (isset($params['show_deleted']) && $params['show_deleted']==true) {
-            $where .= empty($where) ? "WHERE account_id =".AuthContext::get(AuthConstants::ACCOUNT_ID) : " AND account_id =".AuthContext::get(AuthConstants::ACCOUNT_ID);
+        if (isset($params['show_deleted']) && $params['show_deleted'] == true) {
+            $where .= empty($where) ? "WHERE account_id =" . AuthContext::get(AuthConstants::ACCOUNT_ID) : " AND account_id =" . AuthContext::get(AuthConstants::ACCOUNT_ID);
         } else {
-            $where .= empty($where) ? "WHERE isdeleted <> 1 AND account_id =".AuthContext::get(AuthConstants::ACCOUNT_ID) : " AND isdeleted <> 1 AND account_id =".AuthContext::get(AuthConstants::ACCOUNT_ID);
+            $where .= empty($where) ? "WHERE isdeleted <> 1 AND account_id =" . AuthContext::get(AuthConstants::ACCOUNT_ID) : " AND isdeleted <> 1 AND account_id =" . AuthContext::get(AuthConstants::ACCOUNT_ID);
         }
-        $sort = $paginateOptions['sort'] ? " ORDER BY ".$paginateOptions['sort'] : '';
-        $limit = " LIMIT ".$paginateOptions['pageSize']." offset ".$paginateOptions['offset'];
+        $sort = $paginateOptions['sort'] ? " ORDER BY " . $paginateOptions['sort'] : '';
+        $limit = " LIMIT " . $paginateOptions['pageSize'] . " offset " . $paginateOptions['offset'];
 
-        $cntQuery ="SELECT count(id) as 'count' FROM `ox_datasource` ";
-        $resultSet = $this->executeQuerywithParams($cntQuery.$where);
-        $count=$resultSet->toArray()[0]['count'];
+        $cntQuery = "SELECT count(id) as 'count' FROM `ox_datasource` ";
+        $resultSet = $this->executeQuerywithParams($cntQuery . $where);
+        $count = $resultSet->toArray()[0]['count'];
 
-        if (isset($params['show_deleted']) && $params['show_deleted']==true) {
-            $query ="SELECT name,type,configuration,version,IF(created_by = ".AuthContext::get(AuthConstants::USER_ID).", 'true', 'false') as is_owner,version,account_id,isdeleted,uuid FROM `ox_datasource`".$where." ".$sort." ".$limit;
+        if (isset($params['show_deleted']) && $params['show_deleted'] == true) {
+            $query = "SELECT name,type,configuration,version,IF(created_by = " . AuthContext::get(AuthConstants::USER_ID) . ", 'true', 'false') as is_owner,version,account_id,isdeleted,uuid FROM `ox_datasource`" . $where . " " . $sort . " " . $limit;
         } else {
-            $query ="SELECT name,type,configuration,version,IF(created_by = ".AuthContext::get(AuthConstants::USER_ID).", 'true', 'false') as is_owner,version,account_id,uuid FROM `ox_datasource`".$where." ".$sort." ".$limit;
+            $query = "SELECT name,type,configuration,version,IF(created_by = " . AuthContext::get(AuthConstants::USER_ID) . ", 'true', 'false') as is_owner,version,account_id,uuid FROM `ox_datasource`" . $where . " " . $sort . " " . $limit;
         }
         $resultSet = $this->executeQuerywithParams($query);
         $result = $resultSet->toArray();
@@ -120,20 +117,31 @@ class DataSourceService extends AbstractService
             }
         }
         return array('data' => $result,
-                 'total' => $count);
+            'total' => $count);
     }
 
     public function getDataStructureDetails($uuid, $params)
     {
+        // echo "Print";
+        // print_r($params);exit;
         $analyticObject = $this->getAnalyticsEngine($uuid);
         try {
-            $type =(isset($params['type'])) ? $params['type']:'dataentity';
-            if ($type=="fields") {
-                $data=$analyticObject->getFields($params['index']);
-            } elseif ($type=="values") {
-                $data=$analyticObject->getValues($params['index'], $params['field']);
+            $type = (isset($params['type'])) ? $params['type'] : 'dataentity';
+            if ($type == "fields") {
+                $data = $analyticObject->getFields($params['index']);
+            } elseif ($type == "values") {
+                // print_r($params);exit;
+                if ($params['filter'] != "undefined") {
+                    // echo "<pre/>1";
+                    // print_r($params);exit;
+                    $data = $analyticObject->getValues($params['index'], $params['field'], json_decode($params['filter']));
+                } else {
+                    // echo "<pre/>2";
+                    // print_r($params);exit;
+                    $data = $analyticObject->getValues($params['index'], $params['field']);
+                }
             } else {
-                $data=$analyticObject->getDataEntities();
+                $data = $analyticObject->getDataEntities();
             }
         } catch (Exception $e) {
             throw new Exception("This Operation is not supported for the DataSource", 1);
@@ -146,8 +154,8 @@ class DataSourceService extends AbstractService
         $sql = $this->getSqlObject();
         $select = $sql->select();
         $select->from('ox_datasource')
-            ->columns(array('id','name','type','configuration','account_id','isdeleted','uuid'))
-            ->where(array('uuid' => $uuid,'isdeleted' => 0));
+            ->columns(array('id', 'name', 'type', 'configuration', 'account_id', 'isdeleted', 'uuid'))
+            ->where(array('uuid' => $uuid, 'isdeleted' => 0));
         $response = $this->executeQuery($select)->toArray();
         if (count($response) == 0) {
             throw new Exception("Error Processing Request", 1);
@@ -176,7 +184,7 @@ class DataSourceService extends AbstractService
                     break;
                 case 'QUICKBOOKS':
                     $dsConfig = $dsConfig['data'];
-                    $dsConfig['dsid']=$response[0]['id'];
+                    $dsConfig['dsid'] = $response[0]['id'];
                     $analyticsObject = $this->analyticEngines[$type];
                     $analyticsObject->setConfig($dsConfig);
                     break;

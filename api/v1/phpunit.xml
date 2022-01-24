@@ -29,8 +29,10 @@
             <directory>./module/Profile/test</directory>
         </testsuite>
         <testsuite name="App Fixtures">
-            <directory>./module/App/test/Controller/App/AppArtifactControllerTest.php</directory>
             <directory>./module/App/test/Controller/App/AppControllerTest.php</directory>
+            <directory>./module/App/test/Controller/App/FileAttachmentControllerTest.php</directory>
+            <directory>./module/App/test/Controller/App/AppArtifactControllerTest.php</directory>
+            <directory>./module/App/test/Controller/App/AppRegisterControllerTest.php</directory>
             <directory>./module/App/test/Controller/AppView</directory>
             <directory>./module/App/test/Controller/Cache</directory>
             <directory>./module/App/test/Controller/Delegate</directory>
@@ -41,7 +43,7 @@
             <directory>./module/App/test/Controller/Entity/FormControllerTest.php</directory>
             <directory>./module/App/test/Controller/Job</directory>
             <directory>./module/App/test/Controller/Pipeline</directory>
-            <directory>./module/App/test/Controller/Workflow</directory> 
+            <directory>./module/App/test/Controller/Workflow</directory>
         </testsuite>
         <testsuite name="App Fixtures">
             <directory>./module/Workflow/test/Controller/ActivityInstanceControllerTest.php</directory>
@@ -95,7 +97,7 @@
         </testsuite>    
         <testsuite name="Form File Fixtures">
             <directory>./module/File/test</directory>
-        </testsuite> 
+        </testsuite>
     </testsuites> 
     <php>
         <ini name="memory_limit" value="500M" />

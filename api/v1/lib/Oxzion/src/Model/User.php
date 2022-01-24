@@ -25,6 +25,7 @@ class User extends Entity
         'password_reset_code' => ['type' => Type::STRING,    'readonly' => false, 'required' => false],
         'password_reset_expiry_date' => ['type' => Type::TIMESTAMP,    'readonly' => false, 'required' => false],
         'person_id' =>          ['type' => Type::INTEGER,    'readonly' => false, 'required' => true],
+        'cleared_browser_cache' =>          ['type' => Type::INTEGER,    'readonly' => false, 'required' => false, 'value' => 0],
     );
 
     public function &getModel()

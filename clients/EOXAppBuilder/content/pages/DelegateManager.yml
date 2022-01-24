@@ -1,6 +1,20 @@
 name: 'Delegates'
 description: 'Shows a list of delegates'
 content:
+    -
+        type: ReactComponent
+        content:
+                reactId: 'headerActions'
+                params:
+                    operations:
+                        -
+                            name: Import Delegate
+                            rule: 'true'
+                            icon: 'fa fa-cloud-upload'
+                            details:
+                                -
+                                    type: UploadArtifact
+                                    entity: delegate
     # -
     #     type: RenderButtons
     #     content:
@@ -47,21 +61,22 @@ content:
                                 app_uuid: '{{app_uuid}}'
                                 url: 'app/{{app_uuid}}/download/delegate/{{name}}.php'
                                 disableAppId: true
+                                downloadFile: true
                     icon: 'fa fa-download' 
                     updateOnly: true
-            operations:
-                title: "Import Delegate"
-                actions:
-                    -
-                        name: Import Delegate
-                        rule: 'true'
-                        icon: 'fa fa-cloud-upload'
-                        details:
-                            -
-                                type: UploadArtifact
-                                entity: delegate
-                                params:
-                                    app_uuid: '{{app_uuid}}'
+            # operations:
+            #     title: "Import Delegate"
+            #     actions:
+            #         -
+            #             name: Import Delegate
+            #             rule: 'true'
+            #             icon: 'fa fa-cloud-upload'
+            #             details:
+            #                 -
+            #                     type: UploadArtifact
+            #                     entity: delegate
+            #                     params:
+            #                         app_uuid: '{{app_uuid}}'
             columnConfig:
                 -
                     title: Name

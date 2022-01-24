@@ -948,7 +948,7 @@ class UserService extends AbstractService
                         oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip,
                         oxemp.website, oxemp.about, per.gender,
                         manager_user.uuid as managerId,manager_user.name as manager_name,
-                        oxemp.interest,ou.icon,ou.preferences
+                        oxemp.interest,ou.icon,ou.preferences,ou.cleared_browser_cache
                     from ox_user as ou
                     inner join ox_account_user oau on oau.user_id = ou.id
                     inner join ox_account au on au.id = oau.account_id

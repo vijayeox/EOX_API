@@ -343,7 +343,7 @@ return [
             'getupdatecache' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/user/:userId/getuserbrowsercachestatus',
+                    'route' => '/user/me/getuserbrowsercachestatus',
                     'defaults' => [
                         'controller' => Controller\UserController::class,
                         'method' => 'GET',
