@@ -175,24 +175,27 @@ class CommentService extends AbstractService
 
         return 0;
     }
-    public function getComments($fileId)
+    public function getComments($fileId, $parentComment = false)
     {
-        return $this->getCommentsInternal($fileId);
+        return $this->getCommentsInternal($fileId, null, $parentComment);
     }
 
-    private function getCommentsInternal($fileId, $id = null)
+    private function getCommentsInternal($fileId, $id = null,$parentComment = false)
     {
-        $fileClause = "";
+        $fileClause = $parentClause = "";
         $queryParams = array("accountId"=>AuthContext::get(AuthConstants::ACCOUNT_ID),"fileId"=>$fileId);
         if ($id) {
             $fileClause = "AND ox_comment.uuid = :commentId";
             $queryParams['commentId'] = $id;
         }
+        if ($parentComment) {
+            $parentClause = "AND ox_comment.parent IS NULL";
+        }
         $query = "select text,ou.name as name,ou.icon as icon,ou.uuid as userId,ox_comment.date_created as time, ox_comment.uuid as commentId, ox_comment.attachments 
                     from ox_comment 
                     inner join ox_user ou on ou.id = ox_comment.created_by 
                     inner join ox_file of on of.id = ox_comment.file_id 
-                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause order by ox_comment.date_created asc";
+                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause $parentClause order by ox_comment.date_created asc";
         $this->logger->info("Executing Query $query with params - ".print_r($queryParams, true));
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (count($resultSet) >0) {

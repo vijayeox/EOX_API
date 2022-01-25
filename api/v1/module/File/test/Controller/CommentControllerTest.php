@@ -74,14 +74,14 @@ class CommentControllerTest extends ControllerTest
     {
         $this->initAuthToken($this->adminUser);
         $data = ['text' => 'Comment 5','parent' => "c1c5828f-2424-4e80-a09b-d752d004a6c8"];
-        $this->assertEquals(4, $this->getConnection()->getRowCount('ox_comment'));
+        $this->assertEquals(5, $this->getConnection()->getRowCount('ox_comment'));
         $this->dispatch('/file/e23d0c68-98c9-11e9-adc5-308d99c9146c/comment', 'POST', $data);
         $content = (array)json_decode($this->getResponse()->getContent(), true);
         $this->assertResponseStatusCode(201);
         $this->setDefaultAsserts();
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data']['text'], $data['text']);
-        $this->assertEquals(5, $this->getConnection()->getRowCount('ox_comment'));
+        $this->assertEquals(6, $this->getConnection()->getRowCount('ox_comment'));
     }
     public function testCreateWithOutTextFailure()
     {
@@ -224,5 +224,27 @@ class CommentControllerTest extends ControllerTest
         $this->assertEquals("c1c5828f-2424-4e80-a09b-d752d004a6c8", $content['data']['commentId']);
         $this->assertEquals('Comment New', $content['data']['text']);
         $this->assertNotNull($content['data']['attachments']);
+    }
+
+    public function testGetParentCommentsList()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/file/d13d0c68-98c9-11e9-adc5-308d99c9145b/getParentCommentslist', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals("3ff78f56-5748-406b-9ce9-426242c5afc5", $content['data'][0]['commentId']);
+        $this->assertEquals('Comment 1', $content['data'][0]['text']);
+    }
+    public function testGetParentCommentsListNotFound()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/file/e33d0c68-98c9-11e9-adc5-308d99c9146c/getParentCommentslist', 'GET');
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(404);
+        $this->setDefaultAsserts();
+        $this->assertEquals($content['status'], 'error');
+        $this->assertEquals("Parent Comments Not found", $content['message']);
     }
 }

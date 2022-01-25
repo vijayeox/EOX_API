@@ -32,6 +32,19 @@ return [
                     ],
                 ],
             ],
+            'parentComments' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/file/:fileId/getParentCommentslist',
+                    'defaults' => [
+                        'controller' => Controller\CommentController::class,
+                        'method' => 'GET',
+                        'action' => 'getParentCommentslist',
+                        'access' => [
+                        ],
+                    ],
+                ],
+            ],
             'snooze' => [
                 'type' => Segment::class,
                 'options' => [
