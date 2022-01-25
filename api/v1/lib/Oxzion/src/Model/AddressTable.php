@@ -14,6 +14,6 @@ class AddressTable extends ModelTable
 
     public function save(Entity $data)
     {
-        return $this->internalSave($data->toArray());
+    	return $this->internalSave($data->toArray());
     }
 }

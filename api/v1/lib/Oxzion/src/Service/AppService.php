@@ -280,11 +280,15 @@ class AppService extends AbstractService implements AppUpgrade
             $path = $path . '/';
         }
         $filePath = $path . self::APPLICATION_DESCRIPTOR_FILE_NAME;
+        
         //check if filename exists
         if (!(file_exists($filePath))) {
+            
             throw new FileNotFoundException('File not found.', $filePath);
-        }
+        } 
+       
         $yaml = Yaml::parse(file_get_contents($filePath));
+        
         if (empty($yaml)) {
             throw new FileContentException('File is empty.', $filePath);
         }
@@ -294,6 +298,7 @@ class AppService extends AbstractService implements AppUpgrade
                 $filePath
             );
         }
+        
         return $yaml;
     }
 
@@ -328,6 +333,7 @@ class AppService extends AbstractService implements AppUpgrade
                 }
                 
                 $this->logger->info("\n App Data processing - " . print_r($value, true));
+                
                 switch ($value) {
                     case 'initialize':
                         $temp = $this->createOrUpdateApp($ymlData);
@@ -348,8 +354,6 @@ class AppService extends AbstractService implements AppUpgrade
                         $this->performMigration($ymlData, $path);
                         break;
                     case 'workflow':
-                        //print_r($this->processWorkflow($ymlData, $path));
-                        //die;//
                         $this->processWorkflow($ymlData, $path);
                         break;
                     case 'form':
@@ -1039,8 +1043,7 @@ class AppService extends AbstractService implements AppUpgrade
             $data['name'] = str_replace(' ', '_', $data['bpmn_file']); // Replaces all spaces
             $data['name'] = preg_replace('/[^A-Za-z0-9_]/', '', $data['name'], -1); // Removes special chars.
         }
-        //print_r($data);
-        //return $data;
+        
     }
 
     private function setLinkAndRunBuild($appPath, $appId)
