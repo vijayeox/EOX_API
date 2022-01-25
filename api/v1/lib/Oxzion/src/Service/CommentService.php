@@ -53,9 +53,7 @@ class CommentService extends AbstractService
         $data['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
         $data['date_created'] = isset($data['date_created']) ? $data['date_created'] : date('Y-m-d H:i:s');
         $data['date_modified'] = date('Y-m-d H:i:s');
-        if (isset($data['attachments'])) {            
-            $data['attachments'] = json_encode($data['attachments']);
-        }
+        $data['attachments'] = json_encode($data['attachments']);
         if (isset($data['parent'])) {
             $ret = $this->getParentId($data, $fileId);
             if (!$ret) {
