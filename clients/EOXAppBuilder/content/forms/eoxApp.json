@@ -2248,7 +2248,7 @@
 				"tableView": false,
 				"defaultValue": [{
 					"name": "",
-					"uuid": "2e288ca0-5e73-4f19-8510-d80daaa5fa9e",
+					"uuid": "",
 					"description": "",
 					"content": {
 						"data": {}
@@ -2287,7 +2287,7 @@
 									"hideOnChildrenHidden": false
 								}, {
 									"label": "Page UUID",
-									"calculateValue": "try {\n\tif (!(value.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}",
+									"calculateValue": "function uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\ntry {\n\tif (!(value.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}\n",
 									"key": "uuid",
 									"type": "hidden",
 									"input": true,
@@ -2573,7 +2573,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 804,
+	"_vid": 807,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2657,6 +2657,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-02-01T04:59:22.505Z",
+	"modified": "2022-02-01T13:36:06.472Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
