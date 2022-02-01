@@ -1253,28 +1253,14 @@
 		"tableView": false,
 		"input": false,
 		"components": [{
-			"label": "HTML",
-			"tag": "label",
-			"className": "control-label",
-			"attrs": [{
-				"attr": "for",
-				"value": "e2kzst9-entity"
-			}],
-			"content": "Form Types\r\n      <i class=\"fa fa-question-circle text-muted\" ref=\"tooltip\" aria-describedby=\"entity_tooltip\"></i>\r\n<div class=\"tooltip\" style=\"opacity: 1; position: absolute; transform: translate3d(64px, -77px, 0px); top: 0px; left: 0px; will-change: transform;visibility: hidden;\" role=\"tooltip\" id=\"entity_tooltip\" aria-hidden=\"false\" x-placement=\"right\">\r\n            <div class=\"tooltip-arrow\" style=\"top: 86px;\"></div>\r\n            <div class=\"tooltip-inner\">An Form Type is a Data Collection inside the Application and Represents what the File Object will contain<br><br>Each Form Type Represents can contain a Form which will modify Data inside the File.</div>\r\n          </div></label>",
-			"refreshOnChange": false,
-			"key": "html",
-			"type": "htmlelement",
-			"input": false,
-			"tableView": false
-		}, {
 			"label": "Form Types",
 			"reorder": false,
 			"addAnother": "Add Form Type",
 			"addAnotherPosition": "bottom",
-			"defaultOpen": false,
 			"layoutFixed": false,
 			"enableRowGroups": false,
 			"initEmpty": false,
+			"hideLabel": true,
 			"tableView": false,
 			"defaultValue": [{
 				"name": "",
@@ -1296,7 +1282,15 @@
 				"enable_comments": false,
 				"enable_view": false,
 				"enable_auditlog": false,
-				"pageContent": {}
+				"pageContent": {},
+				"participantRole": [{}],
+				"identifiers": [{
+					"identifier": ""
+				}],
+				"enable_print": false,
+				"participantRoleDuplicate": [{
+					"businessRole": {}
+				}]
 			}],
 			"clearOnHide": false,
 			"validate": {
@@ -1304,6 +1298,7 @@
 			},
 			"key": "entity",
 			"type": "datagrid",
+			"defaultOpen": false,
 			"noFirstRow": false,
 			"input": true,
 			"components": [{
@@ -1978,9 +1973,9 @@
 			"persistent": false,
 			"redrawOn": "entity",
 			"clearOnHide": false,
-			"calculateValue": "value = data.form;",
+			"calculateValue": "function getUniqueListBy(arr, key) {\n    return [...new Map(arr.map(item => [item[key], item])).values()]\n}\nconst arr1 = getUniqueListBy(data.form, 'name');\nconsole.log(\"Unique by name\");\nconsole.log(arr1);\nvalue = arr1;",
 			"validate": {
-				"custom": "if (data.formDuplicate) {\n  if (data.formDuplicate.length > 0) {\n    valid =\n      data.formDuplicate.length == new Set(data.formDuplicate.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same form more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+				"custom": "/*if (data.formDuplicate) {if (data.formDuplicate.length > 0) {\n    console.log(\"\"\"\"\"\"\"\"\"\");\n    console.log(data.formDuplicate.length);\n    valid =\n      data.formDuplicate.length == new Set(data.formDuplicate.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same form more than once.\";\n  } else {\n    valid = true;\n  }\n}*/"
 			},
 			"key": "formDuplicate",
 			"type": "datagrid",
@@ -2062,7 +2057,7 @@
 				"tableView": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "console.log(\"sleeee0\");\nconsole.log(data);\nif(data.listOFForms){\n  values = data.listOFForms.map(item=>item.name +'.json')\n}else {\nvalues = [];\n}\nconsole.log(values);"
+					"custom": "console.log(\"sleeee0\");\nconsole.log(data.listOFForms);\nconsole.log(\"-----\");\nconsole.log('values-values-',values);\nconsole.log('values-data-',data.listOFForms);\nif(data.listOFForms){\n  values = data.listOFForms.map(item=>item.name +'.json')\n}else {\nvalues = [];\n}\nconsole.log('values--',values);\nconsole.log('values--',item);\nconsole.log('values--',item);"
 				},
 				"clearOnHide": false,
 				"key": "template_file",
@@ -2253,7 +2248,7 @@
 				"tableView": false,
 				"defaultValue": [{
 					"name": "",
-					"uuid": "2e288ca0-5e73-4f19-8510-d80daaa5fa9e",
+					"uuid": "",
 					"description": "",
 					"content": {
 						"data": {}
@@ -2292,7 +2287,7 @@
 									"hideOnChildrenHidden": false
 								}, {
 									"label": "Page UUID",
-									"calculateValue": "try {\n\tif (!(value.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}",
+									"calculateValue": "function uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\ntry {\n\tif (!(value.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}\n",
 									"key": "uuid",
 									"type": "hidden",
 									"input": true,
@@ -2337,8 +2332,8 @@
 							"type": "form",
 							"input": true,
 							"hideOnChildrenHidden": false,
-							"revision": 293,
-							"formRevision": 293
+							"revision": 303,
+							"formRevision": 303
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
@@ -2578,7 +2573,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 788,
+	"_vid": 807,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2662,6 +2657,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-01-04T10:20:52.843Z",
+	"modified": "2022-02-01T13:36:06.472Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }

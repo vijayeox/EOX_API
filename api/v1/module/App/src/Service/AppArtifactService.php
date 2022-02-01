@@ -85,6 +85,7 @@ class AppArtifactService extends AbstractService
             }
             if (file_exists($targetDir . $fileData['name'])) {
                 FileUtils::deleteFile($fileData['name'], $targetDir);
+                $this->updateAppDescriptor("delete", $descriptorPath, $artifactType, $fileData['name']);
             }
         }
         //Move/copy the files to destination.
@@ -337,6 +338,7 @@ class AppArtifactService extends AbstractService
                 $path = $artifactType == 'workflow' ? $value["bpmn_file"] : $value["template_file"];
                 if ($file == $path) {
                     unset($yaml[$artifactType][$index]);
+                    array_multisort($yaml[$artifactType] , SORT_ASC);
                 }
             }
         }
