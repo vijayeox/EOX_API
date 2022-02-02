@@ -1410,6 +1410,7 @@ class FileServiceTest extends AbstractServiceTest
         $sqlQueryResult = $this->runQuery($sqlQuery2);
         foreach ($sqlQueryResult as $key => $value) {
             $fieldValue = $sqlQueryResult[$key]['field_value'];
+            
             if ($sqlQueryResult[$key]['field_value_type'] == 'OTHER') {
                 $fieldValue = json_decode($fieldValue, true);
             }
@@ -1458,14 +1459,15 @@ class FileServiceTest extends AbstractServiceTest
         $params = array('attachmentId' => $attachmentUuid,'fileId' => $fileUuid);
         $config = $this->getApplicationConfig();
         //path/orguuid/fileuuid/name
-        $folderPath = $config['APP_DOCUMENT_FOLDER']."53012471-2863-4949-afb1-e69b0891c98a/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/";
+        $folderPath = $config['APP_DOCUMENT_FOLDER']."53012471-2863-4949-afb1-e69b0891c98a/temp/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/";
         if (!file_exists($folderPath)) {
             $check = mkdir($folderPath, 0777, true);
         }
-        $filePath = $config['APP_DOCUMENT_FOLDER']."53012471-2863-4949-afb1-e69b0891c98a/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/".$attachmentName;
+        $filePath = $config['APP_DOCUMENT_FOLDER']."53012471-2863-4949-afb1-e69b0891c98a/temp/b3bbf0ff-e489-4938-b672-9271fb0d8ffd/".$attachmentName;
         if (!file_exists($filePath)) {
             touch($filePath);
         }
+        
         $this->fileService->deleteAttachment($params);
         $checkforAttachmentInAttachmentTable = "SELECT * from ox_file_attachment where uuid ='".$attachmentUuid."'";
         $resultforAttachmentInAttachmentTable = $this->runQuery($checkforAttachmentInAttachmentTable);

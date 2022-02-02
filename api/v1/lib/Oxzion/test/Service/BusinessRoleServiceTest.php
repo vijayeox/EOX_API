@@ -75,8 +75,9 @@ class BusinessRoleServiceTest extends AbstractServiceTest
     {
         $dataset = $this->parseYaml();
         $appId = $dataset['ox_app'][0]['uuid'];
-        $this->expectException(ValidationException::class);
+        
         $this->businessRoleService->saveBusinessRole($appId, $data);
+        $this->expectException(ValidationException::class);
     }
 
     public function testUpdateBusinessRole()
