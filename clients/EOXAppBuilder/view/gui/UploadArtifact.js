@@ -12,25 +12,25 @@ class UploadArtifact extends React.Component {
         "Please verify if the zip archive contains valid application.yml file before proceeding with the import";
       this.fileExtension = ".zip";
     } else if (this.props.entity == "form") {
-      this.postURL = "app/" + this.props.params.app_uuid + "/artifact/add/form";
+      this.postURL = "app/" + this.props.params.app_uuid + "/artifact/add/" + this.props.entity;
       this.infoMessage =
         "Please verify if the JSON file has a unique Form Name";
       this.fileExtension = ".json";
     } else if (this.props.entity == "workflow") {
       this.postURL =
-        "app/" + this.props.params.app_uuid + "/artifact/add/workflow";
+        "app/" + this.props.params.app_uuid + "/artifact/add/" + this.props.entity;
       this.infoMessage =
         "Please verify if the BPMN file has a unique Workflow Name and has both start and end events";
       this.fileExtension = ".bpmn";
-    } else if(this.props.entity == 'delegate'){
+    } else if(this.props.entity == 'delegate' || this.props.entity == 'appupgrade'){
       this.postURL =
-        "app/" + this.props.params.app_uuid + "/artifact/add/delegate";
+        "app/" + this.props.params.app_uuid + "/artifact/add/" + this.props.entity;
       this.infoMessage =
         "Please verify if the PHP file has a unique File Name";
       this.fileExtension = ".php";
     } else if(this.props.entity == 'template'){
       this.postURL =
-        "app/" + this.props.params.app_uuid + "/artifact/add/template";
+        "app/" + this.props.params.app_uuid + "/artifact/add/" + this.props.entity;
       this.infoMessage =
         "Please verify if the Template file has a unique File Name";
       this.fileExtension = ".tpl";

@@ -164,6 +164,16 @@ content:
                                 page_id: '7302bd3c-5ea3-11ec-bf63-0242ac130002'
                                 params:
                                     app_uuid: '{{uuid}}'
+                -
+                    name: 'App Upgrade'
+                    icon: 'far fa-list-alt'
+                    rule: '''{{status}}'' !== 1'
+                    details:
+                        -
+                            params:
+                                page_id: 'f922ab50-84b6-11ec-a8a3-0242ac120002'
+                                params:
+                                    app_uuid: '{{uuid}}'
             columnConfig:
                 -
                     title: Name
