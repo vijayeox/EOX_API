@@ -71,6 +71,15 @@ class UploadArtifact extends React.Component {
   }
 
   onFileChange = (event) => {
+    if(this.props.pattern){
+      if(!new RegExp(this.props.pattern.regex).test(event.newState[0].name)){
+        return this.notif.current.notify(
+          `${this.props.pattern?.error || 'Invalid File Name'}`,
+          "Please select a different file.",
+          "danger"
+        )
+      }
+    }
     let fileError = false;
     let validFiles = event.newState.filter((item) => {
       if (item.validationErrors) {
