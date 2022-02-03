@@ -65,8 +65,13 @@ class AppArtifactService extends AbstractService
             break;
             case 'delegate':
                 return $this->uploadContents($appSourceDir, 'delegate', $descriptorPath, $artifactType);
+            break;    
             case 'template':
                 return $this->uploadContents($appSourceDir, 'template', $descriptorPath, $artifactType);
+            break;    
+            case 'appupgrade':
+                return $this->uploadContents($appSourceDir, 'appupgrade', $descriptorPath, $artifactType);
+            break;     
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
@@ -145,6 +150,9 @@ class AppArtifactService extends AbstractService
             break;
             case 'template':
                 $filePath = $filePath . 'template';
+            break;
+            case 'appupgrade':
+                $filePath = $filePath . 'appupgrade';
             break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
@@ -288,6 +296,9 @@ class AppArtifactService extends AbstractService
             case 'template':
                 $targetDir = $contentDir . 'template';
             break;
+            case 'appupgrade':
+                $targetDir = $contentDir . 'appupgrade';
+            break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
@@ -297,7 +308,7 @@ class AppArtifactService extends AbstractService
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
                     $ext = pathinfo($entry, PATHINFO_EXTENSION);
-                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && $artifactType == 'delegate') || ($ext == 'tpl' && $artifactType == 'template')) {
+                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && ($artifactType == 'delegate' || $artifactType == 'appupgrade')) || ($ext == 'tpl' && $artifactType == 'template')) {
                         $files[] = array(
                             'name' => substr($entry, 0, strrpos($entry, '.')) ,
                             'content'=> file_get_contents($targetDir.$entry)
