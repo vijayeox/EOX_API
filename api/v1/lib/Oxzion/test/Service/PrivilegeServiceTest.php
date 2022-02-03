@@ -15,8 +15,12 @@ class PrivilegeServiceTest extends AbstractServiceTest
     public function setUp() : void
     {
         $this->loadConfig();
+        $conn=$this->getConnection();
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=0");
         parent::setUp();
         $this->privilegeService = $this->getApplicationServiceLocator()->get(\Oxzion\Service\PrivilegeService::class);
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=1");
+        
     }
 
     public function getDataSet()
@@ -29,7 +33,10 @@ class PrivilegeServiceTest extends AbstractServiceTest
     {
         $data = array(['name' => 'MANAGE_POLICY_APPROVAL', 'permission' => 3 ], ['name' => 'MANAGE_MY_POLICY', 'permission' => 3 ], ['name' => 'MANAGE_P', 'permission' => 3 ]);
         $config = $this->getApplicationConfig();
+        $conn=$this->getConnection();
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=0");
         $content = $this->privilegeService->saveAppPrivileges(240, $data);
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=1");
         $sqlQuery = "SELECT count(name) as count FROM ox_privilege WHERE app_id = 240";
         $adapter = $this->getDbAdapter();
         $adapter->getDriver()->getConnection()->setResource(static::$pdo);
@@ -52,7 +59,10 @@ class PrivilegeServiceTest extends AbstractServiceTest
         $this->assertEquals($result[0]['count'], 4);
         $data = array(['name' => 'MANAGE_POLICY_APPROVAL', 'permission' => 3 ], ['name' => 'MANAGE_MY_POLICY', 'permission' => 3 ], ['name' => 'MANAGE_P', 'permission' => 3 ]);
         $config = $this->getApplicationConfig();
+        $conn=$this->getConnection();
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=0");
         $content = $this->privilegeService->saveAppPrivileges(240, $data);
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=1");
         $sqlQuery = "SELECT count(name) as count FROM ox_privilege WHERE app_id = 240";
         $adapter = $this->getDbAdapter();
         $adapter->getDriver()->getConnection()->setResource(static::$pdo);
