@@ -15,6 +15,9 @@ content:
                                 -
                                     type: UploadArtifact
                                     entity: appupgrade
+                                    pattern:
+                                        regex: '^AppUpgrade'
+                                        error: 'File name must starts with AppUpgrade'
     -
         type: List
         content:
