@@ -2562,18 +2562,18 @@
 			"input": true
 		}, {
 			"label": "App Version",
-			"mask": false,
-			"tableView": false,
-			"delimiter": false,
-			"requireDecimal": false,
-			"inputFormat": "plain",
+			"tableView": true,
+			"clearOnHide": false,
+			"validate": {
+				"custom": "if (input && input != \"\") {\n    valid = input.match(/^[0-9]+$/)\n      ? true\n      : \"App Version should be numeric\";\n  \n}"
+			},
 			"key": "appVersion",
-			"type": "number",
+			"type": "textfield",
 			"input": true
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 807,
+	"_vid": 809,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2657,6 +2657,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-02-01T13:36:06.472Z",
+	"modified": "2022-02-02T13:32:58.552Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
