@@ -224,6 +224,7 @@ RUN mkdir -p /var/run/mysqld \
     && chown -R www-data:staff /var/lib/mysql \
     && chown -R www-data:staff /var/run/mysqld \
     && chown -R www-data:staff /var/log/mysql
-RUN npm install -g npm    
+RUN npm install -g npm
+RUN update-alternatives --set php /usr/bin/php7.2 && update-alternatives --set phar /usr/bin/phar7.2 && update-alternatives --set phar.phar /usr/bin/phar.phar7.2 && update-alternatives --set phpize /usr/bin/phpize7.2 && update-alternatives --set php-config /usr/bin/php-config7.2
 
 CMD ["/services/run.sh"]

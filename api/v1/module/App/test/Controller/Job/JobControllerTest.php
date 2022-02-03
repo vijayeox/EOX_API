@@ -94,7 +94,7 @@ class JobControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertResponseStatusCode(200);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($result[0]['count(*)'], 1);
+        $this->assertEquals($result[0]['count(*)'], 2);
     }
 
     public function testGetJobsListFromEmptyDb()
@@ -106,7 +106,7 @@ class JobControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertResponseStatusCode(200);
         $result = $this->executeQueryTest("Select * from ox_job");
-        $this->assertEquals(0, count($result));
+        $this->assertEquals(1, count($result));
     }
 
     public function testJobServiceCancelJob()
@@ -134,7 +134,7 @@ class JobControllerTest extends ControllerTest
         $newData['accountId'] = $data['accountId'] ;
         $this->dispatch('/app/2c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/cancelJob', 'POST', $newData);
         $content = json_decode($this->getResponse()->getContent(), true);
-        $select = "Select * from ox_job";
+        $select = "Select * from ox_job where job_id is not null";
         $job = $this->executeQueryTest($select);
         $this->assertEmpty($job);
         $this->assertResponseStatusCode(200);
@@ -194,7 +194,7 @@ class JobControllerTest extends ControllerTest
         $newData['jobTeam'] = $response->JobTeam;
         $this->dispatch('/app/2c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/cancelJobId', 'POST', $newData);
         $content = json_decode($this->getResponse()->getContent(), true);
-        $select = "Select * from ox_job";
+        $select = "Select * from ox_job where job_id is not null";
         $job = $this->executeQueryTest($select);
         $this->assertEmpty($job);
         $this->assertResponseStatusCode(200);
