@@ -94,7 +94,7 @@ class JobControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertResponseStatusCode(200);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($result[0]['count(*)'], 2);
+        $this->assertEquals($result[0]['count(*)'], 1);
     }
 
     public function testGetJobsListFromEmptyDb()
@@ -106,7 +106,7 @@ class JobControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertResponseStatusCode(200);
         $result = $this->executeQueryTest("Select * from ox_job");
-        $this->assertEquals(1, count($result));
+        $this->assertEquals(0, count($result));
     }
 
     public function testJobServiceCancelJob()

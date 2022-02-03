@@ -15,7 +15,10 @@ class AuthControllerTest extends ControllerTest
     public function setUp(): void
     {
         $this->loadConfig();
+        $conn=$this->getConnection();
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=0");
         parent::setUp();
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=1");
     }
 
     public function getDataSet()

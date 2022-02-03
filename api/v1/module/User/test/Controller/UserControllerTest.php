@@ -1128,7 +1128,7 @@ class UserControllerTest extends ControllerTest
         $this->setDefaultAsserts('loggedInUser');
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']['blackListedApps']), 11);
+        $this->assertEquals(count($content['data']['blackListedApps']), 0);
     }
 
     public function testBlackListAppsForEmployee()

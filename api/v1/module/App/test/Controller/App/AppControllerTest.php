@@ -30,7 +30,10 @@ class AppControllerTest extends ControllerTest
 
     public function setUp(): void
     {
+        $conn=$this->getConnection();
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=0");
         parent::setUp();
+        $conn->getConnection()->query("SET FOREIGN_KEY_CHECKS=1");
         
         if ($this->getName() == 'testCopyOnlyNewTemplatesOnDeploy') {
             $this->cleanFile();
@@ -330,9 +333,9 @@ class AppControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']), 17);
-        $this->assertEquals($content['data'][0]['name'], 'App1');
-        $this->assertEquals($content['total'], 17);
+        $this->assertEquals(count($content['data']), 13);
+        $this->assertEquals($content['data'][0]['name'], 'Admin');
+        $this->assertEquals($content['total'], 13);
     }
 
     public function testGet()
@@ -395,9 +398,9 @@ class AppControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals(count($content['data']), 2);
-        $this->assertEquals($content['data'][0]['name'], 'App1');
-        $this->assertEquals($content['data'][1]['name'], 'Calculator');
-        $this->assertEquals($content['total'], 17);
+        $this->assertEquals($content['data'][0]['name'], 'Admin');
+        $this->assertEquals($content['data'][1]['name'], 'Analytics');
+        $this->assertEquals($content['total'], 13);
     }
 
     public function testGetAppListWithPageSize2()
@@ -409,9 +412,9 @@ class AppControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals(count($content['data']), 2);
-        $this->assertEquals($content['data'][0]['name'], 'Calendar');
-        $this->assertEquals($content['data'][1]['name'], 'Chat');
-        $this->assertEquals($content['total'], 17);
+        $this->assertEquals($content['data'][0]['name'], 'AppBuilder');
+        $this->assertEquals($content['data'][1]['name'], 'CRM');
+        $this->assertEquals($content['total'], 13);
     }
 
     public function testCreateWithUserGeneratedUuid()

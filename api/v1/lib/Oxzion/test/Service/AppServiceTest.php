@@ -78,7 +78,7 @@ class AppServiceTest extends AbstractServiceTest
         AuthContext::put(AuthConstants::ACCOUNT_ID, '1');
         $appService = $this->getApplicationServiceLocator()->get(AppService::class);
         $apps = $appService->getApps();
-        $this->assertEquals(5, count($apps));
+        $this->assertEquals(10, count($apps));
     }
 
     public function testGetAppsOfAccountWithoutApps()
@@ -588,7 +588,7 @@ class AppServiceTest extends AbstractServiceTest
         $this->assertEquals($data['role'][0]['default'], $result['default_role']);
         $sqlQuery = "SELECT rp.* FROM ox_role_privilege rp WHERE rp.role_id = ".$result['id'];
         $result = $this->executeQueryTest($sqlQuery);
-        $this->assertEquals(2, count($result));
+        $this->assertEquals(1, count($result));
         $result = $result[0];
         $privilege = $data['role'][0]['privileges'][0];
         $this->assertEquals($privilege['privilege_name'], $result['privilege_name']);
