@@ -29,6 +29,7 @@ class BusinessRoleServiceTest extends AbstractServiceTest
     {
         $dataset = Yaml::parseFile(dirname(__FILE__)."/Dataset/Form.yml");
         return $dataset;
+        
     }
 
     public function testCreateBusinessRole()
@@ -74,10 +75,10 @@ class BusinessRoleServiceTest extends AbstractServiceTest
     public function testCreateBusinessRoleWithNoName()
     {
         $dataset = $this->parseYaml();
-        $appId = $dataset['ox_app'][0]['uuid'];
-        
-        $this->businessRoleService->saveBusinessRole($appId, $data);
+        $appId = $dataset['ox_app'][1]['uuid'];
+        $data=array();
         $this->expectException(ValidationException::class);
+        $this->businessRoleService->saveBusinessRole($appId, $data);
     }
 
     public function testUpdateBusinessRole()

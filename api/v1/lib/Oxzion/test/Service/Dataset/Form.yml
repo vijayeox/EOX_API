@@ -7,12 +7,26 @@ ox_app:
     type: 2
     status: 1
     created_by: 1
+  - id: 102
+    name: "APP FOR TESTING1"
+    uuid: "e8b656b5-5264-43ef-92fb-a06ebf8a7c68"
+    category: "OTHERS"
+    date_created: "2019-06-26 00:00:00"
+    type: 2
+    status: 1
+    created_by: 1
 ox_app_entity:
   - id: 1
     name: "entity1"
     app_id: 100
     date_created: "2019-06-26 00:00:00"
     uuid: "d23d0c68-98c9-11e9-adc5-308d99c9145b"
+    created_by: 1
+  - id: 2
+    name: "entity2"
+    app_id: 102
+    date_created: "2019-06-26 00:00:00"
+    uuid: "c856a275-a743-490b-b185-b7c1c0142fee"
     created_by: 1
 ox_business_role:
   - id: 1

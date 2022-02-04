@@ -56,10 +56,9 @@ class CommentService extends AbstractService
         if (isset($data['attachments'])) {            
             $data['attachments'] = json_encode($data['attachments']);
         }
-        if (isset($data['parent'])) {
-            $ret = $this->getParentId($data, $fileId);
-            if (!$ret) {
-                return 0;
+        if(isset($data['parent'])){
+            if(!is_numeric($data['parent'])) {
+                $data['parent']= $this->getIdFromUuid('ox_comment', $data['parent']);
             }
         }
         $data['isdeleted'] = false;
@@ -104,10 +103,9 @@ class CommentService extends AbstractService
         if (!$obj) {
             return 0;
         }
-        if (isset($data['parent'])) {
-            $ret = $this->getParentId($data, $fileId);
-            if (!$ret) {
-                return 0;
+        if(isset($data['parent'])){
+            if(!is_numeric($data['parent'])) {
+                $data['parent']= $this->getIdFromUuid('ox_comment', $data['parent']);
             }
         }
         $obj = $obj->toArray();
