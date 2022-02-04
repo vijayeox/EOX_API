@@ -180,9 +180,6 @@ class CommentController extends AbstractApiController
             $response = ['data' => $data, 'errors' => $e->getErrors()];
             return $this->getErrorResponse("Validation Errors", 404, $response);
         }
-        if (count($response) == 0) {
-            return $this->getErrorResponse("Parent Comments Not found", 404);
-        }
         return $this->getSuccessResponseWithData($response, 200);
     }
 }
