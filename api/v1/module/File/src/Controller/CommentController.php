@@ -168,9 +168,6 @@ class CommentController extends AbstractApiController
             $response = ['data' => $data, 'errors' => $e->getErrors()];
             return $this->getErrorResponse("Validation Errors", 404, $response);
         }
-        if (count($response) == 0) {
-            return $this->getErrorResponse("Entity not found for id - $id", 404);
-        }
         return $this->getSuccessResponseWithData($response, 200);
     }
 
@@ -182,9 +179,6 @@ class CommentController extends AbstractApiController
         } catch (ValidationException $e) {
             $response = ['data' => $data, 'errors' => $e->getErrors()];
             return $this->getErrorResponse("Validation Errors", 404, $response);
-        }
-        if (count($response) == 0) {
-            return $this->getErrorResponse("Parent Comments Not found", 404);
         }
         return $this->getSuccessResponseWithData($response, 200);
     }

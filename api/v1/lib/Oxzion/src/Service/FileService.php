@@ -1488,7 +1488,7 @@ class FileService extends AbstractService
             }
         }
         $appFilter = "";
-        $appIdClause = "";
+        $appIdClause = $appId= "";
         $queryParams = array();
         if (isset($appUUid)) {
             $appId = $this->getIdFromUuid('ox_app', $appUUid);
