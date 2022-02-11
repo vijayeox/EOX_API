@@ -33,10 +33,11 @@ class LoadAppData extends AbstractAppDelegate
                             foreach ($value['pageContent']['data']['content'][0]['gridContent']['actions'] as $keyPdupl => &$valuePDupl) {
                                 $valuePDupl['contentDuplicate']['data']['content'] = $valuePDupl['details'];
                             }
-
-                            foreach ($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'] as $keyGridDupl => &$valueGridDupl) {
-                                $valueGridDupl['detailsDuplicate']['data']['content'] = $valueGridDupl['details'];
-                            }    
+                            if (isset($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'])) {
+                                foreach ($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'] as $keyGridDupl => &$valueGridDupl) {
+                                    $valueGridDupl['detailsDuplicate']['data']['content'] = $valueGridDupl['details'];
+                                }  
+                            }  
                         }
                     }                   
                 }
