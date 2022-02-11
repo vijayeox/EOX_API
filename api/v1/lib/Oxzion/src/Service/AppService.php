@@ -313,8 +313,7 @@ class AppService extends AbstractService implements AppUpgrade
         }
         try {
             
-            if (isset($ymlData['appVersion'])) { 
-                         
+            if (isset($ymlData['appVersion']) && !empty($ymlData['appVersion'])) {    
                 if ($ymlData['appVersion'] != $ymlData['app']['previousVersion']) {
                     $updatedYml = $this->upgrade($ymlData);
                     $yamlText = Yaml::dump($updatedYml, 20);

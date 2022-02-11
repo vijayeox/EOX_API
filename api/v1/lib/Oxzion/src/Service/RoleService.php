@@ -135,13 +135,15 @@ class RoleService extends AbstractService
             $delete = "DELETE from `ox_role_privilege` where role_id =" . $roleId . "";
             $result = $this->runGenericQuery($delete);
             for ($i = 0; $i < sizeof($privileges); $i++) {
-                $insert = "INSERT INTO `ox_role_privilege` (`role_id`,`privilege_name`,`permission`,`account_id`,`app_id`)
-                        SELECT " . $roleId . ",'" . $privileges[$i]['privilege_name'] . "', CASE WHEN permission_allowed >" . $privileges[$i]['permission'] . " THEN " . $privileges[$i]['permission'] . " ELSE permission_allowed END ," . ($accountId ? $accountId : 'NULL') .
-                    ", app_id from ox_privilege where name = '" . $privileges[$i]['privilege_name'] . "'";
-                $this->logger->info("Executing query $insert");
-                $resultSet = $this->runGenericQuery($insert);
-                $privilegeId = $resultSet->getGeneratedValue();
-                $privileges[$i]['id'] = $privilegeId;
+                if (isset($privileges[$i]['privilege_name']) && isset($privileges[$i]['permission']) ) {
+                    $insert = "INSERT INTO `ox_role_privilege` (`role_id`,`privilege_name`,`permission`,`account_id`,`app_id`)
+                            SELECT " . $roleId . ",'" . $privileges[$i]['privilege_name'] . "', CASE WHEN permission_allowed >" . $privileges[$i]['permission'] . " THEN " . $privileges[$i]['permission'] . " ELSE permission_allowed END ," . ($accountId ? $accountId : 'NULL') .
+                        ", app_id from ox_privilege where name = '" . $privileges[$i]['privilege_name'] . "'";
+                    $this->logger->info("Executing query $insert");
+                    $resultSet = $this->runGenericQuery($insert);
+                    $privilegeId = $resultSet->getGeneratedValue();
+                    $privileges[$i]['id'] = $privilegeId;
+                }
             }
         } catch (Exception $e) {
             throw $e;

@@ -27,29 +27,31 @@ class CleanYml extends AbstractAppDelegate
     }
 
     private function haveOnlyRequiredInfo(&$pageData){
-        if ($pageData['type'] == 'HTMLViewer') {
-            $whitelist = ['type' ,'htmlContent','content'];
-            $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
-        }
-        if ($pageData['type'] == 'Page') {
-            $whitelist = ['type' ,'page_id'];
-            $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
-        }
-
-        if ($pageData['type'] == 'DashboardManager') {
-            $whitelist = ['type' ,'dashboard_uuid','content'];
-            $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
-        }
-
-        if ($pageData['type'] == 'Form') {
-            $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId'];
-            $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
-        }
-
-        if ($pageData['type'] == 'List') {
-            $whitelist = ['type' ,'route','content','gridContent','disableAppId','defaultFilters','pageable','autoRefreshInterval','exportToPDF'];
-            $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
-        }
+        if (isset($pageData['type'])) {
+            if ($pageData['type'] == 'HTMLViewer') {
+                $whitelist = ['type' ,'htmlContent','content'];
+                $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
+            }
+            if ($pageData['type'] == 'Page') {
+                $whitelist = ['type' ,'page_id'];
+                $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
+            }
+    
+            if ($pageData['type'] == 'DashboardManager') {
+                $whitelist = ['type' ,'dashboard_uuid','content'];
+                $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
+            }
+    
+            if ($pageData['type'] == 'Form') {
+                $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId'];
+                $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
+            }
+    
+            if ($pageData['type'] == 'List') {
+                $whitelist = ['type' ,'route','content','gridContent','disableAppId','defaultFilters','pageable','autoRefreshInterval','exportToPDF'];
+                $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
+            }
+        }        
     }
 
     private function cleanUpyml(&$newPageData){ 
@@ -91,7 +93,7 @@ class CleanYml extends AbstractAppDelegate
     private function cleanUpList(&$pagesContent){
         $pagesContent = array_map(function ($newPages){
             $this->haveOnlyRequiredInfo($newPages);
-            if($newPages['type'] == 'List'){
+            if(isset($newPages['type']) && $newPages['type'] == 'List'){
                 unset($newPages["gridContent"]);
                 $newPages['content']['actions'] = array_map(function ($newPageData){
                     $this->cleanUpyml($newPageData);
