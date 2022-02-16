@@ -109,7 +109,7 @@
 						"clearOnHide": false,
 						"validate": {
 							"required": true,
-							"custom": "if(data.app.name && data.app.name != ''){\n      valid = (data.app.name.match(/^[a-z0-9-]+$/i)) ?  true : 'Application Name must Contain only Alphabets and Numbers.';\n}",
+							"custom": "if(data.app.name && data.app.name != ''){\n  valid = (data.app.name.match(/^[a-z0-9-]+$/i)) ? true : 'Application Name must Contain only Alphabets and Numbers.';\n}",
 							"maxLength": 25
 						},
 						"errorLabel": "Application Name",
@@ -435,7 +435,7 @@
 				"name": "Disable",
 				"trigger": {
 					"type": "javascript",
-					"javascript": "result = data.app.name.length > 0 && data.app.category.length > 0;"
+					"javascript": "result = data.app.name.match(/^[a-z0-9-]+$/i) && data.app.name.length > 0 && data.app.category.length > 0;"
 				},
 				"actions": [{
 					"name": "Disable",
@@ -1388,7 +1388,7 @@
 								"columns": [{
 									"components": [{
 										"label": "Start date field",
-										"tooltip": "The Start Date Field which is used in the Form Type",
+										"tooltip": "The Start Date Field which is used as the filter option in loading a List. When a Start Date Field is set, time taken to load a list view reduces.",
 										"tableView": true,
 										"key": "start_date_field",
 										"type": "textfield",
@@ -1404,7 +1404,7 @@
 								}, {
 									"components": [{
 										"label": "End date field",
-										"tooltip": "The End Date Field which is used in the Form Type",
+										"tooltip": "The End Date Field which is used as the filter option in loading a List. When a End Date Field is set, time taken to load a list view reduces.",
 										"tableView": true,
 										"key": "end_date_field",
 										"type": "textfield",
@@ -1432,7 +1432,7 @@
 										"columns": [{
 											"components": [{
 												"label": "Status field",
-												"tooltip": "The Status Field which is used in the Form Type",
+												"tooltip": "The Status Field which is used as the filter option in loading a List. When a Status Field is set, time taken to load a list view reduces.",
 												"tableView": true,
 												"key": "status_field",
 												"type": "textfield",
@@ -1448,7 +1448,7 @@
 										}, {
 											"components": [{
 												"label": "Subscriber field",
-												"tooltip": "The Subscriber Field which is used in the Form Type",
+												"tooltip": "The Subscriber Field which is used when the File Comments is enabled. This Field indicates to whom the chat messages needs to be sent when the message body doesn't contain any specific user name.It can be a single field or a comma-seperated field list.",
 												"tableView": true,
 												"key": "subscriber_field",
 												"logic": [{
@@ -1525,6 +1525,7 @@
 										"input": true,
 										"components": [{
 											"label": "Identifier field",
+											"tooltip": "A unique identifier for a File or Application.",
 											"tableView": true,
 											"clearOnHide": false,
 											"key": "identifier",
@@ -1732,6 +1733,10 @@
 										"label": "Entity View",
 										"tableView": false,
 										"clearOnHide": false,
+										"calculateValue": "console.log(\"ENTITY VIEW----\");\nconsole.log(value);",
+										"validate": {
+											"custom": "console.log(\"VALIDATN ENTITY VIEW----\")\nconsole.log(valid);"
+										},
 										"key": "pageContent",
 										"customConditional": "if(row.enable_view == true || row.enable_view == 'true'){\n  show = true;\n} else {\n  show = false;\n}",
 										"type": "container",
@@ -1746,10 +1751,9 @@
 												"label": "Content",
 												"reorder": false,
 												"addAnotherPosition": "bottom",
-												"defaultOpen": false,
 												"layoutFixed": false,
 												"enableRowGroups": false,
-												"initEmpty": true,
+												"initEmpty": false,
 												"tableView": false,
 												"defaultValue": [{
 													"content": "",
@@ -1758,6 +1762,7 @@
 												"clearOnHide": false,
 												"key": "content",
 												"type": "datagrid",
+												"defaultOpen": false,
 												"input": true,
 												"components": [{
 													"label": "View Template",
@@ -2332,8 +2337,8 @@
 							"type": "form",
 							"input": true,
 							"hideOnChildrenHidden": false,
-							"revision": 303,
-							"formRevision": 303
+							"revision": 304,
+							"formRevision": 304
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
@@ -2575,7 +2580,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 812,
+	"_vid": 821,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2659,6 +2664,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-02-11T08:12:42.398Z",
+	"modified": "2022-02-16T15:50:29.913Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
