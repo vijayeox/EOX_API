@@ -14,6 +14,7 @@ class CleanYml extends AbstractAppDelegate
     public function __construct()
     {
         parent::__construct();
+        error_reporting(0);
     }
 
     public function execute(array $data, Persistence $persistenceService)
