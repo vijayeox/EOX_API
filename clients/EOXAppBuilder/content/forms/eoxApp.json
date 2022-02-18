@@ -1521,6 +1521,47 @@
 											"identifier": ""
 										}],
 										"key": "identifiers",
+										"logic": [{
+											"name": "If File Comments enabled",
+											"trigger": {
+												"type": "simple",
+												"simple": {
+													"show": true,
+													"when": "app.chat_notification",
+													"eq": "true"
+												}
+											},
+											"actions": [{
+												"name": "Set Mandatory",
+												"type": "property",
+												"property": {
+													"label": "Required",
+													"value": "validate.required",
+													"type": "boolean"
+												},
+												"state": true
+											}]
+										}, {
+											"name": "If File Comments not enabled",
+											"trigger": {
+												"type": "simple",
+												"simple": {
+													"show": true,
+													"when": "app.chat_notification",
+													"eq": "false"
+												}
+											},
+											"actions": [{
+												"name": "Set it to Non-mandatory",
+												"type": "property",
+												"property": {
+													"label": "Required",
+													"value": "validate.required",
+													"type": "boolean"
+												},
+												"state": false
+											}]
+										}],
 										"type": "datagrid",
 										"input": true,
 										"components": [{
@@ -1529,47 +1570,6 @@
 											"tableView": true,
 											"clearOnHide": false,
 											"key": "identifier",
-											"logic": [{
-												"name": "If File Comments enabled",
-												"trigger": {
-													"type": "simple",
-													"simple": {
-														"show": true,
-														"when": "app.chat_notification",
-														"eq": "true"
-													}
-												},
-												"actions": [{
-													"name": "Set Mandatory",
-													"type": "property",
-													"property": {
-														"label": "Required",
-														"value": "validate.required",
-														"type": "boolean"
-													},
-													"state": true
-												}]
-											}, {
-												"name": "If File Comments not enabled",
-												"trigger": {
-													"type": "simple",
-													"simple": {
-														"show": true,
-														"when": "app.chat_notification",
-														"eq": "false"
-													}
-												},
-												"actions": [{
-													"name": "Set it to Non-mandatory",
-													"type": "property",
-													"property": {
-														"label": "Required",
-														"value": "validate.required",
-														"type": "boolean"
-													},
-													"state": false
-												}]
-											}],
 											"type": "textfield",
 											"input": true,
 											"hideOnChildrenHidden": false
@@ -1732,8 +1732,8 @@
 									}, {
 										"label": "Entity View",
 										"tableView": false,
-										"clearOnHide": false,
-										"calculateValue": "console.log(\"ENTITY VIEW----\");\nconsole.log(value);",
+										"redrawOn": "entity.enable_view",
+										"calculateValue": "if(value == []){\n  delete(value);\n}\nconsole.log(value == []);\nconsole.log(\"ENTITY VIEW----\");\nconsole.log(value);",
 										"validate": {
 											"custom": "console.log(\"VALIDATN ENTITY VIEW----\")\nconsole.log(valid);"
 										},
@@ -2332,13 +2332,15 @@
 							"label": "Page Content Form",
 							"tableView": false,
 							"form": "5f21c1bdbba30150d672d0cf",
+							"revision": "319",
+							"useOriginalRevision": false,
 							"calculateValue": "if(data.pagesList){\n  if(value && value.data){\n    value.data.pagesList = data.pagesList\n    value.data.formsList = data.formsList\n  }\n}",
 							"key": "pageContent",
 							"type": "form",
 							"input": true,
 							"hideOnChildrenHidden": false,
-							"revision": 304,
-							"formRevision": 304
+							"lazyLoad": false,
+							"formRevision": 320
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
@@ -2580,7 +2582,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 821,
+	"_vid": 830,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2664,6 +2666,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-02-16T15:50:29.913Z",
+	"modified": "2022-02-17T11:21:12.595Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
