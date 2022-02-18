@@ -116,6 +116,9 @@ class CleanYml extends AbstractAppDelegate
                     }, $newPages['content']['operations']['actions']);
                 }
 
+            }
+            if(isset($newPages['type']) && $newPages['type'] == 'Form'){
+                unset($newPages["fileId"]);
             }  
             return $newPages;                      
         }, $pagesContent);
