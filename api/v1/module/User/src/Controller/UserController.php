@@ -153,6 +153,24 @@ class UserController extends AbstractApiController
         $filterParams = $this->params()->fromQuery(); // empty method call
         try {
             $result = $this->userService->getUsers($filterParams, $this->getBaseUrl());
+            $i=0;
+            foreach($result['data'] as $key=>$val)
+            {
+                if(isset($val['uuid']))
+                {
+                    $uuid=$val['uuid'];
+                }
+                if(isset($val['accountId']))
+                {
+                    $accountId=$val['accountId'];
+                }
+                $userid=$this->userService->getUserByUuid($uuid);
+                $projects=$this->projectService->getProjectsOfUserById($userid, $accountId);
+                $result['data'][$i]['project'] = $projects[0];
+                $result['data'][$i]['role'] = $this->userService->getRolesofUser($accountId, $uuid);
+                $i++; 
+            }
+            
             return $this->getSuccessResponseDataWithPagination($result['data'], $result['total']);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
@@ -376,6 +394,7 @@ class UserController extends AbstractApiController
                         break;
                 }
             }
+            
             if ($userInfo) {
                 $baseUrl = $this->getBaseUrl();
                 $userInfo['icon'] = $baseUrl . "/user/profile/" . $userInfo["uuid"];
