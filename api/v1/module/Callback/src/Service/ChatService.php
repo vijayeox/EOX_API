@@ -484,7 +484,7 @@ class ChatService extends AbstractService
             $fileDetails = $this->fileService->getFile($params['fileId'], false,$appDetails['account_id']);
             $title = $fileDetails['title'];
             $this->logger->info("APP Title--".print_r($title,true));
-            $url = "<a eoxapplication=" .'"'.$appDetails['appName']. '"'. " "."file-id=" .'"'.$params['fileId'] . '"'. "></a>";
+            $url = "<a eoxapplication=" .'"'.$appDetails['appName']. '"'. " "."file-id=" .'"'.$params['fileId'] . '"'. "/>";
             $this->logger->info("APP URL--".print_r($url, true));
             $subscribers =  $this->subscriberService->getSubscribers($params['fileId']);
             $subscribersToList = array_column($subscribers, 'username');

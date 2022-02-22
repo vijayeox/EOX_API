@@ -1,0 +1,16 @@
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.0 WHERE `id` = 11;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.1 WHERE `id` = 12;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.2 WHERE `id` = 13;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.3 WHERE `id` = 14;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.4 WHERE `id` = 15;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.5 WHERE `id` = 16;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.6 WHERE `id` = 17;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.7 WHERE `id` = 18;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.8 WHERE `id` = 19;
+UPDATE `ox_app_migration_version`  SET `version_number` = 2.9 WHERE `id` = 20;
+UPDATE `ox_app_migration_version`  SET `version_number` = 3.0 WHERE `id` = 21;
+UPDATE `ox_app_migration_version`  SET `version_number` = 3.1 WHERE `id` = 22;
+UPDATE `ox_app_migration_version`  SET `version_number` = 3.2 WHERE `id` = 23;
+UPDATE `ox_app_migration_version`  SET `version_number` = 3.3 WHERE `id` = 24;
+UPDATE `ox_app_migration_version`  SET `version_number` = 3.4 WHERE `id` = 25;
+UPDATE `ox_app_migration_version`  SET `version_number` = 3.5 WHERE `id` = 26;

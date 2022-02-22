@@ -207,7 +207,7 @@ class CommentService extends AbstractService
 
     public function getchildren($id, $fileId)
     {
-        $queryString = "select ox_comment.text, ou.name, ou.icon, ou.uuid as userId, ox_comment.date_created as time, 
+        $queryString = "select ox_comment.text, ou.name, ou.icon, ou.uuid as userId, ox_comment.date_created as time, ox_comment.attachments,
                         ox_comment.uuid as commentId from ox_comment 
                         inner join ox_comment as parent on parent.id = ox_comment.parent
                         inner join ox_user ou on ou.id = ox_comment.created_by 
@@ -215,6 +215,13 @@ class CommentService extends AbstractService
                         where parent.uuid = :commentId AND ox_comment.account_id=".AuthContext::get(AuthConstants::ACCOUNT_ID)." AND ox_comment.isdeleted!=1 AND of.uuid = :fileId order by ox_comment.id";
         $queryParams = ["commentId" => $id, "fileId" => $fileId];
         $result = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
+        if (count($result) >0) {
+            for ($i=0; $i < count($result); $i++) {               
+                $attachment = json_decode($result[$i]['attachments'],true);
+                $attachment = is_string($attachment) ? json_decode($attachment,true) : $attachment;
+                $result[$i]['attachments'] = isset($attachment['attachments']) ? $attachment['attachments'] : null;
+            }
+        }
         return $result;
     }
 }
