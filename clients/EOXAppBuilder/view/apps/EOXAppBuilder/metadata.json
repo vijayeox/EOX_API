@@ -16,7 +16,7 @@
         "en_EN": "App Studio"
     },
     "description": {
-        "en_EN": "App for EOX App Studio"
+        "en_EN": "App for EOX AppBuilder"
     },
     "files": [
         "main.js",
