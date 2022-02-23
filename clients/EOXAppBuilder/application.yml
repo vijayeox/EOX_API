@@ -11,7 +11,7 @@ app:
     isdefault: false
     logo: default_app.png
     start_options: null
-    title: AppBuilder
+    title: App Studio
     app_properties: '{"chat_notification":"","appIdentifiers":""}'
 checkOrg: true 
 org:
