@@ -89,7 +89,6 @@ class AnnouncementController extends AbstractApiController
     public function getList()
     {
         $params = $this->params()->fromRoute();
-        print_r($params);
         $this->log->info(__CLASS__ . "-> Get announcement list- " . print_r($params, true));
         try {
             $result = $this->announcementService->getAnnouncements($params);
