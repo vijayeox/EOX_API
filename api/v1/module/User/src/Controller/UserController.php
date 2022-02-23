@@ -154,6 +154,8 @@ class UserController extends AbstractApiController
         try {
             $result = $this->userService->getUsers($filterParams, $this->getBaseUrl());
             $i=0;
+            $uuid="";
+            $accountId="";
             foreach($result['data'] as $key=>$val)
             {
                 if(isset($val['uuid']))

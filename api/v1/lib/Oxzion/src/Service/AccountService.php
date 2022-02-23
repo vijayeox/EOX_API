@@ -903,16 +903,16 @@ class AccountService extends AbstractService
         if (!isset($id)) {
             throw new EntityNotFoundException("Invalid Account");
         }
-
+        
         $pageSize = 20;
         $offset = 0;
         $where = "";
         $sort = "oxa.name";
 
         $select = "SELECT oxa.uuid,oxa.name,oxa.description,oxa.link, oxa.type,oxa.end_date,
-                    oxa.start_date,oxa.media_type,oxa.media,oxo.uuid as accountId";
-        $from = "FROM `ox_announcement` as oxa
-                    LEFT JOIN ox_account as oxo on oxa.account_id = oxo.id";
+                    oxa.start_date,oxa.media_type,oxa.media,oxo.uuid as accountId ";
+        $from = "FROM `ox_announcement` as oxa 
+                    LEFT JOIN ox_account as oxo on oxa.account_id = oxo.id ";
 
         $cntQuery = "SELECT count(oxa.uuid) " . $from;
 
@@ -940,7 +940,19 @@ class AccountService extends AbstractService
         $count = $resultSet->toArray();
         $query = $select . " " . $from . " " . $where . " " . $sort . " " . $limit;
         $resultSet = $this->executeQuerywithParams($query)->toArray();
-
+        
+        $i=0;
+        foreach($resultSet as $val)
+        {
+            $media_uuid=$val['media'];
+            if(!empty($media_uuid) && is_string($media_uuid) && strpos($media_uuid, ' ') == false)
+            {
+                $query_media="SELECT * FROM ox_attachment WHERE uuid='$media_uuid'";
+                $resultSetMedia = $this->executeQuerywithParams($query_media)->toArray();
+                $resultSet[$i]['upload']=$resultSetMedia;
+            }
+           $i++; 
+        }
         return array('data' => $resultSet,
             'total' => (int)$count[0]['count(oxa.uuid)']);
     }

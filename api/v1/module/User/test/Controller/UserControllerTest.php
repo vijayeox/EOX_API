@@ -25,11 +25,7 @@ class UserControllerTest extends ControllerTest
 
     public function getDataSet()
     {
-        /*switch ($this->getName()) {
-            case 'testGetListWithProjectAndRoles':
-                return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/UserProjectsRoles.yml");;
-            break;
-        }*/
+        
         $dataset = new YamlDataSet(dirname(__FILE__) . "/../Dataset/User.yml");
         $dataset->addYamlFile(dirname(__FILE__) . "/../../../Project/test/Dataset/Project.yml");
         $dataset->addYamlFile(dirname(__FILE__) . "/../../../Team/test/Dataset/Team.yml");
