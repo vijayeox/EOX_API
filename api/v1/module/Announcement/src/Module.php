@@ -12,6 +12,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Oxzion\Error\ErrorHandler;
 use Oxzion\Service\AccountService;
+use Attachment\Service\AttachmentService;
 
 class Module implements ConfigProviderInterface
 {
@@ -60,7 +61,8 @@ class Module implements ConfigProviderInterface
                     return new Controller\AnnouncementController(
                         $container->get(Model\AnnouncementTable::class),
                         $container->get(Service\AnnouncementService::class),
-                        $container->get(AdapterInterface::class)
+                        $container->get(AdapterInterface::class),
+                        $container->get(AttachmentService::class)
                     );
                 },
                 Controller\HomescreenAnnouncementController::class => function ($container) {

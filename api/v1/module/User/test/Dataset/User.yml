@@ -147,3 +147,6 @@ ox_account_user:
     id : 54
     user_id: 51
     account_id: 2
+ox_user_role:
+  - role_id: 4
+    account_user_id: 52

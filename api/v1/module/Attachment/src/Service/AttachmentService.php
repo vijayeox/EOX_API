@@ -109,6 +109,17 @@ class AttachmentService extends AbstractService
         return $result;
     }
 
+    public function getAttachmentDetails($id)
+    {
+        $sql = $this->getSqlObject();
+        $select = $sql->select();
+        $select->from('ox_attachment')
+            ->columns(array("file_name","extension","type","path"))
+            ->where(array('uuid' => $id));
+        $result = $this->executeQuery($select)->toArray();
+        return $result;
+    }
+
     /**
      * @ignore constructPath
      */

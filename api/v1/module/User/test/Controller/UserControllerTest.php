@@ -25,6 +25,7 @@ class UserControllerTest extends ControllerTest
 
     public function getDataSet()
     {
+        
         $dataset = new YamlDataSet(dirname(__FILE__) . "/../Dataset/User.yml");
         $dataset->addYamlFile(dirname(__FILE__) . "/../../../Project/test/Dataset/Project.yml");
         $dataset->addYamlFile(dirname(__FILE__) . "/../../../Team/test/Dataset/Team.yml");
@@ -430,6 +431,7 @@ class UserControllerTest extends ControllerTest
         $this->assertResponseStatusCode(200);
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
+        
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data'][0]['uuid'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
         $this->assertEquals($content['data'][0]['name'], 'Admin Test');
@@ -444,6 +446,39 @@ class UserControllerTest extends ControllerTest
         $this->assertEquals(5, $content['total']);
     }
 
+    public function testGetListWithProjectAndRoles()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/user', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data'][0]['uuid'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
+        $this->assertEquals($content['data'][0]['name'], 'Admin Test');
+        $this->assertEquals($content['data'][1]['uuid'], '768d1fb9-de9c-46c3-8d5c-23e0e484ce2e');
+        $this->assertEquals($content['data'][1]['name'], 'Cleveland Test');
+        $this->assertEquals($content['data'][2]['uuid'], 'd9890624-8f42-4201-bbf9-675ec5dc8400');
+        $this->assertEquals($content['data'][2]['name'], 'Deepak S');
+        $this->assertEquals($content['data'][3]['uuid'], '4fd9f04d-758f-11e9-b2d5-68ecc57cde45');
+        $this->assertEquals($content['data'][3]['name'], 'Employee Test');
+        $this->assertEquals($content['data'][4]['uuid'], '4fd9ce37-758f-11e9-b2d5-68ecc57cde45');
+        $this->assertEquals($content['data'][4]['name'], 'Manager Test');
+        $this->assertIsArray($content['data'][0]['project'],"assert variable Project is not an array");
+        $this->assertIsArray($content['data'][1]['project'],"assert variable Project is not an array");
+        $this->assertIsArray($content['data'][2]['project'],"assert variable Project is not an array");
+        $this->assertIsArray($content['data'][3]['project'],"assert variable Project is not an array");
+        $this->assertIsArray($content['data'][4]['project'],"assert variable Project is not an array");
+
+        $this->assertIsArray($content['data'][0]['role'],"assert variable Role is not an array");
+        $this->assertIsArray($content['data'][1]['role'],"assert variable Role is not an array");
+        $this->assertIsArray($content['data'][2]['role'],"assert variable Role is not an array");
+        $this->assertIsArray($content['data'][3]['role'],"assert variable Role is not an array");
+        $this->assertIsArray($content['data'][4]['role'],"assert variable Role is not an array");
+        $this->assertEquals(5, $content['total']);
+    }
+
     public function testGetListWithSort()
     {
         $this->initAuthToken($this->adminUser);
@@ -452,6 +487,7 @@ class UserControllerTest extends ControllerTest
         $this->assertResponseStatusCode(200);
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
+        
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals(count($content['data']), 2);
         $this->assertEquals($content['data'][0]['uuid'], '4fd9ce37-758f-11e9-b2d5-68ecc57cde45');
@@ -1014,7 +1050,7 @@ class UserControllerTest extends ControllerTest
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data']['projects'][0]['name'], 'Test Project 1');
-        $this->assertEquals($content['data']['projects'][1]['uuid'], 'ced672bb-fe33-4f0a-b153-f1d182a02603');
+        $this->assertEquals($content['data']['projects'][0]['uuid'], '886d7eff-6bae-4892-baf8-6fefc56cbf0b');
     }
 
     public function testUserAccess()
@@ -1064,7 +1100,7 @@ class UserControllerTest extends ControllerTest
         $this->setDefaultAsserts('getuserproject');
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']), 2);
+        $this->assertEquals(count($content['data']), 1);
     }
 
     public function testGetUserProjectWithoutdata()

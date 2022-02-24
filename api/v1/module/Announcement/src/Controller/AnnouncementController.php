@@ -8,6 +8,7 @@ namespace Announcement\Controller;
 use Announcement\Model\Announcement;
 use Announcement\Model\AnnouncementTable;
 use Announcement\Service\AnnouncementService;
+use Attachment\Service\AttachmentService;
 use Oxzion\Controller\AbstractApiController;
 use Zend\Db\Adapter\AdapterInterface;
 use Exception;
@@ -24,11 +25,12 @@ class AnnouncementController extends AbstractApiController
     /**
      * @ignore __construct
      */
-    public function __construct(AnnouncementTable $table, AnnouncementService $announcementService, AdapterInterface $dbAdapter)
+    public function __construct(AnnouncementTable $table, AnnouncementService $announcementService,AdapterInterface $dbAdapter,AttachmentService $attachmentService)
     {
         parent::__construct($table, Announcement::class);
         $this->setIdentifierName('announcementId');
         $this->announcementService = $announcementService;
+        $this->attachmentService = $attachmentService;
         $this->log = $this->getLogger();
     }
     /**
@@ -199,8 +201,19 @@ class AnnouncementController extends AbstractApiController
     {
         $filterParams = $this->params()->fromQuery();
         $params = $this->params()->fromRoute();
+        
         try {
             $result = $this->announcementService->getAnnouncementsList($filterParams, $params);
+            
+            $i=0;
+            foreach($result['data'] as $key=>$value)
+            {
+                $media_uuid=$value['media'];
+                $result_attachment = $this->attachmentService->getAttachmentDetails($media_uuid);
+                $result['data'][$i]['upload']=$result_attachment;
+                $i++;
+            }
+            
             return $this->getSuccessResponseDataWithPagination($result['data'], $result['total']);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);

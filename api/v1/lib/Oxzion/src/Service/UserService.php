@@ -367,15 +367,28 @@ class UserService extends AbstractService
         $this->executeUpdateWithBindParameters($query, $params);
     }
 
+    private function is_numeric_array($array) {
+        foreach ($array as $key => $value) {
+            if (!is_numeric($value)) return false;
+        }
+        return true;
+    }
+
     private function addRoleToUser($accountUserId, $role, $accountId)
     {
         $roleSingleArray = array_map('current', $role);
+        if($this->is_numeric_array($roleSingleArray))
+        {
+            $roleSingleArray = array_map(function($item) { return $item['uuid']; }, $role);
+        }
+        
         $params = ['accountUserId' => $accountUserId,
             'accountId' => $accountId];
         $delete = "DELETE our FROM ox_user_role as our
                     inner join ox_role as oro on our.role_id = oro.id where oro.uuid not in ('" . implode("','", $roleSingleArray) . "') and our.account_user_id = :accountUserId and oro.account_id = :accountId";
 
         $this->executeQuerywithBindParameters($delete, $params);
+       
         $query = "INSERT into ox_user_role(account_user_id,role_id)
                     SELECT :accountUserId, oro.id
                     from ox_role as oro
