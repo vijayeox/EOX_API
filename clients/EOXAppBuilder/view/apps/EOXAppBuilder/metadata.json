@@ -13,7 +13,7 @@
     "server": "server.js",
     "formio_endpoint": "https:\/\/onboarding-eoxvantage.form.io",
     "title": {
-        "en_EN": "AppBuilder"
+        "en_EN": "App Studio"
     },
     "description": {
         "en_EN": "App for EOX AppBuilder"

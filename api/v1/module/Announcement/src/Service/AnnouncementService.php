@@ -537,7 +537,7 @@ class AnnouncementService extends AbstractService
             $pageSize = $filterArray[0]['take'];
             $offset = $filterArray[0]['skip'];
         }
-        $where .= strlen($where) > 0 ? " AND ox_announcement.uuid = '" . $params['announcementId'] . "' AND ox_announcement.end_date >= now() AND ox_team.status = 1 AND ox_announcement.account_id = " . $accountId : " WHERE ox_announcement.uuid = '" . $params['announcementId'] . "' AND ox_announcement.end_date >= curdate() AND ox_team.status = 1 AND ox_announcement.account_id = " . $accountId;
+        $where .= strlen($where) > 0 ? " AND ox_announcement.uuid = '" . $params['announcementId'] . "' AND ox_announcement.end_date >= now() AND ox_team.status = 1 AND ox_announcement.account_id = " . $accountId : " WHERE ox_announcement.uuid = '" . $params['announcementId'] . "' AND  ox_team.status = 1 AND ox_announcement.account_id = " . $accountId;
         $sort = " ORDER BY " . $sort;
         $limit = " LIMIT " . $pageSize . " offset " . $offset;
         $resultSet = $this->executeQuerywithParams($cntQuery . $where);

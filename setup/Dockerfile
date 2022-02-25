@@ -44,7 +44,7 @@ RUN apt-get -o Dpkg::Options::="--force-confnew" --force-yes -fuy upgrade
 RUN apt-get -y install postfix python3-setuptools wget git apache2 php-xdebug libapache2-mod-php7.2 php7.2-fpm mysql-server zip unzip curl php7.2-cli php7.2-dev 
 RUN apt-get -y install php7.2-mysql php7.2-gd php7.2-imagick php7.2-recode php7.2-tidy php7.2-xmlrpc php7.2-curl php7.2-json php7.2-msgpack php7.2-memcached php7.2-intl 
 RUN apt-get -y install php7.2-sqlite3 php7.2-gmp php7.2-geoip php7.2-mbstring php7.2-xml php7.2-zip php7.2-imap php7.2-soap supervisor php7.2-imagick 
-RUN apt-get -y install libapache2-mod-xsendfile dos2unix xmlstarlet tar tzdata ca-certificates nodejs zlib1g-dev libglib2.0-dev
+RUN apt-get -y install libapache2-mod-xsendfile dos2unix xmlstarlet tar tzdata ca-certificates nodejs zlib1g-dev libglib2.0-dev rsync
 
 COPY pdftk_installer.sh /
 
@@ -224,6 +224,7 @@ RUN mkdir -p /var/run/mysqld \
     && chown -R www-data:staff /var/lib/mysql \
     && chown -R www-data:staff /var/run/mysqld \
     && chown -R www-data:staff /var/log/mysql
-RUN npm install -g npm    
+RUN npm install -g npm
+RUN update-alternatives --set php /usr/bin/php7.2 && update-alternatives --set phar /usr/bin/phar7.2 && update-alternatives --set phar.phar /usr/bin/phar.phar7.2 && update-alternatives --set phpize /usr/bin/phpize7.2 && update-alternatives --set php-config /usr/bin/php-config7.2
 
 CMD ["/services/run.sh"]

@@ -167,8 +167,8 @@ class FileService extends AbstractService
 
             if (isset($result['id'])) {
                 $this->logger->info("THE FILE ID TO BE INDEXED IS ".$result['id']);
-                $this->logger->info("THE FILE UUID TO BE INDEXED IS ".$result['uuid']);
-                $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED_WITH_UUID');
+                // $this->logger->info("THE FILE UUID TO BE INDEXED IS ".$result['uuid']);
+                // $this->messageProducer->sendQueue(json_encode(array('uuid' => $result['uuid'])), 'FILE_ADDED_WITH_UUID');
                 $this->messageProducer->sendQueue(json_encode(array('id' => $result['id'])), 'FILE_ADDED');
             }
         } catch (Exception $e) {
@@ -679,7 +679,7 @@ class FileService extends AbstractService
             } else {
                 if (isset($id)) {
                     $this->messageProducer->sendQueue(json_encode(array('id' => $id)), 'FILE_UPDATED');
-                    $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
+                    // $this->messageProducer->sendQueue(json_encode(array('uuid' => $uuid)), 'FILE_UPDATED_WITH_UUID');
                 }
             }
         } catch (Exception $e) {
@@ -1408,10 +1408,13 @@ class FileService extends AbstractService
             $queryParams['ltCreatedDate'] = date('Y-m-d', strtotime($params['ltCreatedDate'] . "+1 days"));
         }
     }
-    private function processParticipantFiltering($accountId, &$fromQuery, &$whereQuery, &$queryParams)
+    private function processParticipantFiltering($accountId, &$fromQuery, &$whereQuery, &$queryParams,$appId)
     {
-        $query = "SELECT id from ox_account_business_role where account_id = :accountId";
-        $params = ["accountId" => $accountId];
+        $query = "SELECT oabr.id from ox_account_business_role oabr 
+        inner join ox_business_role oxbr ON oxbr.id = oabr.business_role_id
+        where oabr.account_id = :accountId AND oxbr.app_id = :appId";
+        $params = ["accountId" => $accountId, "appId" => $appId];
+        $this->logger->info("Query--- $query with param---".print_r($params,true));
         $result = $this->executeQueryWithBindParameters($query, $params)->toArray();
         if (count($result) == 0) {
             return false;
@@ -1485,7 +1488,7 @@ class FileService extends AbstractService
             }
         }
         $appFilter = "";
-        $appIdClause = "";
+        $appIdClause = $appId= "";
         $queryParams = array();
         if (isset($appUUid)) {
             $appId = $this->getIdFromUuid('ox_app', $appUUid);
@@ -1523,7 +1526,7 @@ class FileService extends AbstractService
         left join ox_file_assignee as oxfa on oxfa.file_id = `of`.id and oxfa.assignee = 1
         left join ox_user as oxu on oxu.id = oxfa.user_id
         inner join ox_app_entity as en on en.id = `of`.entity_id $appQuery ";
-        if (!$this->processParticipantFiltering($accountId, $fromQuery, $whereQuery, $queryParams)) {
+        if (!$this->processParticipantFiltering($accountId, $fromQuery, $whereQuery, $queryParams,$appId)) {
             if ($whereQuery != "") {
                 $whereQuery .= " AND ";
             }
@@ -2140,7 +2143,7 @@ class FileService extends AbstractService
                 $fileFilter['uuid'] = $params['fileId'];
                 $fileRecord = $this->getDataByParams('ox_file', array("entity_id","data"), $fileFilter, null)->toArray();
                 if (!empty($fileRecord) && !is_null($fileRecord)) {
-                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'].AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/' . $params['fileId'].'/';
+                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'].AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/temp/' . $params['fileId'].'/';
                     if (is_dir($folderPath.$attachmentName)) {
                         FileUtils::rmDir($folderPath.$attachmentName);
                     } elseif (file_exists($folderPath.$attachmentName)) {

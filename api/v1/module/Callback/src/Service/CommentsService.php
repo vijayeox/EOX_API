@@ -81,15 +81,6 @@ class CommentsService extends AbstractService
                 FileUtils::createDirectory($dest['absolutePath']);
                 FileUtils::storeFile($file, $dest['absolutePath']);
             }
-            
-            //Appending the attachment to existing attachment list if comment already has an attachment
-            // if (isset($res[0]['commentAttachment'])) {
-            //     $attach = json_decode($res[0]['commentAttachment'],true);
-            //     $attach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].$file['name']];
-            //     $data['attachments'] = json_encode($attach);              
-            // }else{
-            //     $data['attachments'] = json_encode(array("attachments" => array(array("name" => $file['name'], "path" => $dest['relativePath'].$file['name']))));
-            // }
             if (isset($res[0]['commentAttachment'])) {
                 $attach = json_decode($res[0]['commentAttachment'],true);
                 $attach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].str_replace(' ', '_', $file['name'])];
@@ -132,6 +123,7 @@ class CommentsService extends AbstractService
             return  $this->config['APP_DOCUMENT_FOLDER'] . $params['docPath'];
         }else{            
             $attach = json_decode($res[0]['attachments'],true);
+            $attach = is_string($attach) ? json_decode($attach,true) : $attach;
             $path = pathinfo($attach['attachments'][0]['path']);
             // print_r($this->config['APP_DOCUMENT_FOLDER'] . $path['dirname']."/". $params['fileName']);exit;
             return $this->config['APP_DOCUMENT_FOLDER'] . $path['dirname']."/". $params['fileName'];

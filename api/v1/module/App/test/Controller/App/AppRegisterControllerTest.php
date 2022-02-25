@@ -18,6 +18,16 @@ class AppRegisterContollerTest extends ControllerTest
 
     public function getDataSet()
     {
+        switch ($this->getName()) {
+            case 'testGetAccountOnForInstall':
+            case 'testGetAccountOnInstalled':
+            //case 'testCreateWithoutRequiredData':
+                //Return empty data set to keep framework happy!
+                echo "TESTING";
+                return new YamlDataSet(dirname(__FILE__) . "/../../Dataset/fileattachment.yml");;
+            break;
+        }
+
         $dataset = new YamlDataSet(dirname(__FILE__) . "/../../Dataset/Workflow.yml");
         if ($this->getName() == 'testDeployAppWithWrongUuidInDatabase' || $this->getName() == 'testDeployAppWithWrongNameInDatabase' || $this->getName() == 'testDeployAppWithNameAndNoUuidInYMLButNameandUuidInDatabase' || $this->getName() == 'testDeployAppAddExtraPrivilegesInDatabaseFromYml' || $this->getName() == 'testDeployAppDeleteExtraPrivilegesInDatabaseNotInYml') {
             $dataset->addYamlFile(dirname(__FILE__) . "/../../Dataset/App2.yml");
@@ -81,4 +91,6 @@ class AppRegisterContollerTest extends ControllerTest
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'error');
     }
+
+     
 }

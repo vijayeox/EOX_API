@@ -387,14 +387,24 @@ class AccountService extends AbstractService
     public function saveAccount(&$accountData)
     {
         if (isset($accountData['uuid'])) {
+            
             try {
-                $this->updateAccount($accountData['uuid'], $accountData, null);
-                return;
+                if(empty($this->getAccountIdByUuid($accountData['uuid'])))
+                {
+                    $this->createAccount($accountData, null);
+                }
+                else
+                {
+                    $this->updateAccount($accountData['uuid'], $accountData, null);
+                    return;
+                }
+                
             } catch (Exception $e) {
                 if (!$e instanceof EntityNotFoundException) {
                     throw $e;
                 }
             }
+            
         } else {
             $this->createAccount($accountData, null);
         }
@@ -416,18 +426,21 @@ class AccountService extends AbstractService
             $data['preferences'] = json_encode($data['preferences']);
         }
         
-        $form = new Account($this->table);
-        $form->loadByUuid($id);
-        $organizationId = $form->getProperty('organization_id');
-        $organizationOldName = $form->getProperty('name');
-        if (isset($organizationId)) {
-            $this->organizationService->updateOrganization($organizationId, $data);
-        }
-        $changedArray = $data;
-        $changedArray['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
-        $changedArray['date_modified'] = date('Y-m-d H:i:s');
-        $form->assign($changedArray);
+        
         try {
+            $form = new Account($this->table);
+            $form->loadByUuid($id);
+            $organizationId = $form->getProperty('organization_id');
+            $organizationOldName = $form->getProperty('name');
+            
+            
+            if (isset($organizationId)) {
+                $this->organizationService->updateOrganization($organizationId, $data);
+            }
+            $changedArray = $data;
+            $changedArray['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
+            $changedArray['date_modified'] = date('Y-m-d H:i:s');
+            $form->assign($changedArray);
             $this->beginTransaction();
             $form->save();
             if (isset($files)) {
@@ -573,7 +586,7 @@ class AccountService extends AbstractService
         $pageSize = 20;
         $offset = 0;
         $sort = "name";
-        $select = "SELECT DISTINCT og.uuid,og.name,og.subdomain,oa.address1,oa.address2,oa.city,oa.state,oa.country,oa.zip,og.preferences, porg.uuid as parentId, pacct.name as parentName";
+        $select = "SELECT DISTINCT og.uuid,og.id,og.name,og.subdomain,oa.address1,oa.address2,oa.city,oa.state,oa.country,oa.zip,og.preferences, porg.uuid as parentId, pacct.name as parentName";
         $from = " from ox_account as og 
                     left join ox_organization as org on org.id = og.organization_id 
                     left join ox_organization as porg on porg.id = org.parent_id
@@ -594,6 +607,7 @@ class AccountService extends AbstractService
                 return array('data' => [], 'total' => 0); 
             }
         }
+        
         $cntQuery = "SELECT count(og.id) " . $from;
         if (count($filterParams) > 0 || sizeof($filterParams) > 0) {
             $filterArray = json_decode($filterParams['filter'], true);
@@ -604,6 +618,7 @@ class AccountService extends AbstractService
             $pageSize = isset($filterArray[0]['take']) ? $filterArray[0]['take'] : 20;
             $offset = isset($filterArray[0]['skip']) ? $filterArray[0]['skip'] : 0;
         }
+        
         $where .= strlen($where) > 0 ? " AND og.status = 'Active'" : " WHERE og.status = 'Active'";
         $sort = " ORDER BY " . $sort;
         $limit = " LIMIT " . $pageSize . " offset " . $offset;
@@ -612,6 +627,7 @@ class AccountService extends AbstractService
         $query = $select . " " . $from . " " . $where . " " . $sort . " " . $limit;
         $resultSet = $this->executeQuerywithParams($query)->toArray();
         for ($x = 0; $x < sizeof($resultSet); $x++) {
+            //echo $resultSet[$x]['uuid'];
             $resultSet[$x]['contactid'] = $this->getAccountContactPersonDetails($resultSet[$x]['uuid']);
         }
         

@@ -330,7 +330,7 @@ class FileUtils
             self::createDirectory($dest);
         }
         $output = [];
-        if (!exec("rsync --ignore-existing $src $dest", $output)) {
+        if (!exec("rsync -v -a --ignore-existing $src $dest", $output)) {
             throw new Exception("Failed to Copy New Files - ".print_r($output, true));
         }
     }

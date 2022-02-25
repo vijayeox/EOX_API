@@ -29,8 +29,10 @@
             <directory>./module/Profile/test</directory>
         </testsuite>
         <testsuite name="App Fixtures">
-            <directory>./module/App/test/Controller/App/AppArtifactControllerTest.php</directory>
             <directory>./module/App/test/Controller/App/AppControllerTest.php</directory>
+            <directory>./module/App/test/Controller/App/FileAttachmentControllerTest.php</directory>
+            <directory>./module/App/test/Controller/App/AppArtifactControllerTest.php</directory>
+            <directory>./module/App/test/Controller/App/AppRegisterControllerTest.php</directory>
             <directory>./module/App/test/Controller/AppView</directory>
             <directory>./module/App/test/Controller/Cache</directory>
             <directory>./module/App/test/Controller/Delegate</directory>

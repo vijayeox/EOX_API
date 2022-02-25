@@ -11,7 +11,7 @@ app:
     isdefault: false
     logo: default_app.png
     start_options: null
-    title: AppBuilder
+    title: App Studio
     app_properties: '{"chat_notification":"","appIdentifiers":""}'
 checkOrg: true 
 org:
@@ -79,6 +79,9 @@ pages:
     -
         page_name: UninstalledManager.yml
         uuid: 83c014a0-54d4-4dd1-9ebf-55680b5e7d71
+    -
+        page_name: AppUpgrade.yml
+        uuid: f922ab50-84b6-11ec-a8a3-0242ac120002
 menu:
     -
         name: 'Manage EOX Apps'

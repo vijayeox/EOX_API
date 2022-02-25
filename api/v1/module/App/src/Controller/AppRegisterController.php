@@ -80,14 +80,18 @@ class AppRegisterController extends AbstractApiControllerHelper
      */
     public function getAccountOnServiceTypeAction()
     {
+        
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
         $params['filterParams'] = $this->params()->fromQuery(); 
+        
         try {
             $result = $this->appService->getAccountOnServiceType($params);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->getErrorResponse("Error!!!", 400);
         }
+        //print_r($this->getSuccessResponseWithData($result, 200));
+        //die;
         return $this->getSuccessResponseWithData($result, 200);
     }
 }

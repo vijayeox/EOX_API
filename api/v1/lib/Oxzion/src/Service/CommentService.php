@@ -56,10 +56,9 @@ class CommentService extends AbstractService
         if (isset($data['attachments'])) {            
             $data['attachments'] = json_encode($data['attachments']);
         }
-        if (isset($data['parent'])) {
-            $ret = $this->getParentId($data, $fileId);
-            if (!$ret) {
-                return 0;
+        if(isset($data['parent'])){
+            if(!is_numeric($data['parent'])) {
+                $data['parent']= $this->getIdFromUuid('ox_comment', $data['parent']);
             }
         }
         $data['isdeleted'] = false;
@@ -104,10 +103,9 @@ class CommentService extends AbstractService
         if (!$obj) {
             return 0;
         }
-        if (isset($data['parent'])) {
-            $ret = $this->getParentId($data, $fileId);
-            if (!$ret) {
-                return 0;
+        if(isset($data['parent'])){
+            if(!is_numeric($data['parent'])) {
+                $data['parent']= $this->getIdFromUuid('ox_comment', $data['parent']);
             }
         }
         $obj = $obj->toArray();
@@ -175,24 +173,27 @@ class CommentService extends AbstractService
 
         return 0;
     }
-    public function getComments($fileId)
+    public function getComments($fileId, $parentComment = false)
     {
-        return $this->getCommentsInternal($fileId);
+        return $this->getCommentsInternal($fileId, null, $parentComment);
     }
 
-    private function getCommentsInternal($fileId, $id = null)
+    private function getCommentsInternal($fileId, $id = null,$parentComment = false)
     {
-        $fileClause = "";
+        $fileClause = $parentClause = "";
         $queryParams = array("accountId"=>AuthContext::get(AuthConstants::ACCOUNT_ID),"fileId"=>$fileId);
         if ($id) {
             $fileClause = "AND ox_comment.uuid = :commentId";
             $queryParams['commentId'] = $id;
         }
+        if ($parentComment) {
+            $parentClause = "AND ox_comment.parent IS NULL";
+        }
         $query = "select text,ou.name as name,ou.icon as icon,ou.uuid as userId,ox_comment.date_created as time, ox_comment.uuid as commentId, ox_comment.attachments 
                     from ox_comment 
                     inner join ox_user ou on ou.id = ox_comment.created_by 
                     inner join ox_file of on of.id = ox_comment.file_id 
-                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause order by ox_comment.date_created asc";
+                    where ox_comment.account_id = :accountId AND of.uuid = :fileId $fileClause $parentClause order by ox_comment.date_created asc";
         $this->logger->info("Executing Query $query with params - ".print_r($queryParams, true));
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (count($resultSet) >0) {
@@ -206,7 +207,7 @@ class CommentService extends AbstractService
 
     public function getchildren($id, $fileId)
     {
-        $queryString = "select ox_comment.text, ou.name, ou.icon, ou.uuid as userId, ox_comment.date_created as time, 
+        $queryString = "select ox_comment.text, ou.name, ou.icon, ou.uuid as userId, ox_comment.date_created as time, ox_comment.attachments,
                         ox_comment.uuid as commentId from ox_comment 
                         inner join ox_comment as parent on parent.id = ox_comment.parent
                         inner join ox_user ou on ou.id = ox_comment.created_by 
@@ -214,6 +215,13 @@ class CommentService extends AbstractService
                         where parent.uuid = :commentId AND ox_comment.account_id=".AuthContext::get(AuthConstants::ACCOUNT_ID)." AND ox_comment.isdeleted!=1 AND of.uuid = :fileId order by ox_comment.id";
         $queryParams = ["commentId" => $id, "fileId" => $fileId];
         $result = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
+        if (count($result) >0) {
+            for ($i=0; $i < count($result); $i++) {               
+                $attachment = json_decode($result[$i]['attachments'],true);
+                $attachment = is_string($attachment) ? json_decode($attachment,true) : $attachment;
+                $result[$i]['attachments'] = isset($attachment['attachments']) ? $attachment['attachments'] : null;
+            }
+        }
         return $result;
     }
 }

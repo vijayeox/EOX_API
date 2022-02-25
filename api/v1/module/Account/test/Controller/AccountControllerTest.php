@@ -42,6 +42,21 @@ class AccountControllerTest extends ControllerTest
         $this->assertResponseHeaderContains('content-type', 'application/json; charset=utf-8');
     }
     // Testing to see if the Create Contact function is working as intended if all the value passed are correct.
+    
+    public function testGetListWithQuery()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/account?filter=[{"filter":{"logic":"and","filters":[{"field":"name","operator":"endswith","value":"rs"},{"field":"state","operator":"contains","value":"oh"}]},"sort":[{"field":"id","dir":"asc"},{"field":"uuid","dir":"dsc"}],"skip":0,"take":1}]
+', 'GET');
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals(1, count($content['data']));
+        $this->assertEquals($content['data'][0]['uuid'], 'b0971de7-0387-48ea-8f29-5d3704d96a46');
+        $this->assertEquals($content['data'][0]['name'], 'Golden State Warriors');
+        $this->assertEquals($content['total'], 1);
+    }
 
     public function testGetList()
     {
@@ -79,21 +94,7 @@ class AccountControllerTest extends ControllerTest
         $this->assertEquals($content['total'], 1);
     }
 
-    public function testGetListWithQuery()
-    {
-        $this->initAuthToken($this->adminUser);
-        $this->dispatch('/account?filter=[{"filter":{"logic":"and","filters":[{"field":"name","operator":"endswith","value":"rs"},{"field":"state","operator":"contains","value":"oh"}]},"sort":[{"field":"id","dir":"asc"},{"field":"uuid","dir":"dsc"}],"skip":0,"take":1}]
-', 'GET');
-        $content = (array) json_decode($this->getResponse()->getContent(), true);
-        $this->assertResponseStatusCode(200);
-        $this->setDefaultAsserts();
-        $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(1, count($content['data']));
-        $this->assertEquals($content['data'][0]['uuid'], 'b0971de7-0387-48ea-8f29-5d3704d96a46');
-        $this->assertEquals($content['data'][0]['name'], 'Golden State Warriors');
-        $this->assertEquals($content['total'], 1);
-    }
-
+    
     public function testGetListWithQueryField()
     {
         $this->initAuthToken($this->adminUser);
