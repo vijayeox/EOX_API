@@ -82,9 +82,10 @@ class CommentsService extends AbstractService
                 FileUtils::storeFile($file, $dest['absolutePath']);
             }
             if (isset($res[0]['commentAttachment'])) {
-                $attach = json_decode($res[0]['commentAttachment'],true);
-                $attach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].str_replace(' ', '_', $file['name'])];
-                $data['attachments'] = json_encode($attach); 
+                $newAttach['attachments'] = [];
+                $attach = is_string($res[0]['commentAttachment']) ? json_decode($res[0]['commentAttachment'],true) : $res[0]['commentAttachment'];
+                $newAttach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].str_replace(' ', '_', $file['name'])];
+                $data['attachments'] = json_encode($newAttach); 
             }else{
                 $data['attachments'] = json_encode(array("attachments" => array(array("name" => $file['name'], "path" => $dest['relativePath'].str_replace(' ', '_', $file['name'])))));
             } 
@@ -96,11 +97,11 @@ class CommentsService extends AbstractService
             $result = $this->executeQueryWithBindParameters($select,$paramsData)->toArray();
             if (count($result) > 0) {
                 $fieldLabel = json_decode($result[0]['generic_attachment_config'],true);
-                $attachData['fieldLabel'] = $fieldLabel['attachmentField'];
+                $attachData['fieldLabel'] = preg_replace('/[^A-Za-z0-9\-]/', '', $fieldLabel['attachmentField']);
                 $attachData['fileId'] = $res['0']['fileId'];
                 $attachData['appId'] = $this->getUuidFromId('ox_app' ,$res[0]['appId']);
                 $context = ['accountId' => $res[0]['accountId'], 'userId' => $this->getUuidFromId('ox_user',$res[0]['createdBy'])];
-            $this->updateAccountContext($context);
+            	$this->updateAccountContext($context);
                 return $this->fileService->addAttachment($attachData, $file,$params['commentId']);
             }
             
@@ -124,7 +125,7 @@ class CommentsService extends AbstractService
         }else{            
             $attach = json_decode($res[0]['attachments'],true);
             $attach = is_string($attach) ? json_decode($attach,true) : $attach;
-            $path = pathinfo($attach['attachments'][0]['path']);
+            $path = pathinfo($attach[0]['path']);
             // print_r($this->config['APP_DOCUMENT_FOLDER'] . $path['dirname']."/". $params['fileName']);exit;
             return $this->config['APP_DOCUMENT_FOLDER'] . $path['dirname']."/". $params['fileName'];
         }

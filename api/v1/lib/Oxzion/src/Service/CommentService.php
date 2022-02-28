@@ -109,12 +109,18 @@ class CommentService extends AbstractService
             }
         }
         $obj = $obj->toArray();
+        if (isset($obj['attachments'])) {
+            $objAttach = is_string($obj['attachments']) ? json_decode($obj['attachments'],true): $obj['attachments'];
+            $attachmentArray[] = $objAttach[0];
+        }
         $form = new Comment();
         $data = array_merge($obj, $data); //Merging the data from the db for the ID
         $data['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
         $data['date_modified'] = date('Y-m-d H:i:s');
         if (isset($data['attachments'])) {            
-            $data['attachments'] = json_encode($data['attachments']);
+            $attach = is_string($data['attachments']) ? json_decode($data['attachments'],true) : $data['attachments'];
+            $attachmentArray[] = $attach['attachments'][0];
+            $data['attachments'] = json_encode($attachmentArray);
         }
         $form->exchangeArray($data);
         $form->validate();
@@ -217,9 +223,8 @@ class CommentService extends AbstractService
         $result = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
         if (count($result) >0) {
             for ($i=0; $i < count($result); $i++) {               
-                $attachment = json_decode($result[$i]['attachments'],true);
-                $attachment = is_string($attachment) ? json_decode($attachment,true) : $attachment;
-                $result[$i]['attachments'] = isset($attachment['attachments']) ? $attachment['attachments'] : null;
+                $attachment = is_string($result[$i]['attachments']) ? json_decode($result[$i]['attachments'],true) : $result[$i]['attachments'];
+                $result[$i]['attachments'] =  isset($attachment) ? $attachment : (isset($attachment['attachments']) ? $attachment['attachments'] : null);
             }
         }
         return $result;
