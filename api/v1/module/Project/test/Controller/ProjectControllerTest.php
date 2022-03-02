@@ -1027,7 +1027,7 @@ class ProjectControllerTest extends ControllerTest
         $this->setDefaultAsserts('myproject');
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']), 2);
+        $this->assertEquals(count($content['data']), 1);
     }
 
     public function testGetMyProjectListWithAccountId()
@@ -1064,7 +1064,7 @@ class ProjectControllerTest extends ControllerTest
         $this->setDefaultAsserts('myproject');
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']), 2);
+        $this->assertEquals(count($content['data']), 1);
     }
 
     public function testGetMyProjectListByManager()
