@@ -19,9 +19,9 @@ final class Version20220209135804 extends AbstractMigration
 
     public function up(Schema $schema) : void
     {
+        $this->addSql("ALTER TABLE ox_app_registry MODIFY `start_options` JSON;");
         $this->addSql("UPDATE ox_app_registry SET start_options = NULL WHERE start_options = 'json_object';");
         $this->addSql("UPDATE ox_app_registry SET start_options = NULL WHERE start_options = '';");
-        $this->addSql("ALTER TABLE ox_app_registry MODIFY `start_options` JSON;");
 
     }
 
