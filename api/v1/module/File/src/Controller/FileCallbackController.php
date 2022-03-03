@@ -28,7 +28,7 @@ class FileCallbackController extends AbstractApiControllerHelper
     /**
     * Update File Data API
     * @api
-    * @link /callback/file
+    * @link /callback/file/update
     * @method POST
     * @param array $data Array of file data
     * @return array Returns a JSON Response with Status Code.
