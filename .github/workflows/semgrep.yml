@@ -4,9 +4,9 @@ name: Semgrep Scan
 on:
   
   push:
-    branches: [ AppBuilder ]
+    branches: [ QA ]
   pull_request:
-    branches: [ AppBuilder ]
+    branches: [ QA ]
 
   
   workflow_dispatch:
