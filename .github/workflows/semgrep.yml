@@ -1,0 +1,31 @@
+name: Semgrep Scan
+
+
+on:
+  
+  push:
+    branches: [ AppBuilder ]
+  pull_request:
+    branches: [ AppBuilder ]
+
+  
+  workflow_dispatch:
+
+
+jobs:
+  
+  build:
+    
+    runs-on: ubuntu-latest
+
+    
+    steps:
+      
+      - uses: actions/checkout@v2
+      - uses: returntocorp/semgrep-action@v1
+        with:
+          config: >- 
+            p/security-audit
+            p/secrets
+            p/owasp-top-ten
+            p/phpcs-security-audit
