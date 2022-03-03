@@ -2332,15 +2332,14 @@
 							"label": "Page Content Form",
 							"tableView": false,
 							"form": "5f21c1bdbba30150d672d0cf",
-							"revision": "319",
-							"useOriginalRevision": false,
+							"useOriginalRevision": true,
 							"calculateValue": "if(data.pagesList){\n  if(value && value.data){\n    value.data.pagesList = data.pagesList\n    value.data.formsList = data.formsList\n  }\n}",
 							"key": "pageContent",
 							"type": "form",
 							"input": true,
 							"hideOnChildrenHidden": false,
 							"lazyLoad": false,
-							"formRevision": 320
+							"formRevision": 331
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
@@ -2582,7 +2581,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 830,
+	"_vid": 833,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -2666,6 +2665,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-02-17T11:21:12.595Z",
+	"modified": "2022-03-02T13:05:32.009Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
