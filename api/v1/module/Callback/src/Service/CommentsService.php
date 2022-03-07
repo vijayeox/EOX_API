@@ -84,10 +84,10 @@ class CommentsService extends AbstractService
             if (isset($res[0]['commentAttachment'])) {
                 $newAttach['attachments'] = [];
                 $attach = is_string($res[0]['commentAttachment']) ? json_decode($res[0]['commentAttachment'],true) : $res[0]['commentAttachment'];
-                $newAttach['attachments'][] = ['name' =>$file['name'], 'path' => $dest['relativePath'].str_replace(' ', '_', $file['name'])];
+                $newAttach = ['name' =>$file['name'], 'path' => $dest['relativePath'].str_replace(' ', '_', $file['name'])];
                 $data['attachments'] = json_encode($newAttach); 
             }else{
-                $data['attachments'] = json_encode(array("attachments" => array(array("name" => $file['name'], "path" => $dest['relativePath'].str_replace(' ', '_', $file['name'])))));
+                $data['attachments'] = json_encode(array("name" => $file['name'], "path" => $dest['relativePath'].str_replace(' ', '_', $file['name'])));
             } 
             $data['accountId'] = $res[0]['accountId'];
             $this->commentService->updateComment($params['commentId'],$res[0]['fileId'],$data);

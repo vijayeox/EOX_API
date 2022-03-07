@@ -111,7 +111,6 @@ class CommentService extends AbstractService
         $obj = $obj->toArray();
         if (isset($obj['attachments'])) {
             $objAttach = is_string($obj['attachments']) ? json_decode($obj['attachments'],true): $obj['attachments'];
-            $attachmentArray[] = $objAttach[0];
         }
         $form = new Comment();
         $data = array_merge($obj, $data); //Merging the data from the db for the ID
@@ -119,8 +118,11 @@ class CommentService extends AbstractService
         $data['date_modified'] = date('Y-m-d H:i:s');
         if (isset($data['attachments'])) {            
             $attach = is_string($data['attachments']) ? json_decode($data['attachments'],true) : $data['attachments'];
-            $attachmentArray[] = $attach['attachments'][0];
-            $data['attachments'] = json_encode($attachmentArray);
+            $attachmentArray = isset($attach['attachments'][0]) ? $attach['attachments'][0] : (isset($attach['attachments']) ? $attach['attachments'] : (isset($attach) ? $attach : null));
+            if(!in_array($attachmentArray,$objAttach)){
+                $objAttach[] = $attachmentArray;
+            }
+            $data['attachments'] = json_encode($objAttach);
         }
         $form->exchangeArray($data);
         $form->validate();
