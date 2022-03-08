@@ -43,14 +43,14 @@
 <h4>Step 1: <u>Install Software Prerequisites:-</u></h4>
 
 -------------------------
-<h4>1. <u>Node.js 8.x:</u> </h4>
+<h4>1. <u>Node.js 14.x:</u> </h4>
 
-To learn how to install Node.js [click here.](https://nodesource.com/blog/installing-node-js-8-tutorial-linux-via-package-manager/) 
+To learn how to install Node.js [click here.](https://computingforgeeks.com/install-node-js-14-on-ubuntu-debian-linux/) 
 
 <h5><center> OR RUN THE FOLLOWING COMMANDS in terminal</center></h5>
 
 - sudo apt update
-- curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+- curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 - sudo apt-get install -y nodejs
 
 <h5><center>After Installation validate by</center></h5>
