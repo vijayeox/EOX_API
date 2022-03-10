@@ -362,6 +362,16 @@ return [
                     ],
                 ],
             ],
+            'updateProfilePicture' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/callback/chat/updateprofilepicture',
+                    'defaults' => [
+                        'controller' => Controller\ChatCallbackController::class,
+                        'action' => 'updateProfilePicture',
+                    ],
+                ],
+            ],
         ],
     ],
     

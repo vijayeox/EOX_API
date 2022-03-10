@@ -412,7 +412,7 @@ class ChatService extends AbstractService
         }
     }
 
-    private function updateProfileImage($botName, $img)
+    public function updateProfileImage($botName, $img)
     {
         try {
             $headers = $this->getAuthHeader();

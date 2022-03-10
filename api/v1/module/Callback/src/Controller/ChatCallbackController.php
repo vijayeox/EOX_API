@@ -203,4 +203,18 @@ class ChatCallbackController extends AbstractApiControllerHelper
             return $this->getErrorResponse($e->getMessage(), $e->getCode());
         }
     }
+    
+    public function updateProfilePictureAction(){
+        $params = $this->extractPostData();
+        $this->log->info("Profile Picture Params- " . print_r($params,true));
+        try {
+            $this->chatService->updateProfileImage($params['userName'], ($params['destFile']));
+            // header("Refresh:0");
+            header('Location: '.$_SERVER['REQUEST_URI']);
+            return $this->getSuccessResponse();
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->getErrorResponse($e->getMessage(), $e->getCode());
+        }
+    }
 }
