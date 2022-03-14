@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
+use Exception;
+use Oxzion\AccessDeniedException;
+use Oxzion\AppDelegate\AppDelegateService;
+use Oxzion\Controller\AbstractApiController;
 use Oxzion\Model\App;
 use Oxzion\Model\AppTable;
 use Oxzion\Service\AppService;
-use Exception;
-use Oxzion\AccessDeniedException;
-use Oxzion\Controller\AbstractApiController;
 use Oxzion\Service\FileService;
 use Zend\Db\Adapter\AdapterInterface;
-use Oxzion\AppDelegate\AppDelegateService;
 
 class AppController extends AbstractApiController
 {
@@ -266,9 +266,8 @@ class AppController extends AbstractApiController
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        return $this->getSuccessResponseWithData($data, 200);
+        return $this->getSuccessResponseWithData((array) $data, 200);
     }
-
 
     /**
      * POST Assignment API
@@ -320,18 +319,14 @@ class AppController extends AbstractApiController
         }
 
         try {
-            
             $path = $params['path'];
             $path .= substr($path, -1) == '/' ? '' : '/';
             if (isset($params['parameters']) && !empty($params['parameters'])) {
-                
                 $params = $this->processDeploymentParams($params);
             } else {
-                
                 $params = null;
             }
             $appData = $this->appService->deployApp($path, $params);
-            
             return $this->getSuccessResponseWithData($appData);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
@@ -423,7 +418,7 @@ class AppController extends AbstractApiController
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
         try {
             $result = $this->appService->getApp($params['appId'], true);
-            $fileContent = file_get_contents($result.'/index.scss');
+            $fileContent = file_get_contents($result . '/index.scss');
             $data['cssContent'] = $fileContent;
             return $this->getSuccessResponseWithData($data);
         } catch (Exception $e) {
@@ -432,7 +427,7 @@ class AppController extends AbstractApiController
         }
     }
 
-     /**
+    /**
      * GET List of BusinessRoles for an App API
      * @api
      * @link /app/appId/appBusinessRoles
