@@ -23,7 +23,7 @@ abstract class AbstractService extends AbstractBaseService
 
     protected function getAccountIdForOrgId($orgId)
     {
-        $query = "SELECT a.id, a.uuid from ox_account a 
+        $query = "SELECT a.id, a.uuid from ox_account a
                     inner join ox_organization o on o.id = a.organization_id
                     where o.uuid = :orgId";
         $params = ['orgId' => $orgId];
@@ -41,11 +41,11 @@ abstract class AbstractService extends AbstractBaseService
         if (is_numeric($accountId)) {
             $where = "a.id =:accountId";
         }
-        $query = "SELECT o.id, o.uuid from ox_account a 
+        $query = "SELECT o.id, o.uuid from ox_account a
                     left outer join ox_organization o on o.id = a.organization_id
                     where $where";
         $params = ['accountId' => $accountId];
-        $this->logger->info("Excutng query $query with---".print_r($params, true));
+        $this->logger->info("Excutng query $query with---" . print_r($params, true));
         $result = $this->executeQueryWithBindParameters($query, $params)->toArray();
         if (count($result) > 0) {
             return $result[0];
@@ -63,15 +63,16 @@ abstract class AbstractService extends AbstractBaseService
             $query->join($join['table'], $join['condition']);
         }
         $query->columns($columns)
-              ->where($filter);
+            ->where($filter);
         return $this->executeQuery($query)->toArray();
     }
+
     protected function getIdFromUuid($table, $uuid, $filter = array())
     {
         $filter['uuid'] = $uuid;
         $columns = ['id'];
         $responseID = $this->executeQueryOnTable($table, $columns, $filter);
-        return ($responseID) ? $responseID[0]['id'] : null;
+        return ($responseID) ? $responseID[0]['id'] : '';
     }
 
     protected function getUuidFromId($table, $id)
@@ -195,7 +196,7 @@ abstract class AbstractService extends AbstractBaseService
      * @param      integer          $offset      The offset
      * @param      boolean          $debug       flag to print select if needed from any nested function call
      *
-     * @return     array   The data by parameters.
+     * @return     mixed   The data by parameters.
      */
     protected function getDataByParams($tableName, $fieldArray = array(), $where = array(), $joins = array(), $sortby = null, $groupby = array(), $limit = 0, $offset = 0, $debug = false)
     {
@@ -259,7 +260,7 @@ abstract class AbstractService extends AbstractBaseService
      * @param array $tableName Table name to Insert fields into
      * @param array $data Insert array(array('field_name' => 'field_value'), array('field_name' => 'field_value_new'))
      * @param array $excludedColumns For excluding update columns array('field_name1', 'field_name2')
-     * @return bool
+     * @return mixed
      */
 
     public function multiInsertOrUpdate($tableName, array $data, array $excludedColumns = array())
@@ -315,7 +316,7 @@ abstract class AbstractService extends AbstractBaseService
 
     public function updateAccountContext($data)
     {
-        $this->logger->info("Received Data--".print_r($data, true));
+        $this->logger->info("Received Data--" . print_r($data, true));
         try {
             if (isset($data['orgId']) || isset($data['accountId'])) {
                 if (isset($data['orgId'])) {
@@ -327,7 +328,7 @@ abstract class AbstractService extends AbstractBaseService
                     $accountIds = ['uuid' => $data['accountId']];
                     $accountIds['id'] = $this->getIdFromUuid('ox_account', $data['accountId']);
                 }
-                $this->logger->info("AccountIdsss--".print_r($accountIds, true));
+                $this->logger->info("AccountIdsss--" . print_r($accountIds, true));
                 AuthContext::put(AuthConstants::ACCOUNT_ID, $accountIds['id']);
                 AuthContext::put(AuthConstants::ACCOUNT_UUID, $accountIds['uuid']);
                 AuthContext::put(AuthConstants::ORG_UUID, $orgIds['uuid']);
@@ -373,9 +374,9 @@ abstract class AbstractService extends AbstractBaseService
     {
         foreach ($properties as $key => $value) {
             if (is_string($value['value'])) {
-                $value['value'] = "'".$value['value']."'";
+                $value['value'] = "'" . $value['value'] . "'";
             }
-            $query = "SET SESSION ".$value['name']." = ".$value['value'];
+            $query = "SET SESSION " . $value['name'] . " = " . $value['value'];
             $this->executeQuerywithParams($query);
         }
     }
