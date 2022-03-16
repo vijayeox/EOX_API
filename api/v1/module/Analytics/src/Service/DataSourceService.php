@@ -131,7 +131,7 @@ class DataSourceService extends AbstractService
                 $data = $analyticObject->getFields($params['index']);
             } elseif ($type == "values") {
                 // print_r($params);exit;
-                if ($params['filter'] != "undefined") {
+                if ($params['filter'] != "undefined" && $params['filter'] != "") {
                     // echo "<pre/>1";
                     // print_r($params);exit;
                     $data = $analyticObject->getValues($params['index'], $params['field'], json_decode($params['filter']));

@@ -947,7 +947,7 @@ class AccountService extends AbstractService
             $media_uuid=$val['media'];
             if(!empty($media_uuid) && is_string($media_uuid) && strpos($media_uuid, ' ') == false)
             {
-                $query_media="SELECT * FROM ox_attachment WHERE uuid='$media_uuid'";
+                $query_media="SELECT id, uuid, extension, type, path, created_id, account_id, created_date, file_name as name FROM ox_attachment WHERE uuid='$media_uuid'";
                 $resultSetMedia = $this->executeQuerywithParams($query_media)->toArray();
                 $resultSet[$i]['upload']=$resultSetMedia;
             }

@@ -39,7 +39,8 @@ routes {
        // ['from':'activemq:topic:MAKE_CALL', 'to':["${callback.URL}/callback/communication/makecall"]],
         ['from':'activemq:topic:COMMANDS', 'to':["${callback.URL}/callback/workflow/servicetask"]]
         // ['from':'activemq:topic:USER_ADDED', 'to':["${callback.URL}"]],
-        // ['from':'activemq:topic:USER_DELETED', 'to':["${callback.URL}"]]
+        // ['from':'activemq:topic:USER_DELETED', 'to':["${callback.URL}"]],
+        ['from':'activemq:topic:UPDATE_CHAT_PROFILE_PICTURE', 'to':["${callback.URL}/callback/chat/updateprofilepicture"]]
     ]
 }
 

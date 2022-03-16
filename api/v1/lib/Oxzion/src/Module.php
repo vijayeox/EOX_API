@@ -515,7 +515,8 @@ class Module
                 Service\ProfilePictureService::class => function ($container) {
                     $config = $container->get('config');
                     $dbAdapter = $container->get(AdapterInterface::class);
-                    return new Service\ProfilePictureService($config, $dbAdapter);
+                    return new Service\ProfilePictureService($config, $dbAdapter, 
+                        $container->get(Messaging\MessageProducer::class));
                 },
                 Service\UserSessionService::class => function ($container) {
                     $config = $container->get('config');
