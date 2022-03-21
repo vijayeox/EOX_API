@@ -1157,6 +1157,14 @@ class AppService extends AbstractService implements AppUpgrade
         if (file_exists($formsTarget)) {
             $this->setupLink($formsTarget, $formlink);
         }
+        $link = $this->config['TRANSFORMER_FOLDER'] . $appId;
+        $target = $path . "/data/transformer";
+        if (is_link($link)) {
+            FileUtils::unlink($link);
+        }
+        if (file_exists($target)) {
+            $this->setupLink($target, $link);
+        }
 
         $this->setLinkAndRunBuild($path, $appId);
     }

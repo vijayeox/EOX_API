@@ -27,6 +27,10 @@ use Oxzion\Service\UserCacheService;
 use Oxzion\Service\RegistrationService;
 use Oxzion\Utils\ArrayUtils;
 use Oxzion\Service\BusinessParticipantService;
+use Oxzion\Transformer\JsonTransformerService;
+use Oxzion\Utils\ArtifactUtils;
+use Oxzion\Document\DocumentBuilder;
+use Oxzion\Service\EsignService;
 
 class CommandService extends AbstractService
 {
@@ -41,6 +45,7 @@ class CommandService extends AbstractService
     private $userCacheService;
     private $registrationService;
     private $businessParticipantService;
+    private $esignService;
     /**
      * @ignore __construct
      */
@@ -50,7 +55,7 @@ class CommandService extends AbstractService
         $this->restClient = $restClient;
     }
 
-    public function __construct($config, $dbAdapter, TemplateService $templateService, AppDelegateService $appDelegateService, FileService $fileService, JobService $jobService, MessageProducer $messageProducer, WorkflowInstanceService $workflowInstanceService, WorkflowService $workflowService, UserService $userService, UserCacheService $userCacheService, RegistrationService $registrationService, BusinessParticipantService $businessParticipantService)
+    public function __construct($config, $dbAdapter, TemplateService $templateService, AppDelegateService $appDelegateService, FileService $fileService, JobService $jobService, MessageProducer $messageProducer, WorkflowInstanceService $workflowInstanceService, WorkflowService $workflowService, UserService $userService, UserCacheService $userCacheService, RegistrationService $registrationService, BusinessParticipantService $businessParticipantService, JsonTransformerService $jsonTransformerService, EsignService $esignService)
     {
         $this->messageProducer = $messageProducer;
         $this->templateService = $templateService;
@@ -66,6 +71,8 @@ class CommandService extends AbstractService
         $this->userCacheService = $userCacheService;
         $this->registrationService = $registrationService;
         $this->businessParticipantService = $businessParticipantService;
+        $this->jsonTransformerService = $jsonTransformerService;
+        $this->esignService = $esignService;
     }
 
     public function setMessageProducer($messageProducer)
@@ -254,8 +261,19 @@ class CommandService extends AbstractService
             case 'snooze':
                 $this->logger->info("Snooze File");
                 return $this->snoozeFile($data);
+                break;
             case 'setupBusinessRelationship':
                 return $this->setupBusinessRelationship($data);
+                break;
+            case 'jsonTransform':
+                return $this->jsonTransform($data);
+                break; 
+            case 'eSign':
+                return $this->eSign($data);
+                break; 
+            case 'generateExcel':
+                return $this->generateExcel($data);
+                break;   
             default:
                 break;
         };
@@ -566,37 +584,189 @@ class CommandService extends AbstractService
         $this->messageProducer->sendQueue($payload, 'mail');
     }
 
+    private function generateExcel(){}
+
+    protected function eSign(&$data){
+        $fileUUID = isset($data['uuid']) ? $data['uuid'] : $data['fileId'];
+        $accountId = isset($data['accountId']) ? $data['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
+        $fileDestination = ArtifactUtils::getDocumentFilePath($this->config['APP_DOCUMENT_FOLDER'], $fileUUID, array('accountId' => $accountId));
+        $selectedTemplate = isset($data['eSignTemplate']) ? $data['eSignTemplate'] : '';
+        $documentDestination = $fileDestination['absolutePath'] . $selectedTemplate . ".pdf";
+        $this->logger->info("documentDestination --->".print_r($documentDestination,true));
+        $eSignName = isset($data['eSignName']) ? $data['eSignName'] : '';
+        $eSignEmail = isset($data['eSignEmail']) ? $data['eSignEmail'] : '';
+        $signersParticipantEmail = isset($data['signersParticipantEmail']) ? $data['signersParticipantEmail'] : '';
+        $signersParticipantName = isset($data['signersParticipantName']) ? $data['signersParticipantName'] : '';
+        $signersParticipantPhone = isset($data['signersParticipantPhone']) ? $data['signersParticipantPhone'] : '';
+        $signersParticipantSms = isset($data['signersParticipantSms']) ? $data['signersParticipantSms'] : '';
+        $signers = array(
+            "name" => $selectedTemplate,
+            "message" => isset($data['eSignMessage']) ? $data['eSignMessage'] : '',
+            "cc" => [
+                "email" => [
+                    'name' => $this->parseEsignData($data, $eSignName),
+                    'email' => $this->parseEsignData($data, $eSignEmail),
+                ]
+            ],
+            "signers" => [[
+                'participant' => [
+                    "email" => $this->parseEsignData($data, $signersParticipantEmail),
+                    'name' => $this->parseEsignData($data, $signersParticipantName),
+                    "phone" => $this->parseEsignData($data, $signersParticipantPhone),
+                    "sms" => $this->parseEsignData($data, $signersParticipantSms),
+                ],
+                "fields" => array(
+                    array(
+                        "name" => isset($data['signersFieldsName']) ? $data['signersFieldsName'] : '',
+                        "height" => isset($data['signersFieldsHeight']) ? $data['signersFieldsHeight'] : '',
+                        "width" => isset($data['signersFieldsWidth']) ? $data['signersFieldsWidth'] : '',
+                        "x" => isset($data['signersFieldsXcord']) ? $data['signersFieldsXcord'] : '',
+                        "y" => isset($data['signersFieldsYcord']) ? $data['signersFieldsYcord'] : '',
+                        "pageNumber" => isset($data['signersFieldsPageNumber']) ? $data['signersFieldsPageNumber'] : '0',
+                    )
+                )
+            ]]
+        );
+        $docId = $this->esignService->setupDocument($fileUUID . "_" . $selectedTemplate, $documentDestination, $signers);
+        $signingLink = $this->esignService->getDocumentSigningLink($docId);
+        $documentpdf = $fileDestination['relativePath'] . $selectedTemplate . ".pdf";
+        $pdfLocation = isset($data['pdfFileLocation']) ? $data['pdfFileLocation'] : 'attachments';
+        if (!isset($data[$pdfLocation])) {
+            $data[$pdfLocation] = [];
+        }
+        array_push(
+            $data[$pdfLocation],
+            array(
+                "fullPath" => $documentDestination,
+                "file" => $documentpdf,
+                "originalName" => $selectedTemplate . ".pdf",
+                "type" => "file/pdf",
+                "docId" => $docId,
+                "signingLink" => $signingLink,
+                "status" => "UNSIGNED"
+            )
+        );
+    }
+
+    private function parseEsignData($data, $eSignField){
+        if(isset($eSignField)){
+            if (str_starts_with($eSignField, '$')) {
+                $eSignData = ltrim($eSignField , '$');
+                if (isset($data[$eSignData])) {
+                    return $data[$eSignData];
+                }
+            }else{
+                if (isset($data[$eSignField])) {
+                    return $data[$eSignField];
+                }
+            }
+            return $eSignField;
+        }else{
+            throw new EntityNotFoundException("Missing required field - CC Name/Email ");            
+        } 
+    }
+
     protected function generatePDF(&$params)
     {
         if (!$params || empty($params)) {
             return $params;
         }
-        $template = isset($params['template']) ? $params['template'] : 0;
-        if ($template) {
-            $body = $this->templateService->getContent($template, $params);
-        } else {
-            if (isset($params['body'])) {
-                $body = $params['body'];
-            } else {
-                $body = null;
+        $fileUUID = isset($params['uuid']) ? $params['uuid'] : $params['fileId'];
+        $accountId = isset($params['accountId']) ? $params['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
+        $fileDestination = ArtifactUtils::getDocumentFilePath($this->config['APP_DOCUMENT_FOLDER'], $fileUUID, array('accountId' => $accountId));
+        $template = isset($params['htmlTemplate']) ? $params['htmlTemplate'] : 0;
+        if(isset($params['transformer'])){
+            $params['directive'] = $params['transformer'];
+            $processingData = $this->jsonTransform($params,true);
+        }else{
+            $this->processData($params);
+            $processingData = $params;
+        }
+        $processingData['accountId'] = isset($processingData['accountId']) ? $processingData['accountId'] : $accountId;
+        $this->logger->info("DATA TO PDF----->".print_r($processingData,true));
+        $pdfLocation = isset($params['pdfFileLocation']) ? $params['pdfFileLocation'] : 'attachments';
+        if (!isset($params[$pdfLocation])) {
+            $params[$pdfLocation] = [];
+        }
+        if (isset($params['pdfTemplate'])) {
+            return $this->pdfTemplate($params, $fileDestination, $processingData, $pdfLocation);
+        }else{
+            return $this->htmlTemplate($template,$params, $fileDestination);
+        }        
+    }
+
+    protected function processData(&$temp)
+    {
+        foreach ($temp as $key => $value) {
+            if (is_array($temp[$key])) {
+                $temp[$key] = json_encode($value);
             }
         }
-        if (!$body) {
-            return;
-        }
-        if (isset($params['options'])) {
-            $options = $params['options'];
-        } else {
-            $options = null;
-        }
-        if (isset($params['destination'])) {
-            $destination = $params['destination'];
-        } else {
-            return;
-        }
-        $generatePdf = new DocumentGeneratorImpl();
-        $params['document_path'] = $generatePdf->generateDocument($body, $destination, $options);
+    }
+
+    private function pdfTemplate($params, $fileDestination, $processingData, $pdfLocation){
+        $selectedTemplate = $params['pdfTemplate'];                  
+        $documentGenerator = new DocumentGeneratorImpl();
+        $generatePdf = new DocumentBuilder($this->config, $this->templateService, $documentGenerator);    
+        $documentDestination = $fileDestination['absolutePath'] . $selectedTemplate . ".pdf";           
+        $this->logger->info("documentDestination File Exists---->".print_r(file_exists($documentDestination),true));
+        $this->logger->info("documentDestination ---->".print_r(($documentDestination),true));
+        $this->logger->info("data to pdf ---->".print_r($processingData,true));
+        $generatePdf->fillPDFForm(
+            $selectedTemplate . ".pdf",
+            $processingData,
+            $documentDestination
+        );
+        $documentpdf = $fileDestination['relativePath'] . $selectedTemplate . ".pdf";
+        array_push(
+            $params[$pdfLocation],
+            array(
+                "fullPath" => $documentDestination,
+                "file" => $documentpdf,
+                "originalName" => $selectedTemplate.".pdf",
+                "type" => "file/pdf",
+            )
+        ); 
         return $params;
+    }
+
+    private function htmlTemplate($template,$params, $fileDestination){
+        $this->logger->info("-template--- ->".print_r($template,true));         
+        $generatePdf = new DocumentGeneratorImpl();
+            if ($template) {
+                $body = $this->templateService->getContent($template, $params);
+            } else {
+                if (isset($params['body'])) {
+                    $body = $params['body'];
+                } else {
+                    $body = null;
+                }
+            }
+            $this->logger->info("---- ->".print_r(!$body,true));
+            if (!$body) {
+                return;
+            }
+            if (isset($params['options'])) {
+                $options = $params['options'];
+            }
+            //  elseif(isset($params['header'])) {
+            //     $options['header'] = $params['header'];
+            // } elseif (isset($params['footer'])) {
+            //     $options['footer'] = $params['footer'];
+            // } 
+            else {
+                $options = [];
+            }
+            if (isset($params['destination'])) {
+                $destination = $params['destination'];
+            } elseif(isset($fileUUID) && isset($accountId)){
+                $docDest = $dest['absolutePath'] . $params['firstname'] . ".pdf";
+            } else{
+                return;
+            }
+            $params['document_path'] = $generatePdf->generateDocument($body, $destination, $options);
+            $this->logger->info("HHHH---".print_r($params,true));
+            return $params;
     }
 
     protected function extractFileData(&$data)
@@ -857,5 +1027,24 @@ class CommandService extends AbstractService
             $this->logger->info("Batch Process Exception" . print_r($e->getMessage(), true));
             throw $e;
         }
+    }
+
+    protected function jsonTransform($data, $returnNewArray = false){
+        $this->logger->info("Data in Json Transform ---- " . print_r($data, true));
+        if (isset($data['app_id']) && isset($data['directive'])) {
+            $appId = $data['app_id'];
+            if (isset($data['appId'])) {
+                $appId = $data['appId'];
+            }
+            $appId = UuidUtil::isValidUuid($appId)? $appId : $this->getUuidFromId('ox_app', $appId);
+            $directive = $data['directive'];
+            unset($data['directive']);
+        } else {
+            $this->logger->info("App Id or Transform Directive is Not Specified");
+            throw new EntityNotFoundException("App Id or Transform Directive Not Specified");
+        }
+        $response = $this->jsonTransformerService->transform($appId, $directive, $data, $returnNewArray);
+        $this->logger->info("Data in Json Transform before return--- " . print_r($response, true));
+        return $response;
     }
 }
