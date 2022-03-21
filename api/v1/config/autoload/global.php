@@ -114,6 +114,7 @@ return [
     'jwtAlgo' => 'HS512',
     'authRequiredText' => 'Authentication Required',
     'refreshTokenPeriod' => '7',
-    'paymentGatewayType'=>'DEMO'
+    'paymentGatewayType'=>'DEMO',
+    'TRANSFORMER_FOLDER'=>'/app/api/data/transformer/',
 
 ];
