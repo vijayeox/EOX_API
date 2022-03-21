@@ -70,4 +70,5 @@ return [
     'THEME_FOLDER' => "/app/view/themes/",
     'EOX_APP_SOURCE_DIR' => '/app/api/data/AppSource/',
     'EOX_APP_DEPLOY_DIR' => '/app/api/data/AppDeploy/',
+    'TRANSFORMER_FOLDER'=>'/app/api/data/transformer/',
 ];
