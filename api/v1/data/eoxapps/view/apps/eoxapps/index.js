@@ -1,5 +1,5 @@
 import osjs from "osjs";
-import { name, icon_white, appId } from "./metadata.json";
+import { name, icon_white, appId, fontIcon } from "./metadata.json";
 import { React, ReactDOM, EOXApplication } from "oxziongui";
 
 // Our launcher
@@ -10,7 +10,7 @@ const register = (core, args, options, metadata) => {
     .createWindow({
       id: metadata.name + "_Window",
       title: metadata.title.en_EN,
-      icon: proc.resource(icon_white),
+      icon: fontIcon,
       attributes: {
         classNames: ["Window_" + metadata.name],
         dimension: {
