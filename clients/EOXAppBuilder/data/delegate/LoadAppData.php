@@ -16,7 +16,7 @@ class LoadAppData extends AbstractAppDelegate
 
     public function execute(array $data, Persistence $persistenceService)
     {
-        $this->logger->info("Data in the delegate----".print_r($data,true));
+        $this->logger->info("Data in the delegate LoadAppData----".print_r($data,true));
         if (isset($data['app']['uuid'])) {
             $data['listOFForms']  =  $this->getArtifacts($data['app']['uuid'], 'form');  
             $data['listOFWorkflows']  =  $this->getArtifacts($data['app']['uuid'], 'workflow');
@@ -33,29 +33,77 @@ class LoadAppData extends AbstractAppDelegate
                             foreach ($value['pageContent']['data']['content'][0]['gridContent']['actions'] as $keyPdupl => &$valuePDupl) {
                                 $valuePDupl['contentDuplicate']['data']['content'] = $valuePDupl['details'];
                             }
-                            if (isset($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'])) {
-                                foreach ($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'] as $keyGridDupl => &$valueGridDupl) {
-                                    $valueGridDupl['detailsDuplicate']['data']['content'] = $valueGridDupl['details'];
-                                }  
-                            }  
+
+                            foreach ($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'] as $keyGridDupl => &$valueGridDupl) {
+                                $valueGridDupl['detailsDuplicate']['data']['content'] = $valueGridDupl['details'];
+                            }    
+                        }
+                        if ($value['content'][0]['type'] == 'KanbanViewer') {
+                            $value['content'][0]['kanbanContent'] = array('heading'=>$value['content'][0]['content']['heading'], 'url'=>$value['content'][0]['content']['url']);
+                            unset($value['content'][0]['content']);
                         }
                     }                   
                 }
             }
-             $valuepri = [];
-            if(!empty($data['role'])) {
-                foreach ($data['role'] as $key => &$value) {
-                    foreach ($value['privileges'] as $keyPrivileges => $valuePrivileges) {
-                        if (!empty($valuePrivileges['privilege_name'])) {
-                            $valuepri['privilege_name']['name'] = $valuePrivileges['privilege_name'];
-                            $valuepri['permission'] = $valuepri['privilege_name']['permission']= $valuePrivileges['permission'];
-                            $value['privilegesDuplicate'][] = $valuepri;
-                        }
+    
+            $copyDP = [];
+            $copyP = [];
+            if (!empty($data['privilege'])) {
+                foreach($data['privilege'] as &$key) {
+                    $this->logger->info("DATA PRIVILEGE KEY INPUT".print_r($key,true));
+                    
+                    $copyP['name'] = $key['name'];
+                    if (!empty($key["permission"]['15']) && $key['permission']['15'] == true) {
+                        $copyP['permission'] = array("15"=>true, "7"=>true, "3"=>true, "1"=>true);
                     }
-                    array_shift($value['privilegesDuplicate']);
+                    elseif (!empty($key["permission"]['7']) && $key['permission']['7'] == true) {
+                        $copyP['permission'] = array("15"=>false, "7"=>true, "3"=>true, "1"=>true);
+                    }
+                    elseif (!empty($key["permission"]['3']) && $key['permission']['3'] == true) {
+                        $copyP['permission'] = array("15"=>false, "7"=>false, "3"=>true, "1"=>true);
+                    }
+                    elseif (!empty($key["permission"]['1']) && $key['permission']['1'] == true) {
+                        $copyP['permission'] = array("15"=>false, "7"=>false, "3"=>false, "1"=>true);
+                    }
+                    array_push($copyDP, $copyP);
+                    $this->logger->info("DATA PRIVILEGE KEY OUTPUT".print_r($copyP,true));
+                    $copyP = [];
                 }
+                $data['privilege'] = $copyDP;
+                $this->logger->info("DATA PRIVILEGE FINAL OUTPUT".print_r($data['privilege'],true));
             }
             
+            if (!empty($data['role'])) {
+                for ($x = 0; $x <= count($data['role']); $x++) {
+                    if (!empty($data['role'][$x]['privileges'])) {
+                        $this->logger->info("DATA ROLE ELEMENT IN".print_r($data['role'][$x],true));
+                        for ($y = 0; $y <= count($data['role'][$x]['privileges']); $y++) {
+                            if (!empty($data['role'][$x]['privileges'][$y]['permission'])) {
+                                $this->logger->info("DATA ROLE PRIVILEGE ELEMENT IN".print_r($data['role'][$x]['privileges'][$y],true));
+                                if (!empty($data['role'][$x]['privileges'][$y]['permission']['15']) && $data['role'][$x]['privileges'][$y]['permission']['15'] == true) {
+                                    $data['role'][$x]['privileges'][$y]['permission'] = array("15"=>true, "7"=>true, "3"=>true, "1"=>true);
+                                }
+                                elseif (!empty($data['role'][$x]['privileges'][$y]['permission']['7']) && $data['role'][$x]['privileges'][$y]['permission']['7'] == true) {
+                                    $data['role'][$x]['privileges'][$y]['permission'] = array("15"=>false, "7"=>true, "3"=>true, "1"=>true);
+                                }
+                                elseif (!empty($data['role'][$x]['privileges'][$y]['permission']['3']) && $data['role'][$x]['privileges'][$y]['permission']['3'] == true) {
+                                    
+                                    $data['role'][$x]['privileges'][$y]['permission'] = array("15"=>false, "7"=>false, "3"=>true, "1"=>true);
+                                }
+                                elseif (!empty($data['role'][$x]['privileges'][$y]['permission']['1']) && $data['role'][$x]['privileges'][$y]['permission']['1'] == true) {
+                                    $data['role'][$x]['privileges'][$y]['permission'] = array("15"=>false, "7"=>false, "3"=>false, "1"=>true);
+                                }
+                            if (!empty($data['role'][$x]['privileges'][$y])) {
+                                $this->logger->info("DATA ROLE PRIVILEGE ELEMENT OUT".print_r($data['role'][$x]['privileges'][$y],true));
+                            }
+                        }
+                        $this->logger->info("DATA ROLE ELEMENT OUT".print_r($data['role'][$x],true));
+                    }
+                }
+            }
+                $this->logger->info("DATA ROLE FINAL OUTPUT".print_r($data['role'],true));
+            }
+
             $valuePartiRole = [];
             if (!empty($data['entity'])) {
                 foreach ($data['entity'] as $key => &$value) {
@@ -71,7 +119,7 @@ class LoadAppData extends AbstractAppDelegate
                 array_shift($value['participantRoleDuplicate']);
             }
         }
-         $this->logger->info("Data out of delegate----".print_r($data,true));
+         $this->logger->info("Data out of delegate LOADAPPDATA----".print_r($data,true));
         return $data;
     }
 }
