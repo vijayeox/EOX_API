@@ -68,8 +68,6 @@ class JsonTransformerService extends AbstractService
     private function transformData($appId, $srcValue, $value, &$returnArray)
     {
         $field = (isset($srcValue['path']) && isset($returnArray[$srcValue['path']])) ? $returnArray[$srcValue['path']] : '';
-       print_r($field);
-       echo "---\n";
         if(isset($srcValue['emptyOnNull']) && $srcValue['emptyOnNull'] == true && strtoupper($field) == 'NULL'){
             $returnArray[$value['target']] = ''; 
         }elseif((isset($srcValue['excludeOnNull']) && $srcValue['excludeOnNull'] == true && strtoupper($field) == 'NULL') || (isset($srcValue['remove']) && $srcValue['remove'] == true)){

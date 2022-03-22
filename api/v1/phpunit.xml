@@ -75,6 +75,7 @@
             <directory>./lib/Oxzion/test/Service/BusinessRoleServiceTest.php</directory>
             <directory>./lib/Oxzion/test/Service/EsignServiceTest.php</directory>
             <directory>./lib/Oxzion/test/Service/ProjectServiceTest.php</directory>
+            <directory>./lib/Oxzion/test/JsonTransformerServiceTest</directory>
         </testsuite>
         <testsuite name="Callback Fixtures">
             <directory>./module/Callback/test</directory>

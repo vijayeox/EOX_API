@@ -691,7 +691,7 @@ class CommandService extends AbstractService
         if (isset($params['pdfTemplate'])) {
             return $this->pdfTemplate($params, $fileDestination, $processingData, $pdfLocation);
         }else{
-            return $this->htmlTemplate($template,$params, $fileDestination);
+            return $this->htmlTemplate($template,$params, $fileDestination, $pdfLocation);
         }        
     }
 
@@ -730,7 +730,7 @@ class CommandService extends AbstractService
         return $params;
     }
 
-    private function htmlTemplate($template,$params, $fileDestination){
+    private function htmlTemplate($template,$params, $fileDestination, $pdfLocation){
         $this->logger->info("-template--- ->".print_r($template,true));         
         $generatePdf = new DocumentGeneratorImpl();
             if ($template) {
@@ -759,12 +759,12 @@ class CommandService extends AbstractService
             }
             if (isset($params['destination'])) {
                 $destination = $params['destination'];
-            } elseif(isset($fileUUID) && isset($accountId)){
-                $docDest = $dest['absolutePath'] . $params['firstname'] . ".pdf";
+            } elseif(isset($fileDestination)){
+                $destination = $fileDestination['absolutePath'] . $params['firstname'] . ".pdf";
             } else{
                 return;
             }
-            $params['document_path'] = $generatePdf->generateDocument($body, $destination, $options);
+            $params[$pdfLocation] = $params['document_path'] = $generatePdf->generateDocument($body, $destination, $options);
             $this->logger->info("HHHH---".print_r($params,true));
             return $params;
     }

@@ -447,4 +447,40 @@ class PipelineControllerTest extends ControllerTest
         $content = $getBusinessParticipantService->checkIfBusinessRelationshipExists($entityId,$buyerAccountId, $sellerAccountId);
         $this->assertTrue($content);
     }
+
+    public function testGeneratePdfByHtmlTemplateWithNoBody(){
+        $this->initAuthToken($this->adminUser);
+        $data = ['command' => 'pdf',"fileId"=> "cdbbe380-77a7-4dfb-83ed-4e2ae058d387"];
+        $this->setJsonContent(json_encode($data));
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/pipeline', 'POST', $data);
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals("success", $content['status']);
+    }
+
+    public function testGeneratePdfByHtmlTemplate(){
+        $this->initAuthToken($this->adminUser);
+        $data = ['command' => 'pdf',"firstname"=> "tahekuxem","fileId"=> "cdbbe380-77a7-4dfb-83ed-4e2ae058d387",'body' => 'HELLO ALLL!!!'];
+        $this->setJsonContent(json_encode($data));
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/pipeline', 'POST', $data);
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals("success", $content['status']);
+        $this->assertEquals($data['firstname'], $content['data']['firstname']);
+        $this->assertEquals($data['body'], $content['data']['body']);
+        $this->assertNotNull($content['data']['document_path']);
+        $this->assertNotNull($content['data']['attachments']);
+    }
+
+    public function testGeneratePdfByHtmlTemplateInSpecifiedPath(){
+        $this->initAuthToken($this->adminUser);
+        $data = ['command' => 'pdf',"firstname"=> "tahekuxem","fileId"=> "cdbbe380-77a7-4dfb-83ed-4e2ae058d387",'body' => 'HELLO ALLL!!!','pdfFileLocation' =>'attachments1'];
+        $this->setJsonContent(json_encode($data));
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/pipeline', 'POST', $data);
+        $content = json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals("success", $content['status']);
+        $this->assertEquals($data['firstname'], $content['data']['firstname']);
+        $this->assertEquals($data['body'], $content['data']['body']);
+        $this->assertNotNull($content['data']['document_path']);
+        $this->assertNotNull($content['data']['attachments1']);
+    }
 }
+
