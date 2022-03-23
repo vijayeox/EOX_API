@@ -77,7 +77,11 @@ class FileService extends AbstractService
         }
         if (isset($data['assocId'])) {
             $assocId = $this->getIdFromUuid('ox_file', $data['assocId']);
-        } else {
+        }
+        else if(isset($data['bos']['assoc_id']) && UuidUtil::isValidUuid($data['bos']['assoc_id'])){
+            $assocId = $this->getIdFromUuid('ox_file', $data['bos']['assoc_id']);
+        }
+        else {
             $assocId = null;
         }
 
@@ -98,15 +102,7 @@ class FileService extends AbstractService
         $this->logger->info("Data From Fileservice after encoding - " . print_r($jsonData, true));
         $accountId = $this->businessParticipantService->getEntitySellerAccount($entityId);
         $data['uuid'] = $uuid;
-        if (isset($data['sellerAccountName'])) {
-            if (isset($data['CCAccountId'])) {
-                $data['account_id'] = $data['CCAccountId'];
-            } else {
-                $data['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
-            }
-        } else {
-            $data['account_id'] = $accountId ? $accountId : AuthContext::get(AuthConstants::ACCOUNT_ID);
-        }
+        $data['account_id'] = $accountId ? $accountId : AuthContext::get(AuthConstants::ACCOUNT_ID);
         $data['created_by'] = AuthContext::get(AuthConstants::USER_ID);
         $data['date_created'] = date('Y-m-d H:i:s');
         $data['form_id'] = $formId;
@@ -356,9 +352,24 @@ class FileService extends AbstractService
                 return;
             }
         } elseif ($user == 'manager') {
-            $manager = $this->executeQuerywithParams("SELECT manager_id FROM `ox_employee_manager` inner join ox_user on ox_employee_manager.employee_id=ox_user.id inner join ox_file on ox_user.id=ox_file.created_by WHERE `ox_file`.`id` = " . $fileId . ";")->toArray();
+            $manager = $this->executeQuerywithParams("SELECT oem.manager_id , ou.id
+            FROM ox_employee_manager oem
+            inner join ox_employee oe on oem.employee_id=oe.id
+            inner join ox_user ou on oe.person_id = ou.person_id 
+            inner join ox_file of2 on of2.created_by = ou.id
+            WHERE of2.id = " . $fileId . ";")->toArray();
+            $this->logger->info("The Manager Assignment Query ------ ".print_r($manager,true));
             if (isset($manager) && count($manager) > 0) {
-                $userId = $manager[0]['manager_id'];
+                $managerEmployeeId = $manager[0]['manager_id'];
+                $managerUserId = $this->executeQuerywithParams("SELECT ou.id from ox_user ou 
+                inner join ox_employee oe on oe.person_id = ou.person_id
+                WHERE oe.id = " . $managerEmployeeId . ";")->toArray();
+                $this->logger->info("The Manager User Id ------ ".print_r($managerUserId,true));
+                if(isset($managerUserId) && count($managerUserId) > 0) {
+                    $userId = $managerUserId[0]['id'];
+                } else {
+                    return;
+                }
             } else {
                 return;
             }
@@ -397,41 +408,18 @@ class FileService extends AbstractService
         $entityId = $file['entity_id'];
         $fileData = json_decode($file['data'], true);
         $accountId = $buyerAccountId = $file['account_id'];
-        if (isset($file['sellerAccountName'])) {
-            $query = "select uuid from ox_account where name = :name";
-            $queryParams = ['name' => $file['sellerAccountName']];
-            $resultSellerAccountID = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
-            $file['sellerAccountId'] = $resultSellerAccountID[0]['uuid'];
-            $sellerAccountId = $this->getIdFromUuid('ox_account', $file['sellerAccountId']);
-            $queryParams = ['entityId' => $entityId];
-            //check for seller buyer for this account
-            $getSellerBuyer = "SELECT sbr.account_id as sellerAccountId, sbr.business_role_id as sellerRole, bbr.account_id as buyerAccountId, bbr.business_role_id as buyerRole from ox_business_relationship obr inner join ox_account_business_role sbr on sbr.id = obr.seller_account_business_role_id inner join ox_account_business_role bbr on bbr.id = obr.buyer_account_business_role_id where  bbr.account_id = :buyerAccountId AND sbr.account_id = :sellerAccountId";
-            $sellerbuyerparams = ['buyerAccountId' => $buyerAccountId, 'sellerAccountId' => $sellerAccountId];
-            $this->logger->info("get seller buyer-- " . $getSellerBuyer . "with params  " . print_r($sellerbuyerparams, true));
-            $resultSellerAccount = $this->executeQuerywithBindParameters($getSellerBuyer, $sellerbuyerparams)->toArray();
-            $this->logger->info("get seller buyer result-- " . print_r($resultSellerAccount, true));
-
-            if (count($resultSellerAccount) > 0) {
-                $insertParams = array("fileId" => $fileId, "buyerAccountId" => $resultSellerAccount[0]['buyerAccountId'], "buyerBusinessRoleId" => $resultSellerAccount[0]['buyerRole'], "sellerAccountId" => $resultSellerAccount[0]['sellerAccountId'], "sellerBusinessRoleId" => $resultSellerAccount[0]['sellerRole']);
-                $insert = "INSERT IGNORE INTO ox_file_participant (`file_id`, `account_id`, `business_role_id`)  VALUES (:fileId,:buyerAccountId,:buyerBusinessRoleId),(:fileId,:sellerAccountId,:sellerBusinessRoleId) ";
-                $insertresult = $this->executeQuerywithBindParameters($insert, $insertParams);
-
-                $this->logger->info("get seller buyer inset query-- " . print_r($insert, true));
-                $this->logger->info("get seller buyer inset param-- " . print_r($insertParams, true));
-            }
-        } else {
-            $queryParams = ['entityId' => $entityId];
-            $query = "INSERT IGNORE INTO ox_file_participant (file_id, account_id, business_role_id)
+        $queryParams = ['entityId' => $entityId];
+           
+        $query = "INSERT IGNORE INTO ox_file_participant (file_id, account_id, business_role_id)
                   (SELECT $fileId, $accountId, ob.business_role_id
                   from ox_account_business_role ob inner join ox_account_offering oo on ob.id = oo.account_business_role_id
                   WHERE oo.entity_id = :entityId)";
-            $this->logger->info("File Part-- $query with params---" . print_r($queryParams, true));
-            $this->executeUpdateWithBindParameters($query, $queryParams);
-            $query = "select identifier from ox_entity_identifier where entity_id = :entityId";
-            $result = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
-        }
+        $this->logger->info("File Part-- $query with params---" . print_r($queryParams, true));
+        $this->executeUpdateWithBindParameters($query, $queryParams);
         $query = "select identifier from ox_entity_identifier where entity_id = :entityId";
         $result = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
+        
+        
         $identifier = null;
         $identifierField = null;
         foreach ($result as $value) {
@@ -786,7 +774,7 @@ class FileService extends AbstractService
             // AuthContext::get(AuthConstants::ACCOUNT_ID);
             $params = array('id' => $id, 'isActive' => 1);
             //
-            $select = "SELECT oxf.id, oxf.uuid, oxf.data, ou.uuid as ownerId, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf
+            $select = "SELECT oxf.id, oxf.uuid, oxf.data, ou.uuid as ownerId, ou.name as created_by, oae.uuid as entity_id,oae.id as entityId, oxf.fileTitle as title from ox_file oxf 
             inner join ox_user as ou on `oxf`.created_by = `ou`.id
                         inner join ox_app_entity oae on oae.id = oxf.entity_id";
             $where = " where oxf.uuid = :id and oxf.is_active = :isActive ";
@@ -810,6 +798,7 @@ class FileService extends AbstractService
                 $this->logger->info("FILE ID  ------" . json_encode($result));
                 if ($result[0]['data']) {
                     $result[0]['data'] = json_decode($result[0]['data'], true);
+                    $result[0]['data']['myId'] = $result[0]['id'];
                 }
                 unset($result[0]['id']);
                 $this->logger->info("FILE DATA SUCCESS ------" . print_r($result[0], true));
@@ -1410,10 +1399,13 @@ class FileService extends AbstractService
             $queryParams['ltCreatedDate'] = date('Y-m-d', strtotime($params['ltCreatedDate'] . "+1 days"));
         }
     }
-    private function processParticipantFiltering($accountId, &$fromQuery, &$whereQuery, &$queryParams)
+    private function processParticipantFiltering($accountId, &$fromQuery, &$whereQuery, &$queryParams,$appId)
     {
-        $query = "SELECT id from ox_account_business_role where account_id = :accountId";
-        $params = ["accountId" => $accountId];
+        $query = "SELECT oabr.id from ox_account_business_role oabr 
+        inner join ox_business_role oxbr ON oxbr.id = oabr.business_role_id
+        where oabr.account_id = :accountId AND oxbr.app_id = :appId";
+        $params = ["accountId" => $accountId, "appId" => $appId];
+        $this->logger->info("Query--- $query with param---".print_r($params,true));
         $result = $this->executeQueryWithBindParameters($query, $params)->toArray();
         if (count($result) == 0) {
             return false;
@@ -1480,7 +1472,7 @@ class FileService extends AbstractService
             }
         }
         $appFilter = "";
-        $appIdClause = "";
+        $appIdClause = $appId= "";
         $queryParams = array();
         if (isset($appUUid)) {
             $appId = $this->getIdFromUuid('ox_app', $appUUid);
@@ -1518,7 +1510,7 @@ class FileService extends AbstractService
         left join ox_file_assignee as oxfa on oxfa.file_id = `of`.id and oxfa.assignee = 1
         left join ox_user as oxu on oxu.id = oxfa.user_id
         inner join ox_app_entity as en on en.id = `of`.entity_id $appQuery ";
-        if (!$this->processParticipantFiltering($accountId, $fromQuery, $whereQuery, $queryParams)) {
+        if (!$this->processParticipantFiltering($accountId, $fromQuery, $whereQuery, $queryParams,$appId)) {
             if ($whereQuery != "") {
                 $whereQuery .= " AND ";
             }
@@ -1810,7 +1802,7 @@ class FileService extends AbstractService
     public function getChangeLog($entityId, $startData, $completionData, $labelMapping = null, $fileId = null)
     {
         $fieldSelect = "SELECT ox_field.name,ox_field.template,ox_field.type,ox_field.text,ox_field.data_type,COALESCE(parent.name,'') as parentName,COALESCE(parent.text,'') as parentText,parent.data_type as parentDataType FROM ox_field
-                    left join ox_field as parent on ox_field.parent_id = parent.id WHERE ox_field.entity_id=:entityId AND ox_field.type NOT IN ('hidden','file','document','documentviewer') ORDER BY parentName, ox_field.name ASC";
+                    left join ox_field as parent on ox_field.parent_id = parent.id WHERE ox_field.entity_id=:entityId AND ox_field.type NOT IN ('file','document','documentviewer') ORDER BY parentName, ox_field.name ASC";
 
         $fieldParams = array('entityId' => $entityId);
         $resultSet = $this->executeQueryWithBindParameters($fieldSelect, $fieldParams)->toArray();
@@ -1875,6 +1867,19 @@ class FileService extends AbstractService
                 $initialData = $fileSubscribers[$initialData];
             } else {
                 return "";
+            }
+        }
+        if ($value['type'] == 'hidden') {
+            if (isset($value['template']) && is_string($value['template'])) {
+                $template = json_decode($value['template'],true);
+                if (isset($template['properties'])) {
+                   $template = is_string($template['properties']) ? json_decode($template['properties'],true) : $template['properties'];
+                }
+                if (isset($template['shadow']) && $template['shadow'] == 'true') {
+                    $initialData = $initialData;
+                }else{
+                    return "";
+                }
             }
         }
 
@@ -1975,8 +1980,15 @@ class FileService extends AbstractService
                 }
             }
         }
+        if ((isset($value['type']) && $value['type'] =='documentsigner')){
+            return '';// Ignoring the documentsigner component from showing up on the history data.
+         }
         if ($labelMapping && !empty($initialData) && isset($labelMapping[$initialData])) {
+            if ($value['data_type'] == 'numeric') {
+                $initialData = $initialData;
+              }else {
             $initialData = $labelMapping[$initialData];
+              }
         }
         return $initialData;
     }
@@ -2105,7 +2117,7 @@ class FileService extends AbstractService
                 $fileFilter['uuid'] = $params['fileId'];
                 $fileRecord = $this->getDataByParams('ox_file', array("entity_id", "data"), $fileFilter, null)->toArray();
                 if (!empty($fileRecord) && !is_null($fileRecord)) {
-                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'] . AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/' . $params['fileId'] . '/';
+                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'] . AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/path' . $params['fileId'] . '/';
                     if (is_dir($folderPath . $attachmentName)) {
                         FileUtils::rmDir($folderPath . $attachmentName);
                     } elseif (file_exists($folderPath . $attachmentName)) {
@@ -2569,8 +2581,8 @@ class FileService extends AbstractService
             // $this->logger->info("getFileVersionChangeLog----$select".print_r($params,true));
             // $resultSet = $this->executeQuerywithBindParameters($selectQuery,$params)->toArray();
             // print_r($resultSet);exit;
-            $select = " SELECT ofal.entity_id,ofal.data,ofal.created_by,ofal.modified_by,ofal.date_modified,ofal.date_created FROM ox_file_audit_log ofal WHERE ofal.uuid = :uuid and ofal.version =:version";
-            $params = array('uuid' => $fileId, 'version' => $version);
+            $selectQuery = " SELECT ofal.entity_id,ofal.data,ofal.created_by,ofal.modified_by,ofal.date_modified,ofal.date_created FROM ox_file_audit_log ofal WHERE ofal.uuid = :uuid and ofal.version =:version";
+            $paramsQuery = array('uuid' => $fileId,'version'=>$previousFileVersion);
             $this->logger->info("getFileVersionChangeLog----$select" . print_r($params, true));
             $resultSet = $this->executeQuerywithBindParameters($select, $params)->toArray();
             // echo "-----\n";print_r($resultSet);
@@ -2674,7 +2686,7 @@ class FileService extends AbstractService
             LEFT JOIN ox_file as oxf ON oxf.id = ox_file_assignee.file_id
             LEFT JOIN ox_user_role ON ox_file_assignee.role_id = ox_user_role.role_id
             LEFT JOIN ox_account_user au on au.id = ox_user_role.account_user_id
-            inner join ox_user as oxuc on of.created_by = oxuc.id
+            inner join ox_user as ou on of.created_by = ou.id
             LEFT JOIN ox_user ON ox_file_assignee.user_id = ox_user.id";
 
         $fileQuery = "FROM ox_file as `of`
@@ -2684,7 +2696,7 @@ class FileService extends AbstractService
         LEFT JOIN ox_user_team ON ox_file_assignee.team_id = ox_user_team.team_id
         LEFT JOIN ox_user_role ON ox_file_assignee.role_id = ox_user_role.role_id
         LEFT JOIN ox_account_user au on au.id = ox_user_role.account_user_id
-        inner join ox_user as oxuc on `of`.created_by = `oxuc`.id
+        inner join ox_user as ou on `of`.created_by = `ou`.id
         LEFT JOIN ox_user ON ox_file_assignee.user_id = ox_user.id";
         if (!empty($filterParams)) {
             $cacheQuery = '';
@@ -2713,23 +2725,23 @@ class FileService extends AbstractService
             $whereQuery = "WHERE ";
         }
         $whereQuery .= 'of.is_active = 1  AND COALESCE(of.is_snoozed,0) !=1 ';
-        $pageSize = "LIMIT " . (isset($filterParamsArray[0]['take']) ? $filterParamsArray[0]['take'] : 20);
-        $offset = "OFFSET " . (isset($filterParamsArray[0]['skip']) ? $filterParamsArray[0]['skip'] : 0);
-        $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status as fileStatus,oxuc.name as created_by,`of`.rygStatus,`of`.version,
-    NULL as activityInstanceId,NULL as workflowInstanceId, `of`.date_created as created_date,en.name as entity_name,
-    NULL as activityName, `of`.date_created,
-    CASE WHEN ox_file_assignee.assignee = 0 then 1
-    WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
-    end as to_be_claimed,ox_user.name as assigned_user $field";
+        $pageSize = "LIMIT " . (isset($pageSize) ? ltrim($pageSize, " LIMIT ") : 20);
+        $offset = "OFFSET " . (isset($offset) ? ltrim($offset, ' OFFSET ') : 0);
+        $fieldList2 = "distinct ox_app.name as appName,`of`.id,NULL as workflow_name, `of`.uuid,`of`.data,`of`.start_date as startDate,`of`.end_date as endDate,`of`.status as fileStatus,ou.name as created_by,`of`.rygStatus,`of`.version,
+        NULL as activityInstanceId,NULL as workflowInstanceId, `of`.date_created as created_date,en.name as entity_name,
+        NULL as activityName, `of`.date_created,
+        CASE WHEN ox_file_assignee.assignee = 0 then 1
+        WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
+        end as to_be_claimed,ox_user.name as assigned_user $field";
         $countQuery = "SELECT count(id) as `count`
                     from ((SELECT distinct ox_file_assignee.id $fromQuery $filterFromQuery $whereQuery) UNION all (SELECT distinct ox_file_assignee.id $fileQuery $filterFromQuery $whereQuery)) as t1";
         $countResultSet = $this->executeQuerywithParams($countQuery)->toArray();
-        $fieldList = "distinct ox_app.name as appName,`of`.id as myId,ox_workflow.name as workflow_name, `of`.uuid,`of`.data,`of`.start_date,`of`.end_date,`of`.status,oxuc.name as created_by,`of`.rygStatus,`of`.version,
-    ox_activity_instance.activity_instance_id as activityInstanceId,ox_workflow_instance.process_instance_id as workflowInstanceId, ox_activity_instance.start_date as created_date,en.name as entity_name,
-    ox_activity.name as activityName, `of`.date_created,
-    CASE WHEN ox_file_assignee.assignee = 0 then 1
-    WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
-    end as to_be_claimed,ox_user.name as assigned_user $field";
+        $fieldList = "distinct ox_app.name as appName,`of`.id as myId,ox_workflow.name as workflow_name, `of`.uuid,`of`.data,`of`.start_date as startDate,`of`.end_date as endDate,`of`.status as fileStatus,ou.name as created_by,`of`.rygStatus,`of`.version,
+        ox_activity_instance.activity_instance_id as activityInstanceId,ox_workflow_instance.process_instance_id as workflowInstanceId, ox_activity_instance.start_date as created_date,en.name as entity_name,
+        ox_activity.name as activityName, `of`.date_created,
+        CASE WHEN ox_file_assignee.assignee = 0 then 1
+        WHEN ox_file_assignee.assignee = 1 AND ox_file_assignee.user_id = $userId then 0 else 2
+        end as to_be_claimed,ox_user.name as assigned_user $field";
         $querySet = "select * from ((SELECT $fieldList $fromQuery $filterFromQuery $whereQuery) UNION (SELECT $fieldList2 $fileQuery $filterFromQuery $whereQuery)) as assigneeList $sort $pageSize $offset";
         $this->logger->info("Executing Assignment listing query - $querySet");
         $resultSet = $this->executeQuerywithParams($querySet)->toArray();
