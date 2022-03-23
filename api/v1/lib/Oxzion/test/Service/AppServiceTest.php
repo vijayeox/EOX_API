@@ -389,7 +389,7 @@ class AppServiceTest extends AbstractServiceTest
     public function testProcessMenu()
     {
         AuthContext::put(AuthConstants::USER_ID, '1');
-        $data = array('app' => array('uuid' => 'a77ea120-b028-479b-8c6e-60476b6a4459'),'org' => array('uuid' => 'a77ea120-b028-479b-8c6e-60476b6a4456'), 'menu' => array(array('name' => 'Home', 'icon' => 'fa fa-home', 'uuid' => '24176975-8f4d-499d-8b2d-86902de26c14', 'page_uuid' => 'b9714cfd-2ae5-4f13-83eb-7d925c3b660c')));
+        $data = array('app' => array('uuid' => 'a77ea120-b028-479b-8c6e-60476b6a4459'),'org' => array('uuid' => 'a77ea120-b028-479b-8c6e-60476b6a4456'), 'menu' => array(array('name' => 'Home', 'icon' => 'fa fa-home', 'uuid' => '24176975-8f4d-499d-8b2d-86902de26c14')));
         $appService = $this->getApplicationServiceLocator()->get(AppService::class);
         $path = __DIR__ . '/../../../../module/App/test/sampleapp/';
         $content = $appService->processMenu($data, $path);

@@ -565,7 +565,7 @@ class AnnouncementService extends AbstractService
             throw new ServiceException("Announcement not found", "announcement.not.found", OxServiceException::ERR_CODE_NOT_FOUND);
         }
         if (isset($params['accountId'])) {
-            print("Accounts - " .$params['accountId'] != $obj->account_id."\n");
+            $this->logger->info(print_r("Accounts - " .$params['accountId'] != $obj->account_id."\n",true));
             if ($params['accountId'] != $obj->account_id) {
                 throw new ServiceException("Announcement does not belong to the account", "announcement.not.found", OxServiceException::ERR_CODE_NOT_FOUND);
             }

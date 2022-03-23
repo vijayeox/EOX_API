@@ -721,7 +721,7 @@ class AnnouncementControllerTest extends ControllerTest
         $this->assertResponseHeaderContains('content-type', 'application/json; charset=utf-8');
 
         $this->assertEquals($content['status'], 'error');
-        $this->assertEquals($content['message'], 'Account does not exist');
+        $this->assertEquals($content['message'], 'Announcement does not belong to the account');
     }
 
     public function testsaveTeamWithInvalidAnnouncementId()

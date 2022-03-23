@@ -827,7 +827,7 @@ class ProjectControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'error');
-        $this->assertEquals($content['message'], 'Invalid account');
+        $this->assertEquals($content['message'], 'Project does not belong to the account');
     }
 
     public function testSaveUserInvalidProject()

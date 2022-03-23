@@ -89,7 +89,7 @@ class PageContentService extends AbstractService
                         $resultSet = $this->getDataByParams('ox_form', array("id"), ['name' => $value['template_file']], null)->toArray();
                         $data['form_id'] = $value['form_id'] = $resultSet[0]['id'];
                     } else {
-                        $value['form_id'] = $this->getIdFromUuid('ox_form', $value['form_id']);
+                        $value['form_id'] = is_numeric($value['form_id']) ? $value['form_id'] : $this->getIdFromUuid('ox_form', $value['form_id']);
                     }
                 }
                 if ($value['type'] == 'DashboardManager') {

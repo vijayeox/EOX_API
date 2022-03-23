@@ -671,7 +671,7 @@ class CommandService extends AbstractService
         if (!$params || empty($params)) {
             return $params;
         }
-        $fileUUID = isset($params['uuid']) ? $params['uuid'] : $params['fileId'];
+        $fileUUID = isset($params['uuid']) ? $params['uuid'] : isset($params['fileId']) ? $params['fileId'] : null;
         $accountId = isset($params['accountId']) ? $params['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
         $fileDestination = ArtifactUtils::getDocumentFilePath($this->config['APP_DOCUMENT_FOLDER'], $fileUUID, array('accountId' => $accountId));
         $template = isset($params['htmlTemplate']) ? $params['htmlTemplate'] : 0;

@@ -100,20 +100,9 @@ class ServiceTaskControllerTest extends ControllerTest
         $this->assertResponseStatusCode(200);
         $templateName = "GenericTemplate.tpl";
         FileUtils::deleteFile($templateName, $tempFile);
-        FileUtils::deleteFile("GenericTemplate.pdf", $config['TEMPLATE_FOLDER']);
-    }
-
-    public function testServiceTaskPDFInvalidTemplateExecution()
-    {
-        $config = $this->getApplicationConfig();
-        $data = ['uuid' => '53012471-2863-4949-afb1-e69b0891c98a'];
-        $params['variables'] = ['command' => 'pdf', 'template' => 'GenericTemplate', 'accountId' => $data['uuid'], 'options' => array('initial_title' => 'Vantage agora Pdf Template', 'second_title' => 'Title 2', 'pdf_header_logo' => '/logo_example.jpg', 'pdf_header_logo_width' => 20, 'header_text_color' => array(139, 58, 58), 'header_line_color' => array(255, 48, 48), 'footer_text_color' => array(123, 121, 34), 'footer_line_color' => array(56, 142, 142)), 'destination' => $config['TEMPLATE_FOLDER'] . "GenericTemplate.pdf"];
-        $this->setJsonContent(json_encode($params));
-        $this->dispatch('/callback/workflow/servicetask', 'POST', $params);
-        $content = json_decode($this->getResponse()->getContent(), true);
-        $this->assertResponseStatusCode(500);
-        $this->assertEquals('error', $content['status']);
-        $this->assertEquals("Unexpected error.", $content['message']);
+        if (file_exists($config['TEMPLATE_FOLDER'].'GenericTemplate.pdf')) {
+            FileUtils::deleteFile("GenericTemplate.pdf", $config['TEMPLATE_FOLDER']);
+        }
     }
 
     public function testServiceTaskSchedule()
@@ -384,7 +373,7 @@ class ServiceTaskControllerTest extends ControllerTest
         $this->assertResponseStatusCode(200);
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals(is_array($content['data']), true);
-        $this->assertEquals(24, count($content['data']));
+        $this->assertEquals(23, count($content['data']));
     }
         
     public function testExtractFileWithPreDefinedFields()
@@ -415,7 +404,9 @@ class ServiceTaskControllerTest extends ControllerTest
         $this->assertResponseStatusCode(200);
         $templateName = "GenericTemplate.tpl";
         FileUtils::deleteFile($templateName, $tempFile);
-        FileUtils::deleteFile("GenericTemplate.pdf", $config['TEMPLATE_FOLDER']);
+        if (file_exists($config['TEMPLATE_FOLDER'].'GenericTemplate.pdf')) {
+            FileUtils::deleteFile("GenericTemplate.pdf", $config['TEMPLATE_FOLDER']);
+        }
     }
 
     public function testGenerateMultipleCommands()
