@@ -955,7 +955,7 @@ return [
                     'route' => '/app/:appUuid/artifact/list/:artifactType',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow|delegate|template|appupgrade',
+                        'artifactType' => 'form|workflow|delegate|template|appupgrade|transformer',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -973,7 +973,7 @@ return [
                     'route' => '/app/:appUuid/artifact/add/:artifactType',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow|app_icon|app_icon_white|delegate|template|appupgrade',
+                        'artifactType' => 'form|workflow|app_icon|app_icon_white|delegate|template|appupgrade|transformer',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -991,7 +991,7 @@ return [
                     'route' => '/app/:appUuid/artifact/delete/:artifactType/:artifactName',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow|delegate|template|appupgrade',
+                        'artifactType' => 'form|workflow|delegate|template|appupgrade|transformer',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -1076,7 +1076,7 @@ return [
                     'route' => '/app/:appUuid/download/:artifactType/:artifactName',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'delegate|template|appupgrade',
+                        'artifactType' => 'delegate|template|appupgrade|transformer',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,

@@ -29,14 +29,16 @@ class LoadAppData extends AbstractAppDelegate
                             $value['content'][0]['gridContent'] =  
                             $value['pageContent']['data']['content'][0]['gridContent'] =
                             $value['pageContent']['data']['content']['gridContent'] = $value['content'][0]['content'];
-
-                            foreach ($value['pageContent']['data']['content'][0]['gridContent']['actions'] as $keyPdupl => &$valuePDupl) {
-                                $valuePDupl['contentDuplicate']['data']['content'] = $valuePDupl['details'];
+                            if (isset($value['pageContent']['data']['content'][0]['gridContent']['actions'])) {
+                                foreach ($value['pageContent']['data']['content'][0]['gridContent']['actions'] as $keyPdupl => &$valuePDupl) {
+                                    $valuePDupl['contentDuplicate']['data']['content'] = $valuePDupl['details'];
+                                }
                             }
-
-                            foreach ($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'] as $keyGridDupl => &$valueGridDupl) {
-                                $valueGridDupl['detailsDuplicate']['data']['content'] = $valueGridDupl['details'];
-                            }    
+                            if (isset($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'])) {
+                                foreach ($value['pageContent']['data']['content'][0]['gridContent']['operations']['actions'] as $keyGridDupl => &$valueGridDupl) {
+                                    $valueGridDupl['detailsDuplicate']['data']['content'] = $valueGridDupl['details'];
+                                } 
+                            }   
                         }
                         if ($value['content'][0]['type'] == 'KanbanViewer') {
                             $value['content'][0]['kanbanContent'] = array('heading'=>$value['content'][0]['content']['heading'], 'url'=>$value['content'][0]['content']['url']);

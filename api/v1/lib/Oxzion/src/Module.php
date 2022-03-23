@@ -588,6 +588,15 @@ class Module
                 NLP\NLPEngine::class => function ($container) {
                     return new NLP\Dialogflow\NLPDialogflowV1();
                 },
+                Transformer\AttributeTransformer::class => function ($container) {
+                    return new Transformer\AttributeTransformer($container->get('config'));
+                },
+                Transformer\JsonTransformerService::class => function ($container) {
+                    return new Transformer\JsonTransformerService(
+                        $container->get('config'),
+                        $container->get(Transformer\AttributeTransformer::class)
+                    );
+                },
                 Service\UserCacheService::class => function ($container) {
                     return new Service\UserCacheService(
                         $container->get('config'),
@@ -744,7 +753,9 @@ class Module
                         $container->get(Service\UserService::class),
                         $container->get(Service\UserCacheService::class),
                         $container->get(Service\RegistrationService::class),
-                        $container->get(Service\BusinessParticipantService::class)   
+                        $container->get(Service\BusinessParticipantService::class),
+                        $container->get(Transformer\JsonTransformerService::class),
+                        $container->get(Service\EsignService::class)   
                     );
                 },
                 Model\ServiceTaskInstanceTable::class => function ($container) {

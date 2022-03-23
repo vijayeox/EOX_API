@@ -95,6 +95,16 @@ content:
                                 params:
                                     app_uuid: '{{uuid}}'
                 -
+                    name: 'Pdf Transformer'
+                    icon: 'fas fa-file-pdf'
+                    rule: '''{{status}}'' !== 1'
+                    details:
+                        -
+                            params:
+                                page_id: '25b6b9d2-9f69-11ec-b909-0242ac120002'
+                                params:
+                                    app_uuid: '{{uuid}}'
+                -
                     name: Export
                     rule: '''{{status}}'' !== 1'
                     details:

@@ -34,6 +34,12 @@ class UploadArtifact extends React.Component {
       this.infoMessage =
         "Please verify if the Template file has a unique File Name";
       this.fileExtension = ".tpl";
+    } else if(this.props.entity == 'transformer'){
+      this.postURL =
+        "app/" + this.props.params.app_uuid + "/artifact/add/" + this.props.entity;
+      this.infoMessage =
+        "Please verify if the Transformer file has a unique File Name";
+      this.fileExtension = ".yml";
     }
     this.core = this.props.core;
     this.loader = this.core.make("oxzion/splash");

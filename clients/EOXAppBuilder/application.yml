@@ -82,6 +82,9 @@ pages:
     -
         page_name: AppUpgrade.yml
         uuid: f922ab50-84b6-11ec-a8a3-0242ac120002
+    -
+        page_name: PdfTransformer.yml
+        uuid: 25b6b9d2-9f69-11ec-b909-0242ac120002
 menu:
     -
         name: 'Manage EOX Apps'

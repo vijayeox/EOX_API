@@ -1,0 +1,56 @@
+name: 'Transformer'
+description: 'Shows a list of transformers'
+content:
+    -
+        type: ReactComponent
+        content:
+                reactId: 'headerActions'
+                params:
+                    operations:
+                        -
+                            name: Import Transformer File
+                            rule: 'true'
+                            icon: 'fa fa-cloud-upload'
+                            details:
+                                -
+                                    type: UploadArtifact
+                                    entity: transformer
+    -
+        type: List
+        content:
+            route: 'app/{{app_uuid}}/artifact/list/transformer'
+            disableAppId: true    
+            resizable: true
+            actions:
+                -
+                    name: Delete
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            successMessage: "Transformer deleted successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/artifact/delete/transformer/{{name}}.yml'
+                                disableAppId: true
+                    icon: 'fas fa-trash-alt' 
+                    updateOnly: true
+                -
+                    name: Download
+                    rule: "true"
+                    details:
+                        -
+                            type: Update
+                            method: "GET"
+                            successMessage: "Transformer downloaded successfully!"
+                            params:
+                                app_uuid: '{{app_uuid}}'
+                                url: 'app/{{app_uuid}}/download/transformer/{{name}}.yml'
+                                disableAppId: true
+                                downloadFile: true
+                    icon: 'fa fa-download' 
+                    updateOnly: true
+            columnConfig:
+                -
+                    title: Name
+                    field: name

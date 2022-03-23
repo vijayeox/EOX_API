@@ -98,12 +98,14 @@ class CleanYml extends AbstractAppDelegate
             $this->haveOnlyRequiredInfo($newPages);
             if($newPages['type'] == 'List'){
                 unset($newPages["gridContent"]);
-                $newPages['content']['actions'] = array_map(function ($newPageData){
-                    $this->cleanUpyml($newPageData);
-                    return $newPageData;
-                }, $newPages['content']['actions']);
+                if (isset($newPages['content']['actions'])) {                    
+                    $newPages['content']['actions'] = array_map(function ($newPageData){
+                        $this->cleanUpyml($newPageData);
+                        return $newPageData;
+                    }, $newPages['content']['actions']);
+                }
 
-                if (empty($newPages['content']['operations'])) {
+                if (isset($newPages['content']['operations']) && empty($newPages['content']['operations'])) {
                     unset($newPages['content']['operations']);
                 }
 
@@ -127,10 +129,10 @@ class CleanYml extends AbstractAppDelegate
             foreach ($descriptorData["privilege"] as &$i) {
                 $this->logger->info("ENTERING LOOP check fr i val | inside the priv".print_r($i,true));
 
-                if ($i["permission"]["15"] == true) { $i["permission"] = "15"; }
-                elseif ($i["permission"]["7"] == true) { $i["permission"] = "7"; }
-                elseif ($i["permission"]["3"] == true) { $i["permission"] = "3"; }
-                elseif ($i["permission"]["1"] == true) { $i["permission"] = "1"; }
+                if (isset($j["permission"]["15"]) && $i["permission"]["15"] == true) { $i["permission"] = "15"; }
+                elseif (isset($j["permission"]["7"]) && $i["permission"]["7"] == true) { $i["permission"] = "7"; }
+                elseif (isset($j["permission"]["3"]) && $i["permission"]["3"] == true) { $i["permission"] = "3"; }
+                elseif (isset($j["permission"]["1"]) && $i["permission"]["1"] == true) { $i["permission"] = "1"; }
                 
             }
         }
@@ -140,10 +142,10 @@ class CleanYml extends AbstractAppDelegate
         foreach ($descriptorData["role"] as &$i) {
             if (isset($i["privileges"])) {
                 foreach ($i["privileges"] as &$j) {
-                    if ($j["permission"]["15"] == true) { $j["permission"] = "15"; }
-                    elseif ($j["permission"]["7"] == true) { $j["permission"] = "7"; }
-                    elseif ($j["permission"]["3"] == true) { $j["permission"] = "3"; }
-                    elseif ($j["permission"]["1"] == true) { $j["permission"] = "1"; }
+                    if (isset($j["permission"]["15"]) && $j["permission"]["15"] == true) { $j["permission"] = "15"; }
+                    elseif (isset($j["permission"]["7"]) && $j["permission"]["7"] == true) { $j["permission"] = "7"; }
+                    elseif (isset($j["permission"]["3"]) && $j["permission"]["3"] == true) { $j["permission"] = "3"; }
+                    elseif (isset($j["permission"]["1"]) && $j["permission"]["1"] == true) { $j["permission"] = "1"; }
                     $this->logger->info("ENTERING LOOP | role > privileges");
                 }
             }
