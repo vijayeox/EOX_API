@@ -674,7 +674,8 @@ class CommandService extends AbstractService
         $fileUUID = isset($params['uuid']) ? $params['uuid'] : isset($params['fileId']) ? $params['fileId'] : null;
         $accountId = isset($params['accountId']) ? $params['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
         $fileDestination = ArtifactUtils::getDocumentFilePath($this->config['APP_DOCUMENT_FOLDER'], $fileUUID, array('accountId' => $accountId));
-        $template = isset($params['htmlTemplate']) ? $params['htmlTemplate'] : 0;
+        $template = isset($params['htmlTemplate']) ? $params['htmlTemplate'] : 0; // If a TPL file is used for generating PDF, please mention this flag.
+        // When a Transfer Yml is provided, only the data of the fields mentioned in the YML will be returned back to the user Else the entire formdata is returned back.
         if(isset($params['transformer'])){
             $params['directive'] = $params['transformer'];
             $processingData = $this->jsonTransform($params,true);
@@ -684,7 +685,7 @@ class CommandService extends AbstractService
         }
         $processingData['accountId'] = isset($processingData['accountId']) ? $processingData['accountId'] : $accountId;
         $this->logger->info("DATA TO PDF----->".print_r($processingData,true));
-        $pdfLocation = isset($params['pdfFileLocation']) ? $params['pdfFileLocation'] : 'attachments';
+        $pdfLocation = isset($params['pdfFileLocation']) ? $params['pdfFileLocation'] : 'attachments';// Location where the pdf needs to be stored.
         if (!isset($params[$pdfLocation])) {
             $params[$pdfLocation] = [];
         }

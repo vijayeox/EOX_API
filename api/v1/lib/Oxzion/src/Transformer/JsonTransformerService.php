@@ -76,8 +76,8 @@ class JsonTransformerService extends AbstractService
                 $returnArray[$value['target']] = date($srcValue['format'], strtotime($field));
         }elseif(isset($srcValue['script'])){
             $returnArray[$value['target']] = $this->attributeTransformer->processScript($srcValue['script'], $field);
-        }elseif(isset($srcValue['scriptFile'])){
-            $this->attributeTransformer->processScriptFile($appId,$srcValue['scriptFile'], $field, $returnArray);
+        }elseif(isset($srcValue['method'])){
+            $this->attributeTransformer->processMethod($appId,$srcValue['method'], $field, $returnArray);
             $returnArray[$value['target']] = $field;  
         }else{
             $returnArray[$value['target']] = $field;

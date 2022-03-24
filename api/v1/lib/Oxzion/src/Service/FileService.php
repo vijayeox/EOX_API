@@ -71,7 +71,7 @@ class FileService extends AbstractService
             }
         }
         if (isset($data['form_id'])) {
-            $formId = $this->getIdFromUuid('ox_form', $data['form_id']);
+            $formId =  is_numeric($data['form_id']) ? $data['form_id'] :$this->getIdFromUuid('ox_form', $data['form_id']);
         } else {
             $formId = null;
         }
@@ -2366,7 +2366,7 @@ class FileService extends AbstractService
         $this->processFilterParams($fromQuery, $whereQuery, $sort, $pageSize, $offset, $field, $filterParams);
         $this->beginTransaction();
         try {
-            $updateFile = 'UPDATE ox_file as of ' . $fromQuery . 'SET data = REPLACE(data,' . "'" . '"' . $fieldName . '":"' . $initialFieldValue . '"' . "','" . '"' . $fieldName . '":"' . $newFieldValue . '"' . "'" . ' WHERE ' . $entityFilter . ' ' . $whereQuery;
+            $updateFile = 'UPDATE ox_file as of ' . $fromQuery . 'SET data = REPLACE(data,' . "'" . '"' . $fieldName . '":"' . $initialFieldValue . '"' . "','" . '"' . $fieldName . '":"' . $newFieldValue . '"' . "'" . ') WHERE ' . $entityFilter . ' ' . $whereQuery;
             $queryParams['appId'] = $appId;
             $this->logger->info("Update File Attribute Query -- $updateFile with params - " . print_r($queryParams, true));
             $resultSet = $this->executeUpdateWithBindParameters($updateFile, $queryParams);

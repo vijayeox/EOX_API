@@ -19,7 +19,7 @@ class AttributeTransformer
         }
     }
 
-    public function processScriptFile($appId, $scriptFile, &$field, &$data){
+    public function processMethod($appId, $scriptFile, &$field, &$data){
         $this->loadScriptFile($appId, $scriptFile, $field, $data);  
     }
 
