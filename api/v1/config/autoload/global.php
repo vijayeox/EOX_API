@@ -115,6 +115,6 @@ return [
     'authRequiredText' => 'Authentication Required',
     'refreshTokenPeriod' => '7',
     'paymentGatewayType'=>'DEMO',
-    'TRANSFORMER_FOLDER'=>'/app/api/data/transformer/',
+    'TRANSFORMER_FOLDER'=> __DIR__.'/../../data/transformer/',
 
 ];
