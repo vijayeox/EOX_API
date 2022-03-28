@@ -41,8 +41,7 @@ class LoadAppData extends AbstractAppDelegate
                             }   
                         }
                         if ($value['content'][0]['type'] == 'KanbanViewer') {
-                            $value['content'][0]['kanbanContent'] = array('heading'=>$value['content'][0]['content']['heading'], 'url'=>$value['content'][0]['content']['url']);
-                            unset($value['content'][0]['content']);
+                            $value['content'][0]['kanbanContent'] = $value['content'][0]['content'];
                         }
                     }                   
                 }

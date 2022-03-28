@@ -51,8 +51,12 @@ class CleanYml extends AbstractAppDelegate
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
         if ($pageData['type'] == 'KanbanViewer') {
-            $pageData['content'] = array('heading'=>$pageData['kanbanContent']['heading'], 'url'=>$pageData['kanbanContent']['url']);
+            $pageData['content'] = $pageData['kanbanContent'];
             $whitelist = ['type' ,'content'];
+            $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
+        }
+        if ($pageData['type'] == 'GoogleMapViewer') {
+            $whitelist = ['type'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
     }
