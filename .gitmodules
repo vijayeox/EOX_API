@@ -1,0 +1,6 @@
+[submodule "view"]
+	path = view
+	url = ../view.git
+[submodule "clients/Axon"]
+	path = clients/Axon
+	url = ../../applications/axon.git

@@ -15,35 +15,26 @@ class SpreadsheetParserImpl implements SpreadsheetParser
     private $defaultFilter;
     public function init($file)
     {
-        $ext = FileUtils::getFileExtension($file);
-        $type = "";
-        switch (strtolower($ext)) {
-            case 'xlsx':
-                $type = 'Xlsx';
-                break;
-            case 'xls':
-                $type = 'Xls';
-                break;
-            case 'xml':
-                $type = 'Xml';
-                break;
-            case 'ods':
-                $type = 'Ods';
-                break;
-            case 'csv':
-                $type = 'Csv';
-                break;
-        }
-
-        if ($type == "") {
-            throw new Exception("Unrecognized file format");
-        }
         if (!FileUtils::fileExists($file)) {
             throw new Exception("File $file not found");
         }
-        
+        // supported files:
+        // 'xlsx' // Excel (OfficeOpenXML) Spreadsheet
+        // 'xlsm' // Excel (OfficeOpenXML) Macro Spreadsheet (macros will be discarded)
+        // 'xltx' // Excel (OfficeOpenXML) Template
+        // 'xltm' // Excel (OfficeOpenXML) Macro Template (macros will be discarded)
+        // 'xls' // Excel (BIFF) Spreadsheet
+        // 'xlt' // Excel (BIFF) Template
+        // 'ods' // Open/Libre Offic Calc
+        // 'ots' // Open/Libre Offic Calc Template
+        // 'slk'
+        // 'xml' // Excel 2003 SpreadSheetML
+        // 'gnumeric'
+        // 'htm'
+        // 'html'
+        // 'csv'
         $this->file = $file;
-        $this->reader = IOFactory::createReader($type);
+        $this->reader = IOFactory::createReaderForFile($file);
         $this->reader->setReadDataOnly(true);
         $this->reader->setReadEmptyCells(false);
         $this->sheetInfos = array();
@@ -116,7 +107,7 @@ class SpreadsheetParserImpl implements SpreadsheetParser
             $this->reader->setLoadSheetsOnly($sheetName);
             $spreadsheet = $this->reader->load($this->file);
             $worksheetData = $spreadsheet->getActiveSheet();
-            
+
             if ($rowMapper) {
                 $list = $worksheetData->toArray();
                 foreach ($list as $index => $rowData) {
@@ -126,6 +117,16 @@ class SpreadsheetParserImpl implements SpreadsheetParser
                 $rowMapper->resetData();
             } else {
                 $data[$sheetName] = $worksheetData->toArray();
+                foreach ($data[$sheetName] as $rowkey => &$rowvalue) {
+                    foreach ($rowvalue as $colkey => &$colvalue) {
+                        $cell = $worksheetData->getCellByColumnAndRow($colkey + 1, $rowkey + 1, false);
+                        if (!is_null($cell)) {
+                            if ($cell->isFormula()) {
+                                $colvalue = $cell->getOldCalculatedValue();
+                            }
+                        }
+                    }
+                }
             }
         }
 

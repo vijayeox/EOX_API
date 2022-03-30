@@ -12,14 +12,21 @@
  * credentials from accidentally being committed into version control.
  */
 use Doctrine\DBAL\Driver\PDOMySql\Driver as PDOMySqlDriver;
-$host = getenv('HOST'); 
-$dbhost = getenv('DB_HOST');
-$db = getenv('API_DB');
-$username = getenv('DB_USERNAME');
-$password = getenv('DB_PASSWORD');
+
+putenv('ENV=test');
+
+$host       = getenv('HOST')        ? getenv('HOST')        : 'localhost';
+$dbhost     = getenv('DB_HOST')     ? getenv('DB_HOST')     : 'localhost';
+$db         = getenv('API_DB')      ? getenv('API_DB')      : 'oxzionapi';
+$username   = getenv('DB_USERNAME') ? getenv('DB_USERNAME') : 'user';
+$password   = getenv('DB_PASSWORD') ? getenv('DB_PASSWORD') : 'password';
 
 if(isset($_ENV['ENV']) && $_ENV['ENV'] == 'test'){
-    $db = getenv('TEST_API_DB');
+    $host       = getenv('TEST_HOST')           ? getenv('TEST_HOST')           : 'localhost';
+    $dbhost     = getenv('TEST_DB_HOST')        ? getenv('TEST_DB_HOST')        : 'localhost';
+    $db         = getenv('TEST_API_DB')         ? getenv('TEST_API_DB')         : 'oxzionapi_test';
+    $username   = getenv('TEST_DB_USERNAME')    ? getenv('TEST_DB_USERNAME')    : 'user';
+    $password   = getenv('TEST_DB_PASSWORD')    ? getenv('TEST_DB_PASSWORD')    : 'password';
 }
 
 return [
@@ -92,7 +99,7 @@ return [
     'CLIENT_FOLDER' => __DIR__.'/../../../../clients/',
     'APPS_FOLDER' => __DIR__."/../../../../view/apps/",
     'EOX_APP_SOURCE_DIR' => __DIR__.'/../../data/AppSource/',
-    'EOX_APP_DEPLOY_DIR' => __DIR__.'/../../data/AppDeploy/', 
+    'EOX_APP_DEPLOY_DIR' => __DIR__.'/../../data/AppDeploy/',
     'GUI_FOLDER' => __DIR__."/../../../../view/gui/src/externals/",
     'THEME_FOLDER' => __DIR__."/../../../../view/themes/",
     'internalBaseUrl' => 'http://'.$host.':8080',

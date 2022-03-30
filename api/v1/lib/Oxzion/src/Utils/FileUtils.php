@@ -12,6 +12,10 @@ class FileUtils
     {
         return pathinfo($file, PATHINFO_EXTENSION);
     }
+    public static function getMimeType($file)
+    {
+        return (new \finfo())->file($file, FILEINFO_MIME_TYPE);
+    }
 
     public static function createDirectory($directory)
     {
@@ -334,4 +338,16 @@ class FileUtils
             throw new Exception("Failed to Copy New Files - ".print_r($output, true));
         }
     }
+
+    public static function fileToBinary($fullPath, $downloadable = false)
+    {
+        if (!is_file($fullPath)) return false;
+        $data = base64_encode(file_get_contents($fullPath));
+        if ($downloadable) {
+            return 'data:' . self::getMimeType($fullPath) . ';base64,' . $data;
+        } else {
+            return $data;
+        }
+    }
+
 }

@@ -152,7 +152,7 @@ class AppService extends AbstractService implements AppUpgrade
         WHERE ar.account_id=:accountId AND ap.status <> :status AND ap.name <> \'' . AppService::EOX_RESERVED_APP_NAME . '\'';
         $queryParams = [
             'accountId' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'status' => App::DELETED,
+            'status' => App::DELETED
         ];
         $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
         if (empty($resultSet)) {
@@ -171,7 +171,7 @@ class AppService extends AbstractService implements AppUpgrade
         $queryParams = [
             'accountId' => AuthContext::get(AuthConstants::ACCOUNT_ID),
             'statusDeleted' => App::DELETED,
-            'uuid' => $uuid,
+            'uuid' => $uuid
         ];
         $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
         if (is_null($resultSet) || empty($resultSet)) {
@@ -197,7 +197,7 @@ class AppService extends AbstractService implements AppUpgrade
             'type' => App::MY_APP,
             'isdefault' => false,
             'category' => 'Unassigned',
-            'status' => App::IN_DRAFT,
+            'status' => App::IN_DRAFT
         ]);
         //Assign user input values AFTER assigning default values.
         $appData = $data['app'];
@@ -718,8 +718,10 @@ class AppService extends AbstractService implements AppUpgrade
         if (isset($yamlData['job'])) {
             $appUuid = $yamlData['app']['uuid'];
             $this->processDeletedJobs($yamlData['job'], $appUuid);
-            foreach ($yamlData['job'] as $data) {
+            foreach ($yamlData['job'] as &$job) {
                 try {
+                    $job['uuid'] = isset($job['uuid']) ? $job['uuid'] : UuidUtil::uuid();
+                    $data = $job;
                     if (!isset($data['name']) || !isset($data['url']) || !isset($data['uuid']) || !isset($data['cron'])) {
                         throw new ServiceException('Job Name/url/uuid/cron not specified', 'job.details.not.specified');
                     }
@@ -1051,18 +1053,18 @@ class AppService extends AbstractService implements AppUpgrade
             [
                 "type" => "app",
                 "sourceFolder" => $appPath . "view/apps/",
-                "viewLink" => $this->config['APPS_FOLDER'],
+                "viewLink" => $this->config['APPS_FOLDER']
             ],
             [
                 "type" => "theme",
                 "sourceFolder" => $appPath . "view/themes/",
-                "viewLink" => $this->config['THEME_FOLDER'],
+                "viewLink" => $this->config['THEME_FOLDER']
             ],
             [
                 "type" => "gui",
                 "sourceFolder" => $appPath . "view/gui/",
-                "viewLink" => $this->config['GUI_FOLDER'],
-            ],
+                "viewLink" => $this->config['GUI_FOLDER']
+            ]
         );
         $buildFolders = [];
         foreach ($defaultFolders as $folderConfig) {
@@ -1096,7 +1098,7 @@ class AppService extends AbstractService implements AppUpgrade
                             $this->setupLink($targetName, $linkName);
                             array_push($buildFolders, [
                                 "path" => $targetName,
-                                "type" => $folderConfig["type"],
+                                "type" => $folderConfig["type"]
                             ]);
                         }
                     }
@@ -1107,8 +1109,12 @@ class AppService extends AbstractService implements AppUpgrade
         if (count($buildFolders) > 0) {
             array_push($buildFolders, [
                 "path" => $this->config['APPS_FOLDER'] . "../bos/",
-                "type" => "bos",
+                "type" => "bos"
             ]);
+            $this->logger->info("\nRunning App installer (View) - " . json_encode(
+                ["folders" => $buildFolders],
+                JSON_PRETTY_PRINT
+            ));
             $restClient = $this->restClient;
             $output = json_decode($restClient->post(
                 ($this->config['applicationUrl'] . "/installer"),
@@ -1468,7 +1474,7 @@ class AppService extends AbstractService implements AppUpgrade
         $app->assign([
             'status' => App::DELETED,
             'name' => $app->toArray()['id'] . '_' . $app->toArray()['name'],
-            'uuid' => UuidUtil::uuid(),
+            'uuid' => UuidUtil::uuid()
         ]);
         try {
             $this->beginTransaction();
@@ -1533,7 +1539,7 @@ class AppService extends AbstractService implements AppUpgrade
                     $appObj->assign([
                         'start_options' => isset($app['options']) ? json_encode($app['options']) : null,
                         'status' => App::PUBLISHED,
-                        'type' => App::PRE_BUILT,
+                        'type' => App::PRE_BUILT
                     ]);
                     $appObj->setCreatedBy(1);
                     $appObj->setCreatedDate(date('Y-m-d H:i:s'));
@@ -1643,7 +1649,7 @@ class AppService extends AbstractService implements AppUpgrade
                 }
                 $individualEntry = array(
                     'workflow_id' => $workflowId,
-                    'entity_id' => $entityData['id'],
+                    'entity_id' => $entityData['id']
                 );
                 array_push($data, $individualEntry);
             }
@@ -1774,7 +1780,7 @@ class AppService extends AbstractService implements AppUpgrade
         $request = array();
         array_push($request, [
             "path" => $this->config['APPS_FOLDER'] . "../bos/",
-            "type" => "bos",
+            "type" => "bos"
         ]);
         $restClient = $this->restClient;
         $output = json_decode($restClient->post(

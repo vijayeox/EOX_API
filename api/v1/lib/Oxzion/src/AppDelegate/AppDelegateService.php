@@ -24,6 +24,7 @@ use Oxzion\Service\AccountService;
 use Oxzion\EntityNotFoundException;
 use Oxzion\Service\BusinessParticipantService;
 use \Analytics\Service\QueryService;
+use Oxzion\Service\ElasticService;
 use oxzion\Insurance\InsuranceService;
 use Oxzion\Service\AppService;
 use App\Service\AppArtifactService;
@@ -54,6 +55,7 @@ class AppDelegateService extends AbstractService
         AccountService $accountService,
         BusinessParticipantService $businessParticipantService,
         QueryService $queryService,
+        ElasticService $elasticService,
         InsuranceService $insuranceService,
         TeamService $teamService,
         AppService $appService,
@@ -81,6 +83,7 @@ class AppDelegateService extends AbstractService
         $this->accountService = $accountService;
         $this->businessParticipantService = $businessParticipantService;
         $this->queryService = $queryService;
+        $this->elasticService = $elasticService;
         $this->insuranceService = $insuranceService;
     }
 
@@ -106,7 +109,7 @@ class AppDelegateService extends AbstractService
 
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService ,$this->appService, $this->appArtifactService);
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService, $this->elasticService, $this->insuranceService,$this->teamService, $this->appService, $this->appArtifactService);
         return $appDelegateService;
     }
 
@@ -196,11 +199,14 @@ class AppDelegateService extends AbstractService
                 if (method_exists($obj, "setQueryService")) {
                     $obj->setQueryService($this->queryService);
                 }
+                if (method_exists($obj, "setElasticService")) {
+                    $obj->setElasticService($this->elasticService);
+                }
                 if (method_exists($obj, "setInsuranceService")) {
                     $obj->setInsuranceService($this->insuranceService);
                 }
                 if (method_exists($obj, "setAppDelegateService")) {
-                    $obj->setAppDelegateService($this->setAppDelegateService());
+                    $obj->setAppDelegateService($this->setAppDelegateService(), $appId);
                 }
                 $persistenceService = $this->getPersistence($appId);
 

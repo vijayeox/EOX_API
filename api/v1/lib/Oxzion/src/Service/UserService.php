@@ -181,7 +181,7 @@ class UserService extends AbstractService
                 $accountId = $account;
             } else {
                 if (isset($data['accountId']) && $data['accountId'] != '') {
-                    $accountId = $params['accountId'];
+                    $accountId = $data['accountId'];
                 } else {
                     if (AuthContext::get(AuthConstants::ACCOUNT_ID) != null) {
                         $accountId = AuthContext::get(AuthConstants::ACCOUNT_ID);
@@ -741,8 +741,9 @@ class UserService extends AbstractService
      * @method GET
      * @return array $dataget list of Users
      */
-    public function getUsers($filterParams = null, $baseUrl = '', $params = null)
+    public function getUsers($filterParams = null, $baseUrl = "", $params = null)
     {
+        $baseUrl == "" ? $baseUrl = $this->config["baseUrl"] : null;
         if (isset($params['accountId'])) {
             if (
                 !SecurityManager::isGranted('MANAGE_ACCOUNT_READ') &&
@@ -1551,7 +1552,7 @@ class UserService extends AbstractService
 
     public function getUserDataByIdentifier($appId, $identifier, $identifierField)
     {
-        $select = "SELECT oxu.uuid as userId, oxa.uuid as accountId,oxa.id as account_id, oxae.id as entityId
+        $select = "SELECT oxu.uuid as userId,oxu.id as user_id, oxa.uuid as accountId,oxa.id as account_id, oxae.id as entityId
                     FROM ox_wf_user_identifier owui
                     INNER JOIN ox_user oxu ON oxu.id = owui.user_id
                     INNER JOIN ox_account oxa ON oxa.id = owui.account_id

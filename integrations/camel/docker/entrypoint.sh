@@ -59,6 +59,7 @@ then
     ln -s /workspace/app/.gradle /root/.gradle
 fi
 
+chmod 777 ./gradlew
 ./gradlew bootJar
 mkdir -p /workspace/camel
 cp ./build/libs/app-0.0.1-SNAPSHOT.jar /workspace/camel/camel.jar
