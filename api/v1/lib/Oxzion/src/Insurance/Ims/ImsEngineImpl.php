@@ -28,6 +28,10 @@ class ImsEngineImpl implements InsuranceEngine
     }
     public function setConfig($data)
     {
+        if (empty($data['wsdlUrl']) || empty($data['userName']) || empty($data['tripleDESEncryptedPassword'])) {
+            throw new \Exception("Insurance Management Systems auth not provided.", 404);
+        }
+        $this->config['ims'] = $data;
         $this->setSoapClient($data['handle']);
     }
     private function setSoapClient($handle)
@@ -51,7 +55,8 @@ class ImsEngineImpl implements InsuranceEngine
     {
         $this->checkHandle($method);
         try {
-            $response = $this->soapClient->makeCall($method, $data);
+            $bypassValidation = ['SaveRatingSheet'];
+            $response = $this->soapClient->makeCall($method, $data, true, !in_array($method, $bypassValidation));
         } catch (\Exception $e) {
             if (!$suppressError) throw $e;
             $response = [];
@@ -126,7 +131,7 @@ class ImsEngineImpl implements InsuranceEngine
                 $InsuredList = $this->makeCall($searchMethod, $data + ['xmlToArray' => 'ClearInsuredAsXmlResult']);
                 $insureds = array_map(function($insured){
                     return ['InsuredGuid' => $insured['InsuredGuid'], 'Clearance' => $insured];
-                }, (isset($InsuredList['Clearance']['Insured']) ? $InsuredList['Clearance']['Insured'] : []));
+                }, (isset($InsuredList['Clearance']['Insured']) ? ((is_array(current($InsuredList['Clearance']['Insured']))) ? $InsuredList['Clearance']['Insured'] : $InsuredList['Clearance']) : []));
                 unset($InsuredList);
                 break;
         }
@@ -175,12 +180,15 @@ class ImsEngineImpl implements InsuranceEngine
                 break;
             case 'ProducerSearch':
                 $ProducerSearchResult = current($this->makeCall($searchMethod, $data));
+                if (!empty($ProducerSearchResult['ProducerLocation']) && isset($ProducerSearchResult['ProducerLocation']['ProducerLocationGuid'])) {
+                    $ProducerSearchResult['ProducerLocation'] = [$ProducerSearchResult['ProducerLocation']];
+                }
                 $producers = array_map(function($ProducerLocation) {
                     return [
                         'producerLocationGuid' => $ProducerLocation['ProducerLocationGuid'],
                         'GetProducerInfoResult' => $ProducerLocation
                     ];
-                }, (isset($ProducerSearchResult['ProducerLocation']) ? $ProducerSearchResult['ProducerLocation'] : []));
+                }, (!empty($ProducerSearchResult['ProducerLocation']) ? $ProducerSearchResult['ProducerLocation'] : []));
                 unset($ProducerSearchResult);
                 break;
             case 'ProducerClearance':
@@ -301,6 +309,9 @@ class ImsEngineImpl implements InsuranceEngine
                 }
                 $response += $this->makeCall('AddQuoteWithAutocalculateDetailsQuote', $data['quote']);
                 break;
+            case 'DocumentFunctions':
+                $response = $this->makeCall('SaveRatingSheet', $data);
+                break;
             default:
                 throw new ServiceException("Create not avaliable for " . $this->handle, 'create.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
                 break;
@@ -316,6 +327,7 @@ class ImsEngineImpl implements InsuranceEngine
     public function getQuotingParams(Array $data = [])
     {
         // return $this->getQuotingParams(['programCode' => 'APPL8']);
+        // return $this->getQuotingParams(['programCode' => 'AXON1']);
         $response = $this->makeCall('ExecuteCommand', [
             "procedureName" => "ValidCompanyLinesXml",
             "parameters" => "<string>@programCode</string><string>".$data['programCode']."</string>"
@@ -351,7 +363,8 @@ class ImsEngineImpl implements InsuranceEngine
                     $result['Underwriters'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$User['@attributes']['UserGUID']] = $User['@attributes']['UserName'];
                 }
                 $result['States'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']] = $CompanyLine['StateID'];
-                $result['Company'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']] = $CompanyLine['LocationName'];
+                $result['CompanyLocations'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']] = $CompanyLine['LocationName'];
+                $result['CompanyLines'][$Office['@attributes']['OfficeGuid']][$CompanyLine['LineGUID']][$CompanyLine['StateID']][$CompanyLine['CompanyLocationGUID']][$CompanyLine['CompanyLineGUID']] = $CompanyLine['CompanyLineGUID'];
 
                 if (isset($CompanyLine['BillTypes']['BillType']['@attributes'])) {
                     $CompanyLine['BillTypes']['BillType'] = [$CompanyLine['BillTypes']['BillType']];
@@ -394,7 +407,7 @@ class ImsEngineImpl implements InsuranceEngine
                 break;
         }
         if ($this->handle != $handle) {
-            $this->setConfig(['handle' => $handle]);
+            $this->setSoapClient($handle);
         }
     }
 

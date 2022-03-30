@@ -84,7 +84,7 @@ public class SendSmtpMail extends RouteBuilder {
 
                         }
                         if (object.replyTo) {
-                            messageIn.setHeader("replyTo", setMessageHeader(object.replyTo))
+                            messageIn.setHeader("reply-to", setMessageHeader(object.replyTo))
                         }
 
                         logger.info("Processing Email with from address" + object.from)

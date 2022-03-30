@@ -213,6 +213,10 @@ class CommandService extends AbstractService
                 $this->logger->info("START FORM");
                 return $this->getStartForm($data);
                 break;
+            case 'auth_user':
+                $this->logger->info("Auth User");
+                return $this->authUser($data);
+                break;
             case 'register_user':
             case 'create_user':
                 $this->logger->info("START FORM");
@@ -979,6 +983,15 @@ class CommandService extends AbstractService
             $result = $this->workflowInstanceService->getActivityInstanceForm($data);
             return $result;
         }
+    }
+
+    private function authUser(&$data)
+    {
+        // to be modified and secured
+        (new \Oxzion\Auth\AuthSuccessListener($this->userService))->loadUserDetails([
+            AuthConstants::USERNAME => $data['auth']['username']
+        ]);
+        unset($data['auth']['username']);
     }
 
     //Register a new user

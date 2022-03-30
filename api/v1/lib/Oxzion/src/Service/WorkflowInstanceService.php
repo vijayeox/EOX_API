@@ -290,7 +290,12 @@ class WorkflowInstanceService extends AbstractService
         try {
             $this->logger->info("WorkflowInstanceId created" . print_r($workflowInstanceId, true));
             $updateQuery = "UPDATE ox_workflow_instance SET process_instance_id=:process_instance_id, file_id=:fileId, start_data=:startData where id = :workflowInstanceId";
-            $updateParams = array('process_instance_id' => $workflowInstanceId['id'], 'workflowInstanceId' => $workflowInstance['id'], 'fileId' => $this->getIdFromUuid('ox_file', $params['fileId']), 'startData' => is_array($fileData['data']) ? json_encode($fileData['data']) : $fileData['data']);
+            $updateParams = array(
+                'process_instance_id' => $workflowInstanceId['id'],
+                'workflowInstanceId' => $workflowInstance['id'],
+                'fileId' => $this->getIdFromUuid('ox_file', $params['fileId']),
+                'startData' => is_array($fileData['data']) ? json_encode($fileData['data']) : $fileData['data']
+            );
             $this->logger->info("Query1 - $updateQuery with Parametrs - " . print_r($updateParams, true));
             $update = $this->executeUpdateWithBindParameters($updateQuery, $updateParams);
             $this->commit();

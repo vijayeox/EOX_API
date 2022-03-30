@@ -22,7 +22,7 @@ class AbstractController extends AbstractApiController
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        return $this->getSuccessResponseWithData($response, 201);
+        return $this->getSuccessResponseWithData(($response) ? $response : [], 201);
     }
 
     public function getList()
@@ -39,7 +39,7 @@ class AbstractController extends AbstractApiController
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        return $this->getSuccessResponseWithData($response, 201);
+        return $this->getSuccessResponseWithData(($response) ? $response : [], 201);
     }
 
     public function create($data)
@@ -55,7 +55,7 @@ class AbstractController extends AbstractApiController
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        return $this->getSuccessResponseWithData($response, 201);
+        return $this->getSuccessResponseWithData(($response) ? $response : [], 201);
     }
 
 }
