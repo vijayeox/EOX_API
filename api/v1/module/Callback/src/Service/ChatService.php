@@ -6,7 +6,6 @@ use Oxzion\Service\AbstractService;
 use Oxzion\Utils\RestClient;
 use Oxzion\Service\FileService;
 use Oxzion\Service\SubscriberService;
-use Oxzion\Service\CommentService;
 use Oxzion\Service\UserService;
 
 class ChatService extends AbstractService
@@ -20,7 +19,7 @@ class ChatService extends AbstractService
         $this->restClient = $restClient;
     }
 
-    public function __construct($config, $dbAdapter, FileService $fileService, SubscriberService $subscriberService, CommentService $commentService, UserService $userService)
+    public function __construct($config, $dbAdapter, FileService $fileService, SubscriberService $subscriberService, UserService $userService)
     {
         parent::__construct($config, $dbAdapter);
         $chatServerUrl = $this->config['chat']['chatServerUrl'];
@@ -30,7 +29,6 @@ class ChatService extends AbstractService
         $this->applicationUrl = $this->config['applicationUrl'];
         $this->fileService = $fileService;
         $this->subscriberService = $subscriberService;
-        $this->commentService = $commentService;
         $this->userService = $userService;
         $this->dbAdapter = $dbAdapter;
     }
@@ -97,7 +95,7 @@ class ChatService extends AbstractService
             $user = $this->sanitizeName($user);
             $response = $this->restClient->postWithHeader('api/v4/users', array('email' => $user . '@gmail.com', 'username' => $user, 'first_name' => $user, 'password' => md5($user)), $headers);
             $userData = json_decode($response['body'], true);
-            return $userData;
+            return $this->updateUser($user);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $this->logger->error("Username doesn't exist/Username validation failure", $e);
         }
@@ -508,6 +506,21 @@ class ChatService extends AbstractService
             return json_decode($userData, true);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             return $e->getCode();
+        }
+    }
+
+    private function updateUser($user){
+        try {
+            $headers = $this->getAuthHeader();
+            $userID = $this->getUserByUsername($user);
+            $userInfo = $this->userService->getUserBaseProfile($user);
+            if ($userInfo) {
+                $userData = $this->restClient->put('api/v4/users/' . $userID, array('first_name' =>$userInfo['firstname'] ,'last_name' => $userInfo['lastname'], 'email' => $userInfo['email']), $headers);
+                return json_decode($userData['body'], true);
+            }
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $this->logger->error($e->getMessage(), $e);
+            throw $e;
         }
     }
 
