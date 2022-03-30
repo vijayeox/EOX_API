@@ -4,6 +4,7 @@ if [ ! -d ./IdentityService/build ]; then
 
     echo "Building IdentityService..."
     cd ./IdentityService
+    chmod 777 ./gradlew
     ./gradlew build
 
     chmod 777 .
@@ -15,6 +16,7 @@ fi
 
 echo "Building ProcessEngine..."
 cd ./ProcessEngine
+chmod 777 ./gradlew
 ./gradlew build
 
 chmod 777 .
