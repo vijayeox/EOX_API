@@ -176,7 +176,7 @@ class ElasticService
             }
         }
 
-        $boolfilterquery['explain'] = true;
+        $boolfilterquery['explain'] = false;
         if (!empty($searchconfig['append_account_id'])) {
             if ($searchconfig['append_account_id'] == 1) {
                 $app_name = $app_name . '_' . $accountId;
