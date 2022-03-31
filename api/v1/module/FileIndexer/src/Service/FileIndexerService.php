@@ -73,7 +73,7 @@ class FileIndexerService extends AbstractService
     {
         //Get all file data and relevant parameters
         $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
-            file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,
+            file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,file.date_created,file.date_modified,
             CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
             CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
             from ox_file as file
