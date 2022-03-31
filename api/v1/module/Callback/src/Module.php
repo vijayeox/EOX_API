@@ -98,9 +98,6 @@ class Module implements ConfigProviderInterface
                 Controller\CalendarCallbackController::class => function ($container) {
                     return new Controller\CalendarCallbackController($container->get(Service\CalendarService::class), $container->get(EmailService::class), $container->get('config'));
                 },
-                Controller\CommunicationCallbackController::class => function ($container) {
-                    return new Controller\CommunicationCallbackController();
-                },
                 Controller\CommentController::class => function ($container) {
                     return new Controller\CommentController($container->get(Service\CommentsService::class));
                 },
