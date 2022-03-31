@@ -41,6 +41,17 @@ return [
                     ],
                 ],
             ],
+            'triumph_delta' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/integration/triumph',
+                    'defaults' => [
+                        'controller' => Controller\TriumphController::class,
+                        'method' => 'POST',
+                        'action' => 'testEndpoint',
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

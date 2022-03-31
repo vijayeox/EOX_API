@@ -1,6 +1,6 @@
 <?php
 
-namespace OverdriveIntegrations;
+namespace Integrations;
 
 use Oxzion\Error\ErrorHandler;
 use Zend\Db\Adapter\AdapterInterface;
@@ -46,6 +46,11 @@ class Module implements ConfigProviderInterface
                     return new Controller\OverdriveapiController(
                         $container->get(OverdriveService::class),
                         $container->get(AdapterInterface::class)
+                    );
+                },
+                Controller\TriumphController::class => function ($container) {
+                    return new Controller\TriumphController(
+                        $container->get(\Oxzion\Integrations\DeltaService::class)
                     );
                 },
             ],
