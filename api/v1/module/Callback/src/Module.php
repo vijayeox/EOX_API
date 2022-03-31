@@ -39,7 +39,7 @@ class Module implements ConfigProviderInterface
             'factories' => [
                 Service\ChatService::class => function ($container) {
                     $dbAdapter = $container->get(AdapterInterface::class);
-                    return new Service\ChatService($container->get('config'), $dbAdapter, $container->get(\Oxzion\Service\FileService::class), $container->get(\Oxzion\Service\SubscriberService::class), $container->get(\Oxzion\Service\CommentService::class), $container->get(\Oxzion\Service\UserService::class));
+                    return new Service\ChatService($container->get('config'), $dbAdapter, $container->get(\Oxzion\Service\FileService::class), $container->get(\Oxzion\Service\SubscriberService::class), $container->get(\Oxzion\Service\UserService::class));
                 },
                 Service\CommentsService::class => function ($container) {
                     $dbAdapter = $container->get(AdapterInterface::class);
