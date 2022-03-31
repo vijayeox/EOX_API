@@ -11,11 +11,6 @@ abstract class SmsDelegate extends CommunicationDelegate
     public function __construct()
     {
         parent::__construct();
-        $this->setSmsConfig([
-            'from' => '+16606386121',
-            'accountSid' => 'AC95e7fff441af372f5c0a6e8185ba3859',
-            'authToken' => '690d4de8fb14bd53847efa30c862db99'
-        ]);
     }
 
     protected function setSmsConfig($config)
