@@ -1,6 +1,6 @@
 <?php
 
-namespace Attachment;
+namespace Integrations;
 
 use Zend\Router\Http\Segment;
 
