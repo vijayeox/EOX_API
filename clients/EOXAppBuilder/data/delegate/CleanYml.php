@@ -146,6 +146,12 @@ class CleanYml extends AbstractAppDelegate
         foreach ($descriptorData["role"] as &$i) {
             if (isset($i["privileges"])) {
                 foreach ($i["privileges"] as &$j) {
+                    $this->logger->info("JJJ | role".print_r($j,true));
+                    if (isset($j['privilege_name']) && is_array($j['privilege_name'])) {
+                        $privilegeArray = $j['privilege_name'];
+                        unset($j['privilege_name']);
+                        $j['privilege_name'] = $privilegeArray['name'];
+                    }
                     if (isset($j["permission"]["15"]) && $j["permission"]["15"] == true) { $j["permission"] = "15"; }
                     elseif (isset($j["permission"]["7"]) && $j["permission"]["7"] == true) { $j["permission"] = "7"; }
                     elseif (isset($j["permission"]["3"]) && $j["permission"]["3"] == true) { $j["permission"] = "3"; }
