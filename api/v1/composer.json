@@ -114,7 +114,9 @@
       "Import\\": "module/Import/src/",
       "Ims\\": "module/Ims/src/",
       "Kra\\": "module/Kra/src/",
-      "Profile\\": "module/Profile/src"
+      "Profile\\": "module/Profile/src",
+      "Rate\\": "module/Rate/src",
+      "Integrations\\": "module/Integrations/src"
     }
   },
   "autoload-dev": {
@@ -146,7 +148,9 @@
       "MessagingTest\\": "module/Messaging/test/",
       "DiveInsuranceTest\\": "../../clients/Dive Insurance/test/",
       "ErrorLogTest\\": "module/ErrorLog/test/",
-      "EsignTest\\": "module/Esign/test/"
+      "EsignTest\\": "module/Esign/test/",
+      "RateTest\\": "module/Rate/test/",
+      "IntegrationsTest\\": "module/IntegrationsTest/src"
     }
   },
   "extra": [],
