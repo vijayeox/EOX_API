@@ -71,7 +71,6 @@
 				"hideOnChildrenHidden": false
 			}, {
 				"label": "Old App Name",
-				"customDefaultValue": "console.log(\"APP NME---\");\nconsole.log(value);",
 				"key": "oldAppName",
 				"type": "hidden",
 				"input": true,
@@ -311,6 +310,7 @@
 				"input": false
 			}, {
 				"label": "Application Icon",
+				"tooltip": "The Application Icon will be visible in the Application Menu",
 				"tableView": true,
 				"key": "fontIcon",
 				"type": "textfield",
@@ -1316,7 +1316,7 @@
 						"tableView": true,
 						"dataSrc": "custom",
 						"data": {
-							"custom": "if(data.privilege){\n  console.log('inside drop down');\n  values = data.privilege.map(item =>item)\n  console.log(values);\n} else {\n  values = [];\n}"
+							"custom": "if(data.privilege){\n  values = data.privilege.map(item =>item)\n} else {\n  values = [];\n}"
 						},
 						"template": "<span>{{ item.name }}</span>",
 						"clearOnHide": false,
@@ -1526,7 +1526,7 @@
 					"tableView": false,
 					"dataSrc": "custom",
 					"data": {
-						"custom": "if(data.businessRole){\n  console.log(\"Inside businessRole dropdown\");\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
+						"custom": "if(data.businessRole){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
 					},
 					"template": "<span>{{ item.name }}</span>",
 					"clearOnHide": false,
@@ -1687,7 +1687,7 @@
 								"hideOnChildrenHidden": false
 							}, {
 								"label": "Actual Participant ROle Key",
-								"calculateValue": "try {\n  console.log(row);\n  value = row.participantRoleDuplicate.map((i) => {\n    console.log(1111);\n    console.log(i);\n    return { businessRole: i.businessRole.name};\n    console.log(value);\n  });\n} catch (error) {}",
+								"calculateValue": "try {\n  value = row.participantRoleDuplicate.map((i) => {\n    return { businessRole: i.businessRole.name};\n  });\n} catch (error) {}",
 								"key": "participantRole",
 								"type": "hidden",
 								"input": true,
@@ -1946,7 +1946,11 @@
 										"tableView": true,
 										"inputFormat": "raw",
 										"key": "chatAttachmentField",
-										"customConditional": "console.log(\"NOTID_----\");\nconsole.log(data);",
+										"conditional": {
+											"show": true,
+											"when": "app.chat_notification",
+											"eq": "true"
+										},
 										"logic": [{
 											"name": "If File Comments enabled",
 											"trigger": {
@@ -2047,10 +2051,7 @@
 										"label": "Entity View",
 										"tableView": false,
 										"redrawOn": "entity.enable_view",
-										"calculateValue": "if(value == []){\n  delete(value);\n}\nconsole.log(value == []);\nconsole.log(\"ENTITY VIEW----\");\nconsole.log(value);",
-										"validate": {
-											"custom": "console.log(\"VALIDATN ENTITY VIEW----\")\nconsole.log(valid);"
-										},
+										"calculateValue": "if(value == []){\n  delete(value);\n}",
 										"key": "pageContent",
 										"customConditional": "if(row.enable_view == true || row.enable_view == 'true'){\n  show = true;\n} else {\n  show = false;\n}",
 										"type": "container",
@@ -2292,7 +2293,7 @@
 			"persistent": false,
 			"redrawOn": "entity",
 			"clearOnHide": false,
-			"calculateValue": "function getUniqueListBy(arr, key) {\n    return [...new Map(arr.map(item => [item[key], item])).values()]\n}\nconst arr1 = getUniqueListBy(data.form, 'name');\nconsole.log(\"Unique by name\");\nconsole.log(arr1);\nvalue = arr1;",
+			"calculateValue": "function getUniqueListBy(arr, key) {\n    return [...new Map(arr.map(item => [item[key], item])).values()]\n}\nconst arr1 = getUniqueListBy(data.form, 'name');\nvalue = arr1;",
 			"validate": {
 				"custom": "/*if (data.formDuplicate) {if (data.formDuplicate.length > 0) {\n    console.log(\"\"\"\"\"\"\"\"\"\");\n    console.log(data.formDuplicate.length);\n    valid =\n      data.formDuplicate.length == new Set(data.formDuplicate.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same form more than once.\";\n  } else {\n    valid = true;\n  }\n}*/"
 			},
@@ -2376,7 +2377,7 @@
 				"tableView": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "console.log(\"sleeee0\");\nconsole.log(data.listOFForms);\nconsole.log(\"-----\");\nconsole.log('values-values-',values);\nconsole.log('values-data-',data.listOFForms);\nif(data.listOFForms){\n  values = data.listOFForms.map(item=>item.name +'.json')\n}else {\nvalues = [];\n}\nconsole.log('values--',values);\nconsole.log('values--',item);\nconsole.log('values--',item);"
+					"custom": "if(data.listOFForms){\n  values = data.listOFForms.map(item=>item.name +'.json')\n}else {\nvalues = [];\n}"
 				},
 				"clearOnHide": false,
 				"key": "template_file",
@@ -2411,7 +2412,6 @@
 			"label": "Workflows",
 			"reorder": false,
 			"addAnotherPosition": "bottom",
-			"defaultOpen": false,
 			"layoutFixed": false,
 			"enableRowGroups": false,
 			"initEmpty": false,
@@ -2425,10 +2425,11 @@
 			}],
 			"clearOnHide": false,
 			"validate": {
-				"custom": "if (data.workflowDuplicate) {\n  if (data.workflowDuplicate.length > 0) {\n  console.log(data.workflowDuplicate);\n  valid =\n      data.workflowDuplicate.length == new Set(data.workflowDuplicate.map((i) => i.bpmn_file.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same workflow more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+				"custom": "if (data.workflowDuplicate) {\n  if (data.workflowDuplicate.length > 0) {\n  valid =\n      data.workflowDuplicate.length == new Set(data.workflowDuplicate.map((i) => i.bpmn_file.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same workflow more than once.\";\n  } else {\n    valid = true;\n  }\n}"
 			},
 			"key": "workflowDuplicate",
 			"type": "datagrid",
+			"defaultOpen": false,
 			"noFirstRow": false,
 			"input": true,
 			"components": [{
@@ -2451,11 +2452,10 @@
 				"multiple": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "\nconsole.log(\"WF\");\nconsole.log(row.template.length);\nif(data.entity){\nvalues = data.entity.map(item=>item.name)\n} else {\nvalues = []\n}\nconsole.log(values);"
+					"custom": "if(data.entity){\nvalues = data.entity.map(item=>item.name)\n} else {\nvalues = []\n}"
 				},
 				"clearOnHide": false,
 				"validate": {
-					"custom": "console.log(\"Validation\");\nconsole.log(valid);",
 					"multiple": true
 				},
 				"key": "entity",
@@ -2509,7 +2509,7 @@
 				"tableView": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "console.log(\"sleeee0\");\nconsole.log(data);\nif(data.listOFWorkflows){\n  values = data.listOFWorkflows.map(item=>item.name +'.bpmn')\n}else {\nvalues = [];\n}\nconsole.log(values);"
+					"custom": "if(data.listOFWorkflows){\n  values = data.listOFWorkflows.map(item=>item.name +'.bpmn')\n}else {\nvalues = [];\n}"
 				},
 				"clearOnHide": false,
 				"key": "bpmn_file",
@@ -2732,7 +2732,6 @@
 							"label": "Page Content Form",
 							"tableView": false,
 							"form": "5f21c1bdbba30150d672d0cf",
-							"revision": 352,
 							"useOriginalRevision": true,
 							"calculateValue": "if(data.pagesList){\n  if(value && value.data){\n    value.data.pagesList = data.pagesList\n    value.data.formsList = data.formsList\n  }\n}",
 							"key": "pageContent",
@@ -2740,7 +2739,7 @@
 							"input": true,
 							"hideOnChildrenHidden": false,
 							"lazyLoad": false,
-							"formRevision": 352
+							"formRevision": 354
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
@@ -2889,7 +2888,7 @@
 					"tableView": true,
 					"dataSrc": "custom",
 					"data": {
-						"custom": "var privArray = [];\nif(data.privilege){\ndata.privilege.map((i) => {\n  if (i.permission >= 1) {\n    privArray.push({\n      key: i.name + \"_READ\",\n      name: i.name + \"_READ\",\n    });\n  }\n  if (i.permission >= 3) {\n    privArray.push({\n      key: i.name + \"_WRITE\",\n      name: i.name + \"_WRITE\",\n    });\n  }\n  if (i.permission >= 7) {\n    privArray.push({\n      key: i.name + \"_CREATE\",\n      name: i.name + \"_CREATE\",\n    });\n  }\n  if (i.permission == 15) {\n    privArray.push({\n      key: i.name + \"_DELETE\",\n      name: i.name + \"_DELETE\",\n    });\n  }\n});\n}\nvalues = privArray.length > 0 ? privArray : [];\n"
+						"custom": "var privArray = [];\nif(data.privilege){\ndata.privilege.map((i) => {\n  if (i.permission['1'] == true) {\n    privArray.push({\n      key: i.name + \"_READ\",\n      name: i.name + \"_READ\",\n    });\n  }\n  if (i.permission['3'] == true) {\n    privArray.push({\n      key: i.name + \"_WRITE\",\n      name: i.name + \"_WRITE\",\n    });\n  }\n  if (i.permission['7'] == true) {\n    privArray.push({\n      key: i.name + \"_CREATE\",\n      name: i.name + \"_CREATE\",\n    });\n  }\n  if (i.permission['15'] == true) {\n    privArray.push({\n      key: i.name + \"_DELETE\",\n      name: i.name + \"_DELETE\",\n    });\n  }\n});\n}\nvalues = privArray.length > 0 ? privArray : [];\n"
 					},
 					"valueProperty": "key",
 					"template": "<span>{{ item.name }}</span>",
@@ -2982,7 +2981,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 858,
+	"_vid": 882,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -3066,6 +3065,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-03-25T05:21:01.965Z",
+	"modified": "2022-04-01T06:51:02.189Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
