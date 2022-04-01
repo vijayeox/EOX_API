@@ -1,6 +1,6 @@
 <?php
 
-namespace Attachment;
+namespace Integrations;
 
 use Zend\Router\Http\Segment;
 
@@ -38,6 +38,17 @@ return [
                         'access' => [
                             
                         ],
+                    ],
+                ],
+            ],
+            'triumph_delta' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/integration/triumph',
+                    'defaults' => [
+                        'controller' => Controller\TriumphController::class,
+                        'method' => 'POST',
+                        'action' => 'testEndpoint',
                     ],
                 ],
             ],
