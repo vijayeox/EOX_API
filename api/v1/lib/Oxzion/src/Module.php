@@ -138,6 +138,12 @@ class Module
                         $container->get(Model\PrivilegeTable::class)
                     );
                 },
+                Integrations\DeltaService::class => function ($container) {
+                    return new Integrations\DeltaService(
+                        $container->get('config'),
+                        $container->get(AdapterInterface::class)
+                    );
+                },
                 Model\RoleTable::class => function ($container) {
                     return new Model\RoleTable(
                         $container->get(Model\RoleTableGateway::class)
