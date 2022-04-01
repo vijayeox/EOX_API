@@ -133,10 +133,10 @@ class CleanYml extends AbstractAppDelegate
             foreach ($descriptorData["privilege"] as &$i) {
                 $this->logger->info("ENTERING LOOP check fr i val | inside the priv".print_r($i,true));
 
-                if (isset($j["permission"]["15"]) && $i["permission"]["15"] == true) { $i["permission"] = "15"; }
-                elseif (isset($j["permission"]["7"]) && $i["permission"]["7"] == true) { $i["permission"] = "7"; }
-                elseif (isset($j["permission"]["3"]) && $i["permission"]["3"] == true) { $i["permission"] = "3"; }
-                elseif (isset($j["permission"]["1"]) && $i["permission"]["1"] == true) { $i["permission"] = "1"; }
+                if (isset($i["permission"]["15"]) && $i["permission"]["15"] == true) { $i["permission"] = "15"; }
+                elseif (isset($i["permission"]["7"]) && $i["permission"]["7"] == true) { $i["permission"] = "7"; }
+                elseif (isset($i["permission"]["3"]) && $i["permission"]["3"] == true) { $i["permission"] = "3"; }
+                elseif (isset($i["permission"]["1"]) && $i["permission"]["1"] == true) { $i["permission"] = "1"; }
                 
             }
         }
@@ -230,6 +230,9 @@ class CleanYml extends AbstractAppDelegate
         }
         if (isset($descriptorData["workflow"]) && empty($descriptorData['workflow'][0]['name'])) {
             unset($descriptorData["workflow"]);
+        }
+        if (isset($descriptorData["businessRole"]) && empty($descriptorData['businessRole'][0]['name'])) {
+            unset($descriptorData["businessRole"]);
         }
         if (isset($descriptorData["role"])) {
             $descriptorData["role"] = array_map(function ($role) {
