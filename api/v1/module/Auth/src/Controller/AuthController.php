@@ -8,12 +8,12 @@ use Exception;
 use Firebase\JWT\JWT;
 use Oxzion\Controller\AbstractApiControllerHelper;
 use Oxzion\Encryption\Crypto;
+use Oxzion\EntityNotFoundException;
 use Oxzion\ServiceException;
+use Oxzion\Service\CommandService;
 use Oxzion\Service\UserService;
 use Oxzion\Service\UserTokenService;
-use Oxzion\Service\CommandService;
 use Oxzion\ValidationException;
-use Oxzion\EntityNotFoundException;
 use Zend\Authentication\Adapter\DbTable\CredentialTreatmentAdapter as ApiAdapter;
 
 class AuthController extends AbstractApiControllerHelper
@@ -87,6 +87,7 @@ class AuthController extends AbstractApiControllerHelper
         if (isset($result)) {
             if ($result->isValid()) {
                 if (isset($data['username']) && isset($data['password'])) {
+                    $userInfo = $this->userService->updateUserCacheData(0);
                     return $this->getJwt($data['username'], $this->userService->getUserAccount($data['username']), 0);
                 } elseif (isset($data['apikey'])) {
                     return $this->getApiJwt($data['apikey']);
@@ -104,7 +105,7 @@ class AuthController extends AbstractApiControllerHelper
                 $tokenPayload = $this->decodeJwtToken($data['jwt']);
                 if (is_array($tokenPayload) || is_object($tokenPayload)) {
                     $uname = isset($tokenPayload->data->username) ? $tokenPayload->data->username : $tokenPayload['username'];
-                    $accountId = isset($tokenPayload->data->accountId) ? $tokenPayload->data->accountId : (isset($tokenPayload['accountId']) ?  $tokenPayload['accountId'] : null);
+                    $accountId = isset($tokenPayload->data->accountId) ? $tokenPayload->data->accountId : (isset($tokenPayload['accountId']) ? $tokenPayload['accountId'] : null);
                     if (!$accountId) {
                         return $this->getErrorResponse("Invalid JWT Token", 404);
                     }
