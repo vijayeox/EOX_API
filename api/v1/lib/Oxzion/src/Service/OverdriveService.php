@@ -29,7 +29,7 @@ class OverdriveService extends AbstractService
 
     public function getContractor($data)
     {
-        $this->httpmethod = HTTPMethod::GET;
+        $this->httpmethod = HTTPMethod::POSTWITHHEADERS;
         $this->endpoint = 'api/contractor/search';
         $json_request = '{
             "FirstName": "' . $data['firstname'] . '",
@@ -43,35 +43,11 @@ class OverdriveService extends AbstractService
         return $response;
     }
 
-    public function addCoverage($data)
-    {
-        $this->httpmethod = HTTPMethod::GET;
-        $this->endpoint = 'api/coverages/'.$data[''].'/driver/{entryId}/truechoices';
-        $json_request = '{
-            "FirstName": "' . $data['firstname'] . '",
-            "LastName": "' . $data['lastname'] . '",
-            "DateOfBirth": "' . $data['dateOfBirth'] . '",
-            "Email": "' . $data['email'] . '",
-            "MotorCarrierName": "' . $data['motorCarrier1'] . '"
-            }';
-        $json_request_array = json_decode($json_request);
-        $response = $this->apiCall($json_request_array);
-        return $response;
-    }
-    
     public function getActiveCoverages($data)
     {
         $this->httpmethod = HTTPMethod::GET;
-        $this->endpoint = 'api/coverages/{parentId}/driver/{entryId}/truechoices';
-        $json_request = '{
-            "FirstName": "' . $data['firstname'] . '",
-            "LastName": "' . $data['lastname'] . '",
-            "DateOfBirth": "' . $data['dateOfBirth'] . '",
-            "Email": "' . $data['email'] . '",
-            "MotorCarrierName": "' . $data['motorCarrier1'] . '"
-            }';
-        $json_request_array = json_decode($json_request);
-        $response = $this->apiCall($json_request_array);
+        $this->endpoint = 'api/coverages/'.$data["contractor_entryid"].'/driver/'.$data['driver_entryid'].'/truechoices';
+        $response = $this->apiCall(array());
         return $response;
     }
 
@@ -181,10 +157,12 @@ class OverdriveService extends AbstractService
             $this->TruechoiceApiUrl . $this->endpoint,
             $json_request_array,
             [
-                'AuthorizationToken' => 'Bearer ' . $this->truechoice_auth_token
+                'AuthorizationToken' => 'Bearer ' . $this->truechoice_auth_token,
+                'content-type' => 'application/json'
             ],
             ''
         );
+        
         return $response;
     }
 }

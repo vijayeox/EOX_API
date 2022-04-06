@@ -7,20 +7,24 @@ use Zend\Router\Http\Segment;
 return [
     'router' => [
         'routes' => [
-            'overdrive' => [
+            'getContractor' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/getContractor',
+                    'route' => '/getContractors',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
-                        'method' => 'GET',
+                        'method' => 'POST',
                         'action' => 'getContractor',
                         'access' => [
                             
                         ],
                     ],
-
-                    'route' => '/addContractor',
+                ]
+                ],
+            'addContractor' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/addContractor1',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'PUT',
@@ -29,8 +33,12 @@ return [
                             
                         ],
                     ],
-
-                    'route' => '/addDriver',
+                ]
+                ],
+                'addDriver' => [
+                    'type' => Segment::class,
+                    'options' => [
+                    'route' => '/addDriver1',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'PUT',
