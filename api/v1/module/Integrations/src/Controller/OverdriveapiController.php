@@ -1,18 +1,24 @@
 <?php
 
-namespace Integrations\Controller;
+/**
+ * Attachment Api
+ */
 
-use OverdriveIntegrations\Service\OverdriveService;
-use Oxzion\Controller\AbstractApiController;
+namespace OverdriveIntegrations\Controller;
+
+use Oxzion\Service\OverdriveService;
+use Exception;
+use Oxzion\Controller\AbstractApiControllerHelper;
+use Oxzion\ValidationException;
 use Zend\Db\Adapter\AdapterInterface;
 
 /**
- * OverDrive Integration Controller
+ * Attachment Controller
  */
-class OverdriveapiController extends AbstractApiController
+class OverdriveapiController extends AbstractApiControllerHelper
 {
     /**
-     * @var overdriveService Instance of OverdriveService Service
+     * @var AttachmentService Instance of Attchment Service
      */
     private $overdriveService;
     /**
@@ -21,7 +27,9 @@ class OverdriveapiController extends AbstractApiController
 
     public function __construct(OverdriveService $overdriveService, AdapterInterface $dbAdapter)
     {
+        //parent::__construct($table, AttachmentController::class);
         $this->overdriveService = $overdriveService;
+        //$this->setIdentifierName('attachmentId');
         $this->log = $this->getLogger();
     }
 

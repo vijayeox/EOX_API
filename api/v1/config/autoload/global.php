@@ -113,7 +113,14 @@ return [
     'jwtAlgo' => 'HS512',
     'authRequiredText' => 'Authentication Required',
     'refreshTokenPeriod' => '7',
-    'paymentGatewayType' => 'DEMO',
-    'TRANSFORMER_FOLDER' => __DIR__ . '/../../data/transformer/',
+    'paymentGatewayType'=>'DEMO',
+    'TRANSFORMER_FOLDER'=> __DIR__.'/../../data/transformer/',
+    'TRUECHOICE'=>[
+        'TRUECHOICE_API_URL'=> 'https://devapi.truenorthcompanies.com/',
+        'TRUECHOICE_AUTH_TOKEN'=>'EC9C87D0-04F5-4683-9D19-9312811318C7',
+        'TRUECHOICE_MAIL_TO'=> 'truechoices@truenorthcompanies.com',
+        'TRUECHOICE_MAIL_CC'=> 'support@eoxvantage.com'
+        ]
+
 
 ];
