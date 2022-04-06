@@ -5,6 +5,7 @@ namespace Oxzion\Service;
 use Oxzion\Auth\AuthConstants;
 use Oxzion\Auth\AuthContext;
 use Oxzion\Service\AbstractService;
+use Oxzion\ServiceException;
 use Oxzion\AppDelegate\HTTPMethod;
 use Oxzion\AppDelegate\HttpClientTrait;
 use Exception;
@@ -44,9 +45,9 @@ class OverdriveService extends AbstractService
         $json_request_array = json_decode($json_request);
         $response = $this->apiCall($json_request_array);
         return $response;
-        } catch (Exception $e) {
+        } catch (ServiceException $e) {
             $this->log->error($e->getMessage(), $e);
-            throw $e;
+            throw new ServiceException("Cant get Contractors".$e->getMessage(), 1);
         }
     }
 
@@ -58,9 +59,9 @@ class OverdriveService extends AbstractService
         $this->endpoint = 'api/coverages/'.$data["contractor_entryid"].'/driver/'.$data['driver_entryid'].'/truechoices';
         $response = $this->apiCall(array());
         return $response;
-        } catch (Exception $e) {
+        } catch (ServiceException $e) {
             $this->log->error($e->getMessage(), $e);
-            throw $e;
+            throw new ServiceException("Cant get Active Coverages".$e->getMessage(), 1);
         }
     }
 
@@ -122,9 +123,9 @@ class OverdriveService extends AbstractService
         $this->endpoint = 'api/contractor';
         $response = $this->apiCall($json_request_array);
         return $response;
-        } catch (Exception $e) {
+        } catch (ServiceException $e) {
             $this->log->error($e->getMessage(), $e);
-            throw $e;
+            throw new ServiceException("Cant add Contractor to truechoice" . $e->getMessage(), 1);
         }
     }
 
@@ -170,9 +171,9 @@ class OverdriveService extends AbstractService
         $json_request_array = json_decode($json_request);
         $response_api = $this->apiCall($json_request_array);
         return $response_api;
-        } catch (Exception $e) {
+        } catch (ServiceException $e) {
             $this->log->error($e->getMessage(), $e);
-            throw $e;
+            throw new ServiceException("Cant add driver under contractor to truechoice".$e->getMessage(),1);
         }
     }
     
