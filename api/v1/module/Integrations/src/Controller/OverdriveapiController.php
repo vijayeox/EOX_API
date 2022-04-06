@@ -1,10 +1,9 @@
 <?php
 
 /**
- * Attachment Api
+ * Overdrive Api
  */
-
-namespace OverdriveIntegrations\Controller;
+namespace Integrations\Controller;
 
 use Oxzion\Service\OverdriveService;
 use Exception;
@@ -13,12 +12,12 @@ use Oxzion\ValidationException;
 use Zend\Db\Adapter\AdapterInterface;
 
 /**
- * Attachment Controller
+ * Overdriveapi Controller
  */
 class OverdriveapiController extends AbstractApiControllerHelper
 {
     /**
-     * @var AttachmentService Instance of Attchment Service
+     * @var OverdriveService Instance of Overdrive Service
      */
     private $overdriveService;
     /**
@@ -27,24 +26,37 @@ class OverdriveapiController extends AbstractApiControllerHelper
 
     public function __construct(OverdriveService $overdriveService, AdapterInterface $dbAdapter)
     {
-        //parent::__construct($table, AttachmentController::class);
         $this->overdriveService = $overdriveService;
-        //$this->setIdentifierName('attachmentId');
         $this->log = $this->getLogger();
     }
 
     public function getContractor($data)
     {
-        return $this->overdriveService->getContractor($data);
+        try{
+            return $this->overdriveService->getContractor($data);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
     }
 
     public function addContractor($data)
     {
+        try{
         return $this->overdriveService->addContractor($data);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
     }
 
     public function addDriver($data)
     {
+        try{
         return $this->overdriveService->addDriver($data);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
     }
 }
