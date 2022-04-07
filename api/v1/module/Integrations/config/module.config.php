@@ -3,7 +3,6 @@
 namespace Integrations;
 
 use Zend\Router\Http\Segment;
-
 return [
     'router' => [
         'routes' => [
