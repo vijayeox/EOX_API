@@ -43,5 +43,7 @@ return [
     'Import',
     'Ims',
     'Kra',
-    'Profile'
+    'Profile',
+    'Rate',
+    'Integrations'
 ];
