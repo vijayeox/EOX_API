@@ -949,6 +949,7 @@ class AccountService extends AbstractService
             {
                 $query_media="SELECT id, uuid, extension, type, path, created_id, account_id, created_date, file_name as name FROM ox_attachment WHERE uuid='$media_uuid'";
                 $resultSetMedia = $this->executeQuerywithParams($query_media)->toArray();
+                $resultSetMedia[0]['size'] = filesize($resultSetMedia[0]['path']);
                 $resultSet[$i]['upload']=$resultSetMedia;
             }
            $i++; 

@@ -74,7 +74,10 @@ class AppArtifactService extends AbstractService
             break;    
             case 'transformer':
                 return $this->uploadContents($appSourceDir, 'transformer', $descriptorPath, $artifactType);
-            break;      
+            break;   
+            case 'migrations':
+                return $this->uploadContents($appSourceDir, 'migrations', $descriptorPath, $artifactType);
+            break;        
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
@@ -159,6 +162,9 @@ class AppArtifactService extends AbstractService
             break;
             case 'transformer':
                 $filePath = $filePath . 'transformer';
+            break;
+            case 'migrations':
+                $filePath = $filePath . 'migrations';
             break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
@@ -308,6 +314,9 @@ class AppArtifactService extends AbstractService
             case 'transformer':
                 $targetDir = $contentDir . 'transformer';
             break;
+            case 'migrations':
+                $targetDir = $contentDir . 'migrations';
+            break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
@@ -317,7 +326,7 @@ class AppArtifactService extends AbstractService
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
                     $ext = pathinfo($entry, PATHINFO_EXTENSION);
-                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && ($artifactType == 'delegate' || $artifactType == 'appupgrade')) || ($ext == 'tpl' && $artifactType == 'template') || ($ext == 'yml' && $artifactType == 'transformer')) {
+                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && ($artifactType == 'delegate' || $artifactType == 'appupgrade')) || ($ext == 'tpl' && $artifactType == 'template') || (($ext == 'yml' || $ext == 'php') && $artifactType == 'transformer') || ($ext == 'sql' && $artifactType == 'migrations')) {
                         $files[] = array(
                             'name' => substr($entry, 0, strrpos($entry, '.')) ,
                             'content'=> file_get_contents($targetDir.$entry)
