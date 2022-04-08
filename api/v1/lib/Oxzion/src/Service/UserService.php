@@ -1564,10 +1564,10 @@ class UserService extends AbstractService
         return $this->executeQuerywithBindParameters($select, $selectQuery)->toArray();
     }
 
-    public function updateUserCacheData()
+    public function updateUserCacheData($value = null)
     {
         $sql = $this->getSqlObject();
-        $updatedData['cleared_browser_cache'] = 1;
+        $updatedData['cleared_browser_cache'] = $value;
         $update = $sql->update('ox_user')->set($updatedData);
         $result = $this->executeUpdate($update);
         return $updatedData;

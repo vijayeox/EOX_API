@@ -1125,7 +1125,7 @@ class AppService extends AbstractService implements AppUpgrade
     private function setupLinksAndBuild($path, $appId)
     {
         $link = $this->config['DELEGATE_FOLDER'] . $appId;
-        $target = $path . "/data/delegate";
+        $target = $path . "data/delegate";
         if (is_link($link)) {
             FileUtils::unlink($link);
         }
@@ -1195,6 +1195,8 @@ class AppService extends AbstractService implements AppUpgrade
         }
         if (!is_link($link)) {
             $this->logger->info("setting up link $link with $target");
+            // echo "<pre/>"; print_r($link);
+            // echo "<pre/>"; print_r($target);exit;
             FileUtils::symlink($target, $link);
         }
     }

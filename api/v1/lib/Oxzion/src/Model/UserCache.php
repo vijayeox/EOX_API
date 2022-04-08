@@ -7,7 +7,7 @@ use Oxzion\Model\Entity;
 class UserCache extends Entity
 {
     protected $data = array(
-        'id'=>0 ,
+        'id' => 0,
         'app_id' => 0,
         'content' => null,
         'user_id' => 0,
@@ -16,7 +16,7 @@ class UserCache extends Entity
         'activity_instance_id' => null,
         'form_id' => null,
         'date_created' => 0,
-        'deleted' => 0
+        'deleted' => 0,
     );
     protected $attributes = array();
 
