@@ -105,6 +105,16 @@ content:
                                 params:
                                     app_uuid: '{{uuid}}'
                 -
+                    name: 'Migration'
+                    icon: 'fas fa-database'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: 'f5d87830-af1d-11ec-b909-0242ac120002'
+                                params:
+                                    app_uuid: '{{uuid}}'
+                -
                     name: Export
                     rule: '''{{status}}'' !== 1'
                     details:
@@ -118,14 +128,6 @@ content:
                                 successNotification: "Application exported successfully!"
                     icon: 'far fa-cloud-download'
                     updateOnly: true   
-                # -
-                #     name: Install or Uninstall Application
-                #     rule: 'true'
-                #     details:
-                #         -
-                #             params:
-                #                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
-                #     icon: 'far fa-download'
                 -
                     name: Install or Uninstall Application
                     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
@@ -134,14 +136,6 @@ content:
                             params:
                                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
                     icon: 'far fa-download'
-                # -
-                #     name: Installed
-                #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
-                #     details:
-                #         -
-                #             params:
-                #                 page_id: '83c014a0-54d4-4dd1-9ebf-55680b5e7d71'
-                #     icon: 'far fa-download'
                 -
                     name: Delete
                     rule: '''{{status}}'' !== 1'

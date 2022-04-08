@@ -1,0 +1,6 @@
+transform:
+    -
+        target: 'Todaysdate'
+        src:
+            -
+                script: " true ? date('m/d/y') : null"
