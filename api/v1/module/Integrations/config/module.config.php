@@ -3,13 +3,14 @@
 namespace Integrations;
 
 use Zend\Router\Http\Segment;
+
 return [
     'router' => [
         'routes' => [
             'overdrive' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/getContractor',
+                    'route' => '/overdrive[/:action]',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'GET',
@@ -19,7 +20,7 @@ return [
                         ],
                     ],
 
-                    'route' => '/addContractor',
+                    'route' => '/overdrive[/:action]',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'PUT',
@@ -29,11 +30,20 @@ return [
                         ],
                     ],
 
-                    'route' => '/addDriver',
+                    'route' => '/overdrive[/:action]',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'PUT',
                         'action' => 'addDriver',
+                        'access' => [
+                            
+                        ],
+                    ],
+                    'route' => '/overdrive[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\OverdriveapiController::class,
+                        'method' => 'POST',
+                        'action' => 'tchoiceRegistration',
                         'access' => [
                             
                         ],

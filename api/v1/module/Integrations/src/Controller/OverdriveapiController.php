@@ -8,13 +8,14 @@ namespace Integrations\Controller;
 use Oxzion\Service\OverdriveService;
 use Exception;
 use Oxzion\Controller\AbstractApiControllerHelper;
+use Oxzion\Controller\AbstractApiController;
 use Oxzion\ValidationException;
 use Zend\Db\Adapter\AdapterInterface;
 
 /**
  * Overdriveapi Controller
  */
-class OverdriveapiController extends AbstractApiControllerHelper
+class OverdriveapiController extends AbstractApiController
 {
     /**
      * @var OverdriveService Instance of Overdrive Service
@@ -30,33 +31,42 @@ class OverdriveapiController extends AbstractApiControllerHelper
         $this->log = $this->getLogger();
     }
 
-    public function getContractor($data)
+    public function getContractorAction($data)
     {
         try{
-            return $this->overdriveService->getContractor($data);
+            $result=$this->overdriveService->getContractor($data);
+            return $this->getSuccessResponseWithData($result);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
     }
 
-    public function addContractor($data)
+    public function addContractorAction($data)
     {
         try{
-        return $this->overdriveService->addContractor($data);
+        $result=$this->overdriveService->addContractor($data);
+        return $this->getSuccessResponseWithData($result);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
     }
 
-    public function addDriver($data)
+    public function addDriverAction($data)
     {
         try{
-        return $this->overdriveService->addDriver($data);
+        $result=$this->overdriveService->addDriver($data);
+        return $this->getSuccessResponseWithData($result);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
+    }
+
+    public function tchoiceRegistrationAction()
+    {
+        $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
+        print_r($params);
     }
 }
