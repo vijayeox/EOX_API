@@ -153,31 +153,26 @@ class UserController extends AbstractApiController
         $filterParams = $this->params()->fromQuery(); // empty method call
         try {
             $result = $this->userService->getUsers($filterParams, $this->getBaseUrl());
-            $i=0;
-            $uuid="";
-            $accountId="";
-            foreach($result['data'] as $key=>$val)
-            {
-                if(isset($val['uuid']))
-                {
-                    $uuid=$val['uuid'];
+            $i = 0;
+            $uuid = "";
+            $accountId = "";
+            foreach ($result['data'] as $key => $val) {
+                if (isset($val['uuid'])) {
+                    $uuid = $val['uuid'];
                 }
-                if(isset($val['accountId']))
-                {
-                    $accountId=$val['accountId'];
+                if (isset($val['accountId'])) {
+                    $accountId = $val['accountId'];
                 }
-                $userid=$this->userService->getUserByUuid($uuid);
-                $projects=$this->projectService->getProjectsOfUserById($userid, $accountId);
-                $roles=$this->userService->getRolesofUser($accountId, $uuid);
-                if(!empty($projects))
-                {
+                $userid = $this->userService->getUserByUuid($uuid);
+                $projects = $this->projectService->getProjectsOfUserById($userid, $accountId);
+                $roles = $this->userService->getRolesofUser($accountId, $uuid);
+                if (!empty($projects)) {
                     $result['data'][$i]['project'] = $projects[0];
                 }
-                if(!empty($roles))
-                {
-                    $result['data'][$i]['role'] =  $roles;
+                if (!empty($roles)) {
+                    $result['data'][$i]['role'] = $roles;
                 }
-                $i++; 
+                $i++;
             }
             return $this->getSuccessResponseDataWithPagination($result['data'], $result['total']);
         } catch (Exception $e) {
@@ -402,7 +397,7 @@ class UserController extends AbstractApiController
                         break;
                 }
             }
-            
+
             if ($userInfo) {
                 $baseUrl = $this->getBaseUrl();
                 $userInfo['icon'] = $baseUrl . "/user/profile/" . $userInfo["uuid"];
@@ -632,7 +627,7 @@ class UserController extends AbstractApiController
             $userId = AuthContext::get(AuthConstants::USER_ID);
             $this->log->info(__CLASS__ . "-> \n Setting User Session Cache By User - " . print_r($userId, true));
             try {
-                $userInfo = $this->userService->updateUserCacheData();
+                $userInfo = $this->userService->updateUserCacheData(1);
                 return $this->getSuccessResponseWithData($userInfo, 200);
             } catch (Exception $e) {
                 return $this->getErrorResponse("Update Failure", 404, array("message" => $e->getMessage()));
