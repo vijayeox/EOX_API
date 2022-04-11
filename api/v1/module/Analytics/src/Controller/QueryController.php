@@ -6,7 +6,6 @@ use Analytics\Model\Query;
 use Exception;
 use Oxzion\Controller\AbstractApiController;
 use Oxzion\ValidationException;
-use Oxzion\VersionMismatchException;
 use Zend\Db\Exception\ExceptionInterface as ZendDbException;
 
 class QueryController extends AbstractApiController
@@ -164,7 +163,7 @@ class QueryController extends AbstractApiController
             return $this->getErrorResponse("Validation Errors", 404, $response);
         }
         if (isset($result['targetquery'])) {
-            $returnresult = ['result' => $result['data'],'targetquery' => $result['targetquery']];
+            $returnresult = ['result' => $result['data'], 'targetquery' => $result['targetquery']];
         } else {
             $returnresult = ['result' => $result['data']];
         }
