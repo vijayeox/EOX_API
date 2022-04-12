@@ -907,7 +907,7 @@ class AccountService extends AbstractService
         $pageSize = 20;
         $offset = 0;
         $where = "";
-        $sort = "oxa.name";
+        $sort = "oxa.id DESC";
 
         $select = "SELECT oxa.uuid,oxa.name,oxa.description,oxa.link, oxa.type,oxa.end_date,
                     oxa.start_date,oxa.media_type,oxa.media,oxo.uuid as accountId ";
