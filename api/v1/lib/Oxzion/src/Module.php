@@ -569,6 +569,7 @@ class Module
                         $container->get(Service\AppService::class),
                         $container->get(\App\Service\AppArtifactService::class),
                         $container->get(Service\OverdriveService::class)
+                        $container->get(\Rate\Service\RateService::class)
                 );
                 },
                 Document\DocumentBuilder::class => function ($container) {

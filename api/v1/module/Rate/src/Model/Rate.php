@@ -27,7 +27,7 @@ class Rate extends Entity
 
         'conditional_expression' => ['type' => Type::STRING,   'readonly' => false,    'required' => false],
 
-        'rate' =>                   ['type' => Type::STRING,   'readonly' => false,    'required' => false],
+        'rate' =>                   ['type' => Type::STRING,   'readonly' => false,    'required' => true],
 
         'isdeleted' =>              ['type' => Type::INTEGER,   'readonly' => false,    'required' => false, 'value' => 0],
 

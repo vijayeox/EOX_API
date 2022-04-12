@@ -28,6 +28,7 @@ use oxzion\Insurance\InsuranceService;
 use Oxzion\Service\AppService;
 use App\Service\AppArtifactService;
 use Oxzion\Service\OverdriveService;
+use Rate\Service\RateService;
 
 class AppDelegateService extends AbstractService
 {
@@ -60,6 +61,7 @@ class AppDelegateService extends AbstractService
         AppService $appService,
         AppArtifactService $appArtifactService,
         OverdriveService $appOverdriveService
+        RateService $rateService
     )
     {
         $this->templateService = $templateService;
@@ -85,6 +87,7 @@ class AppDelegateService extends AbstractService
         $this->queryService = $queryService;
         $this->insuranceService = $insuranceService;
         $this->appOverdriveService=$appOverdriveService;
+        $this->rateService = $rateService;
     }
 
     public function setPersistence($appId, $persistence)
@@ -115,7 +118,7 @@ class AppDelegateService extends AbstractService
 
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService ,$this->appService, $this->appArtifactService,$this->appOverdriveService);
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService ,$this->appService, $this->appArtifactService,$this->rateService,$this->appOverdriveService);
         return $appDelegateService;
     }
 
@@ -220,6 +223,9 @@ class AppDelegateService extends AbstractService
 
                 if (method_exists($obj, "setAppDelegateService")) {
                     $obj->setAppDelegateService($this->setAppDelegateService());
+                }
+                if (method_exists($obj, "setRateService")) {
+                    $obj->setRateService($this->rateService);
                 }
                 $persistenceService = $this->getPersistence($appId);
 

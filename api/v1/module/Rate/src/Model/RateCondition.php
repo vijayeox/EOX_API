@@ -16,6 +16,8 @@ class RateCondition extends Entity
 
         'value' =>                  ['type' => Type::STRING,    'readonly' => false,    'required' => true],
 
+        'sequence_id' =>            ['type' => Type::STRING,    'readonly' => true,    'required' => true],
+
         'isdeleted' =>              ['type' => Type::INTEGER,   'readonly' => false,    'required' => false, 'value' => 0],
 
         'version' =>                ['type' => Type::INTEGER,   'readonly' => false,    'required' => false, 'value' => 0],
