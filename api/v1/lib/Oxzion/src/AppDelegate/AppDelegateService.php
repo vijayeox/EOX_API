@@ -27,6 +27,7 @@ use \Analytics\Service\QueryService;
 use oxzion\Insurance\InsuranceService;
 use Oxzion\Service\AppService;
 use App\Service\AppArtifactService;
+use Oxzion\Service\OverdriveService;
 use Rate\Service\RateService;
 
 class AppDelegateService extends AbstractService
@@ -59,6 +60,7 @@ class AppDelegateService extends AbstractService
         TeamService $teamService,
         AppService $appService,
         AppArtifactService $appArtifactService,
+        OverdriveService $appOverdriveService
         RateService $rateService
     )
     {
@@ -84,6 +86,7 @@ class AppDelegateService extends AbstractService
         $this->businessParticipantService = $businessParticipantService;
         $this->queryService = $queryService;
         $this->insuranceService = $insuranceService;
+        $this->appOverdriveService=$appOverdriveService;
         $this->rateService = $rateService;
     }
 
@@ -107,10 +110,21 @@ class AppDelegateService extends AbstractService
         $this->insuranceService = $insuranceService;
     }
 
+    public function setAppOverdriveService($appOverdriveService)
+    {
+        $this->appOverdriveService = $appOverdriveService;
+    }
+
+
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService ,$this->appService, $this->appArtifactService,$this->rateService);
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService ,$this->appService, $this->appArtifactService,$this->rateService,$this->appOverdriveService);
         return $appDelegateService;
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     public function execute($appId, $delegate, $dataArray = array())
@@ -202,6 +216,11 @@ class AppDelegateService extends AbstractService
                 if (method_exists($obj, "setInsuranceService")) {
                     $obj->setInsuranceService($this->insuranceService);
                 }
+
+                if (method_exists($obj, "setAppOverdriveService")) {
+                    $obj->setAppOverdriveService($this->appOverdriveService);
+                }
+
                 if (method_exists($obj, "setAppDelegateService")) {
                     $obj->setAppDelegateService($this->setAppDelegateService());
                 }
