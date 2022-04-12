@@ -1,0 +1,26 @@
+name: Horusec Scan
+
+on: [push]
+
+jobs:
+   checking_code:
+     runs-on: ubuntu-latest
+     name: Horusec Scan
+     steps:
+       - uses: actions/checkout@v3
+
+       - name: Install & run Horusec
+         run: |
+            curl -fsSL https://raw.githubusercontent.com/ZupIT/horusec/master/deployments/scripts/install.sh | bash -s latest
+            horusec start -p /home/runner/work/EOS-Framework-API/EOS-Framework-API > res1.txt
+            cat res1.txt | sed 's/\x1B[@A-Z\\\]^_]\|\x1B\[[0-9:;<=>?]*[-!"#$%&'"'"'()*+,.\/]*[][\\@A-Z^_`a-z{|}~]//g' > res2.txt
+            tr -cd '\11\12\15\40-\176' < res2.txt > res3.txt
+            sudo apt-get install enscript ghostscript
+            enscript -p output.ps res3.txt
+            ps2pdf output.ps result.pdf
+            mkdir output
+            cp result.pdf output
+       - uses: actions/upload-artifact@master
+         with:
+          name: output
+          path: output

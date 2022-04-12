@@ -85,6 +85,9 @@ pages:
     -
         page_name: PdfTransformer.yml
         uuid: 25b6b9d2-9f69-11ec-b909-0242ac120002
+    -
+        page_name: Migraton.yml
+        uuid: f5d87830-af1d-11ec-b909-0242ac120002
 menu:
     -
         name: 'Manage EOX Apps'
