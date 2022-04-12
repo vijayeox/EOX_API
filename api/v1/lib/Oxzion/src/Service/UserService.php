@@ -1580,20 +1580,4 @@ class UserService extends AbstractService
         return $updatedData;
 	}
 
-    public function insertActivityTime($activity){
-        $this->logger->info("User login Insert-----\n");
-        $userId = AuthContext::get(AuthConstants::USER_ID);
-        $accountId = AuthContext::get(AuthConstants::ACCOUNT_ID);
-        $params = array(
-            'userId' => $userId,
-            'accountId' => $accountId,
-            'activityTime' => date('Y-m-d H:i:s'),
-            'activity' => $activity
-        );
-        $query = "INSERT into ox_user_audit_log (`user_id`, `account_id`, `activity_time`, `activity`) 
-                  VALUES (:userId, :accountId, :activityTime, :activity)";
-        $result = $this->executeUpdateWithBindParameters($query, $params);
-        
-    }
-
 }

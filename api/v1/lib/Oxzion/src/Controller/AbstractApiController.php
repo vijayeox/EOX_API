@@ -24,6 +24,7 @@ abstract class AbstractApiController extends AbstractApiControllerHelper
     protected $modelClass;
     protected $parentId;
     protected $username;
+    protected $jwtToken;
 
     public function __construct($table = null, $modelClass = null, $parentId = null)
     {
@@ -64,7 +65,7 @@ abstract class AbstractApiController extends AbstractApiControllerHelper
     {
         $config = $event->getApplication()->getServiceManager()->get('Config');
         $request = $event->getRequest();
-        $jwtToken = $this->findJwtToken($request);
+        $jwtToken = $this->jwtToken = $this->findJwtToken($request);
         if ($jwtToken) {
             try {
                 $token = $jwtToken;

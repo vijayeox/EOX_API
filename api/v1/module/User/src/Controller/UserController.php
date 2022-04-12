@@ -641,7 +641,7 @@ class UserController extends AbstractApiController
         $params = $this->params()->fromRoute();
         if (AuthContext::get(AuthConstants::USER_ID)) {
             try {
-                $count = $this->userService->insertActivityTime($params['activity']);
+                $count = $this->userService->insertActivityTime($params['activity'], $this->jwtToken);
             } catch (Exception $e) {
                 return $this->getErrorResponse("Insert log Failure", 404, array("message" => $e->getMessage()));
             }
