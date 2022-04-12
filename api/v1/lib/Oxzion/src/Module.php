@@ -567,7 +567,8 @@ class Module
                         $container->get(Insurance\InsuranceService::class),
                         $container->get(\Team\Service\TeamService::class),
                         $container->get(Service\AppService::class),
-                        $container->get(\App\Service\AppArtifactService::class)
+                        $container->get(\App\Service\AppArtifactService::class),
+                        $container->get(Service\OverdriveService::class)
                 );
                 },
                 Document\DocumentBuilder::class => function ($container) {
@@ -830,6 +831,12 @@ class Module
                         $container->get('config'),
                         $container->get(AdapterInterface::class),
                         $container->get(Messaging\MessageProducer::class)
+                    );
+                },
+                Service\OverdriveService::class => function ($container) {
+                    return new Service\OverdriveService(
+                        $container->get('config'),
+                        $container->get(AdapterInterface::class)
                     );
                 },
             ],
