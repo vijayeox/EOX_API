@@ -33,7 +33,7 @@ class OverdriveapiController extends AbstractApiController
 
     public function getContractorAction()
     {
-        $data = array_merge($this->extractPostData(), $this->params()->fromRoute());
+        $data = json_decode($this->getRequest()->getContent(),true);
         try{
             $result=$this->overdriveService->getContractor($data);
             return $this->getSuccessResponseWithData($result);
@@ -45,7 +45,7 @@ class OverdriveapiController extends AbstractApiController
 
     public function addContractorAction()
     {
-        $data = array_merge($this->extractPostData(), $this->params()->fromRoute());
+        $data = json_decode($this->getRequest()->getContent(),true);
         try{
         $result=$this->overdriveService->addContractor($data);
         return $this->getSuccessResponseWithData($result);
@@ -57,7 +57,7 @@ class OverdriveapiController extends AbstractApiController
 
     public function addDriverAction()
     {
-        $data = array_merge($this->extractPostData(), $this->params()->fromRoute());
+        $data = json_decode($this->getRequest()->getContent(),true);
         try{
         $result=$this->overdriveService->addDriver($data);
         return $this->getSuccessResponseWithData($result);
@@ -70,5 +70,5 @@ class OverdriveapiController extends AbstractApiController
     public function tchoiceRegistrationAction()
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
-            }
+    }
 }
