@@ -567,7 +567,8 @@ class Module
                         $container->get(Insurance\InsuranceService::class),
                         $container->get(\Team\Service\TeamService::class),
                         $container->get(Service\AppService::class),
-                        $container->get(\App\Service\AppArtifactService::class)
+                        $container->get(\App\Service\AppArtifactService::class),
+                        $container->get(\Rate\Service\RateService::class)
                 );
                 },
                 Document\DocumentBuilder::class => function ($container) {

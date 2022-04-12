@@ -24,7 +24,7 @@ class RateController extends AbstractApiController
     /**
      * Create Rate API
      * @api
-     * @link /rate
+     * @link /app/:appId/entity/:entityId/rate
      * @method POST
      * @param array $data Array of elements as shown
      * <code> {
@@ -37,8 +37,6 @@ class RateController extends AbstractApiController
      *               condition_6 : integer,
      *               conditional_expression: string,
      *               value : string,
-     *               entity_id : uuid
-     *               app_id : uuid
      *               account_id : uuid
      *   } </code>
      * @return array Returns a JSON Response with Status Code and Created Rate.
@@ -46,6 +44,8 @@ class RateController extends AbstractApiController
     public function create($data)
     {
         $data = $this->params()->fromPost();
+        $data['app_id'] = $this->params()->fromRoute()['appId'];
+        $data['entity_id'] = $this->params()->fromRoute()['entityId'];
         try {
             $this->rateService->createRate($data);
             return $this->getSuccessResponseWithData($data, 201);
@@ -66,6 +66,8 @@ class RateController extends AbstractApiController
      */
     public function update($uuid, $data)
     {
+        $data['app_id'] = $this->params()->fromRoute()['appId'];
+        $data['entity_id'] = $this->params()->fromRoute()['entityId'];
         try {
             $this->rateService->updateRate($uuid, $data);
             return $this->getSuccessResponseWithData($data, 200);
@@ -163,9 +165,14 @@ class RateController extends AbstractApiController
     public function getList()
     {
         $params = $this->params()->fromQuery();
-        $result = $this->rateService->getRateList($params);
-        if ($result == 0) {
-            return $this->getErrorResponse("Query not found", 404, ['params' => $params]);
+        try {
+            $params['app_id'] = $this->params()->fromRoute()['appId'];
+            $params['entity_id'] = $this->params()->fromRoute()['entityId'];
+            $result = $this->rateService->getRateList($params);
+        }
+        catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
         }
         return $this->getSuccessResponseWithData($result);
     }

@@ -5,6 +5,8 @@ use Oxzion\Service\AbstractService;
 use Rate\Model\RateTable;
 use Rate\Model\Rate;
 use Exception;
+use Oxzion\Auth\AuthContext;
+use Oxzion\Auth\AuthConstants;
 use Oxzion\Utils\UuidUtil;
 use Oxzion\EntityNotFoundException;
 use Oxzion\OxServiceException;
@@ -17,7 +19,9 @@ class RateService extends AbstractService
     private $table;
     private $uuidToTableList = array('entity_id' => 'ox_app_entity','account_id' => 'ox_account','app_id' => 'ox_app','condition_1' => 'ox_rate_condition','condition_2' => 'ox_rate_condition','condition_3' => 'ox_rate_condition','condition_4' => 'ox_rate_condition','condition_5' => 'ox_rate_condition','condition_6' => 'ox_rate_condition');
 
-    public static $rateFields = array('id' => 'ora.id', 'uuid' => 'ora.uuid', 'condition_1' => 'ora.condition_1', 'condition_2' => 'ora.condition_2', 'condition_3' => 'ora.condition_3','condition_4' => 'ora.condition_4','condition_5' => 'ora.condition_5','condition_6' => 'ora.condition_6', 'conditional_expression' => 'ora.conditional_expression', 'rate' => 'ora.rate', 'app_id' => 'ora.app_id', 'account_id' => 'ora.account_id', 'entity_id' => 'ora.entity_id','date_created' => 'ora.date_created');
+    private $maxConditon = 6;
+
+    public static $rateFields = array('id' => 'ora.id', 'uuid' => 'ora.uuid', 'condition_1' => 'orc.value', 'condition_2' => 'orc2.value', 'condition_3' => 'orc3.value','condition_4' => 'orc4.value','condition_5' => 'orc5.value','condition_6' => 'orc6.value', 'conditional_expression' => 'ora.conditional_expression', 'rate' => 'ora.rate', 'app_id' => 'ora.app_id', 'account_id' => 'ora.account_id', 'entity_id' => 'ora.entity_id','date_created' => 'ora.date_created');
 
     public function __construct($config, $dbAdapter, RateTable $table, RateConditionService $rateConditionService)
     {
@@ -38,9 +42,29 @@ class RateService extends AbstractService
         }
     }
 
+    private function checkConditionToSequenceMatch($data) {
+        foreach($data as $key => $value) {
+            if(str_contains($key,'condition_')) {
+                $sequence_id = $this->rateConditionSerive->getSequenceId($value);
+                $condition_id = substr($key,-1);
+                if($sequence_id == $condition_id) {
+                    continue;
+                } else {
+                    throw new ServiceException("Condition and Sequence do not match","condition.sequence.mismatch");
+                }
+            }
+        }
+    }
+
     public function createRate($data)
     {
+        if(!isset($data['account_id'])) {
+            $data['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_UUID);
+        }
+
         $this->convertEssentialUuidsToIds($data);
+        $this->checkConditionToSequenceMatch($data);
+
         if(isset($data['conditional_expression'])) {
             if(!ArrayUtils::isJson($data['conditional_expression'])){
                 throw new ServiceException("Conditional Expression must be a json string","conditional.expression.incorrect");
@@ -62,6 +86,7 @@ class RateService extends AbstractService
     public function updateRate($uuid, $data)
     {
         $this->convertEssentialUuidsToIds($data);
+        $this->checkConditionToSequenceMatch($data);
         $rate = new Rate($this->table);
         $rate->loadByUuid($uuid);
         $rate->assign($data);
@@ -115,30 +140,25 @@ class RateService extends AbstractService
         return $resultSet;
     }
 
-    private function convertValueToCondition(&$params) {
-        // This is just for reference and the function is not needed at the moment. Will remove it if it is no longer required
-        if (!empty($params['filter'])) {
-            $filterArray = json_decode($params['filter'], true);
-            if (isset($filterArray[0]['filter'])) {
-                $filterList = $filterArray[0]['filter']['filters'];
-                foreach($filterList as $key => $value) {
-                    if(isset($value['value'])) {
-                        $result = $this->rateConditionSerive->getRateConditionIdByName($value['value']);
-                        // Need to convert value to the conditional expression
-                    }
-                }
-            }
-        }
-    }
-
     public function getRateList($params = null)
     {
+        $this->convertEssentialUuidsToIds($params);
+        if(!isset($params['account_id'])) {
+            $params['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
+        }
+
         $paginateOptions = FilterUtils::paginateLikeKendo($params,self::$rateFields);
         $where = $paginateOptions['where'];
         $sort = $paginateOptions['sort'] ? " ORDER BY ".$paginateOptions['sort'] : '';
         $limit = " LIMIT ".$paginateOptions['pageSize']." offset ".$paginateOptions['offset'];
 
-        $selectQuery = "SELECT ora.uuid, orc.uuid as condition_1, ora.condition_2, ora.condition_3,ora.condition_4,ora.condition_5,ora.condition_6, ora.conditional_expression, ora.rate, oa.uuid as account_id, ora.`version`, oap.uuid as app_id, oae.uuid as entity_id, ora.date_created, ora.date_modified,ora.modified_by, ora.created_by";
+        if(!empty($where)) {
+            $where .= " AND orc.app_id = '".$params['app_id']."' AND orc.entity_id = '".$params['entity_id']."' AND orc.account_id = ".$params['account_id']." AND orc.isdeleted <>1";
+        } else {
+            $where .= "WHERE orc.app_id = '".$params['app_id']."' AND orc.entity_id = '".$params['entity_id']."' AND orc.account_id = ".$params['account_id']." AND orc.isdeleted <>1";
+        }
+
+        $selectQuery = "SELECT ora.uuid, orc.value as condition_1, orc2.value as condition_2, orc3.value as condition_3, orc4.value as condition_4, orc5.value as condition_5, orc6.value as condition_6, ora.conditional_expression, ora.rate, oa.uuid as account_id, ora.`version`, oap.uuid as app_id, oae.uuid as entity_id, ora.date_created, ora.date_modified,ora.modified_by, ora.created_by";
         $fromQuery = "from ox_rate ora
         left join ox_account oa on ora.account_id = oa.id
         left join ox_app_entity oae on ora.entity_id = oae.id
@@ -157,7 +177,6 @@ class RateService extends AbstractService
         $query = $selectQuery." ".$fromQuery." ".$where." ".$sort." ".$limit;
         $resultSet = $this->executeQuerywithParams($query);
         $result = $resultSet->toArray();
-
         $cntQuery ="SELECT count(orc.id) as 'count'";
         $resultSet = $this->executeQuerywithParams($cntQuery." ".$fromQuery." ".$where);
         $count=$resultSet->toArray()[0]['count'];
