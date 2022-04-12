@@ -31,8 +31,9 @@ class OverdriveapiController extends AbstractApiController
         $this->log = $this->getLogger();
     }
 
-    public function getContractorAction($data)
+    public function getContractorAction()
     {
+        $data = array_merge($this->extractPostData(), $this->params()->fromRoute());
         try{
             $result=$this->overdriveService->getContractor($data);
             return $this->getSuccessResponseWithData($result);
@@ -42,8 +43,9 @@ class OverdriveapiController extends AbstractApiController
         }
     }
 
-    public function addContractorAction($data)
+    public function addContractorAction()
     {
+        $data = array_merge($this->extractPostData(), $this->params()->fromRoute());
         try{
         $result=$this->overdriveService->addContractor($data);
         return $this->getSuccessResponseWithData($result);
@@ -53,8 +55,9 @@ class OverdriveapiController extends AbstractApiController
         }
     }
 
-    public function addDriverAction($data)
+    public function addDriverAction()
     {
+        $data = array_merge($this->extractPostData(), $this->params()->fromRoute());
         try{
         $result=$this->overdriveService->addDriver($data);
         return $this->getSuccessResponseWithData($result);
@@ -67,6 +70,5 @@ class OverdriveapiController extends AbstractApiController
     public function tchoiceRegistrationAction()
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
-        print_r($params);
-    }
+            }
 }

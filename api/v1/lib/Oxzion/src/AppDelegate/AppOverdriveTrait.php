@@ -21,31 +21,16 @@ trait AppOverdriveTrait
 
     protected function getContractor($data)
     {
-        try{
-            return $this->appOverdriveService->getContractor($data);
-        } catch (Exception $e) {
-            $this->log->error($e->getMessage(), $e);
-            return $this->exceptionToResponse($e);
-        }
+        return $this->appOverdriveService->getContractor($data);
     }
 
     protected function addContractor($data)
     {
-        try{
-            return $this->appOverdriveService->addContractor($data);
-            } catch (Exception $e) {
-                $this->log->error($e->getMessage(), $e);
-                return $this->exceptionToResponse($e);
-            }
+        return $this->appOverdriveService->addContractor($data);
     }
 
     protected function addDriver($data)
     {
-        try{
-            return $this->appOverdriveService->addDriver($data);
-            } catch (Exception $e) {
-                $this->log->error($e->getMessage(), $e);
-                return $this->exceptionToResponse($e);
-            }
+        return $this->appOverdriveService->addDriver($data);
     }
 }
