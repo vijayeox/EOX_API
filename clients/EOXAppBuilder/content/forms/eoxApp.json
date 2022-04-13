@@ -415,7 +415,7 @@
 			"spellcheck": false,
 			"disabled": true,
 			"tableView": true,
-			"defaultValue": "Please click on the Create App button before you proceed",
+			"defaultValue": "Please click on the Create Application button before you proceed",
 			"validateOn": "blur",
 			"validate": {
 				"custom": "if (data.app.name.length > 0 && data.app.category.length > 0) {\n  valid = data.app.uuid.length > 0\n      ? true\n      : \"Create App to proceed further\";\n} else {\n  valid = true;\n}"
@@ -2980,7 +2980,7 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 883,
+	"_vid": 885,
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -3064,6 +3064,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-04-12T04:38:56.216Z",
+	"modified": "2022-04-13T11:36:29.411Z",
 	"machineName": "onboarding-eoxvantage:eoxApp"
 }
