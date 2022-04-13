@@ -3,9 +3,6 @@
 namespace UserAuditLog;
 
 use Oxzion\Error\ErrorHandler;
-use Oxzion\Messaging\MessageProducer;
-use Oxzion\Service\AccountService;
-use Oxzion\Service\UserService;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
@@ -36,15 +33,10 @@ class Module implements ConfigProviderInterface
             'factories' => [
                 Service\UserAuditLogService::class => function ($container) {
                     $dbAdapter = $container->get(AdapterInterface::class);
-                    $accoutService = $container->get(AccountService::class);
-                    $userService = $container->get(UserService::class);
                     return new Service\UserAuditLogService(
                         $container->get('config'),
                         $dbAdapter,
-                        $container->get(Model\UserAuditLogTable::class),
-                        $accoutService,
-                        $container->get(MessageProducer::class),
-                        $userService
+                        $container->get(Model\UserAuditLogTable::class)
                     );
                 },
                 Model\UserAuditLogTable::class => function ($container) {
@@ -69,8 +61,7 @@ class Module implements ConfigProviderInterface
                     return new Controller\UserAuditLogController(
                         $container->get(Model\UserAuditLogTable::class),
                         $container->get(Service\UserAuditLogService::class),
-                        $container->get(AdapterInterface::class),
-                        $container->get(AccountService::class)
+                        $container->get(AdapterInterface::class)
                     );
                 }
             ],
