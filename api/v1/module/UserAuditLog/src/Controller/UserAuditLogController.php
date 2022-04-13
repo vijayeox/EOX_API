@@ -8,10 +8,7 @@ use Oxzion\Auth\AuthContext;
 use UserAuditLog\Model\UserAuditLog;
 use UserAuditLog\Model\UserAuditLogTable;
 use UserAuditLog\Service\UserAuditLogService;
-use Oxzion\AccessDeniedException;
 use Oxzion\Controller\AbstractApiController;
-use Oxzion\ServiceException;
-use Oxzion\ValidationException;
 use Zend\Db\Adapter\AdapterInterface;
 
 class UserAuditLogController extends AbstractApiController
