@@ -839,7 +839,7 @@ class AccountService extends AbstractService
             throw new EntityNotFoundException("Invalid Account");
         }
         $where .= strlen($where) > 0 ? " AND " : " WHERE ";
-        $where .= "oxg.account_id =" . $accountId . " and oxg.status = 'Active'";
+        $where .= "oxg.account_id =" . $accountId . " and oxg.status = 'Active' and oxg.parent_id IS NULL";
 
         $sort = " ORDER BY " . $sort;
         $limit = " LIMIT " . $pageSize . " offset " . $offset;
