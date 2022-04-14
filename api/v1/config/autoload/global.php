@@ -120,6 +120,7 @@ return [
         'TRUECHOICE_AUTH_TOKEN'=>'EC9C87D0-04F5-4683-9D19-9312811318C7',
         'TRUECHOICE_MAIL_TO'=> 'truechoices@truenorthcompanies.com',
         'TRUECHOICE_MAIL_CC'=> 'support@eoxvantage.com'
-     ],
+        ]
+
 
 ];

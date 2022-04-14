@@ -149,7 +149,7 @@ class ProjectService extends AbstractService
                     throw new ServiceException("Project parent is invalid", "project.parent.invalid", OxServiceException::ERR_CODE_NOT_FOUND);
                 }
             }else{
-                $data['parent_id'] = isset($data['parent_id']) ? (!is_numeric($data['parent_id']) ? $this->getIdFromUuid('ox_project', $data['parent_id']) : $data['parent_id'] ): null;
+                $data['parent_id'] = (isset($data['parent_id']) && !empty($data['parent_id']))? (!is_numeric($data['parent_id']) ? $this->getIdFromUuid('ox_project', $data['parent_id']) : $data['parent_id'] ): null;
             }
             //Additional fields that are needed for the create
             $inputData['uuid'] = $data['uuid'] = UuidUtil::uuid();

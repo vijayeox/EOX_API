@@ -38,7 +38,7 @@ class AccountService extends AbstractService
     public static $teamField = array('name' => 'oxg.name', 'description' => 'oxg.description', 'date_created' => 'oxg.date_created');
     public static $projectField = array('name' => 'oxp.name', 'description' => 'oxp.description', 'date_created' => 'oxp.date_created');
     public static $announcementField = array('name' => 'oxa.name', 'description' => 'oxa.description','type' => 'oxa.type');
-    public static $roleField = array('name' => 'oxr.name', 'description' => 'oxr.description');
+    public static $roleField = array('name' => 'oxr.name', 'description' => 'oxr.description','appName' =>'oxa.name');
     public static $accountField = array('id' => 'og.id', 'uuid' => 'og.uuid', 'name' => 'og.name', 'preferences' => 'og.preferences', 'address1' => 'oa.address1', 'address2' => 'oa.address2', 'city' => 'oa.city', 'state' => 'oa.state', 'country' => 'oa.country', 'zip' => 'oa.zip', 'logo' => 'og.logo');
 
     public function setMessageProducer($messageProducer)
@@ -714,7 +714,7 @@ class AccountService extends AbstractService
         $pageSize = 20;
         $offset = 0;
         $where = "";
-        $sort = "ox_user.name";
+        $sort = "ox_user.id DESC";
 
         $query = "SELECT ox_user.uuid,ox_user.name,ox_user.username,oxup.email,ox_address.address1,ox_address.address2,ox_address.city,oxemp.id as employee_id,ox_address.state,ox_address.country,ox_address.zip,oxemp.designation,
         case when (ox_account.contactid = ox_user.id)
@@ -815,7 +815,7 @@ class AccountService extends AbstractService
         $pageSize = 20;
         $offset = 0;
         $where = "";
-        $sort = "oxg.name";
+        $sort = "oxg.id DESC";
 
         $select = "SELECT oxg.uuid,oxg.name,oxg.description,oxu.uuid as managerId, oxg1.uuid as parent_id, oxo.uuid as accountId";
         $from = "FROM `ox_team` as oxg
@@ -862,7 +862,7 @@ class AccountService extends AbstractService
         $pageSize = 20;
         $offset = 0;
         $where = "";
-        $sort = "oxp.name";
+        $sort = "oxp.id DESC";
 
         $select = "SELECT oxp.uuid,oxp.name,oxp.description, oxu.uuid as managerId, oxo.uuid as accountId";
         $from = "FROM `ox_project` as oxp
@@ -984,7 +984,7 @@ class AccountService extends AbstractService
         $pageSize = 1000;
         $offset = 0;
         $where = "";
-        $sort = "oxr.name";
+        $sort = "oxr.id DESC";
 
         $select = "SELECT oxr.uuid,oxa.name as appName, oxr.name,oxr.description,oxr.is_system_role,oxo.uuid as accountId,oxa.type";
         $from = "FROM `ox_role` as oxr

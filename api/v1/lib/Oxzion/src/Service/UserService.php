@@ -277,7 +277,7 @@ class UserService extends AbstractService
             $form->save();
             $accountId = $this->getUuidFromId('ox_account', $data['account_id']);
             $accountUserId = $this->addUserToAccount($form->id, $form->account_id);
-            if (isset($data['project'])) {
+            if (isset($data['project']) && (!empty($data['project']))) {
                 $this->addUserToProject($form->uuid, $data['project']);
             }
             if (isset($data['role']) && is_array($data['role'])) {
@@ -1045,11 +1045,14 @@ class UserService extends AbstractService
         $userId = $resultSet[0]['id'];
         $oxUserProject = array();
         foreach ($projectList as $key => $value) {
-            $oxUserProject[$key]['user_id'] = $userId;
-            $oxUserProject[$key]['project_id'] = $this->getIdFromUuid('ox_project', $value['uuid']);
+            if (!empty($value)) {
+                $oxUserProject[$key]['user_id'] = $userId;
+                $oxUserProject[$key]['project_id'] = $this->getIdFromUuid('ox_project', $value['uuid']);
+            }
         }
-
-        $this->multiInsertOrUpdate('ox_user_project', $oxUserProject, array());
+        if (!empty($oxUserProject)) {
+            $this->multiInsertOrUpdate('ox_user_project', $oxUserProject, array());
+        }
     }
 
     public function removeUserFromTeam($userid)
