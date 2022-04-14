@@ -325,7 +325,7 @@ abstract class Entity implements Countable
         if (is_null($obj) || (0 == count($obj))) {
             throw new EntityNotFoundException('Entity not found.', ['entity' => $this->table->getTableGateway()->getTable(), 'id' => $id]);
         }
-        $this->assignInternal($obj->toArray(), false);
+        $this->assignInternal($obj->toArray(), false,true);
         return $this;
     }
 
