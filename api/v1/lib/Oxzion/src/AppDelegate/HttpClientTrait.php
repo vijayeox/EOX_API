@@ -12,6 +12,7 @@ class HTTPMethod
     const PUT = 3;
     const DELETE = 4;
     const POSTMULTIPART = 5;
+    const POSTWITHHEADERS = 6;
 }
 
 trait HttpClientTrait
@@ -70,6 +71,13 @@ trait HttpClientTrait
                     $url,
                     $params,
                     $fileParams
+                );
+                break;
+            case HTTPMethod::POSTWITHHEADERS:
+                $response = $restClient->postWithHeader(
+                    $url,
+                    $params,
+                    $headers
                 );
                 break;
             default:

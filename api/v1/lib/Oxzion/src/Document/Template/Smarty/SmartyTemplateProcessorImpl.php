@@ -32,7 +32,7 @@ class SmartyTemplateProcessorImpl implements TemplateParser
      *   templateNameWithExt (example: file.ext)
      * @param array $data
      * @param array $options N/A
-     * @return the generated content of the template
+     * @return array the generated content of the template
      */
     public function getContent($template, $data = array(), $options = array())
     {
