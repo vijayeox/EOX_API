@@ -38,7 +38,7 @@ class AccountService extends AbstractService
     public static $teamField = array('name' => 'oxg.name', 'description' => 'oxg.description', 'date_created' => 'oxg.date_created');
     public static $projectField = array('name' => 'oxp.name', 'description' => 'oxp.description', 'date_created' => 'oxp.date_created');
     public static $announcementField = array('name' => 'oxa.name', 'description' => 'oxa.description','type' => 'oxa.type');
-    public static $roleField = array('name' => 'oxr.name', 'description' => 'oxr.description');
+    public static $roleField = array('name' => 'oxr.name', 'description' => 'oxr.description','appName' =>'oxa.name');
     public static $accountField = array('id' => 'og.id', 'uuid' => 'og.uuid', 'name' => 'og.name', 'preferences' => 'og.preferences', 'address1' => 'oa.address1', 'address2' => 'oa.address2', 'city' => 'oa.city', 'state' => 'oa.state', 'country' => 'oa.country', 'zip' => 'oa.zip', 'logo' => 'og.logo');
 
     public function setMessageProducer($messageProducer)
