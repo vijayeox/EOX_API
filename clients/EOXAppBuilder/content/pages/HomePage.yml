@@ -179,6 +179,17 @@ content:
                                 page_id: 'f922ab50-84b6-11ec-a8a3-0242ac120002'
                                 params:
                                     app_uuid: '{{uuid}}'
+
+                -
+                    name: 'Component Manager'
+                    icon: 'fa fa-upload'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: '63cb348f-e3e1-4459-8338-40f0acbcf173'
+                                params:
+                                    app_uuid: '{{uuid}}'
             columnConfig:
                 -
                     title: Name
