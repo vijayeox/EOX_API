@@ -938,9 +938,10 @@ return [
             'getCssFile' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/app/:appId/cssFile',
+                    'route' => '/app/:appId/:indexType',
                     'constraints' => [
                         'appId' => UuidUtil::UUID_PATTERN,
+                        'indexType' => 'cssFile|jsIndex',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppController::class,

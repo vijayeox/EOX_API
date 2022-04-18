@@ -417,9 +417,12 @@ class AppController extends AbstractApiController
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
         try {
+            $this->log->info($params['indexType']);
             $result = $this->appService->getApp($params['appId'], true);
-            $fileContent = file_get_contents($result . '/index.scss');
-            $data['cssContent'] = $fileContent;
+            $fileType = $params['indexType']== "cssFile" ? "index.scss" : "index.js";
+            $paramDataType = $params['indexType']== "cssFile" ? "cssContent" : "jsContent";
+            $fileContent = file_get_contents($result . DIRECTORY_SEPARATOR . $fileType );
+            $data[$paramDataType] = $fileContent;
             return $this->getSuccessResponseWithData($data);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
