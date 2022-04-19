@@ -213,8 +213,7 @@ class ProjectService extends AbstractService
         if (isset($data['parent_id'])) {
             $projParentId = $data['parent_id'];
         }
-
-        if (isset($projParentId)) {
+        if (isset($projParentId) && !empty($projParentId)) {
             $parentId = $this->getIdFromUuid('ox_project', $projParentId);
             $parent_uuid = $projParentId;
             $data['parent_id'] = $parentId;
