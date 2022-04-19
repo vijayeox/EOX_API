@@ -60,7 +60,7 @@ class AppDelegateService extends AbstractService
         TeamService $teamService,
         AppService $appService,
         AppArtifactService $appArtifactService,
-        OverdriveService $appOverdriveService
+        OverdriveService $appOverdriveService,
         RateService $rateService
     )
     {
