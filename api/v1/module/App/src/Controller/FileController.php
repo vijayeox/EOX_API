@@ -4,6 +4,10 @@ namespace App\Controller;
 /**
  * File Api
  */
+use Exception;
+use Oxzion\AccessDeniedException;
+use Oxzion\Auth\AuthConstants;
+use Oxzion\Auth\AuthContext;
 use Oxzion\Controller\AbstractApiController;
 use Oxzion\Encryption\Crypto;
 use Oxzion\Model\File;
@@ -11,14 +15,8 @@ use Oxzion\Model\FileTable;
 use Oxzion\ServiceException;
 use Oxzion\Service\FileService;
 use Oxzion\ValidationException;
-use Oxzion\AccessDeniedException;
-use Oxzion\Utils\ArtifactUtils;
-use Oxzion\EntityNotFoundException;
-use Zend\Db\Adapter\AdapterInterface;
 use Oxzion\VersionMismatchException;
-use Exception;
-use Oxzion\Auth\AuthConstants;
-use Oxzion\Auth\AuthContext;
+use Zend\Db\Adapter\AdapterInterface;
 
 class FileController extends AbstractApiController
 {
@@ -178,20 +176,20 @@ class FileController extends AbstractApiController
     {
     }
     /**
-    * GET List Entitys API
-    * @api
-    * @link /app/:appId/file/search
-    * @method GET
-    * @return array Returns a JSON Response list of Entitys based on Access.
-    */
+     * GET List Entitys API
+     * @api
+     * @link /app/:appId/file/search
+     * @method GET
+     * @return array Returns a JSON Response list of Entitys based on Access.
+     */
     public function getFileListAction()
     {
-        $appUuid = isset($this->params()->fromRoute()['appId']) ? $this->params()->fromRoute()['appId'] : null ;
+        $appUuid = isset($this->params()->fromRoute()['appId']) ? $this->params()->fromRoute()['appId'] : null;
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
         $filterParams = $this->params()->fromQuery();
         if (isset($params['createdBy']) && $params['createdBy'] === 'me') {
             $params['createdBy'] = AuthContext::get(AuthConstants::USER_UUID);
-            ;
+
         }
         try {
             $result = $this->fileService->getFileList($appUuid, $params, $filterParams);
@@ -210,14 +208,13 @@ class FileController extends AbstractApiController
         return $this->getSuccessResponseDataWithPagination($result['data'], $result['total']);
     }
 
-
     /**
-    * GET List Entitys API
-    * @api
-    * @link /app/appId/search
-    * @method GET
-    * @return array Returns a JSON Response list of Entitys based on Access.
-    */
+     * GET List Entitys API
+     * @api
+     * @link /app/appId/search
+     * @method GET
+     * @return array Returns a JSON Response list of Entitys based on Access.
+     */
     public function getFileListCommandAction()
     {
         $appUuid = $this->params()->fromRoute()['appId'];
@@ -228,16 +225,16 @@ class FileController extends AbstractApiController
         try {
             foreach ($commandsArray as $command) {
                 switch ($command) {
-                case 'myfiles':
+                    case 'myfiles':
                         $params['status'] = 'Completed';
                         $result['myfiles'] = $this->fileService->getFileList($appUuid, $params, $filterParams);
-                    break;
-                case 'assignments':
+                        break;
+                    case 'assignments':
                         $result['assignments'] = $this->fileService->getAssignments($appUuid, $filterParams);
-                    break;
-                default:
-                    break;
-            }
+                        break;
+                    default:
+                        break;
+                }
             }
         } catch (ValidationException $e) {
             $response = ['errors' => $e->getErrors()];

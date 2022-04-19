@@ -2,12 +2,12 @@
 
 namespace Oxzion;
 
+use Logger;
 use Zend\Db\Adapter\AdapterInterface;
 use Zend\Db\ResultSet\ResultSet;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\ModuleManager\ModuleEvent;
 use Zend\ModuleManager\ModuleManager;
-use Logger;
 
 class Module
 {
@@ -24,7 +24,7 @@ class Module
     public function onMergeConfig(ModuleEvent $e)
     {
         $configListener = $e->getConfigListener();
-        $config         = $configListener->getMergedConfig(false);
+        $config = $configListener->getMergedConfig(false);
         if (!self::$logInitialized) {
             self::$logInitialized = true;
             Logger::configure($config['logger']);
@@ -342,7 +342,7 @@ class Module
                         $container->get(Service\OrganizationService::class),
                         $container->get(Service\EntityService::class),
                         $container->get(Service\AppRegistryService::class),
-                        $container->get(Messaging\MessageProducer::class)                     
+                        $container->get(Messaging\MessageProducer::class)
                     );
                 },
                 Model\OrganizationTable::class => function ($container) {
@@ -413,11 +413,11 @@ class Module
                         $container->get(Model\PersonTable::class)
                     );
                 },
-                 Model\PersonTable::class => function ($container) {
-                     return new Model\PersonTable(
-                         $container->get(Model\PersonTableGateway::class)
-                     );
-                 },
+                Model\PersonTable::class => function ($container) {
+                    return new Model\PersonTable(
+                        $container->get(Model\PersonTableGateway::class)
+                    );
+                },
                 Model\PersonTableGateway::class => function ($container) {
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new Model\Person());
@@ -435,11 +435,11 @@ class Module
                         $container->get(Model\EmployeeTable::class)
                     );
                 },
-                 Model\EmployeeTable::class => function ($container) {
-                     return new Model\EmployeeTable(
-                         $container->get(Model\EmployeeTableGateway::class)
-                     );
-                 },
+                Model\EmployeeTable::class => function ($container) {
+                    return new Model\EmployeeTable(
+                        $container->get(Model\EmployeeTableGateway::class)
+                    );
+                },
                 Model\EmployeeTableGateway::class => function ($container) {
                     $resultSetPrototype = new ResultSet();
                     $resultSetPrototype->setArrayObjectPrototype(new Model\Employee());
@@ -521,7 +521,7 @@ class Module
                 Service\ProfilePictureService::class => function ($container) {
                     $config = $container->get('config');
                     $dbAdapter = $container->get(AdapterInterface::class);
-                    return new Service\ProfilePictureService($config, $dbAdapter, 
+                    return new Service\ProfilePictureService($config, $dbAdapter,
                         $container->get(Messaging\MessageProducer::class));
                 },
                 Service\UserSessionService::class => function ($container) {
@@ -538,7 +538,7 @@ class Module
                 Service\AppRegistryService::class => function ($container) {
                     $config = $container->get('config');
                     $dbAdapter = $container->get(AdapterInterface::class);
-                    $businessParticipantService = $container->get(\Oxzion\Service\BusinessParticipantService::class);                    
+                    $businessParticipantService = $container->get(\Oxzion\Service\BusinessParticipantService::class);
                     return new Service\AppRegistryService($config, $dbAdapter, $businessParticipantService);
                 },
                 Service\BusinessParticipantService::class => function ($container) {
@@ -568,7 +568,7 @@ class Module
                         $container->get(\Team\Service\TeamService::class),
                         $container->get(Service\AppService::class),
                         $container->get(\App\Service\AppArtifactService::class),
-                        $container->get(Service\OverdriveService::class)
+                        $container->get(Service\OverdriveService::class),
                         $container->get(\Rate\Service\RateService::class)
                 );
                 },
@@ -703,10 +703,10 @@ class Module
                         $container->get(Service\FileService::class)
                     );
                 },
-                 Model\JobTable::class => function ($container) {
-                     $tableGateway = $container->get(Model\JobTableGateway::class);
-                     return new Model\JobTable($tableGateway);
-                 },
+                Model\JobTable::class => function ($container) {
+                    $tableGateway = $container->get(Model\JobTableGateway::class);
+                    return new Model\JobTable($tableGateway);
+                },
                 Model\JobTableGateway::class => function ($container) {
                     $dbAdapter = $container->get(AdapterInterface::class);
                     $resultSetPrototype = new ResultSet();
@@ -763,7 +763,7 @@ class Module
                         $container->get(Service\RegistrationService::class),
                         $container->get(Service\BusinessParticipantService::class),
                         $container->get(Transformer\JsonTransformerService::class),
-                        $container->get(Service\EsignService::class)   
+                        $container->get(Service\EsignService::class)
                     );
                 },
                 Model\ServiceTaskInstanceTable::class => function ($container) {

@@ -11,14 +11,13 @@
  * in ZendSkeletonApplication. This is a good practice, as it prevents sensitive
  * credentials from accidentally being committed into version control.
  */
-use Doctrine\DBAL\Driver\PDOMySql\Driver as PDOMySqlDriver;
-$host = getenv('HOST'); 
+$host = getenv('HOST');
 $dbhost = getenv('DB_HOST');
 $db = getenv('API_DB');
 $username = getenv('DB_USERNAME');
 $password = getenv('DB_PASSWORD');
 
-if(isset($_ENV['ENV']) && $_ENV['ENV'] == 'test'){
+if (isset($_ENV['ENV']) && $_ENV['ENV'] == 'test') {
     $db = getenv('TEST_API_DB');
 }
 
@@ -32,40 +31,40 @@ return [
         'dsn' => 'mysql:dbname=' . $db . ';host=' . $dbhost . ';charset=utf8;username=' . $username . ';password=' . $password,
     ],
     'elasticsearch' => [
-        'serveraddress'=>$host,
-        'port'=>'9200',
-        'scheme'=>'http',
-        'core'=>'core',
-        'type'=>'type',
-        'user'=>'user',
-        'password'=>'password'
+        'serveraddress' => $host,
+        'port' => '9200',
+        'scheme' => 'http',
+        'core' => 'core',
+        'type' => 'type',
+        'user' => 'user',
+        'password' => 'password',
     ],
     'amqp' => [
-        'host' => 'tcp://'.$host.':61613'
+        'host' => 'tcp://' . $host . ':61613',
     ],
     'workflow' => [
-        'engineUrl' => 'http://'.$host.':8090/engine-rest/engine/default/'
+        'engineUrl' => 'http://' . $host . ':8090/engine-rest/engine/default/',
     ],
     'chat' => [
-        'chatServerUrl' => 'http://'.$host.':8065/',
-        'authToken' => ''
+        'chatServerUrl' => 'http://' . $host . ':8065/',
+        'authToken' => '',
     ],
     'crm' => [
-        'crmServerUrl' => 'http://'.$host.':8075/crm/public/',
-        'authToken' => ''
+        'crmServerUrl' => 'http://' . $host . ':8075/crm/public/',
+        'authToken' => '',
     ],
     'task' => [
-        'taskServerUrl' => 'http://'.$host.':3000/api/v3/',
+        'taskServerUrl' => 'http://' . $host . ':3000/api/v3/',
         'username' => 'apikey',
-        'authToken' => ''
+        'authToken' => '',
     ],
     'calendar' => [
-        'calendarServerUrl' => 'http://'.$host.':8075/calendar',
-        'authToken' => ''
+        'calendarServerUrl' => 'http://' . $host . ':8075/calendar',
+        'authToken' => '',
     ],
     'job' => [
-        'jobUrl' => 'http://'.$host.':8085/',
-        'authToken' => ''
+        'jobUrl' => 'http://' . $host . ':8085/',
+        'authToken' => '',
     ],
     'esign' => [
         'integrator' => 'VANTAGE',
@@ -76,32 +75,32 @@ return [
         "email" => "info@vantageagora.com",
         "username" => "info@vantageagora.com",
         "password" => "CFnEWs0g",
-        "callbackUrl" => 'https://qa3.eoxvantage.com/esign/event'
+        "callbackUrl" => 'https://qa3.eoxvantage.com/esign/event',
     ],
-    'DELEGATE_FOLDER'=>__DIR__.'/../../data/delegate/',
-    'UPGRADE_FOLDER' =>__DIR__.'/../../data/appupgrade/',
-    'FORM_FOLDER'=>__DIR__.'/../../data/forms/',
-    'apiUrl' => 'http://'.$host.':8080',
-    'applicationUrl' => 'http://'.$host.':8081',
-    'RULE_FOLDER'=>__DIR__.'/../../data/rules/',
-    'DATA_FOLDER'=>__DIR__.'/../../data/',
-    "UPLOAD_FOLDER" => __DIR__.'/../../data/uploads/',
-    'TEMPLATE_FOLDER'=>__DIR__.'/../../data/template/',
-    'APP_UPLOAD_FOLDER' => __DIR__.'/../../data/app',
-    'APP_DOCUMENT_FOLDER' => __DIR__.'/../../data/file_docs/',
-    'CLIENT_FOLDER' => __DIR__.'/../../../../clients/',
-    'APPS_FOLDER' => __DIR__."/../../../../view/apps/",
-    'EOX_APP_SOURCE_DIR' => __DIR__.'/../../data/AppSource/',
-    'EOX_APP_DEPLOY_DIR' => __DIR__.'/../../data/AppDeploy/', 
-    'GUI_FOLDER' => __DIR__."/../../../../view/gui/src/externals/",
-    'THEME_FOLDER' => __DIR__."/../../../../view/themes/",
-    'internalBaseUrl' => 'http://'.$host.':8080',
-    'baseUrl' => 'http://'.$host.':8080',
+    'DELEGATE_FOLDER' => __DIR__ . '/../../data/delegate/',
+    'UPGRADE_FOLDER' => __DIR__ . '/../../data/appupgrade/',
+    'FORM_FOLDER' => __DIR__ . '/../../data/forms/',
+    'apiUrl' => 'http://' . $host . ':8080',
+    'applicationUrl' => 'http://' . $host . ':8081',
+    'RULE_FOLDER' => __DIR__ . '/../../data/rules/',
+    'DATA_FOLDER' => __DIR__ . '/../../data/',
+    "UPLOAD_FOLDER" => __DIR__ . '/../../data/uploads/',
+    'TEMPLATE_FOLDER' => __DIR__ . '/../../data/template/',
+    'APP_UPLOAD_FOLDER' => __DIR__ . '/../../data/app',
+    'APP_DOCUMENT_FOLDER' => __DIR__ . '/../../data/file_docs/',
+    'CLIENT_FOLDER' => __DIR__ . '/../../../../clients/',
+    'APPS_FOLDER' => __DIR__ . "/../../../../view/apps/",
+    'EOX_APP_SOURCE_DIR' => __DIR__ . '/../../data/AppSource/',
+    'EOX_APP_DEPLOY_DIR' => __DIR__ . '/../../data/AppDeploy/',
+    'GUI_FOLDER' => __DIR__ . "/../../../../view/gui/src/externals/",
+    'THEME_FOLDER' => __DIR__ . "/../../../../view/themes/",
+    'internalBaseUrl' => 'http://' . $host . ':8080',
+    'baseUrl' => 'http://' . $host . ':8080',
     'batch_size' => 100,
     'salt' => 'arogAegatnaVOfficeBack123',
     'jwtKey' => 'l7Hnf6TGMYTy6eP7oyyWNG1MGay1T39/If495vwYBhS2j6OOHlMKhSf3qADPlWwkHQ6h3tjP2klI0kvKPltvVA==',
     'jwtAlgo' => 'HS512',
     'authRequiredText' => 'Authentication Required',
     'refreshTokenPeriod' => '7',
-    'paymentGatewayType'=>'DEMO'
+    'paymentGatewayType' => 'DEMO',
 ];

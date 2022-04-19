@@ -10,7 +10,7 @@
         <testsuite name="Attachment Fixtures">
             <directory>./module/Attachment/test</directory>
             <directory>./module/Resource/test</directory>
-        </testsuite> 
+        </testsuite>
         <testsuite name="Analytics Fixtures">
             <directory>./module/Analytics/test</directory>
             <directory>./module/FileIndexer/test</directory>
@@ -36,7 +36,7 @@
             <directory>./module/App/test/Controller/AppView</directory>
             <directory>./module/App/test/Controller/Cache</directory>
             <directory>./module/App/test/Controller/Delegate</directory>
-            <directory>./module/App/test/Controller/Document</directory> 
+            <directory>./module/App/test/Controller/Document</directory>
             <directory>./module/App/test/Controller/Entity/EntityControllerTest.php</directory>
             <directory>./module/App/test/Controller/Entity/FieldControllerTest.php</directory>
             <directory>./module/App/test/Controller/Entity/FileControllerTest.php</directory>
@@ -54,7 +54,7 @@
         <testsuite name="Core Fixtures">
             <directory>./lib/Oxzion/test/AnalyticsTest</directory>
             <directory>./lib/Oxzion/test/AppDelegateServiceTest</directory>
-            <directory>./lib/Oxzion/test/DocumentTest</directory> 
+            <directory>./lib/Oxzion/test/DocumentTest</directory>
             <directory>./lib/Oxzion/test/Migration</directory>
             <directory>./lib/Oxzion/test/NLPTest</directory>
             <directory>./lib/Oxzion/test/ParserTest</directory>
@@ -81,7 +81,7 @@
             <directory>./module/Callback/test</directory>
         </testsuite>
         <testsuite name="User Fixtures">
-            <directory>./module/Account/test</directory> 
+            <directory>./module/Account/test</directory>
             <directory>./module/Alert/test</directory>
             <directory>./module/User/test/Controller/ForgotPasswordControllerTest.php</directory>
             <directory>./module/User/test/Controller/ProfilePictureControllerTest.php</directory>
@@ -92,29 +92,29 @@
             <directory>./module/Contact/test</directory>
             <directory>./module/Privilege/test</directory>
             <directory>./module/PaymentGateway/test</directory>
-        </testsuite> 
+        </testsuite>
         <testsuite name="Esign Fixtures">
             <directory>./module/Esign/test</directory>
-        </testsuite>    
+        </testsuite>
         <testsuite name="Form File Fixtures">
             <directory>./module/File/test</directory>
         </testsuite>
-    </testsuites> 
+    </testsuites>
     <php>
         <ini name="memory_limit" value="500M" />
-        <const name="enableNLP" value="0"/>
-        <const name="enableCamunda" value="0"/>
-        <const name="enableElastic" value="0"/>
-        <const name="enableMattermost" value="0"/>
-        <const name="enableActiveMQ" value="0"/>
-        <const name="enableCamel" value="0"/>
-        <const name="enableProspectResearch" value="0"/>
-        <const name="enableCamundaForDeployApp" value="0"/>
-        <const name="enableExecUtils" value="0"/>
-        <const name="enableEsign" value="0"/>
+        <const name="enableNLP" value="0" />
+        <const name="enableCamunda" value="0" />
+        <const name="enableElastic" value="0" />
+        <const name="enableMattermost" value="0" />
+        <const name="enableActiveMQ" value="0" />
+        <const name="enableCamel" value="0" />
+        <const name="enableProspectResearch" value="0" />
+        <const name="enableCamundaForDeployApp" value="0" />
+        <const name="enableExecUtils" value="0" />
+        <const name="enableEsign" value="0" />
     </php>
     <listeners>
-        <listener class="\MyBuilder\PhpunitAccelerator\TestListener"/>
+        <listener class="\MyBuilder\PhpunitAccelerator\TestListener" />
         <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" />
     </listeners>
 </phpunit>
