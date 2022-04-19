@@ -421,6 +421,10 @@ class AppService extends AbstractService implements AppUpgrade
             file_put_contents($res . '/index.scss', $ymlData['cssContent']);
             // unset($ymlData['cssContent']);
         }
+        if (isset($ymlData['jsContent']) && !empty($ymlData['jsContent'])) {
+            file_put_contents($res . '/index.js', $ymlData['jsContent']);
+            // unset($ymlData['jsContent']);
+        }
     }
 
     private function removeViewAppOnError($path)
@@ -1182,7 +1186,7 @@ class AppService extends AbstractService implements AppUpgrade
                 FileUtils::chmod_r($link, 0777);
                 FileUtils::copyDir($source, $link);
             } else {
-                FileUtils::copyOnlyNewFiles($source, $link);
+                // FileUtils::copyOnlyNewFiles($source, $link);
             }
         }
     }
