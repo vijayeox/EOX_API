@@ -193,9 +193,8 @@ class AuthController extends AbstractApiControllerHelper
     public function validatetokenAction()
     {
         $data = $this->request->getPost()->toArray();
-        echo "<pre/>";print_r($data);exit;
         try {
-            if (isset($data['jwt']/* && $data['jwt'] !== ""*/)) {
+            if (isset($data['jwt'])) {
                 $tokenPayload = $this->decodeJwtToken($data['jwt']);
                 if (is_array($tokenPayload) && !is_object($tokenPayload)) {
                     if ($tokenPayload['Error'] == 'Expired token') {

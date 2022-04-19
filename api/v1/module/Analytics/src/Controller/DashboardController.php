@@ -32,7 +32,7 @@ class DashboardController extends AbstractApiController
      *               ispublic : integer(binary)
      *               description : string
      *   } </code>
-     * @return object Returns a JSON Response with Status Code and Created Dashboard.
+     * @return array Returns a JSON Response with Status Code and Created Dashboard.
      */
     public function create($data)
     {
