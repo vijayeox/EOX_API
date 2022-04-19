@@ -568,7 +568,7 @@ class Module
                         $container->get(\Team\Service\TeamService::class),
                         $container->get(Service\AppService::class),
                         $container->get(\App\Service\AppArtifactService::class),
-                        $container->get(Service\OverdriveService::class)
+                        $container->get(Service\OverdriveService::class),
                         $container->get(\Rate\Service\RateService::class)
                 );
                 },
