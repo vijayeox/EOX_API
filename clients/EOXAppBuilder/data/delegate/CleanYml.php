@@ -62,6 +62,9 @@ class CleanYml extends AbstractAppDelegate
             $whitelist = ['type'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
+        if ($pageData['type'] == 'ReactComponent' && isset($pageData['content'])) {
+            $pageData['content'] = array('reactId' => isset($pageData['reactId']) ? $pageData['reactId'] : null);
+        }
     }
 
     private function cleanUpyml(&$newPageData){ 

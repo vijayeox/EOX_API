@@ -63,6 +63,9 @@ class AppArtifactService extends AbstractService
                 }
                 return $this->uploadAppIcon($targetDir, $artifactType);
             break;
+            case 'component':                
+                return $this->uploadCustomComponent($appUuid, $appSourceDir);
+            break;
             case 'delegate':
                 return $this->uploadContents($appSourceDir, 'delegate', $descriptorPath, $artifactType);
             break;    
@@ -135,6 +138,31 @@ class AppArtifactService extends AbstractService
         }
     }
 
+
+    private function uploadCustomComponent($appUuid, $appSourceDir)
+    {
+        if (isset($_FILES) && isset($_FILES['file'])) {
+            $app = new App($this->table);
+            $app->loadByUuid($appUuid);
+            $appData = [
+                'uuid' => $appUuid,
+                'name' => $app->getProperty('name')
+            ];
+            $prefixDir = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData['name'] . DIRECTORY_SEPARATOR . "components";
+            $targetDir = $prefixDir. DIRECTORY_SEPARATOR .$_FILES['file']['name'];
+            if(!is_dir($prefixDir)){
+                mkdir($prefixDir);
+            }
+            move_uploaded_file($_FILES['file']['tmp_name'], $targetDir);
+            return [
+                "originalName" => $_FILES['file']['name'],
+                "size" => filesize($targetDir)
+            ];
+        } else {
+            throw new Exception('File upload failed.');
+        }
+    }
+
     public function deleteArtifact($appUuid, $artifactType, $artifactName)
     {
         $appSourceDir = $this->getAppSourceDirPath($appUuid);
@@ -165,6 +193,18 @@ class AppArtifactService extends AbstractService
             break;
             case 'migrations':
                 $filePath = $filePath . 'migrations';
+            case 'component':
+                $app = new App($this->table);
+                $app->loadByUuid($appUuid);
+                $appData = [
+                    'uuid' => $appUuid,
+                    'name' => $app->getProperty('name')
+                ];
+                $filePath = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData['name'] . DIRECTORY_SEPARATOR . "components";
+                if(!is_dir($filePath)){
+                    mkdir($filePath);
+                }
+            break;
             break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
@@ -317,6 +357,12 @@ class AppArtifactService extends AbstractService
             case 'migrations':
                 $targetDir = $contentDir . 'migrations';
             break;
+            case 'component':
+                $targetDir = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData['name'] . DIRECTORY_SEPARATOR . "components";
+                if(!is_dir($targetDir)){
+                    return array();
+                }
+            break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
@@ -326,7 +372,7 @@ class AppArtifactService extends AbstractService
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
                     $ext = pathinfo($entry, PATHINFO_EXTENSION);
-                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && ($artifactType == 'delegate' || $artifactType == 'appupgrade')) || ($ext == 'tpl' && $artifactType == 'template') || (($ext == 'yml' || $ext == 'php') && $artifactType == 'transformer') || ($ext == 'sql' && $artifactType == 'migrations')) {
+                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && ($artifactType == 'delegate' || $artifactType == 'appupgrade')) || ($ext == 'tpl' && $artifactType == 'template') || (($ext == 'yml' || $ext == 'php') && $artifactType == 'transformer') || ($ext == 'sql' && $artifactType == 'migrations')||($ext == 'js' && $artifactType == 'component')) {
                         $files[] = array(
                             'name' => substr($entry, 0, strrpos($entry, '.')) ,
                             'content'=> file_get_contents($targetDir.$entry)
@@ -397,6 +443,15 @@ class AppArtifactService extends AbstractService
         $appSourceDir = $this->getAppSourceDirPath($appUuid);
         $this->logger->info("DOWNLOAD Appsource----".print_r($appSourceDir,true));
         $filePath = $appSourceDir . $this->dataFolder . $artifactType . DIRECTORY_SEPARATOR. $artifactNamer;
+        if($artifactType == "component"){
+            $app = new App($this->table);
+            $app->loadByUuid($appUuid);
+            $appData = [
+                'uuid' => $appUuid,
+                'name' => $app->getProperty('name')
+            ];
+            $filePath = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData["name"] . DIRECTORY_SEPARATOR . "components". DIRECTORY_SEPARATOR . $artifactNamer;
+        }
         $this->logger->info("DOWNLOAD PATH----".print_r($filePath,true));
         //Check the file exists or not
         if(file_exists($filePath)) {
