@@ -88,6 +88,9 @@ pages:
     -
         page_name: Migraton.yml
         uuid: f5d87830-af1d-11ec-b909-0242ac120002
+    -
+        page_name: ComponentManager.yml
+        uuid: 63cb348f-e3e1-4459-8338-40f0acbcf173
 menu:
     -
         name: 'Manage EOX Apps'
