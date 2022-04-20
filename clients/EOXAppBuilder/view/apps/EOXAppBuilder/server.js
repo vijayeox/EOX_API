@@ -16,7 +16,7 @@ module.exports = (core, proc) => {
       });
 
       routeAuthenticated('GET', proc.resource('/appstudio/samplecomponent'), async (req, res) => {
-        res.sendFile(path.join(__dirname + '/public/img/samplecustom-component.js'))
+        res.sendFile(path.join(__dirname + '/custom-components/samplecustom-component.js'))
       });
     },
   

@@ -28,7 +28,7 @@ class SampleDownloadComponent extends React.Component {
           color: "#000",
           right: "3.75rem",
         }}
-        download={"sameple-component.js"}
+        download={"sample-component.js"}
         href={"/apps/EOXAppBuilder/appstudio/samplecomponent"}
         target="_blank"
         rel="noopener noreferrer"
