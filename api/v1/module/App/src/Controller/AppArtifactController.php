@@ -114,14 +114,14 @@ class AppArtifactController extends AbstractApiController
         $artifactType = $routeParams['artifactType'];
         try {
             $fileData = $this->appArtifactService->createDownload($appUuid, $artifactType, $artifactName);
-            $response = new \Zend\Http\Response\Stream();
+            $response = new \Zend\Http\Response();
             $headers = new \Zend\Http\Headers();
             $headers->addHeaderLine('Content-Type', 'application/octet-stream')
                     ->addHeaderLine("Content-disposition: attachment; filename=\"".$artifactName."\"")
                     ->addHeaderLine('Access-Control-Expose-Headers: Content-Disposition')
                     ->addHeaderLine('Content-Length', filesize($fileData));
             $response->setHeaders($headers);
-            
+            readfile($fileData);
             return $response;
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);

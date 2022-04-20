@@ -360,7 +360,7 @@ class AppArtifactService extends AbstractService
             case 'component':
                 $targetDir = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData['name'] . DIRECTORY_SEPARATOR . "components";
                 if(!is_dir($targetDir)){
-                    mkdir($targetDir);
+                    return array();
                 }
             break;
             default:
