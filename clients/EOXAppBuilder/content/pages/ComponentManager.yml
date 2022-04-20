@@ -15,6 +15,11 @@ content:
                                 -
                                     type: UploadArtifact
                                     entity: component
+    
+    -
+        type: ReactComponent
+        content:
+                reactId: 'sampleComponentDownload'
     # -
     #     type: RenderButtons
     #     content:
