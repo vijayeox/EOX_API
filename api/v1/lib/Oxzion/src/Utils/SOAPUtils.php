@@ -12,7 +12,7 @@ class SOAPUtils extends \SoapClient
 
     public function __construct(String $wsdl, Array $options = [])
     {
-        parent::__construct($wsdl, $options);
+        parent::__construct($wsdl, $options /* + ['trace' => true] */);
         $this->processXml($wsdl, $options);
         self::$logger = \Logger::getLogger(__CLASS__);
     }
