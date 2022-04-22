@@ -148,11 +148,7 @@ class AppArtifactService extends AbstractService
                 'uuid' => $appUuid,
                 'name' => $app->getProperty('name')
             ];
-            $prefixDir = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData['name'] . DIRECTORY_SEPARATOR . "components";
-            $targetDir = $prefixDir. DIRECTORY_SEPARATOR .$_FILES['file']['name'];
-            if(!is_dir($prefixDir)){
-                mkdir($prefixDir);
-            }
+            $targetDir =  self::getCustomComponentDir($appSourceDir, $appData["name"]) . DIRECTORY_SEPARATOR .$_FILES['file']['name'];
             move_uploaded_file($_FILES['file']['tmp_name'], $targetDir);
             return [
                 "originalName" => $_FILES['file']['name'],
@@ -200,10 +196,7 @@ class AppArtifactService extends AbstractService
                     'uuid' => $appUuid,
                     'name' => $app->getProperty('name')
                 ];
-                $filePath = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData['name'] . DIRECTORY_SEPARATOR . "components";
-                if(!is_dir($filePath)){
-                    mkdir($filePath);
-                }
+                $filePath = self::getCustomComponentDir($appSourceDir, $appData["name"]);
             break;
             break;
             default:
@@ -358,10 +351,7 @@ class AppArtifactService extends AbstractService
                 $targetDir = $contentDir . 'migrations';
             break;
             case 'component':
-                $targetDir = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData['name'] . DIRECTORY_SEPARATOR . "components";
-                if(!is_dir($targetDir)){
-                    return array();
-                }
+                $targetDir = self::getCustomComponentDir($appSourceDir, $appData["name"]);
             break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
@@ -450,7 +440,7 @@ class AppArtifactService extends AbstractService
                 'uuid' => $appUuid,
                 'name' => $app->getProperty('name')
             ];
-            $filePath = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps" . DIRECTORY_SEPARATOR . $appData["name"] . DIRECTORY_SEPARATOR . "components". DIRECTORY_SEPARATOR . $artifactNamer;
+            $filePath = self::getCustomComponentDir($appSourceDir, $appData["name"]) . DIRECTORY_SEPARATOR . $artifactNamer;
         }
         $this->logger->info("DOWNLOAD PATH----".print_r($filePath,true));
         //Check the file exists or not
@@ -460,5 +450,11 @@ class AppArtifactService extends AbstractService
         else{
             echo "File does not exist.";
         }
+    }
+
+    private function getCustomComponentDir($appSourceDir, $appName){
+        $prefixPath = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps";
+        $appPath = is_dir($prefixPath. DIRECTORY_SEPARATOR . $appName) ? $appName : "eoxapps";
+        return $prefixPath . DIRECTORY_SEPARATOR . $appPath . DIRECTORY_SEPARATOR . "components";
     }
 }
