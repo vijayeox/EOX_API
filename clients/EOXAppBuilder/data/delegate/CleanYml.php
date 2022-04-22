@@ -4,7 +4,6 @@
 use Oxzion\Db\Persistence\Persistence;
 use Oxzion\AppDelegate\AbstractAppDelegate;
 use Oxzion\AppDelegate\AppTrait;
-use Respect\Validation\Rules\Length;
 
 class CleanYml extends AbstractAppDelegate
 {
