@@ -4,8 +4,7 @@
 use Oxzion\Db\Persistence\Persistence;
 use Oxzion\AppDelegate\AbstractAppDelegate;
 use Oxzion\AppDelegate\AppTrait;
-
-
+use Respect\Validation\Rules\Length;
 
 class CleanYml extends AbstractAppDelegate
 {
@@ -24,6 +23,27 @@ class CleanYml extends AbstractAppDelegate
         $this->updateApp($uuid, $data);
         $this->logger->info("Data out of delegate----".print_r($data,true));
         return $data;
+    }
+
+    private function cleanTabSegment(&$tabs){
+        for($i = 0; $i < count($tabs); $i++){
+            if(!isset($tabs[$i]['detailsDuplicate']['data']['content'])) continue;
+            $tabs[$i]['content'] = $tabs[$i]['detailsDuplicate']['data']['content'];
+            unset($tabs[$i]['detailsDuplicate']);
+            if(isset($tabs[$i]['name1'])){
+                $tabs[$i]['name'] = $tabs[$i]['name1'];
+                unset($tabs[$i]['name1']);
+            }
+            for($j = 0;$j < count($tabs[$i]['content']);$j++){
+                if(isset($tabs[$i]['content'][$j]['tabs'])){
+                    $tabs[$i]['content'][$j]['content'] = array('tabs' => $tabs[$i]['content'][$j]['tabs']);
+                    unset($tabs[$i]['content'][$j]['tabs']);
+                    $this->cleanTabSegment($tabs[$i]['content'][$j]['content']['tabs']);
+                }else{
+                    $this->haveOnlyRequiredInfo($tabs[$i]['content'][$j]);
+                }
+            }
+        }
     }
 
     private function haveOnlyRequiredInfo(&$pageData){
@@ -64,6 +84,10 @@ class CleanYml extends AbstractAppDelegate
         }
         if ($pageData['type'] == 'ReactComponent' && isset($pageData['content'])) {
             $pageData['content'] = array('reactId' => isset($pageData['reactId']) ? $pageData['reactId'] : null);
+        }
+        if ($pageData['type'] == 'TabSegment' && isset($pageData['tabs'])) {
+            $pageData['content'] = array('tabs' => $pageData['tabs']);
+            $this->cleanTabSegment($pageData['content']['tabs']);
         }
     }
 
