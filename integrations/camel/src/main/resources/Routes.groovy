@@ -53,8 +53,6 @@ routes {
 
 		['from':'activemq:topic:ADD_CALENDAR_EVENT', 	'to':["${callback.URL}/callback/calendar/addevent"]],
 
-		['from':'activemq:topic:SEND_SMS', 				'to':["${callback.URL}/callback/communication/sendsms"]],
-		['from':'activemq:topic:MAKE_CALL', 			'to':["${callback.URL}/callback/communication/makecall"]],
 		['from':'activemq:topic:UPDATE_CHAT_PROFILE_PICTURE', 'to':["${callback.URL}/callback/chat/updateprofilepicture"]]
 	]
 }
