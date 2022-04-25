@@ -60,9 +60,12 @@ class UserAuditLogService extends AbstractService
                             'activity' => 'logout',
                             'jwtToken' => $lastloginresult[0]['jwtToken']
                         );
-                        $insertQuery = "INSERT into ox_user_audit_log (`user_id`, `account_id`, `activity_time`, `activity`, `jwtToken`) 
-                          VALUES (:userId, :accountId, :activityTime, :activity, :jwtToken)";
-                        $queryResult = $this->executeUpdateWithBindParameters($insertQuery, $insertParams);
+                        $jwtExplode = explode('-', $jwtExpirytime);
+                        if($jwtExplode[0] == date('Y')){//avoiding activty year as 1970
+                            $insertQuery = "INSERT into ox_user_audit_log (`user_id`, `account_id`, `activity_time`, `activity`, `jwtToken`) 
+                              VALUES (:userId, :accountId, :activityTime, :activity, :jwtToken)";
+                            $queryResult = $this->executeUpdateWithBindParameters($insertQuery, $insertParams);
+                        }
                     }
 
                 }
