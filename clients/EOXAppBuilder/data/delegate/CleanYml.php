@@ -47,7 +47,7 @@ class CleanYml extends AbstractAppDelegate
 
     private function haveOnlyRequiredInfo(&$pageData){
         if ($pageData['type'] == 'HTMLViewer') {
-            $pageData['content'] = $pageData['htmlContent'];
+            $pageData['content'] = isset($pageData['htmlContent']) ? $pageData['htmlContent'] : null;
             $whitelist = ['type' ,'htmlContent','content'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
@@ -67,13 +67,13 @@ class CleanYml extends AbstractAppDelegate
         }
 
         if ($pageData['type'] == 'List') {
-            $pageData['content'] = $pageData['gridContent'];
+            $pageData['content'] = isset($pageData['gridContent']) ? $pageData['gridContent'] : null;
             $this->logger->info("CONTENT----".print_r($pageData,true));
             $whitelist = ['type' ,'route','content','gridContent','disableAppId','defaultFilters','pageable','autoRefreshInterval','exportToPDF'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
         if ($pageData['type'] == 'KanbanViewer') {
-            $pageData['content'] = $pageData['kanbanContent'];
+            $pageData['content'] = isset($pageData['kanbanContent']) ? $pageData['kanbanContent'] : null;
             $whitelist = ['type' ,'content'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
@@ -88,7 +88,7 @@ class CleanYml extends AbstractAppDelegate
             $pageData['content'] = array('tabs' => $pageData['tabs']);
             $this->cleanTabSegment($pageData['content']['tabs']);
         }
-        if ($pageData['type'] == 'Comment' && isset($pageData['fileId']) && isset($pageData['content']) && $pageData['content'] == '') {
+        if ($pageData['type'] == 'Comment' && isset($pageData['fileId']) && isset($pageData['content']) && !empty($pageData['content'])) {
             $pageData['content'] = $pageData['fileId'];
             $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content'] ) );
         }

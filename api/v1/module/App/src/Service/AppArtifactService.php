@@ -148,8 +148,11 @@ class AppArtifactService extends AbstractService
                 'uuid' => $appUuid,
                 'name' => $app->getProperty('name')
             ];
-            $targetDir =  self::getCustomComponentDir($appSourceDir, $appData["name"]) . DIRECTORY_SEPARATOR .$_FILES['file']['name'];
-            move_uploaded_file($_FILES['file']['tmp_name'], $targetDir);
+            $targetDir =  self::getCustomComponentDir($appSourceDir, $appData["name"]);
+            if(!is_dir($targetDir)){
+                mkdir($targetDir);
+            }
+            move_uploaded_file($_FILES['file']['tmp_name'], $targetDir. DIRECTORY_SEPARATOR .$_FILES['file']['name']);
             return [
                 "originalName" => $_FILES['file']['name'],
                 "size" => filesize($targetDir)
@@ -352,6 +355,9 @@ class AppArtifactService extends AbstractService
             break;
             case 'component':
                 $targetDir = self::getCustomComponentDir($appSourceDir, $appData["name"]);
+                if(!is_dir($targetDir)){
+                    return array();
+                }
             break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
