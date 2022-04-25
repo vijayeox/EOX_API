@@ -26,7 +26,7 @@ content:
         content:
             route: 'app'
             disableAppId: true
-            filterable: false
+            filterable: true
             defaultFilters: 
                 filter:
                     logic: and
@@ -41,6 +41,7 @@ content:
                         dir: desc                            
             resizable: true
             actionsWidth: 340px
+            take: 50
             pageable:
                 buttonCount: 3
                 pageSizes:
