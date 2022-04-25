@@ -7,7 +7,7 @@ content:
                 buttonList:
                     -
                         name: Build Application
-                        icon: 'fa fa-gavel'
+                        icon: 'fa fa-hammer'
                         rule: 'true'
                         details:
                             -
@@ -15,7 +15,7 @@ content:
                                 form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
                     -
                         name: Import Application
-                        icon: 'fa fa-cloud-upload'
+                        icon: 'fa fa-upload'
                         rule: 'true'
                         details:
                             -

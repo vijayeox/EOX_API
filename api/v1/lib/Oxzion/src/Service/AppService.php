@@ -820,7 +820,7 @@ class AppService extends AbstractService implements AppUpgrade
                     if ($page) {
                         $menu['page_id'] = $page['id'];
                     } else {
-                        throw new ValidationException(['page or page_uuid' => 'required']);
+                        throw new ValidationException(['Menu : page or page_uuid' => 'required']);
                     }
                 }
                 $count = $this->menuItemService->updateMenuItem($menu['uuid'], $menu);
