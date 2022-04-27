@@ -2597,6 +2597,7 @@ class FileService extends AbstractService
             $resultQuery = $this->executeQuerywithBindParameters($selectQuery, $paramsQuery)->toArray();
             $entityId = null;
             $completionData = null;
+            $startData = null;
             if (count($resultSet) > 0) {
                 $entityId = $resultSet[0]['entity_id'];
                 $completionData = json_decode($resultSet[0]['data'], true);
