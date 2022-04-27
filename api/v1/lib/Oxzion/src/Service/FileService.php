@@ -2627,7 +2627,8 @@ class FileService extends AbstractService
             }
             if (count($resultQuery) > 0) {
                 $startData = json_decode($resultQuery[0]['data'], true);
-            }
+            } else {
+                $startData = json_decode($resultSet[0]['data'], true);
             // print_r("expression---\n");  print_r($completionData);
             $resultData = $this->getChangeLog($entityId, $startData, $completionData,$fileId=$fileId);
             return $resultData;
