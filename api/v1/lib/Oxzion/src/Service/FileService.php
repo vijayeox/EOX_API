@@ -2595,14 +2595,15 @@ class FileService extends AbstractService
             $selectQuery = " SELECT ofal.entity_id,ofal.data,ofal.created_by,ofal.modified_by,ofal.date_modified,ofal.date_created FROM ox_file_audit_log ofal WHERE (ofal.id = :fileId or ofal.uuid = :uuid) and ofal.version =:version";
             $paramsQuery = array('fileId' => $fileId, 'uuid' => $fileId, 'version' => $previousFileVersion);
             $resultQuery = $this->executeQuerywithBindParameters($selectQuery, $paramsQuery)->toArray();
+            $entityId = null;
+            $completionData = null;
             if (count($resultSet) > 0) {
                 $entityId = $resultSet[0]['entity_id'];
                 $completionData = json_decode($resultSet[0]['data'], true);
+                $startData = json_decode($resultSet[0]['data'], true);
             }
             if (count($resultQuery) > 0) {
                 $startData = json_decode($resultQuery[0]['data'], true);
-            } else {
-                $startData = json_decode($resultSet[0]['data'], true);
             }
             // print_r("expression---\n");  print_r($completionData);
             $resultData = $this->getChangeLog($entityId, $startData, $completionData, $fileId = $fileId);
