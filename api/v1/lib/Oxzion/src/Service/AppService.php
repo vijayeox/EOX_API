@@ -946,6 +946,7 @@ class AppService extends AbstractService implements AppUpgrade
             copy($eoxapp . '/view/apps/eoxapps/metadata.json', $path . '/view/apps/' . $yamlData['app']['name'] . '/metadata.json');
             copy($eoxapp . '/view/apps/eoxapps/package.json', $path . '/view/apps/' . $yamlData['app']['name'] . '/package.json');
             copy($eoxapp . '/view/apps/eoxapps/index.scss', $path . '/view/apps/' . $yamlData['app']['name'] . '/index.scss');
+            copy($eoxapp . '/view/apps/eoxapps/index.js', $path . '/view/apps/' . $yamlData['app']['name'] . '/index.js');
         } else {
             if (is_dir($path . 'view/apps/eoxapps')) {
                 FileUtils::rmDir($path . 'view/apps/eoxapps');
@@ -955,6 +956,14 @@ class AppService extends AbstractService implements AppUpgrade
                 FileUtils::copy($srcIconPath . 'icon.png', "icon.png", $appName);
                 FileUtils::copy($srcIconPath . 'icon_white.png', "icon_white.png", $appName);
                 FileUtils::copy($srcIconPath . 'index.scss', "index.scss", $appName); // Copy css from Source to Deploy directory
+                FileUtils::copy($srcIconPath . 'index.js', "index.js", $appName); // Copy index.js from Source to Deploy directory
+                if(is_dir($srcIconPath . 'components')){
+                    //override components folder in deploy with source directory
+                    if(is_dir($appName . "/components")) {
+                        FileUtils::rmDir($appName . "/components");
+                    }
+                    FileUtils::copyDir($srcIconPath . 'components', $appName . "/components"); // Copy css from Source to Deploy directory
+                }
             }
         }
 
