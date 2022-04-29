@@ -88,6 +88,19 @@ class CacheController extends AbstractApiController
         }
     }
 
+    public function formcacheAction()
+    {
+        $routeParams = $this->params()->fromRoute();
+        $this->log->info(__CLASS__ . "-> \n Get Form Cache - " . print_r($routeParams, true));
+        try {
+            $result = $this->userCacheService->getCache(null, $routeParams['appId'], AuthContext::get(AuthConstants::USER_ID), $routeParams);
+            return $this->getSuccessResponseWithData($result);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+    }
+
     public function cacheDeleteAction()
     {
         $appId = $this->params()->fromRoute()['appId'];
