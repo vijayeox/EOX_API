@@ -487,19 +487,36 @@ class ProjectService extends AbstractService
         return $newaccountId;
     }
 
-    public function getSubprojects($params)
+    public function getSubprojects($params, $filterParams)
     {
         if (!isset($params['projectId'])) {
             throw new ServiceException("Project not provided", "project.required", OxServiceException::ERR_CODE_NOT_FOUND);
         }
+        $sort = "name";
+        $where = "";
+        $fieldMap = ['name' => 'oxp.name', 'description' => 'oxp.description'];
+        if (isset($filterParams['filter'])) {
+            $filterArray = json_decode($filterParams['filter'], true);
+            if (isset($filterArray[0]['filter'])) {
+                $filterlogic = isset($filterArray[0]['filter']['logic']) ? $filterArray[0]['filter']['logic'] : "AND";
+                $filterList = $filterArray[0]['filter']['filters'];
+                $where = " and " . FilterUtils::filterArray($filterList, $filterlogic, $fieldMap);
+            }
+            if (isset($filterArray[0]['sort']) && count($filterArray[0]['sort']) > 0) {
+                $sort = $filterArray[0]['sort'];
+                $sort = FilterUtils::sortArray($sort);
+            }
+        }
         $id = $this->getIdFromUuid('ox_project', $params['projectId']);
+        $sort = " ORDER BY " . $sort;
         // Done Twice  - one for admin and one for PPM App
         $queryString = "SELECT oxp.name,oxp.description,oxp.uuid,oxp.date_created,
                         ou.uuid as managerId,sub.uuid as parentId,ou.uuid as manager_id,sub.uuid as parent_id 
                         from ox_project as oxp 
                         INNER JOIN ox_user as ou on oxp.manager_id = ou.id 
                         INNER JOIN ox_project as sub on sub.id = oxp.parent_id 
-                        where oxp.parent_id = $id and oxp.isdeleted <> 1";
+                        where oxp.parent_id = $id and oxp.isdeleted <> 1".
+                        $where. " " . $sort;
         $resultSet = $this->executeQuerywithParams($queryString);
         return $resultSet->toArray();
     }
