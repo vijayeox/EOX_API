@@ -419,6 +419,19 @@ return [
                     ],
                 ],
             ],
+            'form_cache' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/formCache[/workflowId/:workflowId][/formId/:formId]',
+                    'constraints' => [
+                        'appId' => UuidUtil::UUID_PATTERN,
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\CacheController::class,
+                        'action' => 'formcache',
+                    ],
+                ],
+            ],
             'remove_app_cache' => [
                 'type' => Segment::class,
                 'options' => [
