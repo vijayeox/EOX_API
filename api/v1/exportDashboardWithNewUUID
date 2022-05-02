@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 use Zend\Config\Reader\Ini;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Metadata\Metadata;
@@ -53,59 +54,62 @@ class Dashboard_Export
      * @param Application $application
      */
 
-     protected $dataFolder;
-     protected $queryArray;
+    protected $dataFolder;
+    protected $queryArray;
 
-    public function __construct(Application $application, $workingDir){
+    public function __construct(Application $application, $workingDir)
+    {
         $this->workingDir = $workingDir;
         $dbAdapterServiceKey = self::DEFAULT_DB_ADAPTER_KEY;
         $this->dbAdapter = $application->getServiceManager()->get($dbAdapterServiceKey);
-        $this->dataFolder = $workingDir."/data/OIData";
+        $this->dataFolder = $workingDir . "/data/OIData";
         $this->queryArray = array();
     }
 
-	public function export($uuid){
+    public function export($uuid)
+    {
         if (!file_exists($this->dataFolder)) {
             mkdir($this->dataFolder, 0777, true);
         }
         $sql    = new Sql($this->dbAdapter);
-		$select = $sql->select();
-//		print_r($para['select']);exit;
+        $select = $sql->select();
+        //		print_r($para['select']);exit;
         $select->from('ox_dashboard');
-        $select->where(['uuid=?'=>$uuid]);
+        $select->where(['uuid=?' => $uuid]);
         $statement = $sql->prepareStatementForSqlObject($select);
-		$result = $statement->execute();
+        $result = $statement->execute();
         $resultSet = new ResultSet();
         $finalResult = $resultSet->initialize($result)->toArray();
         $dashboardarray = $finalResult[0];
-        $fp = fopen($this->dataFolder.'/widget.csv', 'w');
+        $fp = fopen($this->dataFolder . '/widget.csv', 'w');
         fclose($fp);
-        $fp = fopen($this->dataFolder.'/widget_query.csv', 'w');
+        $fp = fopen($this->dataFolder . '/widget_query.csv', 'w');
         fclose($fp);
-        $fp = fopen($this->dataFolder.'/query.csv', 'w');
+        $fp = fopen($this->dataFolder . '/query.csv', 'w');
         fclose($fp);
         $newuuid = UuidUtil::uuid();
         $dashboardarray['uuid'] = $newuuid;
         $description = $dashboardarray['content'];
-      //  print_r($description);
+        //  print_r($description);
         $pattern = "/data-oxzion-widget-id\=\"(.*?)\"/i";
-        preg_match_all($pattern,$description,$matches);
-        $flag=0;
-        foreach($matches[1] as $widgetuuid) {
-            $newwidgetuuid = $this->exportWidget($widgetuuid,$flag);
-            $dashboardarray['content']=str_replace($widgetuuid,$newwidgetuuid,$dashboardarray['content']);
+        preg_match_all($pattern, $description, $matches);
+        $flag = 0;
+        foreach ($matches[1] as $widgetuuid) {
+            $newwidgetuuid = $this->exportWidget($widgetuuid, $flag);
+            $dashboardarray['content'] = str_replace($widgetuuid, $newwidgetuuid, $dashboardarray['content']);
             $flag = 1;
         }
-        $fp = fopen($this->dataFolder.'/dashboard.csv', 'w');
-        fputcsv($fp,array_keys($dashboardarray));
+        $fp = fopen($this->dataFolder . '/dashboard.csv', 'w');
+        fputcsv($fp, array_keys($dashboardarray));
         fputcsv($fp, $dashboardarray);
         fclose($fp);
-}
+    }
 
-    
-    public function run(){
+
+    public function run()
+    {
         error_reporting(E_ERROR | E_PARSE);
-//        $uuid = 'c6318742-b9f9-4a18-abce-7a7fbbac8c8b';
+        //        $uuid = 'c6318742-b9f9-4a18-abce-7a7fbbac8c8b';
         $uuid = $_SERVER['argv'][1];
         if (!$uuid) {
             echo 'Dashboard UUID not provided';
@@ -114,79 +118,81 @@ class Dashboard_Export
         echo 'Export Done';
     }
 
-    public function exportWidget($widgetuuid,$flag) {
+    public function exportWidget($widgetuuid, $flag)
+    {
         $sql    = new Sql($this->dbAdapter);
-		$select = $sql->select();
+        $select = $sql->select();
         $select->from('ox_widget');
-        $select->where(['uuid=?'=>$widgetuuid]);
-        $statement = $sql->prepareStatementForSqlObject($select);
-		$result = $statement->execute();
-        $resultSet = new ResultSet();
-        $finalResult = $resultSet->initialize($result)->toArray();
-        $fp = fopen($this->dataFolder.'/widget.csv', 'a');
-        if ($flag ==0) fputcsv($fp,array_keys($finalResult[0]));
-        $newuuid = UuidUtil::uuid();
-        $finalResult[0]['uuid'] = $newuuid;
-	    foreach ($finalResult[0] as $data) {
-        	 $finaldata[]=str_replace('\"', "@@", $data);
-        }
-        fputcsv($fp, $finaldata);
-        fclose($fp);
-        $id = $finalResult[0]['id'];
-        $this->exportWidgetQuery($id,$widgetuuid,$newuuid,$flag);
-        return $newuuid;
-    }
-
-    public function exportWidgetQuery($id,$uuid,$newuuid, $flag) {
-        $sql    = new Sql($this->dbAdapter);
-		$select = $sql->select();
-        $select->from('ox_widget_query');
-        $select->join('ox_query','ox_query_id=id',['uuid']);
-        $select->where(['ox_widget_id=?'=>$id]);
+        $select->where(['uuid=?' => $widgetuuid]);
         $statement = $sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();
         $resultSet = new ResultSet();
         $finalResult = $resultSet->initialize($result)->toArray();
-        $fp = fopen($this->dataFolder.'/widget_query.csv', 'a');
-        foreach($finalResult as $row) {
+        $fp = fopen($this->dataFolder . '/widget.csv', 'a');
+        if ($flag == 0) fputcsv($fp, array_keys($finalResult[0]));
+        $newuuid = UuidUtil::uuid();
+        $finalResult[0]['uuid'] = $newuuid;
+        foreach ($finalResult[0] as $data) {
+            $finaldata[] = str_replace('\"', "@@", $data);
+        }
+        fputcsv($fp, $finaldata);
+        fclose($fp);
+        $id = $finalResult[0]['id'];
+        $this->exportWidgetQuery($id, $widgetuuid, $newuuid, $flag);
+        return $newuuid;
+    }
+
+    public function exportWidgetQuery($id, $uuid, $newuuid, $flag)
+    {
+        $sql    = new Sql($this->dbAdapter);
+        $select = $sql->select();
+        $select->from('ox_widget_query');
+        $select->join('ox_query', 'ox_query_id=id', ['uuid']);
+        $select->where(['ox_widget_id=?' => $id]);
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+        $resultSet = new ResultSet();
+        $finalResult = $resultSet->initialize($result)->toArray();
+        $fp = fopen($this->dataFolder . '/widget_query.csv', 'a');
+        foreach ($finalResult as $row) {
             if (array_key_exists($row['uuid'], $this->queryArray)) {
-               $newqueryuuid = $this->queryArray[$row['uuid']];
+                $newqueryuuid = $this->queryArray[$row['uuid']];
             } else {
                 $newqueryuuid = UuidUtil::uuid();
                 $this->queryArray[$row['uuid']] = $newqueryuuid;
             }
-            $outputrow = ['ox_widget_uuid'=>$newuuid,'ox_widget_id'=>$row['ox_widget_id'],'ox_query_id'=>$row['ox_query_id'],'sequence'=>$row['sequence'],'configuration'=>$row['configuration'],'ox_query_uuid'=>$newqueryuuid];
-            if ($flag==0) fputcsv($fp,array_keys($outputrow));
+            $outputrow = ['ox_widget_uuid' => $newuuid, 'ox_widget_id' => $row['ox_widget_id'], 'ox_query_id' => $row['ox_query_id'], 'sequence' => $row['sequence'], 'configuration' => $row['configuration'], 'ox_query_uuid' => $newqueryuuid];
+            if ($flag == 0) fputcsv($fp, array_keys($outputrow));
             $finaldata = array();
-	        foreach ($outputrow as $data) {
-		        $finaldata[]=str_replace('\"', "@@", $data);
+            foreach ($outputrow as $data) {
+                $finaldata[] = str_replace('\"', "@@", $data);
             }
-            fputcsv($fp,$finaldata);
+            fputcsv($fp, $finaldata);
             $queryid = $row['ox_query_id'];
-            $this->exportQuery($queryid,$flag,$newqueryuuid);
+            $this->exportQuery($queryid, $flag, $newqueryuuid);
             $flag = 1;
         }
         fclose($fp);
     }
 
-    public function exportQuery($id,$flag,$newqueryuuid) {
+    public function exportQuery($id, $flag, $newqueryuuid)
+    {
         $sql    = new Sql($this->dbAdapter);
-		$select = $sql->select();
+        $select = $sql->select();
         $select->from('ox_query');
-        $select->where(['id=?'=>$id]);
+        $select->where(['id=?' => $id]);
         $statement = $sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();
         $resultSet = new ResultSet();
         $finalResult = $resultSet->initialize($result)->toArray();
-        $fp = fopen($this->dataFolder.'/query.csv', 'a');
+        $fp = fopen($this->dataFolder . '/query.csv', 'a');
         $finalResult[0]['uuid'] = $newqueryuuid;
-        if ($flag==0) fputcsv($fp,array_keys($finalResult[0]));
-	    foreach ($finalResult[0] as $data) {
-	        $finaldata[]=str_replace('\"', "@@", $data);
+        if ($flag == 0) fputcsv($fp, array_keys($finalResult[0]));
+        foreach ($finalResult[0] as $data) {
+            $finaldata[] = str_replace('\"', "@@", $data);
         }
         fputcsv($fp, $finaldata);
         fclose($fp);
     }
-
 }
 ?>
