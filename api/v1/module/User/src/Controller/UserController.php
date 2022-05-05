@@ -150,9 +150,10 @@ class UserController extends AbstractApiController
      */
     public function getList()
     {
-        $filterParams = $this->params()->fromQuery(); // empty method call
+        $params = $this->params()->fromRoute(); // empty method call
+        $filterParams = array_merge($params, $this->params()->fromQuery());
         try {
-            $result = $this->userService->getUsers($filterParams, $this->getBaseUrl());
+            $result = $this->userService->getUsers($filterParams, $this->getBaseUrl(),$params);
             $i = 0;
             $uuid = "";
             $accountId = "";
