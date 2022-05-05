@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\AppDelegate;
 
 use Logger;
@@ -9,7 +10,7 @@ abstract class AbstractDocumentAppDelegate implements DocumentAppDelegate
     use UserContextTrait;
     protected $logger;
     protected $documentBuilder;
-	protected $baseUrl;
+    protected $baseUrl;
     protected $destination;
 
     public function __construct()
@@ -21,11 +22,14 @@ abstract class AbstractDocumentAppDelegate implements DocumentAppDelegate
     {
         $this->documentBuilder = $documentBuilder;
     }
+    
     public function setDocumentPath($destination)
     {
         $this->destination = $destination;
     }
-    public function setBaseUrl($url) {
-    	$this->baseUrl = $url;
+    
+    public function setBaseUrl($url)
+    {
+        $this->baseUrl = $url;
     }
 }
