@@ -261,9 +261,10 @@ class ProjectController extends AbstractApiController
     public function getSubprojectsAction()
     {
         $params = $this->params()->fromRoute();
+        $filterParams = $this->params()->fromQuery();
         $this->log->info(__CLASS__ . "-> \nGet Project - " . print_r($params, true) . "Parameters - " . print_r($params, true));
         try {
-            $result = $this->projectService->getSubprojects($params);
+            $result = $this->projectService->getSubprojects($params, $filterParams);
             return $this->getSuccessResponseWithData($result);
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), $e);
