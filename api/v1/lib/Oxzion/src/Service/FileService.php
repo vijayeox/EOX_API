@@ -2059,7 +2059,6 @@ class FileService extends AbstractService
                     $folderPath .= $subFolder . '/';
                 }
                 $path = realpath($folderPath . $data['name']) ? realpath($folderPath . $data['name']) : FileUtils::truepath($folderPath . $data['name']);
-                $data['file'] = AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/' . $params['fileId'] . (isset($subFolder) ? "/" . $subFolder : "") . '/' . $file['name'];
                 $data['path'] = $path;
                 $data['url'] = $this->config['baseUrl'] . (isset($params['appId']) ? "/" . $params['appId'] : "") . "/data/" . $fileStorage . $data['uuid'] . "/" . $data['name'];
             } else {
