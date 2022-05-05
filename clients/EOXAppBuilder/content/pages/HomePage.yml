@@ -7,7 +7,7 @@ content:
                 buttonList:
                     -
                         name: Build Application
-                        icon: 'fa fa-gavel'
+                        icon: 'fa fa-hammer'
                         rule: 'true'
                         details:
                             -
@@ -15,7 +15,7 @@ content:
                                 form_id: 1fa0d5c0-b428-499a-a490-37e4349c1060
                     -
                         name: Import Application
-                        icon: 'fa fa-cloud-upload'
+                        icon: 'fa fa-upload'
                         rule: 'true'
                         details:
                             -
@@ -26,7 +26,7 @@ content:
         content:
             route: 'app'
             disableAppId: true
-            filterable: false
+            filterable: true
             defaultFilters: 
                 filter:
                     logic: and
@@ -41,6 +41,7 @@ content:
                         dir: desc                            
             resizable: true
             actionsWidth: 340px
+            take: 50
             pageable:
                 buttonCount: 3
                 pageSizes:
@@ -105,6 +106,16 @@ content:
                                 params:
                                     app_uuid: '{{uuid}}'
                 -
+                    name: 'Migration'
+                    icon: 'fas fa-database'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: 'f5d87830-af1d-11ec-b909-0242ac120002'
+                                params:
+                                    app_uuid: '{{uuid}}'
+                -
                     name: Export
                     rule: '''{{status}}'' !== 1'
                     details:
@@ -118,14 +129,6 @@ content:
                                 successNotification: "Application exported successfully!"
                     icon: 'far fa-cloud-download'
                     updateOnly: true   
-                # -
-                #     name: Install or Uninstall Application
-                #     rule: 'true'
-                #     details:
-                #         -
-                #             params:
-                #                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
-                #     icon: 'far fa-download'
                 -
                     name: Install or Uninstall Application
                     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
@@ -134,14 +137,6 @@ content:
                             params:
                                 page_id: 'bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6'
                     icon: 'far fa-download'
-                # -
-                #     name: Installed
-                #     rule: '''{{status}}'' == 4 && profile.privileges.MANAGE_INSTALL_APP_WRITE==true'
-                #     details:
-                #         -
-                #             params:
-                #                 page_id: '83c014a0-54d4-4dd1-9ebf-55680b5e7d71'
-                #     icon: 'far fa-download'
                 -
                     name: Delete
                     rule: '''{{status}}'' !== 1'
@@ -183,6 +178,17 @@ content:
                         -
                             params:
                                 page_id: 'f922ab50-84b6-11ec-a8a3-0242ac120002'
+                                params:
+                                    app_uuid: '{{uuid}}'
+
+                -
+                    name: 'Component Manager'
+                    icon: 'fa fa-upload'
+                    rule: 'true'
+                    details:
+                        -
+                            params:
+                                page_id: '63cb348f-e3e1-4459-8338-40f0acbcf173'
                                 params:
                                     app_uuid: '{{uuid}}'
             columnConfig:

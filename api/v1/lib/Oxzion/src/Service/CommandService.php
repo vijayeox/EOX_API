@@ -1000,7 +1000,11 @@ class CommandService extends AbstractService
         $this->logger->info("Register User");
         try {
             $tempUser = $data;
-            $this->userService->createUser(array(), $tempUser, true);
+            $params = array();
+            if(isset($data['accountUuid'])) {
+                $params['accountId'] = $this->getIdFromUuid('ox_account', $data['accountUuid']);
+            }
+            $this->userService->createUser($params, $tempUser, true);
             $data['user'] = $tempUser;
             return $data;
         } catch (Exception $e) {
@@ -1008,6 +1012,7 @@ class CommandService extends AbstractService
             throw $e;
         }
     }
+
 
     public function batchProcess(&$data, $request)
     {

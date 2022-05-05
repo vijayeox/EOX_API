@@ -39,7 +39,13 @@ class UploadArtifact extends React.Component {
         "app/" + this.props.params.app_uuid + "/artifact/add/" + this.props.entity;
       this.infoMessage =
         "Please verify if the Transformer file has a unique File Name";
-      this.fileExtension = ".yml";
+      this.fileExtension = ".yml, .php";
+    } else if(this.props.entity == 'migration'){
+      this.postURL =
+        "app/" + this.props.params.app_uuid + "/artifact/add/" + this.props.entity;
+      this.infoMessage =
+        "Please verify if the Migration file has a unique File Name";
+      this.fileExtension = ".sql";
     }
     this.core = this.props.core;
     this.loader = this.core.make("oxzion/splash");

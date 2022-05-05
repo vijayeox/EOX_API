@@ -5,8 +5,6 @@ use Oxzion\Db\Persistence\Persistence;
 use Oxzion\AppDelegate\AbstractAppDelegate;
 use Oxzion\AppDelegate\AppTrait;
 
-
-
 class CleanYml extends AbstractAppDelegate
 {
     use AppTrait;
@@ -26,8 +24,30 @@ class CleanYml extends AbstractAppDelegate
         return $data;
     }
 
+    private function cleanTabSegment(&$tabs){
+        for($i = 0; $i < count($tabs); $i++){
+            if(!isset($tabs[$i]['detailsDuplicate']['data']['content'])) continue;
+            $tabs[$i]['content'] = $tabs[$i]['detailsDuplicate']['data']['content'];
+            unset($tabs[$i]['detailsDuplicate']);
+            if(isset($tabs[$i]['name1'])){
+                $tabs[$i]['name'] = $tabs[$i]['name1'];
+                unset($tabs[$i]['name1']);
+            }
+            for($j = 0;$j < count($tabs[$i]['content']);$j++){
+                if(isset($tabs[$i]['content'][$j]['tabs'])){
+                    $tabs[$i]['content'][$j]['content'] = array('tabs' => $tabs[$i]['content'][$j]['tabs']);
+                    unset($tabs[$i]['content'][$j]['tabs']);
+                    $this->cleanTabSegment($tabs[$i]['content'][$j]['content']['tabs']);
+                }else{
+                    $this->haveOnlyRequiredInfo($tabs[$i]['content'][$j]);
+                }
+            }
+        }
+    }
+
     private function haveOnlyRequiredInfo(&$pageData){
         if ($pageData['type'] == 'HTMLViewer') {
+            $pageData['content'] = isset($pageData['htmlContent']) ? $pageData['htmlContent'] : null;
             $whitelist = ['type' ,'htmlContent','content'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
@@ -47,17 +67,30 @@ class CleanYml extends AbstractAppDelegate
         }
 
         if ($pageData['type'] == 'List') {
+            $pageData['content'] = isset($pageData['gridContent']) ? $pageData['gridContent'] : null;
+            $this->logger->info("CONTENT----".print_r($pageData,true));
             $whitelist = ['type' ,'route','content','gridContent','disableAppId','defaultFilters','pageable','autoRefreshInterval','exportToPDF'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
         if ($pageData['type'] == 'KanbanViewer') {
-            $pageData['content'] = $pageData['kanbanContent'];
+            $pageData['content'] = isset($pageData['kanbanContent']) ? $pageData['kanbanContent'] : null;
             $whitelist = ['type' ,'content'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
         if ($pageData['type'] == 'GoogleMapViewer') {
             $whitelist = ['type'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
+        }
+        if ($pageData['type'] == 'ReactComponent' && isset($pageData['content'])) {
+            $pageData['content'] = array('reactId' => isset($pageData['reactId']) ? $pageData['reactId'] : null);
+        }
+        if ($pageData['type'] == 'TabSegment' && isset($pageData['tabs'])) {
+            $pageData['content'] = array('tabs' => $pageData['tabs']);
+            $this->cleanTabSegment($pageData['content']['tabs']);
+        }
+        if ($pageData['type'] == 'Comment' && isset($pageData['fileId']) && isset($pageData['content']) && !empty($pageData['content'])) {
+            $pageData['content'] = $pageData['fileId'];
+            $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content'] ) );
         }
     }
 
@@ -71,30 +104,38 @@ class CleanYml extends AbstractAppDelegate
         if (isset($newPageData['detailsDuplicate'])) {
             unset($newPageData['detailsDuplicate']);
         }
-        if ($newPageData['details'][0]['type'] == 'Comment') {
-            $whitelist = ['type' ,'url'];
-            $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
-        }
-        if ($newPageData['details'][0]['type'] == 'EntityViewer') {
-            $whitelist = ['type' ,'page_id'];
-            $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
-        }
-        if ($newPageData['details'][0]['type'] == 'Form') {
-            $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId'];
-            $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
-        }
-        if ($newPageData['details'][0]['type'] == 'API') {
-            $whitelist = ['type' ,'route', 'typeOfRequest'];
-            $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
-        }
-        if ($newPageData['details'][0]['type'] == 'Page') {
-            $whitelist = ['type' ,'page_id'];
-            $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
-        }
-        if ($newPageData['details'][0]['type'] == 'ButtonPopUp') {
-            $whitelist = ['type' ,'params','fileId'];
-            $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
-        }
+        $this->logger->info("DETAILS-----".print_r($newPageData,true));
+        if (isset($newPageData['details']) && !empty($newPageData['details'])) {
+            if ($newPageData['details'][0]['type'] == 'Comment') {
+                $whitelist = ['type' ,'url'];
+                $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
+            }
+            if ($newPageData['details'][0]['type'] == 'EntityViewer') {
+                $whitelist = ['type' ,'page_id'];
+                $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
+            }
+            if ($newPageData['details'][0]['type'] == 'Form') {
+                $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId'];
+                $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
+            }
+            if ($newPageData['details'][0]['type'] == 'API') {
+                $whitelist = ['type' ,'route', 'typeOfRequest'];
+                $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
+            }
+            if ($newPageData['details'][0]['type'] == 'Page') {
+                $whitelist = ['type' ,'page_id'];
+                $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
+            }
+            if ($newPageData['details'][0]['type'] == 'ButtonPopUp') {
+                $whitelist = ['type' ,'params','fileId'];
+                $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
+            }
+            if ($newPageData['details'][0]['type'] == 'HTMLViewer') {
+                $newPageData['details'][0]['content'] = $newPageData['details'][0]['htmlContent'];
+                $whitelist = ['type' ,'htmlContent','content'];
+                $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
+            }
+        }        
     }
 
     private function cleanUpList(&$pagesContent){
@@ -102,18 +143,24 @@ class CleanYml extends AbstractAppDelegate
             $this->haveOnlyRequiredInfo($newPages);
             if($newPages['type'] == 'List'){
                 unset($newPages["gridContent"]);
+                if (isset($newPages['route']) && empty($newPages['route'])) {
+                    unset($newPages['route']);
+                }
                 if (isset($newPages['content']['actions'])) {                    
                     $newPages['content']['actions'] = array_map(function ($newPageData){
                         $this->cleanUpyml($newPageData);
                         return $newPageData;
                     }, $newPages['content']['actions']);
                 }
-
-                if (isset($newPages['content']['operations']) && empty($newPages['content']['operations'])) {
+                if (isset($newPages['content']['defaultFilters']) && empty($newPages['content']['defaultFilters'])) {
+                    unset($newPages['content']['defaultFilters']);
+                }
+            $this->logger->info("OPERATIONS----".print_r($newPages,true));
+                if (isset($newPages['content']['operations']) && empty($newPages['content']['operations']['title'])) {
                     unset($newPages['content']['operations']);
                 }
 
-                if (isset($newPages['content']['operations'])) {
+                if (isset($newPages['content']['operations']['title'])) {
                     $newPages['content']['operations']['actions'] = array_map(function ($newPageOperation){
                         $this->cleanUpyml($newPageOperation);
                         return $newPageOperation;

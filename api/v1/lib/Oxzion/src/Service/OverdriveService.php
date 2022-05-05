@@ -5,8 +5,10 @@ namespace Oxzion\Service;
 use Oxzion\Auth\AuthConstants;
 use Oxzion\Auth\AuthContext;
 use Oxzion\Service\AbstractService;
+use Oxzion\ServiceException;
 use Oxzion\AppDelegate\HTTPMethod;
 use Oxzion\AppDelegate\HttpClientTrait;
+use Exception;
 
 
 class OverdriveService extends AbstractService
@@ -27,9 +29,11 @@ class OverdriveService extends AbstractService
         $this->truechoice_auth_token=$config['TRUECHOICE']['TRUECHOICE_AUTH_TOKEN'];
     }
 
+    /* Get Contractor Details from Truechoice */
     public function getContractor($data)
     {
-        $this->httpmethod = HTTPMethod::GET;
+        try {
+        $this->httpmethod = HTTPMethod::POSTWITHHEADERS;
         $this->endpoint = 'api/contractor/search';
         $json_request = '{
             "FirstName": "' . $data['firstname'] . '",
@@ -41,42 +45,30 @@ class OverdriveService extends AbstractService
         $json_request_array = json_decode($json_request);
         $response = $this->apiCall($json_request_array);
         return $response;
+        } catch (ServiceException $e) {
+            $this->log->error($e->getMessage(), $e);
+            throw new ServiceException("Cant get Contractors".$e->getMessage(), 1);
+        }
     }
 
-    public function addCoverage($data)
-    {
-        $this->httpmethod = HTTPMethod::GET;
-        $this->endpoint = 'api/coverages/'.$data[''].'/driver/{entryId}/truechoices';
-        $json_request = '{
-            "FirstName": "' . $data['firstname'] . '",
-            "LastName": "' . $data['lastname'] . '",
-            "DateOfBirth": "' . $data['dateOfBirth'] . '",
-            "Email": "' . $data['email'] . '",
-            "MotorCarrierName": "' . $data['motorCarrier1'] . '"
-            }';
-        $json_request_array = json_decode($json_request);
-        $response = $this->apiCall($json_request_array);
-        return $response;
-    }
-    
+    /* Get Active Coverages of driver from Truechoice */
     public function getActiveCoverages($data)
     {
+        try {
         $this->httpmethod = HTTPMethod::GET;
-        $this->endpoint = 'api/coverages/{parentId}/driver/{entryId}/truechoices';
-        $json_request = '{
-            "FirstName": "' . $data['firstname'] . '",
-            "LastName": "' . $data['lastname'] . '",
-            "DateOfBirth": "' . $data['dateOfBirth'] . '",
-            "Email": "' . $data['email'] . '",
-            "MotorCarrierName": "' . $data['motorCarrier1'] . '"
-            }';
-        $json_request_array = json_decode($json_request);
-        $response = $this->apiCall($json_request_array);
+        $this->endpoint = 'api/coverages/'.$data["contractor_entryid"].'/driver/'.$data['driver_entryid'].'/truechoices';
+        $response = $this->apiCall(array());
         return $response;
+        } catch (ServiceException $e) {
+            $this->log->error($e->getMessage(), $e);
+            throw new ServiceException("Cant get Active Coverages".$e->getMessage(), 1);
+        }
     }
 
+    /* Add Contractor to Truechoice */
     public function addContractor($data)
     {
+        try {
         $json_request = '{
             "EntryId": 0,
             "MotorCarrierName": "' . $data['motorCarrier1'] . '",
@@ -131,10 +123,17 @@ class OverdriveService extends AbstractService
         $this->endpoint = 'api/contractor';
         $response = $this->apiCall($json_request_array);
         return $response;
+        } catch (ServiceException $e) {
+            $this->log->error($e->getMessage(), $e);
+            throw new ServiceException("Cant add Contractor to truechoice" . $e->getMessage(), 1);
+        }
     }
 
-    public function addDriver($data, $contractor_entryid)
+    /* Add Driver under Contractor to Truechoice */
+    public function addDriver($data)
     {
+        try {
+        $contractor_entryid=$data['contractor_entryid'];
         $json_request = '{
                 "EntryId": 0,
                 "ParentId": ' . $contractor_entryid . ',
@@ -172,6 +171,10 @@ class OverdriveService extends AbstractService
         $json_request_array = json_decode($json_request);
         $response_api = $this->apiCall($json_request_array);
         return $response_api;
+        } catch (ServiceException $e) {
+            $this->log->error($e->getMessage(), $e);
+            throw new ServiceException("Cant add driver under contractor to truechoice".$e->getMessage(),1);
+        }
     }
     
     public function apiCall($json_request_array)
@@ -181,10 +184,12 @@ class OverdriveService extends AbstractService
             $this->TruechoiceApiUrl . $this->endpoint,
             $json_request_array,
             [
-                'AuthorizationToken' => 'Bearer ' . $this->truechoice_auth_token
+                'AuthorizationToken' => 'Bearer ' . $this->truechoice_auth_token,
+                'content-type' => 'application/json'
             ],
             ''
         );
+        
         return $response;
     }
 }

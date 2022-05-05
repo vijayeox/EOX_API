@@ -10,7 +10,7 @@ return [
             'rate' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/rate[/:rateUuid]',
+                    'route' => '/app/:appId/entity/:entityId/rate[/:rateUuid]',
                     'defaults' => [
                         'controller' => Controller\RateController::class,
                         'access' => [

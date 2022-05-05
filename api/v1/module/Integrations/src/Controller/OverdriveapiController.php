@@ -1,18 +1,24 @@
 <?php
 
+/**
+ * Overdrive Api
+ */
 namespace Integrations\Controller;
 
-use OverdriveIntegrations\Service\OverdriveService;
+use Oxzion\Service\OverdriveService;
+use Exception;
+use Oxzion\Controller\AbstractApiControllerHelper;
 use Oxzion\Controller\AbstractApiController;
+use Oxzion\ValidationException;
 use Zend\Db\Adapter\AdapterInterface;
 
 /**
- * OverDrive Integration Controller
+ * Overdriveapi Controller
  */
 class OverdriveapiController extends AbstractApiController
 {
     /**
-     * @var overdriveService Instance of OverdriveService Service
+     * @var OverdriveService Instance of Overdrive Service
      */
     private $overdriveService;
     /**
@@ -25,18 +31,44 @@ class OverdriveapiController extends AbstractApiController
         $this->log = $this->getLogger();
     }
 
-    public function getContractor($data)
+    public function getContractorAction()
     {
-        return $this->overdriveService->getContractor($data);
+        $data = json_decode($this->getRequest()->getContent(),true);
+        try{
+            $result=$this->overdriveService->getContractor($data);
+            return $this->getSuccessResponseWithData($result);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
     }
 
-    public function addContractor($data)
+    public function addContractorAction()
     {
-        return $this->overdriveService->addContractor($data);
+        $data = json_decode($this->getRequest()->getContent(),true);
+        try{
+        $result=$this->overdriveService->addContractor($data);
+        return $this->getSuccessResponseWithData($result);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
     }
 
-    public function addDriver($data)
+    public function addDriverAction()
     {
-        return $this->overdriveService->addDriver($data);
+        $data = json_decode($this->getRequest()->getContent(),true);
+        try{
+        $result=$this->overdriveService->addDriver($data);
+        return $this->getSuccessResponseWithData($result);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+    }
+
+    public function tchoiceRegistrationAction()
+    {
+        $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
     }
 }

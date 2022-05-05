@@ -1,0 +1,206 @@
+#!/usr/bin/env php
+<?php
+use Zend\Config\Reader\Ini;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Metadata\Metadata;
+use Zend\Db\Metadata\Object\ColumnObject;
+use Zend\Db\Metadata\Object\ConstraintObject;
+use Zend\Db\Metadata\Object\TableObject;
+use Zend\Mvc\Application;
+use Zend\DB;
+use Zend\Db\ResultSet\ResultSet;
+use Zend\Db\Sql\Sql;
+use Zend\Db\Sql\Where;
+
+error_reporting(E_ERROR | E_PARSE);
+
+$_SERVER['REQUEST_URI'] = '/';
+$_SERVER['REQUEST_METHOD'] = '';
+
+require 'public/index.php';
+
+
+$application = Application::init(require 'config/application.config.php');
+
+$Oxzion_EI = new Dashboard_Export($application, __DIR__);
+$Oxzion_EI->run();
+
+class Dashboard_Export
+{
+    /**
+     * @var string
+     */
+    const DEFAULT_DB_ADAPTER_KEY = 'Zend\Db\Adapter\Adapter';
+    /**
+     *
+     * @var array
+     */
+    protected $configs = array();
+    /**
+     *
+     * @var Adapter
+     */
+    protected $dbAdapter;
+
+    /**
+     *
+     * @var string
+     */
+    protected $workingDir;
+    /**
+     *
+     * @param Application $application
+     */
+
+     protected $dataFolder;
+
+     protected $queryArry;
+
+     protected $widgetArry;
+
+    public function __construct(Application $application, $workingDir){
+        $this->workingDir = $workingDir;
+        $dbAdapterServiceKey = self::DEFAULT_DB_ADAPTER_KEY;
+        $this->dbAdapter = $application->getServiceManager()->get($dbAdapterServiceKey);
+        $this->dataFolder = $workingDir."/data/OIData";
+    }
+
+	public function import(){
+
+        $this->importQueries();
+        $this->importWidgets();
+        $this->importWidgetQuery();
+        $this->importDashboard();
+}
+
+    public function importDashboard()   {
+        $fp = fopen($this->dataFolder.'/dashboard.csv', 'r');
+        $header = fgetcsv($fp);
+        $sql    = new Sql($this->dbAdapter);
+        $row = fgetcsv($fp);
+        $all_rows = array_combine($header, $row);
+
+        $select = $sql->select();
+        $select->from('ox_dashboard');
+        $select->where(['uuid=?'=>$all_rows['uuid']]);
+        
+        $statement = $sql->prepareStatementForSqlObject($select);
+        $result = $statement->execute();
+        $resultSet = new ResultSet();
+        $finalResult = $resultSet->initialize($result)->toArray();
+        if (empty($finalResult[0])) {
+            $insert = $sql->insert();
+            $insert->into('ox_dashboard');
+            unset($all_rows['id']);
+            $insert->values($all_rows);
+            $statement = $sql->prepareStatementForSqlObject($insert);
+            $results = $statement->execute();
+        } else {
+            echo 'Dashboard Exists!';
+        }
+    }
+
+
+    public function run(){
+        error_reporting(E_ERROR | E_PARSE);
+        $this->import();
+        echo 'import done';
+    }
+
+    public function importWidgets() {
+        $fp = fopen($this->dataFolder.'/widget.csv', 'r');
+        $header = fgetcsv($fp);
+        $sql    = new Sql($this->dbAdapter);
+		
+        while ($row = fgetcsv($fp)) {
+	    $row=str_replace("@@",'\"', $row);
+            $all_rows = array_combine($header, $row);
+            $widget_uuid = $all_rows['uuid'];
+            $select = $sql->select();
+            $select->from('ox_widget');
+            $select->where(['uuid=?'=>$widget_uuid]);
+            $statement = $sql->prepareStatementForSqlObject($select);
+            $result = $statement->execute();
+            $resultSet = new ResultSet();
+            $finalResult = $resultSet->initialize($result)->toArray();
+            if (empty($finalResult[0])) {
+                $insert = $sql->insert();
+                $insert->into('ox_widget');
+                unset($all_rows['id']);
+                $insert->values($all_rows);
+                $statement = $sql->prepareStatementForSqlObject($insert);
+                $results = $statement->execute();
+                $widgetid = $results->getGeneratedValue();
+            } else {
+                $widgetid = $finalResult[0]['id'];
+            }
+            $this->widgetArry[$widget_uuid] = $widgetid;
+        }
+        fclose($fp);
+    }
+
+    public function importWidgetQuery() {
+        $fp = fopen($this->dataFolder.'/widget_query.csv', 'r');
+        $header = fgetcsv($fp);
+        $sql    = new Sql($this->dbAdapter);
+        while ($row = fgetcsv($fp)) {
+            $all_rows = array_combine($header, $row);
+            $widget_uuid = $all_rows['ox_widget_uuid'];
+            $query_uuid = $all_rows['ox_query_uuid'];
+            $widget_id = $this->widgetArry[$widget_uuid];
+            $query_id = $this->queryArry[$query_uuid];
+            $select = $sql->select();
+            $select->from('ox_widget_query');
+            $select->where(['ox_widget_id=?'=>$widget_id]);
+            $select->where(['ox_query_id=?'=>$query_id]);
+            $statement = $sql->prepareStatementForSqlObject($select);
+            $result = $statement->execute();
+            $resultSet = new ResultSet();
+            $finalResult = $resultSet->initialize($result)->toArray();
+            if (empty($finalResult[0])) {
+                $insertrows = ['ox_widget_id'=>$widget_id,'ox_query_id'=>$query_id,'sequence'=>$all_rows['sequence'],'configuration'=>$all_rows['configuration']];
+                $insert = $sql->insert();
+                $insert->into('ox_widget_query');
+                $insert->values($insertrows);
+                $statement = $sql->prepareStatementForSqlObject($insert);
+                $results = $statement->execute();
+                $widgetid = $results->getGeneratedValue();
+            } 
+        }
+        fclose($fp);
+    }
+
+    public function importQueries() {
+        $fp = fopen($this->dataFolder.'/query.csv', 'r');
+        $header = fgetcsv($fp);
+        $sql    = new Sql($this->dbAdapter);
+		
+        while ($row = fgetcsv($fp)) {
+	    $row=str_replace("@@",'\"', $row);
+            $all_rows = array_combine($header, $row);
+            $query_uuid = $all_rows['uuid'];
+            $select = $sql->select();
+            $select->from('ox_query');
+            $select->where(['uuid=?'=>$query_uuid]);
+            $statement = $sql->prepareStatementForSqlObject($select);
+            $result = $statement->execute();
+            $resultSet = new ResultSet();
+            $finalResult = $resultSet->initialize($result)->toArray();
+            if (empty($finalResult[0])) {
+                $insert = $sql->insert();
+                $insert->into('ox_query');
+                unset($all_rows['id']);
+                $insert->values($all_rows);
+                $statement = $sql->prepareStatementForSqlObject($insert);
+                $results = $statement->execute();
+                $queryid = $results->getGeneratedValue();
+            } else {
+                $queryid = $finalResult[0]['id'];
+            }
+            $this->queryArry[$query_uuid] = $queryid;
+        }
+        fclose($fp);
+    }
+
+}
+?>

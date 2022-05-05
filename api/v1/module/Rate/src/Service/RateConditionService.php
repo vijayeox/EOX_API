@@ -97,7 +97,7 @@ class RateConditionService extends AbstractService
         return $resultSet;
     }
 
-    public function getRateList($params = null)
+    public function getRateConditionList($params = null)
     {
         $paginateOptions = FilterUtils::paginateLikeKendo($params);
         $where = $paginateOptions['where'];
@@ -134,6 +134,17 @@ class RateConditionService extends AbstractService
             throw new EntityNotFoundException('Rate Condition specified is not present or has been deleted', OxServiceException::ERR_CODE_NOT_FOUND);
         }
         return $resultSet;
+    }
+
+    public function getSequenceId($id) {
+        $queryString = 'SELECT orc.id from ox_rate_condition orc
+        where orc.id =:id and orc.isdeleted = 0';
+        $queryParams = ['id' => $id];
+        $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
+        if (empty($resultSet)) {
+            throw new EntityNotFoundException('Sequence is invalid or the condition has been deleted', OxServiceException::ERR_CODE_NOT_FOUND);
+        }
+        return $resultSet[0]['id'];
     }
 
 }
