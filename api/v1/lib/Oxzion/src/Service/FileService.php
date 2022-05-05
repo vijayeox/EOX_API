@@ -1632,9 +1632,9 @@ class FileService extends AbstractService
                             $this->parseDocumentData($parseDocData, $document);
                         }
                     }
-                    $documentsArray[$key] = array('value' => $parseDocData, 'type' => isset($document) ? 'document' : 'file');
+                    $documentsArray[$key] = array('value' => $parseDocData, 'type' => isset($document) ? 'document' : 'file', 'app_docs_folder' => $this->config['APP_DOCUMENT_FOLDER']);
                 } else {
-                    $documentsArray[$key] = array('value' => $docItem, 'type' => 'file');
+                    $documentsArray[$key] = array('value' => $docItem, 'type' => 'file', 'app_docs_folder' => $this->config['APP_DOCUMENT_FOLDER']);
                 }
             }
             return $documentsArray;
