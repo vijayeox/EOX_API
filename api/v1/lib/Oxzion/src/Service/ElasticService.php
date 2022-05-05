@@ -274,7 +274,6 @@ class ElasticService
                 } elseif (strtoupper($condition == "STARTSWITH")) {
                     $subQuery["match_phrase_prefix"] = [$column => $value];
                 } elseif (strtoupper($condition == "LIKE")) {
-                    // $subQuery["wildcard"] = [$column => "*" . $value . "*"];
                     $subQuery["match_phrase"] = [$column => $value];
                 } else {
                     if (strtolower(substr($value, 0, 5)) == "date:") {
