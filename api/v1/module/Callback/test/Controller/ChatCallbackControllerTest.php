@@ -6,6 +6,7 @@ use Callback\Service\ChatService;
 use Mockery;
 use Oxzion\Test\ControllerTest;
 use PHPUnit\DbUnit\DataSet\DefaultDataSet;
+use PHPUnit\DbUnit\DataSet\YamlDataSet;
 
 class ChatCallbackControllerTest extends ControllerTest
 {
@@ -16,7 +17,10 @@ class ChatCallbackControllerTest extends ControllerTest
     }
     public function getDataSet()
     {
-        return new DefaultDataSet();
+        // return new DefaultDataSet();
+        
+        $dataset = new YamlDataSet(dirname(__FILE__) . "/../Dataset/User.yml");
+        return $dataset;
     }
 
     private function getMockRestClientForChatService()
@@ -158,15 +162,16 @@ class ChatCallbackControllerTest extends ControllerTest
     public function testAddUserToAccountForNewUser()
     {
         $this->initAuthToken($this->adminUser);
-        $data = ['username' => 'shravani', 'accountName' => 'Teams 1', 'status' => 'Active'];
+        $data = ['username' => 'deepak', 'accountName' => 'Teams 1', 'status' => 'Active'];
         if (enableMattermost == 0) {
             $mockRestClient = $this->getMockRestClientForChatService();
             $request = Mockery::Mock('Psr\Http\Message\RequestInterface');
             $response = Mockery::Mock('Psr\Http\Message\ResponseInterface');
             $response->expects('getStatusCode')->andReturn(404);
             $mockRestClient->expects('get')->with("api/v4/teams/name/teams1", array(), Mockery::any())->once()->andReturn(json_encode(array('name' => "teamoxzion", "display_name" => 'teamoxzion', "id" => 121)));
-            $mockRestClient->expects('get')->with("api/v4/users/username/shravani", array(), Mockery::any())->once()->andThrow(new \GuzzleHttp\Exception\ClientException('"id" : "store.sql_user.get_by_username.app_error"', $request, $response));
-            $mockRestClient->expects('postWithHeader')->with("api/v4/users", array("email" => "shravani@gmail.com", "username" => "shravani", "first_name" => "shravani", "password" => md5('shravani')), Mockery::any())->once()->andReturn(array("body" => json_encode(array("id" => 2, "username" => "shravani", "email" => "shravani@gmail.com", "first_name" => "shravani"))));
+            $mockRestClient->expects('get')->with("api/v4/users/username/deepak", array(), Mockery::any())->once()->andThrow(new \GuzzleHttp\Exception\ClientException('"id" : "store.sql_user.get_by_username.app_error"', $request, $response));
+            $mockRestClient->expects('postWithHeader')->with("api/v4/users", array("email" => "deepak@gmail.com", "username" => "deepak", "first_name" => "deepak", "password" => md5('deepak')), Mockery::any())->once()->andReturn(array("body" => json_encode(array("id" => 2, "username" => "deepak", "email" => "deepak@gmail.com", "first_name" => "deepak"))));
+            $mockRestClient->expects('put')->with('api/v4/users/404', array("first_name" => 'Deepak','last_name' => 'S','email' => 'deepak@eox.com'), Mockery::any())->once()->andReturn(array("body" => json_encode(array("id" => 2, "first_name" => 'Deepak','last_name' => 'S','email' => 'deepak@eox.com'))));
             $mockRestClient->expects('postWithHeader')->with("api/v4/teams/121/members", array('team_id' => 121, 'user_id' => 2), Mockery::any())->once()->andReturn(array("body" => json_encode(array("team_id" => 121, "user_id" => 2, "roles" => "team_user"))));
         }
         $this->dispatch('/callback/chat/adduser', 'POST', $data);
@@ -534,6 +539,7 @@ class ChatCallbackControllerTest extends ControllerTest
             $mockRestClient->expects('get')->with("api/v4/teams/121/channels/name/private1private", array(), Mockery::any())->once()->andReturn(json_encode(array("id" => 260, "name" => "private1private", "display_name" => "private1private", "team_id" => 121)));
             $mockRestClient->expects('get')->with("api/v4/users/username/girly", array(), Mockery::any())->once()->andThrow(new \GuzzleHttp\Exception\ClientException('"id" : "store.sql_user.get_by_username.app_error"', $request, $response));
             $mockRestClient->expects('postWithHeader')->with("api/v4/users", array('email' => "girly@gmail.com", 'username' => "girly", 'first_name' => "girly", 'password' => md5('girly')), Mockery::any())->once()->andReturn(array("body" => json_encode(array("id" => 3, 'email' => "girly@gmail.com", 'username' => "girly", 'first_name' => "girly"))));
+            $mockRestClient->expects('put')->with('api/v4/users/404', array("first_name" => 'Girly Raj','last_name' => 'K','email' => 'girly@yhoo.com'), Mockery::any())->once()->andReturn(array("body" => json_encode(array("id" => 3, "first_name" => 'Girly Raj','last_name' => 'K','email' => 'girly@yhoo.com'))));
             $mockRestClient->expects('get')->with("api/v4/teams/121/members/3", array(), Mockery::any())->once()->andReturn(json_encode(array("team_id" => 121, "user_id" => 3)));
             $mockRestClient->expects('postWithHeader')->with("api/v4/channels/260/members", array('user_id' => 3), Mockery::any())->once()->andReturn(array("body" => json_encode(array('channel_id' => 260, "user_id" => 3))));
         }
