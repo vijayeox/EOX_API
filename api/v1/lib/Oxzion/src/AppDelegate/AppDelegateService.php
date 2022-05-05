@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\AppDelegate;
 
 use Exception;
@@ -62,8 +63,7 @@ class AppDelegateService extends AbstractService
         AppArtifactService $appArtifactService,
         OverdriveService $appOverdriveService,
         RateService $rateService
-    )
-    {
+    ) {
         $this->templateService = $templateService;
         $this->fileService = $fileService;
         $this->fieldService = $fieldService;
@@ -86,7 +86,7 @@ class AppDelegateService extends AbstractService
         $this->businessParticipantService = $businessParticipantService;
         $this->queryService = $queryService;
         $this->insuranceService = $insuranceService;
-        $this->appOverdriveService=$appOverdriveService;
+        $this->appOverdriveService = $appOverdriveService;
         $this->rateService = $rateService;
     }
 
@@ -118,7 +118,7 @@ class AppDelegateService extends AbstractService
 
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService,$this->businessParticipantService, $this->queryService,$this->insuranceService,$this->teamService ,$this->appService, $this->appArtifactService,$this->appOverdriveService,$this->rateService);
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService, $this->businessParticipantService, $this->queryService, $this->insuranceService, $this->teamService, $this->appService, $this->appArtifactService, $this->rateService, $this->appOverdriveService);
         return $appDelegateService;
     }
 
@@ -162,7 +162,6 @@ class AppDelegateService extends AbstractService
                 if (method_exists($obj, "setFieldService")) {
                     $obj->setFieldService($this->fieldService);
                 }
-               
                 if (method_exists($obj, "setTemplateService")) {
                     $obj->setTemplateService($this->templateService);
                 }

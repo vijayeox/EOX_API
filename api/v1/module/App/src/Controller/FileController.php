@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Controller;
 
 /**
  * File Api
  */
+
 use Oxzion\Controller\AbstractApiController;
 use Oxzion\Encryption\Crypto;
 use Oxzion\Model\File;
@@ -178,20 +180,19 @@ class FileController extends AbstractApiController
     {
     }
     /**
-    * GET List Entitys API
-    * @api
-    * @link /app/:appId/file/search
-    * @method GET
-    * @return array Returns a JSON Response list of Entitys based on Access.
-    */
+     * GET List Entitys API
+     * @api
+     * @link /app/:appId/file/search
+     * @method GET
+     * @return array Returns a JSON Response list of Entitys based on Access.
+     */
     public function getFileListAction()
     {
-        $appUuid = isset($this->params()->fromRoute()['appId']) ? $this->params()->fromRoute()['appId'] : null ;
+        $appUuid = isset($this->params()->fromRoute()['appId']) ? $this->params()->fromRoute()['appId'] : null;
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
         $filterParams = $this->params()->fromQuery();
         if (isset($params['createdBy']) && $params['createdBy'] === 'me') {
-            $params['createdBy'] = AuthContext::get(AuthConstants::USER_UUID);
-            ;
+            $params['createdBy'] = AuthContext::get(AuthConstants::USER_UUID);;
         }
         try {
             $result = $this->fileService->getFileList($appUuid, $params, $filterParams);
@@ -212,12 +213,12 @@ class FileController extends AbstractApiController
 
 
     /**
-    * GET List Entitys API
-    * @api
-    * @link /app/appId/search
-    * @method GET
-    * @return array Returns a JSON Response list of Entitys based on Access.
-    */
+     * GET List Entitys API
+     * @api
+     * @link /app/appId/search
+     * @method GET
+     * @return array Returns a JSON Response list of Entitys based on Access.
+     */
     public function getFileListCommandAction()
     {
         $appUuid = $this->params()->fromRoute()['appId'];
@@ -228,16 +229,16 @@ class FileController extends AbstractApiController
         try {
             foreach ($commandsArray as $command) {
                 switch ($command) {
-                case 'myfiles':
+                    case 'myfiles':
                         $params['status'] = 'Completed';
                         $result['myfiles'] = $this->fileService->getFileList($appUuid, $params, $filterParams);
-                    break;
-                case 'assignments':
+                        break;
+                    case 'assignments':
                         $result['assignments'] = $this->fileService->getAssignments($appUuid, $filterParams);
-                    break;
-                default:
-                    break;
-            }
+                        break;
+                    default:
+                        break;
+                }
             }
         } catch (ValidationException $e) {
             $response = ['errors' => $e->getErrors()];
@@ -265,6 +266,14 @@ class FileController extends AbstractApiController
         }
         return $this->getSuccessResponseWithData($result, 200);
     }
+
+    /**
+     * Reindex the files to elastic for a specific app
+     * @api
+     * @link /app/:appId/file/reindex
+     * @method GET
+     * @return array Returns a JSON Response list of Entitys based on Access.
+     */
     public function reIndexAction()
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
@@ -279,6 +288,14 @@ class FileController extends AbstractApiController
         }
         return $this->getSuccessResponseWithData($result, 200);
     }
+
+    /**
+     * GET Audit details fir the selected file
+     * @api
+     * @link /app/:appId/file/:fileId/audit
+     * @method GET
+     * @return array Returns a JSON Response list of Entitys based on Access.
+     */
     public function auditAction()
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
