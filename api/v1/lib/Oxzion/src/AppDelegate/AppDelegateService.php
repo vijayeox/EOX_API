@@ -118,7 +118,7 @@ class AppDelegateService extends AbstractService
 
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService, $this->businessParticipantService, $this->queryService, $this->insuranceService, $this->teamService, $this->appService, $this->appArtifactService, $this->rateService, $this->appOverdriveService);
+        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService, $this->businessParticipantService, $this->queryService, $this->insuranceService, $this->teamService, $this->appService, $this->appArtifactService, $this->appOverdriveService, $this->rateService);
         return $appDelegateService;
     }
 
