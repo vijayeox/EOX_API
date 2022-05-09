@@ -419,6 +419,19 @@ return [
                     ],
                 ],
             ],
+            'form_cache' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/formCache[/workflowId/:workflowId][/formId/:formId]',
+                    'constraints' => [
+                        'appId' => UuidUtil::UUID_PATTERN,
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\CacheController::class,
+                        'action' => 'formcache',
+                    ],
+                ],
+            ],
             'remove_app_cache' => [
                 'type' => Segment::class,
                 'options' => [
@@ -938,9 +951,10 @@ return [
             'getCssFile' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/app/:appId/cssFile',
+                    'route' => '/app/:appId/:indexType',
                     'constraints' => [
                         'appId' => UuidUtil::UUID_PATTERN,
+                        'indexType' => 'cssFile|jsIndex',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppController::class,
@@ -955,7 +969,7 @@ return [
                     'route' => '/app/:appUuid/artifact/list/:artifactType',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow|delegate|template|appupgrade|transformer',
+                        'artifactType' => 'form|workflow|delegate|template|appupgrade|transformer|migrations|component',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -973,7 +987,7 @@ return [
                     'route' => '/app/:appUuid/artifact/add/:artifactType',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow|app_icon|app_icon_white|delegate|template|appupgrade|transformer',
+                        'artifactType' => 'form|workflow|app_icon|app_icon_white|delegate|template|appupgrade|transformer|migrations|component',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -991,7 +1005,7 @@ return [
                     'route' => '/app/:appUuid/artifact/delete/:artifactType/:artifactName',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'form|workflow|delegate|template|appupgrade|transformer',
+                        'artifactType' => 'form|workflow|delegate|template|appupgrade|transformer|migrations|component',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,
@@ -1076,7 +1090,7 @@ return [
                     'route' => '/app/:appUuid/download/:artifactType/:artifactName',
                     'constraints' => [
                         'appUuid' => UuidUtil::UUID_PATTERN,
-                        'artifactType' => 'delegate|template|appupgrade|transformer',
+                        'artifactType' => 'delegate|template|appupgrade|transformer|migrations|component',
                     ],
                     'defaults' => [
                         'controller' => Controller\AppArtifactController::class,

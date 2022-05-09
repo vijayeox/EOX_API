@@ -152,10 +152,10 @@ class TeamService extends AbstractService
             if ($result) {
                 $data['manager_id'] = $result[0]["id"];
             }
-            if (isset($data['parentId'])) {
+            if (isset($data['parentId']) && !empty($data['parentId'])) {
                 $data['parent_id'] = $this->getIdFromUuid('ox_team', $data['parentId']);
             }else{
-                $data['parent_id'] = isset($data['parent_id']) ? (!is_numeric($data['parent_id']) ? $this->getIdFromUuid('ox_team', $data['parent_id']) : $data['parent_id'] ): null;
+                $data['parent_id'] = (isset($data['parent_id']) && !empty($data['parent_id'])) ? (!is_numeric($data['parent_id']) ? $this->getIdFromUuid('ox_team', $data['parent_id']) : $data['parent_id'] ): null;
             }
             $account = $this->accountService->getAccount($data['account_id']);
             $sql = $this->getSqlObject();
@@ -270,7 +270,7 @@ class TeamService extends AbstractService
             $limit = " LIMIT " . $pageSize . " offset " . $offset;
             $resultSet = $this->executeQuerywithParams($cntQuery . $where);
             $count = $resultSet->toArray()[0]['count'];
-            $query = "SELECT g.uuid,g.name,parent.uuid as parentId,a.uuid as accountId,u.uuid as managerId,g.description,g.logo 
+            $query = "SELECT g.uuid,g.name,parent.uuid as parentId,parent.uuid as parent_id,a.uuid as accountId,u.uuid as managerId,g.description,g.logo 
                         FROM `ox_team` g 
                         INNER JOIN ox_user u on g.manager_id = u.id
                         inner join ox_account a on a.id = g.account_id
@@ -314,11 +314,11 @@ class TeamService extends AbstractService
         if ($result) {
             $data['manager_id'] = $result[0]["id"];
         }
-        if (isset($data['parentId'])) {
+        if (isset($data['parentId']) && !empty($data['parentId'])) {
             $data['parent_id'] = $this->getIdFromUuid('ox_team', $data['parentId']);
             $data['parent_id'] = $data['parent_id'] == 0 ? null : $data['parent_id'];
         }else{
-            $data['parent_id'] = isset($data['parent_id']) ? (!is_numeric($data['parent_id']) ? $this->getIdFromUuid('ox_team', $data['parent_id']) : $data['parent_id'] ): null;
+            $data['parent_id'] = (isset($data['parent_id']) && !empty($data['parent_id'])) ? (!is_numeric($data['parent_id']) ? $this->getIdFromUuid('ox_team', $data['parent_id']) : $data['parent_id'] ): null;
         }
         $form->exchangeArray($data);
         $form->validate();
@@ -469,7 +469,7 @@ class TeamService extends AbstractService
         $where .= " oxg.parent_id = $id AND oxg.status = 'Active' AND oxg.account_id = " . $accountId;
         $sort = " ORDER BY " . $sort;
         // Done Twice  - one for admin and one for PPM App
-        $queryString = "SELECT oxg.name,oxg.description,oxg.uuid,oxg.date_created,sub.uuid as parentId, a.uuid as accountId,sub.uuid as parent_id , u.uuid as managerId 
+        $queryString = "SELECT oxg.name,oxg.description,oxg.uuid,oxg.date_created, a.uuid as accountId,sub.uuid as parent_id , u.uuid as managerId 
                         from ox_team as oxg 
                         inner join ox_account a on a.id = oxg.account_id 
                         INNER JOIN ox_team as sub on sub.id = oxg.parent_id 

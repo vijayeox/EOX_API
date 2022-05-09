@@ -63,6 +63,9 @@ class AppArtifactService extends AbstractService
                 }
                 return $this->uploadAppIcon($targetDir, $artifactType);
             break;
+            case 'component':                
+                return $this->uploadCustomComponent($appUuid, $appSourceDir);
+            break;
             case 'delegate':
                 return $this->uploadContents($appSourceDir, 'delegate', $descriptorPath, $artifactType);
             break;    
@@ -74,7 +77,10 @@ class AppArtifactService extends AbstractService
             break;    
             case 'transformer':
                 return $this->uploadContents($appSourceDir, 'transformer', $descriptorPath, $artifactType);
-            break;      
+            break;   
+            case 'migrations':
+                return $this->uploadContents($appSourceDir, 'migrations', $descriptorPath, $artifactType);
+            break;        
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
@@ -132,6 +138,30 @@ class AppArtifactService extends AbstractService
         }
     }
 
+
+    private function uploadCustomComponent($appUuid, $appSourceDir)
+    {
+        if (isset($_FILES) && isset($_FILES['file'])) {
+            $app = new App($this->table);
+            $app->loadByUuid($appUuid);
+            $appData = [
+                'uuid' => $appUuid,
+                'name' => $app->getProperty('name')
+            ];
+            $targetDir =  self::getCustomComponentDir($appSourceDir, $appData["name"]);
+            if(!is_dir($targetDir)){
+                mkdir($targetDir);
+            }
+            move_uploaded_file($_FILES['file']['tmp_name'], $targetDir. DIRECTORY_SEPARATOR .$_FILES['file']['name']);
+            return [
+                "originalName" => $_FILES['file']['name'],
+                "size" => filesize($targetDir)
+            ];
+        } else {
+            throw new Exception('File upload failed.');
+        }
+    }
+
     public function deleteArtifact($appUuid, $artifactType, $artifactName)
     {
         $appSourceDir = $this->getAppSourceDirPath($appUuid);
@@ -159,6 +189,18 @@ class AppArtifactService extends AbstractService
             break;
             case 'transformer':
                 $filePath = $filePath . 'transformer';
+            break;
+            case 'migrations':
+                $filePath = $filePath . 'migrations';
+            case 'component':
+                $app = new App($this->table);
+                $app->loadByUuid($appUuid);
+                $appData = [
+                    'uuid' => $appUuid,
+                    'name' => $app->getProperty('name')
+                ];
+                $filePath = self::getCustomComponentDir($appSourceDir, $appData["name"]);
+            break;
             break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
@@ -308,6 +350,15 @@ class AppArtifactService extends AbstractService
             case 'transformer':
                 $targetDir = $contentDir . 'transformer';
             break;
+            case 'migrations':
+                $targetDir = $contentDir . 'migrations';
+            break;
+            case 'component':
+                $targetDir = self::getCustomComponentDir($appSourceDir, $appData["name"]);
+                if(!is_dir($targetDir)){
+                    return array();
+                }
+            break;
             default:
                 throw new Exception("Unexpected artifact type ${artifactType}.");
         }
@@ -317,7 +368,7 @@ class AppArtifactService extends AbstractService
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != "." && $entry != "..") {
                     $ext = pathinfo($entry, PATHINFO_EXTENSION);
-                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && ($artifactType == 'delegate' || $artifactType == 'appupgrade')) || ($ext == 'tpl' && $artifactType == 'template') || ($ext == 'yml' && $artifactType == 'transformer')) {
+                    if (($ext == 'json' && $artifactType == 'form') || ($ext == 'bpmn' && $artifactType == 'workflow') || ($ext == 'php' && ($artifactType == 'delegate' || $artifactType == 'appupgrade')) || ($ext == 'tpl' && $artifactType == 'template') || (($ext == 'yml' || $ext == 'php') && $artifactType == 'transformer') || ($ext == 'sql' && $artifactType == 'migrations')||($ext == 'js' && $artifactType == 'component')) {
                         $files[] = array(
                             'name' => substr($entry, 0, strrpos($entry, '.')) ,
                             'content'=> file_get_contents($targetDir.$entry)
@@ -388,6 +439,15 @@ class AppArtifactService extends AbstractService
         $appSourceDir = $this->getAppSourceDirPath($appUuid);
         $this->logger->info("DOWNLOAD Appsource----".print_r($appSourceDir,true));
         $filePath = $appSourceDir . $this->dataFolder . $artifactType . DIRECTORY_SEPARATOR. $artifactNamer;
+        if($artifactType == "component"){
+            $app = new App($this->table);
+            $app->loadByUuid($appUuid);
+            $appData = [
+                'uuid' => $appUuid,
+                'name' => $app->getProperty('name')
+            ];
+            $filePath = self::getCustomComponentDir($appSourceDir, $appData["name"]) . DIRECTORY_SEPARATOR . $artifactNamer;
+        }
         $this->logger->info("DOWNLOAD PATH----".print_r($filePath,true));
         //Check the file exists or not
         if(file_exists($filePath)) {
@@ -396,5 +456,11 @@ class AppArtifactService extends AbstractService
         else{
             echo "File does not exist.";
         }
+    }
+
+    private function getCustomComponentDir($appSourceDir, $appName){
+        $prefixPath = $appSourceDir . DIRECTORY_SEPARATOR . "view" . DIRECTORY_SEPARATOR . "apps";
+        $appPath = is_dir($prefixPath. DIRECTORY_SEPARATOR . $appName) ? $appName : "eoxapps";
+        return $prefixPath . DIRECTORY_SEPARATOR . $appPath . DIRECTORY_SEPARATOR . "components";
     }
 }

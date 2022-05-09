@@ -28,6 +28,8 @@ class RateConditionController extends AbstractApiController
      * @param array $data Array of elements as shown
      * <code> {
      *               name : string,
+     *               value: string,
+     *               sequence_id: int,
      *               entity_id: string,
      *               account_id: string
      *               app_id: string
@@ -97,6 +99,8 @@ class RateConditionController extends AbstractApiController
      * {
      *              uuid : string,
      *              name : string,
+     *              value: string,
+     *              sequence_id: int,
      *              version: integer,
      *              created_by: integer,
      *              date_created: date,
@@ -127,11 +131,16 @@ class RateConditionController extends AbstractApiController
      * @param      array[json]  $filter  (filter with logic and filters)
      * @return array $dataget list of Datasource
      * <code>status : "success|error",
+     *              uuid : string,
      *              name : string,
-     *              type : string,
+     *              value: string,
+     *              sequence_id: int,
+     *              version: integer,
      *              created_by: integer,
      *              date_created: date,
-     *              org_id: integer,
+     *              account_id: string,
+     *              app_id: string,
+     *              entity_id: string,
      *              isdeleted: tinyint
      * </code>
      */

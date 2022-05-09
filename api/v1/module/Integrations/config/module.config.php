@@ -1,6 +1,6 @@
 <?php
 
-namespace Attachment;
+namespace Integrations;
 
 use Zend\Router\Http\Segment;
 
@@ -10,7 +10,7 @@ return [
             'overdrive' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/getContractor',
+                    'route' => '/overdrive[/:action]',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'GET',
@@ -20,7 +20,7 @@ return [
                         ],
                     ],
 
-                    'route' => '/addContractor',
+                    'route' => '/overdrive[/:action]',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'PUT',
@@ -30,7 +30,7 @@ return [
                         ],
                     ],
 
-                    'route' => '/addDriver',
+                    'route' => '/overdrive[/:action]',
                     'defaults' => [
                         'controller' => Controller\OverdriveapiController::class,
                         'method' => 'PUT',
@@ -38,6 +38,26 @@ return [
                         'access' => [
                             
                         ],
+                    ],
+                    'route' => '/overdrive[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\OverdriveapiController::class,
+                        'method' => 'POST',
+                        'action' => 'tchoiceRegistration',
+                        'access' => [
+                            
+                        ],
+                    ],
+                ],
+            ],
+            'triumph_delta' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/integration/triumph',
+                    'defaults' => [
+                        'controller' => Controller\TriumphController::class,
+                        'method' => 'POST',
+                        'action' => 'testEndpoint',
                     ],
                 ],
             ],

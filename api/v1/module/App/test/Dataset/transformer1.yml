@@ -1,0 +1,71 @@
+transform:
+    -
+        target: 'firstname'
+        src:
+            -
+                path: firstname
+    -
+        target: 'middlename'
+        src:
+            -
+                path: initial
+                emptyOnNull: true
+    -
+        target: 'topmostSubform[0].Page1[0].Step1a[0].f1_02[0]'
+        src:
+            -
+                path: lastname
+    -
+        target: 'topmostSubform[0].Page1[0].Step1a[0].f1_03[0]'
+        src:
+            -
+                path: address1 
+                emptyOnNull: true
+    -
+        target: 'City'
+        src:
+            -
+                path: city
+                emptyOnNull: true
+    -
+        target: 'State'
+        src:
+            -
+                path: state
+                emptyOnNull: true
+    -
+        target: 'Zip'
+        src:
+            -
+                path: zip
+                # emptyOnNull: true
+    # -
+    #     target: 'Birth Date'
+    #     src:
+    #         -
+    #             path: Dateofbirth
+    #             dataType: 'Date'
+    #             format: 'm/d/Y'
+    # -
+    #     target: 'homeCountrycode'
+    #     src:
+    #         -
+    #             path: home_country_code
+    #             script: " $field === 93 ? 93 : 77" // TERNARY EXPRESSION
+    -
+        target: 'topmostSubform[0].Page1[0].f1_05[0]'
+        src:
+            -
+                path: SocialSecurityNumber
+                method: 'SocialSecurity'  
+    -
+        target: 'maritalStatusSingle'
+        src:
+            -
+                path: maritalStatus
+                method: MaritalStatus
+    -
+        target: 'Todaysdate'
+        src:
+            -
+                script: " true ? date('m/d/y') : null"

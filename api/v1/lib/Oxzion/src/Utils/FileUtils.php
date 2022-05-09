@@ -1,10 +1,9 @@
 <?php
 namespace Oxzion\Utils;
 
-use Oxzion\Utils\StringUtils;
 use DirectoryIterator;
-
 use Exception;
+use Oxzion\Utils\StringUtils;
 
 class FileUtils
 {
@@ -30,17 +29,17 @@ class FileUtils
     public static function truepath($path)
     {
         // whether $path is unix or not
-        $unipath=strlen($path)==0 || $path{0}!='/';
+        $unipath = strlen($path) == 0 || $path{0} != '/';
         // attempts to detect if path is relative in which case, add cwd
-        if (strpos($path, ':')===false && $unipath) {
-            $path=getcwd().DIRECTORY_SEPARATOR.$path;
+        if (strpos($path, ':') === false && $unipath) {
+            $path = getcwd() . DIRECTORY_SEPARATOR . $path;
         }
         // resolve path parts (single dot, double dot and double delimiters)
         $path = str_replace(array('/', '\\'), DIRECTORY_SEPARATOR, $path);
         $parts = array_filter(explode(DIRECTORY_SEPARATOR, $path), 'strlen');
         $absolutes = array();
         foreach ($parts as $part) {
-            if ('.'  == $part) {
+            if ('.' == $part) {
                 continue;
             }
             if ('..' == $part) {
@@ -49,13 +48,13 @@ class FileUtils
                 $absolutes[] = $part;
             }
         }
-        $path=implode(DIRECTORY_SEPARATOR, $absolutes);
+        $path = implode(DIRECTORY_SEPARATOR, $absolutes);
         // resolve any symlinks
-        if (file_exists($path) && linkinfo($path)>0) {
-            $path=readlink($path);
+        if (file_exists($path) && linkinfo($path) > 0) {
+            $path = readlink($path);
         }
         // put initial separator that could have been lost
-        $path=!$unipath ? '/'.$path : $path;
+        $path = !$unipath ? '/' . $path : $path;
         return $path;
     }
     public static function storeFile($file, $directory)
@@ -65,19 +64,19 @@ class FileUtils
         try {
             if (is_array($file)) {
                 if (isset($file['tmp_name'])) {
-                    move_uploaded_file($file['tmp_name'], $directory.$file['name']);
-                    if (!file_exists($directory.$file['name'])) {
-                        file_put_contents($directory.$file['name'], file_get_contents($file['tmp_name']));
+                    move_uploaded_file($file['tmp_name'], $directory . $file['name']);
+                    if (!file_exists($directory . $file['name'])) {
+                        file_put_contents($directory . $file['name'], file_get_contents($file['tmp_name']));
                     }
-                    chmod($directory.$file['name'], 0777);
+                    chmod($directory . $file['name'], 0777);
                 }
                 if (isset($file['body'])) {
-                    file_put_contents($directory.$file['filename'], $file['body']);
+                    file_put_contents($directory . $file['filename'], $file['body']);
                     return $file['filename'];
                 }
             } else {
-                move_uploaded_file($file, $directory.$file);
-                chmod($directory.$file, 0777);
+                move_uploaded_file($file, $directory . $file);
+                chmod($directory . $file, 0777);
             }
         } catch (Exception $e) {
             throw new Exception('Could not save file. Error:' . print_r(error_get_last(), true));
@@ -89,7 +88,7 @@ class FileUtils
     {
         self::createDirectory($destDirectory);
         $destDirectory = self::joinPath($destDirectory);
-        copy($src, $destDirectory.$destFile);
+        copy($src, $destDirectory . $destFile);
     }
 
     public static function copyDir($src, $dest)
@@ -104,10 +103,10 @@ class FileUtils
                 }
                 $srcCheck = self::joinPath($src);
                 $destCheck = self::joinPath($dest);
-                if (is_dir($srcCheck.$file)) {
-                    self::copyDir($srcCheck.$file, $destCheck.$file);
+                if (is_dir($srcCheck . $file)) {
+                    self::copyDir($srcCheck . $file, $destCheck . $file);
                 } else {
-                    copy($srcCheck.$file, $destCheck.$file);
+                    copy($srcCheck . $file, $destCheck . $file);
                 }
             }
         }
@@ -137,7 +136,7 @@ class FileUtils
             return;
         }
         if (is_dir($fsObj)) {
-            if (DIRECTORY_SEPARATOR != $fsObj[strlen($fsObj)-1]) {
+            if (DIRECTORY_SEPARATOR != $fsObj[strlen($fsObj) - 1]) {
                 $fsObj = $fsObj . DIRECTORY_SEPARATOR;
             }
             $dirList = scandir($fsObj);
@@ -159,9 +158,9 @@ class FileUtils
     {
         // Scan the directory and create the list of uploaded files.
         $files = [];
-        $handle  = opendir($directory);
+        $handle = opendir($directory);
         while (false !== ($entry = readdir($handle))) {
-            if ($entry=='.' || $entry=='..') {
+            if ($entry == '.' || $entry == '..') {
                 continue;
             } // Skip current dir and parent dir.
             $files[] = $entry;
@@ -171,7 +170,7 @@ class FileUtils
     }
     public static function getFileSize($fileName, $directory)
     {
-        return filesize($directory.$fileName);
+        return filesize($directory . $fileName);
     }
 
     public static function deleteFile($fileName, $directory)
@@ -182,7 +181,7 @@ class FileUtils
                     print_r(error_get_last(), true));
             }
         } else {
-            if (!unlink($directory.$fileName)) {
+            if (!unlink($directory . $fileName)) {
                 throw new Exception("Could not Delete File: ${fileName} under directory ${directory}." .
                     print_r(error_get_last(), true));
             }
@@ -196,9 +195,14 @@ class FileUtils
 
     public static function symlink($target, $link)
     {
-        if (!symlink($target, $link)) {
-            throw new Exception("Failed to create symlink ${link} -> ${target}." .
+        try {
+            if (!symlink($target, $link)) {
+                throw new Exception("Failed to create symlink ${link} -> ${target}." .
                 'Error:' . print_r(error_get_last(), true));
+            }
+        } catch(Exception $e) {
+            throw new Exception("Failed to create symlink ${link} -> ${target}." .
+            'Error:' . print_r(error_get_last(), true));
         }
     }
 
@@ -207,7 +211,7 @@ class FileUtils
         if (is_link($link)) {
             if (!unlink($link)) {
                 throw new Exception("Failed to unlink ${link}." .
-                'Error:' . print_r(error_get_last(), true));
+                    'Error:' . print_r(error_get_last(), true));
             }
         }
     }
@@ -220,16 +224,16 @@ class FileUtils
             case 'jpeg':
             case 'JPG':
             case 'JPEG':
-            $image = imagecreatefromjpeg($file['tmp_name']);
-            break;
+                $image = imagecreatefromjpeg($file['tmp_name']);
+                break;
             case 'gif':
             case 'GIF':
-            $image = imageCreateFromGIF($file['tmp_name']);
-            break;
+                $image = imageCreateFromGIF($file['tmp_name']);
+                break;
             case 'png':
             case 'PNG':
-            $image = imageCreateFromPNG($file['tmp_name']);
-            break;
+                $image = imageCreateFromPNG($file['tmp_name']);
+                break;
         }
         return $image;
     }
@@ -239,8 +243,8 @@ class FileUtils
         $baseLocation = self::joinPath($baseLocation);
         $counter = 0;
         while (true) {
-            $file = ($counter == 0) ? $file : $file.$counter;
-            if (!file_exists($baseLocation.$file)) {
+            $file = ($counter == 0) ? $file : $file . $counter;
+            if (!file_exists($baseLocation . $file)) {
                 return $file;
             }
             $counter++;
@@ -258,7 +262,7 @@ class FileUtils
     public static function createTempDir($dirNameLength = 10)
     {
         $tempDir = sys_get_temp_dir();
-        for ($i=0; $i<100; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $dirName = StringUtils::randomString($dirNameLength);
             $targetDir = $tempDir . DIRECTORY_SEPARATOR . $dirName;
             if (!file_exists($targetDir)) {
@@ -274,7 +278,7 @@ class FileUtils
     public static function createTempFileName($fileNameLength = 10)
     {
         $tempDir = sys_get_temp_dir();
-        for ($i=0; $i<100; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $fileName = StringUtils::randomString($fileNameLength);
             $targetFile = $tempDir . DIRECTORY_SEPARATOR . $fileName;
             if (!file_exists($targetFile)) {
@@ -335,7 +339,7 @@ class FileUtils
         }
         $output = [];
         if (!exec("rsync -v -a --ignore-existing $src $dest", $output)) {
-            throw new Exception("Failed to Copy New Files - ".print_r($output, true));
+            throw new Exception("Failed to Copy New Files - " . print_r($output, true));
         }
     }
 

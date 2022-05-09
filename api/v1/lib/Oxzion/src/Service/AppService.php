@@ -421,6 +421,10 @@ class AppService extends AbstractService implements AppUpgrade
             file_put_contents($res . '/index.scss', $ymlData['cssContent']);
             // unset($ymlData['cssContent']);
         }
+        if (isset($ymlData['jsContent']) && !empty($ymlData['jsContent'])) {
+            file_put_contents($res . '/index.js', $ymlData['jsContent']);
+            // unset($ymlData['jsContent']);
+        }
     }
 
     private function removeViewAppOnError($path)
@@ -818,7 +822,7 @@ class AppService extends AbstractService implements AppUpgrade
                     if ($page) {
                         $menu['page_id'] = $page['id'];
                     } else {
-                        throw new ValidationException(['page or page_uuid' => 'required']);
+                        throw new ValidationException(['Menu : page or page_uuid' => 'required']);
                     }
                 }
                 $count = $this->menuItemService->updateMenuItem($menu['uuid'], $menu);
@@ -944,6 +948,7 @@ class AppService extends AbstractService implements AppUpgrade
             copy($eoxapp . '/view/apps/eoxapps/metadata.json', $path . '/view/apps/' . $yamlData['app']['name'] . '/metadata.json');
             copy($eoxapp . '/view/apps/eoxapps/package.json', $path . '/view/apps/' . $yamlData['app']['name'] . '/package.json');
             copy($eoxapp . '/view/apps/eoxapps/index.scss', $path . '/view/apps/' . $yamlData['app']['name'] . '/index.scss');
+            copy($eoxapp . '/view/apps/eoxapps/index.js', $path . '/view/apps/' . $yamlData['app']['name'] . '/index.js');
         } else {
             if (is_dir($path . 'view/apps/eoxapps')) {
                 FileUtils::rmDir($path . 'view/apps/eoxapps');
@@ -953,6 +958,14 @@ class AppService extends AbstractService implements AppUpgrade
                 FileUtils::copy($srcIconPath . 'icon.png', "icon.png", $appName);
                 FileUtils::copy($srcIconPath . 'icon_white.png', "icon_white.png", $appName);
                 FileUtils::copy($srcIconPath . 'index.scss', "index.scss", $appName); // Copy css from Source to Deploy directory
+                FileUtils::copy($srcIconPath . 'index.js', "index.js", $appName); // Copy index.js from Source to Deploy directory
+                if(is_dir($srcIconPath . 'components')){
+                    //override components folder in deploy with source directory
+                    if(is_dir($appName . "/components")) {
+                        FileUtils::rmDir($appName . "/components");
+                    }
+                    FileUtils::copyDir($srcIconPath . 'components', $appName . "/components"); // Copy css from Source to Deploy directory
+                }
             }
         }
 
@@ -1131,7 +1144,7 @@ class AppService extends AbstractService implements AppUpgrade
     private function setupLinksAndBuild($path, $appId)
     {
         $link = $this->config['DELEGATE_FOLDER'] . $appId;
-        $target = $path . "/data/delegate";
+        $target = $path . "data/delegate";
         if (is_link($link)) {
             FileUtils::unlink($link);
         }
@@ -1201,6 +1214,8 @@ class AppService extends AbstractService implements AppUpgrade
         }
         if (!is_link($link)) {
             $this->logger->info("setting up link $link with $target");
+            // echo "<pre/>"; print_r($link);
+            // echo "<pre/>"; print_r($target);exit;
             FileUtils::symlink($target, $link);
         }
     }
