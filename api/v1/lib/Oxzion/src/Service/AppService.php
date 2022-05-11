@@ -971,7 +971,7 @@ class AppService extends AbstractService implements AppUpgrade
 
         $jsonData['name'] = $yamlData['app']['name'];
         $jsonData['appId'] = $yamlData['app']['uuid'];
-        $jsonData['fontIcon'] = $yamlData['app']['fontIcon'];// [BUG] 32775 - Adding the fontIcon to the metadata.json file during the appDeploy
+        $jsonData['fontIcon'] = isset($yamlData['app']['fontIcon']) ? $yamlData['app']['fontIcon'] : null;// [BUG] 32775 - Adding the fontIcon to the metadata.json file during the appDeploy
         $jsonData['category'] = isset($yamlData['app']['category']) ? $yamlData['app']['category'] : null;
         $displayName = $jsonData['title']['en_EN'] = ($yamlData['app']['name'] == 'EOXAppBuilder') ? 'App Studio' : (isset($yamlData['app']['title']) ? $yamlData['app']['title'] : $yamlData['app']['name']);
 
