@@ -971,6 +971,7 @@ class AppService extends AbstractService implements AppUpgrade
 
         $jsonData['name'] = $yamlData['app']['name'];
         $jsonData['appId'] = $yamlData['app']['uuid'];
+        $jsonData['fontIcon'] = $yamlData['app']['fontIcon'];// [BUG] 32775 - Adding the fontIcon to the metadata.json file during the appDeploy
         $jsonData['category'] = isset($yamlData['app']['category']) ? $yamlData['app']['category'] : null;
         $displayName = $jsonData['title']['en_EN'] = ($yamlData['app']['name'] == 'EOXAppBuilder') ? 'App Studio' : (isset($yamlData['app']['title']) ? $yamlData['app']['title'] : $yamlData['app']['name']);
 
@@ -1514,7 +1515,7 @@ class AppService extends AbstractService implements AppUpgrade
             }
             $formData['statuslist'] = json_encode($sts);
         }
-        return $this->formService->createForm($formData); // ! Wrong usage of the method. Need to remove this. 
+        return $this->formService->createForm($formData); // ! Wrong usage of the method. Need to remove this.
     }
 
     public function registerApps($data)
