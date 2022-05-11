@@ -148,8 +148,7 @@ class QueryController extends AbstractApiController
 
     public function previewQueryAction()
     {
-        $data = $this->params()->fromPost();
-        $params = array_merge($data, $this->params()->fromRoute());
+        $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
         try {
             $result = $this->queryService->previewQuery($params);
             if (!$result) {
