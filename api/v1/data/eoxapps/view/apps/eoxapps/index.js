@@ -10,7 +10,7 @@ const register = (core, args, options, metadata) => {
     .createWindow({
       id: metadata.name + "_Window",
       title: metadata.title.en_EN,
-      icon: metadata.fontIcon,
+      icon: fontIcon,
       attributes: {
         classNames: ["Window_" + metadata.name],
         dimension: {
