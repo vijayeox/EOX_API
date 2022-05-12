@@ -99,7 +99,7 @@ menu:
         uuid: 18d3e6bb-e948-48e6-b27c-3a00bcee17b8
     -
         name: Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_AXONUNDERWRITER_WRITE
         page_uuid: 4044c80f-4d63-45ee-a447-16f49ac88272
         uuid: 9e221c20-d33d-40a4-b8b3-d523e7e145e6

@@ -203,7 +203,7 @@ menu:
         uuid: cae86177-9fb1-4894-89bd-5e24ddf31180
     -
         name: Hospitality Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_HOSPITALITYUNDERWRITER_WRITE
         page_uuid: 28a3dad1-2f22-4745-99ff-4507921e3391
         uuid: 9a6330d9-11e8-454a-9534-74514c058333
@@ -221,7 +221,7 @@ menu:
         uuid: 54b0fa76-1d04-40f4-b0fd-8b6961ba47d6
     -
         name: PEST Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_PESTUNDERWRITER_WRITE
         page_uuid: 38f63377-e070-42cc-bb22-b9a229f4b0f7
         uuid: 3579e745-8f35-42d2-84ef-d17c14a04ceb
@@ -239,7 +239,7 @@ menu:
         uuid: 674d585f-a8e2-4940-80dd-ee1c9db312c8
     -
         name: REGT Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_REGTUNDERWRITER_WRITE
         page_uuid: 784f75da-a8e4-4874-a956-cef3924d6f98
         uuid: 43b6b3c7-4321-4f30-b620-64f514c2e029
@@ -257,7 +257,7 @@ menu:
         uuid: 80850512-859d-45e9-ae71-d188c9fb6dd3
     -
         name: TimberSure Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_TIMBERSUREUNDERWRITER_WRITE
         page_uuid: 1d4a2ab2-9e45-4711-bfbb-cd9c853c88c0
         uuid: 310b4bd7-56b4-4d76-a916-bd40f49e691e

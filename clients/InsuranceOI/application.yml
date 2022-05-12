@@ -6,7 +6,7 @@ app:
     category: Dashboards
     type: 2
     autostart: 'false'
-checkOrg: true 
+checkOrg: true
 org:
     name: 'EOX Vantage1'
     uuid: b0923de7-0387-48ea-8f29-5d3704d96a46
@@ -78,7 +78,7 @@ menu:
         uuid: e9d94c64-358e-4174-8748-aef23623c2d6
     -
         name: Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_MANAGERVIEW_WRITE
         page_uuid: 1dee3f2e-9952-4390-9d42-904d28b9f91f
         uuid: 234e4f1b-1e44-40f3-a944-3a9b89d855a5

@@ -7,11 +7,11 @@ content:
             route: 'file/search/entity/Dealer Policy'
             filterable: true
             autoRefresh: 10000
-            defaultFilters: 
+            defaultFilters:
                 sort:
                     -
                         field: date_created
-                        dir: desc          
+                        dir: desc
             resizable: true
             pageable:
                 buttonCount: 3
@@ -20,7 +20,7 @@ content:
                     - 20
                     - 50
                 info: true
-            sortable: 
+            sortable:
                 allowUnsort: true
                 mode: single
             actions:
@@ -32,7 +32,7 @@ content:
                             type: Form
                             form_id: dea1187f-62d7-4e4b-963f-7bc5a8f589c8
                             fileId: '{{uuid}}'
-                            downloadPdf: true  
+                            downloadPdf: true
                     icon: 'far fa-pencil-alt'
                 -
                     name: Comments
@@ -54,7 +54,7 @@ content:
                             params:
                                 page_id: 'f52a8856-54af-4efc-b548-3675ddb7f90f'
                                 params:
-                                    parentFileId: '{{uuid}}'                  
+                                    parentFileId: '{{uuid}}'
                     icon: 'far fa-hand-holding-usd'
                 -
                     name: 'Retry'
@@ -82,7 +82,7 @@ content:
                 -
                     name: 'Please Wait'
                     rule: '(row.status == "Processing" && row.submissionTime) ? moment().isBefore(moment(row.submissionTime).add(3,"m")) : false'
-                    icon: 'fad fa-circle-notch fa-spin'
+                    icon: 'fas fa-circle-notch fa-spin'
                 -
                     name: Delete
                     rule: 'profile.privileges.MANAGE_POLICY_APPLICATION_DELETE == true'
@@ -108,8 +108,8 @@ content:
                         details:
                             -
                                 type: Form
-                                form_id: dea1187f-62d7-4e4b-963f-7bc5a8f589c8    
-                                downloadPdf: true  
+                                form_id: dea1187f-62d7-4e4b-963f-7bc5a8f589c8
+                                downloadPdf: true
             columnConfig:
                 -
                     title: Insured
