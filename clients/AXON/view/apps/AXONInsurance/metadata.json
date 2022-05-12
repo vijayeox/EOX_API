@@ -6,7 +6,7 @@
 	"autostart":false,
     "singleton":true,
 	"defaultAppforOrgs":false,
-	"fontIcon": "fad fa-user-chart",
+	"fontIcon": "fas fa-user-chart",
 	"icon": "icon.png",
 	"icon_white": "icon_white.png",
 	"title": {
