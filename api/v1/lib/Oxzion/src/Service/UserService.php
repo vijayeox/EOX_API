@@ -760,17 +760,17 @@ class UserService extends AbstractService
         $offset = 0;
         $sort = "name";
         $select = "SELECT ou.uuid, ou.username, ou.name, ou.icon, ou.timezone, ou.preferences,
-        	au.uuid as accountId, per.firstname, per.lastname, per.email, per.date_of_birth, per.phone, per.gender,
+        	au.uuid as accountId, usrp.firstname, usrp.lastname, usrp.email, usrp.date_of_birth, usrp.phone, usrp.gender,
         	oxemp.designation, oxemp.website, oxemp.about, oxemp.id as employee_id, oxemp.date_of_join, oxemp.interest,
         	oa.address1, oa.address2, oa.city, oa.state, oa.country, oa.zip,
         	manager_user.uuid as managerId,manager_user.name as manager_name";
         $from = " FROM `ox_user` as ou
                   inner join ox_account au on au.id = ou.account_id
-                  join ox_person per on per.id = ou.person_id
-                  inner join ox_employee oxemp on oxemp.person_id = per.id
+                  join ox_person usrp on usrp.id = ou.person_id
+                  inner join ox_employee oxemp on oxemp.person_id = usrp.id
                   LEFT JOIN ox_employee man on man.id = oxemp.manager_id
                   LEFT JOIN ox_user manager_user on manager_user.person_id = man.person_id
-                  left join ox_address as oa on per.address_id = oa.id ";
+                  left join ox_address as oa on usrp.address_id = oa.id ";
         $cntQuery = "SELECT count(ou.id) as count " . $from;
         if (count($filterParams) > 0 || sizeof($filterParams) > 0) {
             if (isset($filterParams['filter'])) {
