@@ -316,7 +316,7 @@ class UserService extends AbstractService
                 'subject' => isset($data['subject']) ? $data['subject'] : null,
                 'REGISTRATION_EMAIL_SEND' => isset($data['REGISTRATION_EMAIL_SEND']) ? $data['REGISTRATION_EMAIL_SEND'] : 'true',
             ));
-            if($data['REGISTRATION_EMAIL_SEND'] == 'true'){
+            if($newUserMailParams['REGISTRATION_EMAIL_SEND'] == 'true'){
                 $this->messageProducer->sendTopic(json_encode($newUserMailParams), 'USER_ADDED');
             }
         } catch (Exception $e) {
