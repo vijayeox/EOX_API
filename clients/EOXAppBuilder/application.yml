@@ -12,6 +12,7 @@ app:
     logo: default_app.png
     start_options: null
     title: App Studio
+    fontIcon: "fas fa-desktop-alt"
     app_properties: '{"chat_notification":"","appIdentifiers":""}'
 checkOrg: true 
 org:

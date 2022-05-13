@@ -4285,7 +4285,8 @@
 							"type": "form",
 							"input": true,
 							"hideOnChildrenHidden": false,
-							"lazyLoad": false
+							"lazyLoad": false,
+							"revision": 382
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
