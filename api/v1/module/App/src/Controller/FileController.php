@@ -300,7 +300,6 @@ class FileController extends AbstractApiController
     {
         $params = array_merge($this->extractPostData(), $this->params()->fromRoute());
         $filterParams = $this->params()->fromQuery();
-
         try {
             if ($params['fileId']) {
                 $result = $this->fileService->getAuditLog($params['fileId'], $filterParams);

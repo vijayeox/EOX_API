@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Service;
 
 use App\Model\PageTable;
@@ -23,13 +24,13 @@ class PageService extends AbstractService
     }
     public function savePage($routeData, &$data, $id = null)
     {
-        $this->logger->info("save page - params - ".json_encode($routeData).", ".json_encode($data).", $id");
+        $this->logger->info("save page - params - " . json_encode($routeData) . ", " . json_encode($data) . ", $id");
         $count = 0;
         $data['app_id'] = $this->getIdFromUuid('ox_app', $routeData['appId']);
         $content = false;
         if (isset($data['app_id'])) {
             $page = null;
-            $content = isset($data['content'])?$data['content']:false;
+            $content = isset($data['content']) ? $data['content'] : false;
             $this->beginTransaction();
             if (isset($id) && !empty($id)) {
                 $page = $this->table->getByUuid($id);
@@ -41,12 +42,12 @@ class PageService extends AbstractService
                     $deleteQuery = "DELETE from ox_page_content where page_id = ?";
                     $whereParams = array($existingPage['id']);
                     $deleteResult = $this->executeUpdatewithBindParameters($deleteQuery, $whereParams);
-                    $deleteRecord = $this->table->delete($existingPage['id'], ['app_id'=>$data['app_id']]);
+                    $deleteRecord = $this->table->delete($existingPage['id'], ['app_id' => $data['app_id']]);
                     unset($data['id']);
                     unset($page->id);
                 }
             }
-           
+
             if (!$page) {
                 $page = new Page();
                 $data['uuid'] = (isset($id) && !empty($id)) ? $id : UuidUtil::uuid();
@@ -81,20 +82,20 @@ class PageService extends AbstractService
         }
         return $count;
     }
-     
+
     public function deletePage($appUuid, $pageUuid)
     {
         $select = "SELECT ox_app_page.* from ox_app_page left join ox_app on ox_app.id = ox_app_page.app_id where ox_app.uuid =? AND ox_app_page.uuid =?";
-        $whereQuery = array($appUuid,$pageUuid);
+        $whereQuery = array($appUuid, $pageUuid);
         $result = $this->executeQueryWithBindParameters($select, $whereQuery)->toArray();
         $count = 0;
-        if (count($result)>0) {
+        if (count($result) > 0) {
             $this->beginTransaction();
             try {
                 $selectQuery = "DELETE from ox_page_content where page_id = ?";
                 $selectParams = array($result[0]['id']);
                 $resultSet = $this->executeQueryWithBindParameters($selectQuery, $selectParams);
-                $count = $this->table->delete($this->getIdFromUuid('ox_app_page', $pageUuid), ['app_id'=>$this->getIdFromUuid('ox_app', $appUuid)]);
+                $count = $this->table->delete($this->getIdFromUuid('ox_app_page', $pageUuid), ['app_id' => $this->getIdFromUuid('ox_app', $appUuid)]);
                 if ($count == 0) {
                     $this->rollback();
                     return 0;
@@ -111,7 +112,7 @@ class PageService extends AbstractService
         return $count;
     }
 
-    public function getPages($appUuid=null, $filterArray = array())
+    public function getPages($appUuid = null, $filterArray = array())
     {
         if (isset($appUuid)) {
             $filterArray['app_id'] = $this->getIdFromUuid('ox_app', $appUuid);
@@ -123,9 +124,9 @@ class PageService extends AbstractService
     {
         try {
             $select = "SELECT ox_app_page.* FROM ox_app_page left join ox_app on ox_app.id = ox_app_page.app_id where ox_app_page.uuid=? and ox_app.uuid=?";
-            $whereQuery = array($pageUuid,$appUuid);
+            $whereQuery = array($pageUuid, $appUuid);
             $response = $this->executeQueryWithBindParameters($select, $whereQuery)->toArray();
-            if (count($response)==0) {
+            if (count($response) == 0) {
                 return 0;
             }
             return $response[0];
@@ -139,9 +140,9 @@ class PageService extends AbstractService
         try {
             $pageName = is_array($pageName) ? $pageName['name'] : $pageName;
             $select = "SELECT ox_app_page.* FROM ox_app_page left join ox_app on ox_app.id = ox_app_page.app_id where ox_app_page.name=? and ox_app.uuid=?";
-            $whereQuery = array($pageName,$appId);
+            $whereQuery = array($pageName, $appId);
             $response = $this->executeQueryWithBindParameters($select, $whereQuery)->toArray();
-            if (count($response)==0) {
+            if (count($response) == 0) {
                 return 0;
             }
             return $response[0];
