@@ -28,6 +28,7 @@ content:
             disableAppId: true
             filterable: true
             defaultFilters: 
+                take: 50
                 filter:
                     logic: and
                     filters:
