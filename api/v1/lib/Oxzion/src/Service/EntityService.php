@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\Service;
 
 use Oxzion\Model\App\Entity;
@@ -34,6 +35,7 @@ class EntityService extends AbstractService
         $count = 0;
         $data['app_id'] = $this->getIdFromUuid('ox_app', $appUuid);
         $data['uuid'] = isset($data['uuid']) ? $data['uuid'] : UuidUtil::uuid();
+        $data['isdeleted'] = 0;
         $entity = new Entity($this->table);
         try {
             $entity->loadByUuid($data['uuid']);
@@ -56,7 +58,6 @@ class EntityService extends AbstractService
             $temp = $entity->getGenerated(true);
             $inputData['id'] = $temp['id'];
             $inputData['uuid'] = $temp['uuid'];
-
         } catch (Exception $e) {
             $this->logger->error($e->getMessage(), $e);
             $this->rollback();
@@ -70,7 +71,7 @@ class EntityService extends AbstractService
         if ($result) {
             $entity = new Entity($this->table);
             $entity->loadByUuid($id);
-            $data = ["isdeleted" => 1];
+            $data['isdeleted'] = 1;
             $entity->assign($data);
             try {
                 $this->beginTransaction();
@@ -106,13 +107,13 @@ class EntityService extends AbstractService
             $where .= " AND ";
             $queryParams[] = $appId;
         }
-        $where .= is_numeric($id) ? "ox_app_entity.id=?" :"ox_app_entity.uuid=?";
+        $where .= is_numeric($id) ? "ox_app_entity.id=?" : "ox_app_entity.uuid=?";
         $query = "SELECT ox_app_entity.*
                     from ox_app_entity
                     left join ox_app on ox_app.id=ox_app_entity.app_id
                     where $where";
         $queryParams[] = $id;
-        $this->logger->info("STATEMENT $query".print_r($queryParams, true));
+        $this->logger->info("STATEMENT $query" . print_r($queryParams, true));
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (count($resultSet) == 0) {
             throw new EntityNotFoundException("Entity not found for the App");
@@ -136,7 +137,7 @@ class EntityService extends AbstractService
 
     public function saveIdentifiers($entityId, $identifiers)
     {
-        $this->logger->info("Save Entity Identifiers - $entityId ".print_r($identifiers, true));
+        $this->logger->info("Save Entity Identifiers - $entityId " . print_r($identifiers, true));
         try {
             $this->beginTransaction();
             $delete = "DELETE FROM ox_entity_identifier WHERE entity_id= :entityId";
@@ -159,7 +160,7 @@ class EntityService extends AbstractService
 
     public function saveParticipantRoles($entityId, $appId, $data)
     {
-        $this->logger->info("Save Participant Roles for Entity - $entityId ".print_r($data, true));
+        $this->logger->info("Save Participant Roles for Entity - $entityId " . print_r($data, true));
         try {
             $this->beginTransaction();
             $delete = "DELETE FROM ox_entity_participant_role WHERE entity_id= :entityId";
@@ -223,7 +224,7 @@ class EntityService extends AbstractService
                     right join ox_app_page on ox_app_page.id=ox_app_entity.page_id
                     where $where";
         $queryParams[] = $entityId;
-        $this->logger->info("STATEMENT $query".print_r($queryParams, true));
+        $this->logger->info("STATEMENT $query" . print_r($queryParams, true));
         $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         if (count($resultSet) == 0) {
             throw new EntityNotFoundException("Entity not found for the App");
@@ -239,7 +240,7 @@ class EntityService extends AbstractService
                     right join ox_workflow on ox_app_entity.id=ox_workflow.entity_id
                     right join ox_app on ox_app.id=ox_app_entity.app_id
                     where $where";
-        $this->logger->info("STATEMENT $query".print_r($queryParams, true));
+        $this->logger->info("STATEMENT $query" . print_r($queryParams, true));
         $workflow = $this->executeQueryWithBindParameters($workFlowQuery, $queryParams)->toArray();
         if (count($workflow) > 0) {
             $result['has_workflow'] = 1;
@@ -252,7 +253,7 @@ class EntityService extends AbstractService
                 $result['has_workflow'] = 1;
             } else {
                 $form = $entityForm[0];
-                $path = $this->config['FORM_FOLDER'].$appId."/".$form['name'].$this->formFileExt;
+                $path = $this->config['FORM_FOLDER'] . $appId . "/" . $form['name'] . $this->formFileExt;
                 $this->logger->info("Form template - $path");
                 $result['form_uuid'] = $form['uuid'];
                 $result['form_name'] = $form['name'];
@@ -261,7 +262,7 @@ class EntityService extends AbstractService
                 }
             }
         }
-        $result['content'] = isset($content['content'])?$content['content']:null;
+        $result['content'] = isset($content['content']) ? $content['content'] : null;
         return $result;
     }
 }

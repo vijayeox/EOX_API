@@ -130,7 +130,7 @@ class AppInstaller extends React.Component {
           {this.state.service.selectedOrganization ||
           this.state.service.updateOrganization ? (
             <KendoReactButtons.Button
-              className={"btn btn-primary install-manager-btn"}
+              className={"btn btn-primary install-manager-btn mb-2"}
               onClick={() => {
                 this.setState({ service: this.state.service.goBack() });
               }}
@@ -178,7 +178,7 @@ class AppInstaller extends React.Component {
           this.state.service.metaData &&
             this.state.service.businessRoles && (
               <button
-                className="install-manager_submit"
+                className="install-manager_submit mt-3"
                 onClick={() => this.installOrUninstall(null, true)}
               >
                 {this.state.service.installationType === "forInstall"
