@@ -31,9 +31,10 @@ class Entity extends OxzionEntity
         'title' =>              ['type' => Type::STRING,    'readonly' => FALSE, 'required' => FALSE],
         'page_id' =>            ['type' => Type::INTEGER,   'readonly' => FALSE, 'required' => FALSE],
         'subscriber_field' =>   ['type' => Type::STRING,    'readonly' => FALSE, 'required' => FALSE],
-        'generic_attachment_config' =>   ['type' => Type::STRING,    'readonly' => FALSE, 'required' => FALSE]
+        'isdeleted' =>          ['type' => Type::INTEGER,   'readonly' => FALSE, 'required' => FALSE],
+        'generic_attachment_config' =>   ['type' => Type::STRING,    'readonly' => FALSE, 'required' => FALSE, 'value' => 0]
     ];
-    
+
     public function &getModel()
     {
         return self::$MODEL;
