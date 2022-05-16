@@ -20,7 +20,7 @@ use Oxzion\Utils\UuidUtil;
 class FormService extends AbstractService
 {
     private $formFileExt = ".json";
-    
+
     public function __construct($config, $dbAdapter, FormTable $table, FormFactory $formEngineFactory, FieldService $fieldService)
     {
         parent::__construct($config, $dbAdapter);
@@ -146,7 +146,7 @@ class FormService extends AbstractService
                 $params['appId'] = $appUuid;
             }
             //TODO handle the $filterArray using FilterUtils
-            $query = "select f.name, e.uuid as entity_id, f.uuid as form_id from 
+            $query = "select f.name, e.uuid as entity_id, f.uuid as form_id from
                       ox_form as f inner join ox_app_entity as e on e.id = f.entity_id
                       inner join ox_app as app on app.id = f.app_id
                       $where and f.isdeleted=0";
@@ -166,6 +166,7 @@ class FormService extends AbstractService
         try {
             $queryString = "Select name, app_id, uuid from ox_form where uuid=? and isdeleted=?";
             $queryParams = array($uuid, 0);
+            $this->logger->info("GET FORM QUERY-- $queryString with params--".print_r($queryParams, true));
             $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
             if (count($resultSet)==0) {
                 return 0;
@@ -202,7 +203,7 @@ class FormService extends AbstractService
         }
         return $response[0];
     }
-    
+
     private function parseForm(&$data, $fieldReference)
     {
         if (isset($data['template']) && is_array($data['template'])) {
