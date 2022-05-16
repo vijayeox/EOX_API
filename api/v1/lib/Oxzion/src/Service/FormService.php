@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\Service;
 
 use Oxzion\Model\FormTable;
@@ -75,6 +76,17 @@ class FormService extends AbstractService
     {
         $this->logger->info("EXECUTING UPDATE FORM");
         $obj = $this->table->getByUuid($formUuid);
+
+        //Update the appId with the latest App
+        $appQuery = "SELECT id from ox_app where uuid = :appUuid ";
+        $appQueryParams = array("appUuid" => $appUuid);
+        $appInfo = $this->executeQueryWithBindParameters($appQuery, $appQueryParams)->toArray();
+
+        //Update the entityId with the latest App
+        $entityQuery = "SELECT id from ox_app_entity where app_id = :appUuid and isdeleted = 0";
+        $entityQueryParams = array("appUuid" => $appInfo[0]['id']);
+        $entityInfo = $this->executeQueryWithBindParameters($entityQuery, $entityQueryParams)->toArray();
+
         if (is_null($obj)) {
             return 0;
         }
@@ -87,6 +99,9 @@ class FormService extends AbstractService
         $changedArray = array_merge($obj->toArray(), $template['form']);
         $changedArray['modified_by'] = AuthContext::get(AuthConstants::USER_ID);
         $changedArray['date_modified'] = date('Y-m-d H:i:s');
+        $changedArray['app_id'] = $appInfo[0]['id'];
+        $changedArray['isdeleted'] = 0;
+        $changedArray['entity_id'] = $entityInfo[0]['id'];
         $form->exchangeArray($changedArray);
         $form->validate();
         $this->beginTransaction();
@@ -135,14 +150,14 @@ class FormService extends AbstractService
         return $count;
     }
 
-    public function getForms($appUuid=null, $filterArray=array())
+    public function getForms($appUuid = null, $filterArray = array())
     {
         $this->logger->info("EXECUTING GET FORMS");
         try {
             $where = "";
             $params = array();
             if (isset($appUuid)) {
-                $where .="where app.uuid = :appId";
+                $where .= "where app.uuid = :appId";
                 $params['appId'] = $appUuid;
             }
             //TODO handle the $filterArray using FilterUtils
@@ -151,7 +166,7 @@ class FormService extends AbstractService
                       inner join ox_app as app on app.id = f.app_id
                       $where and f.isdeleted=0";
             $response = array();
-            $this->logger->info("GET FORM QUERY-- $query with params--".print_r($params, true));
+            $this->logger->info("GET FORM QUERY-- $query with params--" . print_r($params, true));
             $response['data'] = $this->executeQueryWithBindParameters($query, $params)->toArray();
             return $response;
         } catch (Exception $e) {
@@ -166,14 +181,14 @@ class FormService extends AbstractService
         try {
             $queryString = "Select name, app_id, uuid from ox_form where uuid=? and isdeleted=?";
             $queryParams = array($uuid, 0);
-            $this->logger->info("GET FORM QUERY-- $queryString with params--".print_r($queryParams, true));
+            $this->logger->info("GET FORM QUERY-- $queryString with params--" . print_r($queryParams, true));
             $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
-            if (count($resultSet)==0) {
+            if (count($resultSet) == 0) {
                 return 0;
             }
             $data = $resultSet[0];
             $appId = $this->getUuidFromId("ox_app", $data['app_id']);
-            $path = $this->config['FORM_FOLDER'].$appId."/".$data['name'].$this->formFileExt;
+            $path = $this->config['FORM_FOLDER'] . $appId . "/" . $data['name'] . $this->formFileExt;
             $this->logger->info("Form template - $path");
             if (file_exists($path)) {
                 $data['template'] = file_get_contents($path);
@@ -196,9 +211,9 @@ class FormService extends AbstractService
                  inner join ox_workflow w on wd.workflow_id = w.id
                  where f.uuid=:formId and wd.latest=1 and f.isdeleted=0";
         $params = array("formId" => $formId);
-        $this->logger->info("Executing query - $select with params - ".json_encode($params));
+        $this->logger->info("Executing query - $select with params - " . json_encode($params));
         $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
-        if (count($response)==0) {
+        if (count($response) == 0) {
             return 0;
         }
         return $response[0];
@@ -209,7 +224,7 @@ class FormService extends AbstractService
         if (isset($data['template']) && is_array($data['template'])) {
             $data['template'] = json_encode($data['template']);
         } else {
-            if (isset($data['template'])&&is_string($data['template'])) {
+            if (isset($data['template']) && is_string($data['template'])) {
                 $data['template'] = $data['template'];
             } else {
                 throw new ServiceException("Template not provided", 'template.required');
@@ -221,7 +236,7 @@ class FormService extends AbstractService
             return 0;
         }
         if (count($errors) > 0) {
-            $this->logger->info("Form Field mapping Errors ".json_encode($errors, JSON_PRETTY_PRINT));
+            $this->logger->info("Form Field mapping Errors " . json_encode($errors, JSON_PRETTY_PRINT));
             $validationException = new ValidationException();
             $validationException->setErrors($errors);
             throw $validationException;
@@ -233,7 +248,7 @@ class FormService extends AbstractService
     private function generateFields($fieldsList = array(), $appId, $formId, $entityId)
     {
         try {
-            $existingFieldsQuery = "select ox_field.* from ox_field where ox_field.entity_id=".$entityId.";";
+            $existingFieldsQuery = "select ox_field.* from ox_field where ox_field.entity_id=" . $entityId . ";";
             $existingFields = $this->executeQuerywithParams($existingFieldsQuery);
             $existingFields = $existingFields->toArray();
         } catch (Exception $e) {
@@ -244,13 +259,13 @@ class FormService extends AbstractService
         foreach ($fieldsList as $field) {
             $this->saveField($existingFields, $field, $fieldsCreated, $fieldIdArray, $appId, $formId, $entityId);
         }
-        $existingFormFieldsQuery = "select ox_field.* from ox_field INNER JOIN ox_form_field ON ox_form_field.field_id=ox_field.id where ox_form_field.form_id=".$formId.";";
+        $existingFormFieldsQuery = "select ox_field.* from ox_field INNER JOIN ox_form_field ON ox_form_field.field_id=ox_field.id where ox_form_field.form_id=" . $formId . ";";
         $existingFormFields = $this->executeQuerywithParams($existingFormFieldsQuery);
         $existingFormFields = $existingFormFields->toArray();
         foreach ($existingFormFields as $existingField) {
             $fieldDeleted =  ArrayUtils::multiDimensionalSearch($fieldsList, 'name', $existingField['name']);
             if (!isset($fieldDeleted)) {
-                $deleteFormFields = "DELETE from ox_form_field where form_id=".$formId." and field_id=".$existingField['id'].";";
+                $deleteFormFields = "DELETE from ox_form_field where form_id=" . $formId . " and field_id=" . $existingField['id'] . ";";
                 $result = $this->executeQuerywithParams($deleteFormFields);
             }
         }
@@ -259,7 +274,7 @@ class FormService extends AbstractService
     private function createFormFieldEntry($formId, $fieldId)
     {
         $select = "SELECT * FROM `ox_form_field` WHERE form_id=:formId AND field_id=:fieldId";
-        $insertParams = array("formId" => $formId,"fieldId" =>$fieldId);
+        $insertParams = array("formId" => $formId, "fieldId" => $fieldId);
         $result = $this->executeQueryWithBindParameters($select, $insertParams)->toArray();
         if (count($result) > 0) {
             return;
@@ -281,7 +296,7 @@ class FormService extends AbstractService
         $foundField = false;
         if (isset($field['parent'])) {
             $parentField =  ArrayUtils::multiDimensionalSearch($existingFields, 'name', $field['parent']['name']);
-            $this->logger->info("PARENT FIELD----".json_encode($parentField));
+            $this->logger->info("PARENT FIELD----" . json_encode($parentField));
             if (!$parentField) {
                 $this->saveField($existingFields, $field['parent'], $fieldsCreated, $fieldIdArray, $appId, $formId, $entityId);
                 $parentField = $field['parent'];
@@ -291,7 +306,7 @@ class FormService extends AbstractService
             }
             unset($field['parent']);
             if (isset($field['parent_id'])) {
-                $foundField = ArrayUtils::multiFieldSearch($existingFields, array('name' => $field['name'],'parent_id' => $field['parent_id']));
+                $foundField = ArrayUtils::multiFieldSearch($existingFields, array('name' => $field['name'], 'parent_id' => $field['parent_id']));
             }
         } else {
             $foundField =  ArrayUtils::multiDimensionalSearch($existingFields, 'name', $field['name']);
@@ -326,7 +341,7 @@ class FormService extends AbstractService
         $formsRes = $this->getForms($appId);
         if (count($formsRes) > 0) {
             foreach ($formsRes['data'] as $key => $value) {
-                $this->logger->info("FORM ID FOR DELETION---".print_r($value['form_id'], true));
+                $this->logger->info("FORM ID FOR DELETION---" . print_r($value['form_id'], true));
                 $this->deleteForm($value['form_id']);
             }
         }
