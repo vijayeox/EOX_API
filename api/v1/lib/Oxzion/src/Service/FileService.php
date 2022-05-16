@@ -91,7 +91,7 @@ class FileService extends AbstractService
         $entityId = isset($data['entity_id']) ? $data['entity_id'] : null;
 
         if (!$entityId && isset($data['entity_name'])) {
-            $select = "select id from ox_app_entity where name = :entityName";
+            $select = "select id from ox_app_entity where isdeleted = 0 and name = :entityName";
             $params = array('entityName' => $data['entity_name']);
             $result = $this->executeQuerywithBindParameters($select, $params)->toArray();
             if (count($result) > 0) {
@@ -2398,7 +2398,7 @@ class FileService extends AbstractService
             $whereClause = " WHERE oxf.app_id = :appId AND oxf.name = :fieldName ";
             if (isset($data['entityName'])) {
                 $fromClause .= " inner join ox_app_entity as oxe on oxe.id = oxf.entity_id ";
-                $whereClause .= " AND oxe.name = :entityName ";
+                $whereClause .= " AND oxe.isdeleted = 0 and oxe.name = :entityName ";
                 $queryParams['entityName'] = $data['entityName'];
             }
             $queryParams['fieldName'] = $fieldName;
@@ -2522,7 +2522,7 @@ class FileService extends AbstractService
             $entityId = isset($params['entity_id']) ? $params['entity_id'] : null;
         }
         if (!isset($entityId) && isset($params['entity_name'])) {
-            $entitySelect = "select id from ox_app_entity where name = :entityName";
+            $entitySelect = "select id from ox_app_entity where isdeleted = 0 and name = :entityName";
             $entityParams = array('entityName' => $params['entity_name']);
             $result = $this->executeQuerywithBindParameters($entitySelect, $entityParams)->toArray();
             if (count($result) > 0) {
@@ -2936,7 +2936,7 @@ class FileService extends AbstractService
             $appId = is_numeric($data['appId']) ? $this->getUuidFromId('ox_app', $data['appId']) : $data['appId'];
             $queryParams = [];
             if (isset($data['entityName'])) {
-                $entityCondition = " AND ox_app_entity.name=:entityName";
+                $entityCondition = " AND ox_app_entity.isdeleted = 0 and ox_app_entity.name=:entityName";
                 $queryParams['entityName'] = $data['entityName'];
             }
             $query = "SELECT ox_app_entity.name as entityName,ox_app_entity.ryg_rule,ox_app_entity.id
