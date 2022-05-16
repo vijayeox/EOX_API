@@ -2219,7 +2219,6 @@ class FileService extends AbstractService
                 $fileFilter['uuid'] = $data['fileId'];
                 $fileRecord = $this->getDataByParams('ox_file', array("entity_id", "data"), $fileFilter, null)->toArray();
                 if (!empty($fileRecord) && !is_null($fileRecord)) {
-                    $this->logger->info("came here 4");
                     $fileData = json_decode($fileRecord[0]['data'], true);
                     $this->renameAttachmentRecordWithUuid($fileData, $attachmentFilter['uuid'], $newName, $attachmentName);
                     $this->updateFile($fileData, $fileFilter['uuid']);
