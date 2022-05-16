@@ -314,8 +314,11 @@ class UserService extends AbstractService
                 'uuid' => $data['uuid'],
                 'resetCode' => $setPasswordCode,
                 'subject' => isset($data['subject']) ? $data['subject'] : null,
+                'REGISTRATION_EMAIL_SEND' => isset($data['REGISTRATION_EMAIL_SEND']) ? $data['REGISTRATION_EMAIL_SEND'] : 'true',
             ));
-            $this->messageProducer->sendTopic(json_encode($newUserMailParams), 'USER_ADDED');
+            if($newUserMailParams['REGISTRATION_EMAIL_SEND'] == 'true'){
+                $this->messageProducer->sendTopic(json_encode($newUserMailParams), 'USER_ADDED');
+            }
         } catch (Exception $e) {
             $this->rollback();
             throw $e;
