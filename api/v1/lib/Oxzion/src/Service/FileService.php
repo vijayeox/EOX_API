@@ -2198,7 +2198,19 @@ class FileService extends AbstractService
                     ->set(['name' => $newName, 'originalName' => $newName, 'url' => $url, 'path' => $path])
                     ->where(['id' => $attachmentRecord[0]['id']]);
                 $result = $this->executeQuery($update);
-                $folderPath = $this->config['APP_DOCUMENT_FOLDER'] . AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/' . $data['fileId'] . '/';
+                //TEMPORARY QUICK FIX DUE TO URGENCY OF THE SITUATION. NEEDS TO BE REWORKED.
+                $tempFlag = false;
+                $pathParts = explode("/",$path);
+                foreach($pathParts as $key => $value) {
+                    if($value == 'temp') {
+                        $tempFlag = true;
+                    }
+                }
+                if($tempFlag) {
+                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'] . AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/temp/'.$attachmentFilter['uuid']. '/' ;
+                } else {
+                    $folderPath = $this->config['APP_DOCUMENT_FOLDER'] . AuthContext::get(AuthConstants::ACCOUNT_UUID) . '/' . $data['fileId'] . '/';
+                }
                 if (is_file($folderPath . $attachmentName) && file_exists($folderPath . $attachmentName)) {
                     rename($folderPath . $attachmentName, $folderPath . $newName);
                 } elseif (is_dir($folderPath . $attachmentName)) {
@@ -2207,6 +2219,7 @@ class FileService extends AbstractService
                 $fileFilter['uuid'] = $data['fileId'];
                 $fileRecord = $this->getDataByParams('ox_file', array("entity_id", "data"), $fileFilter, null)->toArray();
                 if (!empty($fileRecord) && !is_null($fileRecord)) {
+                    $this->logger->info("came here 4");
                     $fileData = json_decode($fileRecord[0]['data'], true);
                     $this->renameAttachmentRecordWithUuid($fileData, $attachmentFilter['uuid'], $newName, $attachmentName);
                     $this->updateFile($fileData, $fileFilter['uuid']);
