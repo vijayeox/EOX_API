@@ -17,11 +17,7 @@ class AddressUtils
         $apiUrl = 'https://maps.googleapis.com/maps/api/geocode/json?';
         $params = [
             'address' => $address,
-            // 'key' => 'AIzaSyDKTTBIKbunORXBEY-ThE5iynoUvjU3-Cc'
-            // 'key' => 'AIzaSyC1hAY30XQ1QGD6kRH-Q-BuGnabRRENctc'
-            // 'key' => 'AIzaSyC1JjP9YuxKYRNwxPC279AMw3oNb0nk8ro'
-            // 'key' => 'AIzaSyCY6BtcSLKz3Dd__qXbb-qqbT2BuUBV5y4'
-            'key' => 'AIzaSyDRLRuogWKoUl-yaKmr31zf2_aOPo4zQ5c'
+            'key' => 'AIzaSyB_p_jW_fOM0sqN7i8TOtE5l-hCrGLgUcw'
         ];
         $client = new RestClient($apiUrl);
         $googleAddresses = $client->get($apiUrl.http_build_query($params));
@@ -42,6 +38,10 @@ class AddressUtils
                             case 'route':
                                 $returnArray['street'] = $address_component['short_name'];
                                 $returnArray['street_full'] = $address_component['long_name'];
+                                break;
+                            case 'subpremise':
+                                $returnArray['subpremise'] = $address_component['short_name'];
+                                $returnArray['subpremise_full'] = $address_component['long_name'];
                                 break;
                             case 'locality':
                                 $returnArray['city'] = $address_component['long_name'];
