@@ -16,11 +16,11 @@ content:
             route: 'file/user/me'
             filterable: true
             autoRefresh: 10000
-            defaultFilters: 
+            defaultFilters:
                 sort:
                     -
                         field: date_created
-                        dir: desc                 
+                        dir: desc
             resizable: true
             refreshButton: true
             pageable:
@@ -30,7 +30,7 @@ content:
                     - 20
                     - 50
                 info: true
-            sortable: 
+            sortable:
                 allowUnsort: true
                 mode: single
             actions:
@@ -70,7 +70,7 @@ content:
                 -
                     name: 'Please Wait'
                     rule: '''{{status}}'' == ''Processing'''
-                    icon: 'fad fa-circle-notch fa-spin'
+                    icon: 'fas fa-circle-notch fa-spin'
             toolbarTemplate: '<h5>List of workbooks</h5>'
             operations:
                 title: "Create Workbook"
@@ -81,7 +81,7 @@ content:
                         details:
                             -
                                 type: Form
-                                form_id: dea1187f-62d7-4e4b-963f-7bc5a8f589c8      
+                                form_id: dea1187f-62d7-4e4b-963f-7bc5a8f589c8
             columnConfig:
                 -
                     title: Insured

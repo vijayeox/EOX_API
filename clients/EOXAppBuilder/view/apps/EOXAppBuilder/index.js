@@ -2,8 +2,13 @@ import osjs from "osjs";
 import { EOXApplication, React, ReactDOM } from "oxziongui";
 import SampleComponentDownload from "./custom-components/download-sample-component";
 import HeaderActions from "./custom-components/header-actions/header-actions";
-import InstallManager from './custom-components/install-manager/install-manager';
-import { appId, maximizeOnStart, name as applicationName } from "./metadata.json";
+import InputFocuserComp from "./custom-components/input-focuser";
+import InstallManager from "./custom-components/install-manager/install-manager";
+import {
+  appId,
+  maximizeOnStart,
+  name as applicationName,
+} from "./metadata.json";
 // Our launcher
 const register = (core, args, options, metadata) => {
   // Create a new Application instance
@@ -56,7 +61,12 @@ const register = (core, args, options, metadata) => {
           application_id={appId}
           params={args}
           proc={proc}
-          childrenComponents={{installManager : InstallManager, headerActions: HeaderActions, sampleComponentDownload : SampleComponentDownload}}
+          childrenComponents={{
+            installManager: InstallManager,
+            headerActions: HeaderActions,
+            sampleComponentDownload: SampleComponentDownload,
+            inputFocuserComp : InputFocuserComp
+          }}
         />,
         $content
       )
@@ -67,7 +77,7 @@ const register = (core, args, options, metadata) => {
   if (finalMaximised) {
     win.maximize();
   }
-  if(maximizeOnStart){
+  if (maximizeOnStart) {
     win.maximize();
   }
   return proc;

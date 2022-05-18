@@ -1,4 +1,5 @@
 <?php
+
 namespace Analytics;
 
 use Zend\Router\Http\Segment;
@@ -168,7 +169,7 @@ return [
                         'method' => 'POST',
                         'action' => 'previewWidget',
                         // 'access' => [
-                            // 'previewWidget' => 'MANAGE_ANALYTICS_WIDGET_WRITE',
+                        // 'previewWidget' => 'MANAGE_ANALYTICS_WIDGET_WRITE',
                         // ],
                     ],
                 ],

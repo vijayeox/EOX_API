@@ -5,9 +5,9 @@ content:
         type: RenderButtons
         content:
             buttonList:
-                - 
+                -
                     name: View Claims
-                    icon: fad fa-money-bill-alt
+                    icon: fas fa-money-bill-alt
                     details:
                         -
                             type: List
@@ -28,13 +28,13 @@ content:
                                         - 250
                                         - 1000
                                     info: true
-                                filterable: true           
+                                filterable: true
                                 resizable: true
-                                sortable: 
+                                sortable:
                                     allowUnsort: true
                                     mode: single
                                 wrapStyle:
-                                    height: "90%"                            
+                                    height: "90%"
                                 actions:
                                     -
                                         name: Edit
@@ -51,7 +51,7 @@ content:
                                         name: Delete
                                         rule: "profile.privileges.MANAGE_CLAIMS_DELETE == true"
                                         confirmationMessage: "Are you sure you want to delete the record?  &#13;&#10; This cannot be undone."
-                                        updateOnly: true      
+                                        updateOnly: true
                                         details:
                                             -
                                                 type: Update
@@ -75,28 +75,28 @@ content:
                                         cell: '<td>{formatDate(item.lossDate)}</td>'
                                         filter: date
                                         filterFormat: YYYY-MM-DD
-                                    - 
+                                    -
                                         title: Total Amount
                                         field: total
                                         cell: '<td>{item.total.toLocaleString("en-US", {style: "currency", currency: "USD",})}</td>'
-                                    - 
+                                    -
                                         title: Carrier
                                         field: carrier
-                - 
+                -
                     name: Export Claims
                     title: Export List
-                    icon: fad fa-file-excel
+                    icon: fas fa-file-excel
                     details:
                         -
                             type: List
                             content:
                                 route: 'file/search/entity/Claims Export'
                                 filterable: true
-                                defaultFilters: 
+                                defaultFilters:
                                     sort:
                                         -
                                             field: date_created
-                                            dir: desc                 
+                                            dir: desc
                                 resizable: true
                                 pageable:
                                     buttonCount: 3
@@ -106,12 +106,12 @@ content:
                                         - 50
                                     info: true
                                 sortable: false
-                                actions:          
+                                actions:
                                     -
                                         name: 'Download'
                                         icon: 'fas fa-cloud-download'
                                         rule: 'true'
-                                        updateOnly: true      
+                                        updateOnly: true
                                         details:
                                             -
                                                 type: Update
@@ -132,7 +132,7 @@ content:
                                                     type: Update
                                                     params:
                                                         url: command/delegate/ClaimsExcelExport
-                                                    successMessage: 'Export Completed successfully.' 
+                                                    successMessage: 'Export Completed successfully.'
                                 columnConfig:
                                     -
                                         title: Export Date
@@ -143,10 +143,10 @@ content:
                                     -
                                         title: Records Count
                                         field: recordsCount
-                - 
+                -
                     name: Add New Claim
                     title: Search Insured
-                    icon: fad fa-car-crash
+                    icon: fas fa-car-crash
                     details:
                         -
                             type: Search
@@ -158,18 +158,18 @@ content:
                                 filterable : false
                                 placeholder: 'Search using Named Insured or Producer Name'
                                 entity: "Dealer Policy"
-                                defaultFilters: 
+                                defaultFilters:
                                     filter:
                                         logic: and
                                         filters:
-                                            - 
+                                            -
                                                 field: giValidation
                                                 operator: eq
                                                 value: true
                                     sort:
                                         -
                                             field: date_created
-                                            dir: desc    
+                                            dir: desc
                                 columnConfig:
                                     -
                                         title: Insured
@@ -192,4 +192,4 @@ content:
                                                 params:
                                                     page_id: 'ed1b1e0c-5ef9-4332-8703-2a35c8d5e14b'
                                                     params:
-                                                        parentFileId: '{{uuid}}'  
+                                                        parentFileId: '{{uuid}}'

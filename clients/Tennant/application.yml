@@ -91,7 +91,7 @@ menu:
         uuid: c346a5b2-beee-43aa-86e4-b02b28d714a8
     -
         name: Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_TENNANTUNDERWRITER_WRITE
         page_uuid: bcc16b53-2df4-4077-abbd-5b6d1540b862
         uuid: 91d2384b-3032-4288-85d7-f5671c67ba9b

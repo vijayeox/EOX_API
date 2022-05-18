@@ -16,13 +16,9 @@ class AppTable extends ModelTable
     {
         $this->init();
         $filter = array();
-        
         $filter['name'] = $name;
-
         $rowset = $this->tableGateway->select($filter);
-
         $row = $rowset->current();
-
         return $row;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Analytics\Service;
 
 use Analytics\Model\Query;
@@ -96,13 +97,13 @@ class QueryService extends AbstractService
     public function getQuery($uuid, $params)
     {
         if (!isset($params['data'])) {
-            $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';    
-            $queryParams['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);    
+            $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.account_id=:account_id and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';
+            $queryParams['account_id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
         } else {
             $query = 'select q.uuid, q.name, q.configuration, q.ispublic, if(q.created_by=:created_by, true, false) as is_owner, q.isdeleted, q.version, d.uuid as datasource_uuid, d.name as datasource_name from ox_query q join ox_datasource d on d.id=q.datasource_id where q.isdeleted=false and q.uuid=:uuid and (q.ispublic=true or q.created_by=:created_by)';
-        }        
-        $queryParams['created_by']=AuthContext::get(AuthConstants::USER_ID);
-        $queryParams['uuid']=$uuid;
+        }
+        $queryParams['created_by'] = AuthContext::get(AuthConstants::USER_ID);
+        $queryParams['uuid'] = $uuid;
 
         try {
             $resultSet = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
@@ -126,7 +127,7 @@ class QueryService extends AbstractService
             $queryResult = $this->runQuery($resultSet[0]['configuration'], $resultSet[0]['datasource_uuid']);
             $response['query']['data'] = $queryResult['data'];
             if (isset($queryResult['targetquery'])) {
-                $response['query']['targetquery']= $queryResult['targetquery'];
+                $response['query']['targetquery'] = $queryResult['targetquery'];
             }
         }
         return $response;
@@ -159,8 +160,10 @@ class QueryService extends AbstractService
             $result[$key]['configuration'] = json_decode($result[$key]['configuration']);
             unset($result[$key]['id']);
         }
-        return array('data' => $result,
-            'total' => $count);
+        return array(
+            'data' => $result,
+            'total' => $count
+        );
     }
 
     public function getQueryJson($uuid)
@@ -228,11 +231,11 @@ class QueryService extends AbstractService
         }
         if (isset($params['debug'])) {
             $configtemp = json_decode($configuration, 1);
-            $configtemp['debug']=$params['debug'];
+            $configtemp['debug'] = $params['debug'];
             $configuration = json_encode($configtemp);
         }
         try {
-            $result = $this->runQuery($configuration, $datasource_id);
+            $result = $this->runQuery($configuration, $datasource_id, $params);
         } catch (Exception $e) {
             $this->logger->error('Error in running the query');
             $this->logger->error($e);
@@ -245,16 +248,6 @@ class QueryService extends AbstractService
     {
         $analyticsEngine = $this->datasourceService->getAnalyticsEngine($datasource_uuid);
         $parameters = (!is_array($configuration)) ? json_decode($configuration, 1) : $configuration;
-
-        // if (isset($parameters['filter']) && is_string($parameters['filter'])) {
-        //     $exp_config = json_decode($parameters['filter'], 1);
-        //     $parameters['filter'] = $exp_config;
-        // }
-
-        // if (isset($parameters['sort']) && is_string($parameters['sort'])) {
-        //     $exp_sort = json_decode($parameters['sort'], 1);
-        //     $parameters['sort'] = $exp_sort;
-        // }
 
         if (isset($parameters['filter']) && is_string($parameters['filter'])) {
             $parameters['filter'] = $this->stringDecode($parameters['filter']);
@@ -423,7 +416,7 @@ class QueryService extends AbstractService
             $this->logger->info("Executing AnalyticsQuery with input -" . $value);
             $queryData = $this->executeAnalyticsQuery($value, $overRides);
             $this->logger->info("Executing AnalyticsQuery returned -" . print_r($queryData, true));
-            $data[]=$queryData['data'];
+            $data[] = $queryData['data'];
         }
         return $data;
     }
