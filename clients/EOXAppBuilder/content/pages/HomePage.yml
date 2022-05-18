@@ -2,6 +2,10 @@ name: 'Home Page'
 description: 'Shows a list of users'
 content:
     -
+        type: ReactComponent
+        content:
+            reactId: inputFocuserComp
+    -
         type: RenderButtons
         content:
                 buttonList:
@@ -28,6 +32,7 @@ content:
             disableAppId: true
             filterable: true
             defaultFilters: 
+                take: 50
                 filter:
                     logic: and
                     filters:

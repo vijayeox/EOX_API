@@ -37,6 +37,11 @@ $eox_theme : #275362;
         color: #FFF !important;
       }
     }
+    &_content{
+      div>div:nth-child(4){
+        padding-left: 15px;
+      }
+    }
     .install-manager-tabs{
         display: flex;
         gap: 1rem;

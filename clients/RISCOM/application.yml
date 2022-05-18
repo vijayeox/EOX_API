@@ -10,7 +10,7 @@ app:
     logo: default_app.png
     status: 4
     start_options: null
-checkOrg: true    
+checkOrg: true
 org:
     name: RISCOM
     uuid: 8396d782-d9a1-40d2-abf0-b291b8ff75f4
@@ -99,7 +99,7 @@ menu:
         uuid: 27ff522d-4d63-4312-940f-a99d720f61c9
     -
         name: Underwriter
-        icon: 'fad fa-user-edit'
+        icon: 'fas fa-user-edit'
         privilege: MANAGE_RISCOMUNDERWRITER_WRITE
         page_uuid: d5246917-6bd8-4821-8829-7f9e1bb01825
         uuid: ea4368d2-f5e7-48c9-bd0a-9e02c5ca84eb

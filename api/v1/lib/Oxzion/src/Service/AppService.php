@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\Service;
 
 use Exception;
@@ -256,7 +257,7 @@ class AppService extends AbstractService implements AppUpgrade
     private function createOrUpdateApplicationDescriptor($dirPath, $descriptorData)
     {
         $descriptorFilePath = $dirPath .
-        ((DIRECTORY_SEPARATOR == substr($dirPath, -1)) ? '' : DIRECTORY_SEPARATOR) . self::APPLICATION_DESCRIPTOR_FILE_NAME;
+            ((DIRECTORY_SEPARATOR == substr($dirPath, -1)) ? '' : DIRECTORY_SEPARATOR) . self::APPLICATION_DESCRIPTOR_FILE_NAME;
         if (file_exists($descriptorFilePath)) {
             $descriptorDataFromFile = self::loadAppDescriptor($dirPath);
             ArrayUtils::merge($descriptorDataFromFile, $descriptorData);
@@ -323,7 +324,6 @@ class AppService extends AbstractService implements AppUpgrade
                     file_put_contents($deployPath, $yamlText);
                     file_put_contents($sourcePath, $yamlText);
                     $ymlData = Yaml::parse(file_get_contents($sourcePath));
-
                 }
             }
 
@@ -404,8 +404,10 @@ class AppService extends AbstractService implements AppUpgrade
 
     public function saveAppCss($ymlData)
     {
-        $data = ['uuid' => $ymlData['app']['uuid'],
-            'name' => $ymlData['app']['name']];
+        $data = [
+            'uuid' => $ymlData['app']['uuid'],
+            'name' => $ymlData['app']['name']
+        ];
         $appSourceDir = AppArtifactNamingStrategy::getSourceAppDirectory($this->config, $data);
         if (file_exists($appSourceDir . '/view/apps/' . $data['name'])) {
             $res = $appSourceDir . '/view/apps/' . $data['name'];
@@ -894,8 +896,10 @@ class AppService extends AbstractService implements AppUpgrade
         $rowMapper = new FormRowMapper();
         $filter = new SpreadsheetFilter();
         $filter->setRows(2);
-        $fieldReference = $parser->parseDocument(array('rowMapper' => $rowMapper,
-            'filter' => $filter));
+        $fieldReference = $parser->parseDocument(array(
+            'rowMapper' => $rowMapper,
+            'filter' => $filter
+        ));
 
         $fieldReference = $fieldReference[$sheetNames[0]];
         return $fieldReference;
@@ -959,9 +963,9 @@ class AppService extends AbstractService implements AppUpgrade
                 FileUtils::copy($srcIconPath . 'icon_white.png', "icon_white.png", $appName);
                 FileUtils::copy($srcIconPath . 'index.scss', "index.scss", $appName); // Copy css from Source to Deploy directory
                 FileUtils::copy($srcIconPath . 'index.js', "index.js", $appName); // Copy index.js from Source to Deploy directory
-                if(is_dir($srcIconPath . 'components')){
+                if (is_dir($srcIconPath . 'components')) {
                     //override components folder in deploy with source directory
-                    if(is_dir($appName . "/components")) {
+                    if (is_dir($appName . "/components")) {
                         FileUtils::rmDir($appName . "/components");
                     }
                     FileUtils::copyDir($srcIconPath . 'components', $appName . "/components"); // Copy css from Source to Deploy directory
@@ -973,6 +977,7 @@ class AppService extends AbstractService implements AppUpgrade
 
         $jsonData['name'] = $yamlData['app']['name'];
         $jsonData['appId'] = $yamlData['app']['uuid'];
+        $jsonData['fontIcon'] = isset($yamlData['app']['fontIcon']) ? $yamlData['app']['fontIcon'] : null; // [BUG] 32775 - Adding the fontIcon to the metadata.json file during the appDeploy
         $jsonData['category'] = isset($yamlData['app']['category']) ? $yamlData['app']['category'] : null;
         $displayName = $jsonData['title']['en_EN'] = ($yamlData['app']['name'] == 'EOXAppBuilder') ? 'App Studio' : (isset($yamlData['app']['title']) ? $yamlData['app']['title'] : $yamlData['app']['name']);
 
@@ -1010,7 +1015,6 @@ class AppService extends AbstractService implements AppUpgrade
         if ($chatNotification === false) {
             $this->messageProducer->sendTopic(json_encode(array('appName' => $jsonData['name'])), 'DISABLE_CHAT_BOT');
         }
-
     }
 
     public function processWorkflow(&$yamlData, $path)
@@ -1057,7 +1061,6 @@ class AppService extends AbstractService implements AppUpgrade
             $data['name'] = str_replace(' ', '_', $data['bpmn_file']); // Replaces all spaces
             $data['name'] = preg_replace('/[^A-Za-z0-9_]/', '', $data['name'], -1); // Removes special chars.
         }
-
     }
 
     private function setLinkAndRunBuild($appPath, $appId)
@@ -1268,7 +1271,8 @@ class AppService extends AbstractService implements AppUpgrade
                 $role['uuid'] = isset($role['uuid']) ? $role['uuid'] : UuidUtil::uuid();
                 if ((!empty($role['businessRole']['name']) && isset($role['businessRole']['name']) && $templateRole) ||
                     (!empty($role['businessRole']['name']) && isset($role['businessRole']['name']) && $bRole &&
-                        in_array($role['businessRole']['name'], $bRole['businessRole']))) {
+                        in_array($role['businessRole']['name'], $bRole['businessRole']))
+                ) {
                     $temp = $this->businessRoleService->getBusinessRoleByName($appId, $role['businessRole']['name']);
                     if (count($temp) > 0) {
                         $role['business_role_id'] = $temp[0]['id'];
@@ -1520,7 +1524,7 @@ class AppService extends AbstractService implements AppUpgrade
             }
             $formData['statuslist'] = json_encode($sts);
         }
-        return $this->formService->createForm($formData); // ! Wrong usage of the method. Need to remove this. 
+        return $this->formService->createForm($formData); // ! Wrong usage of the method. Need to remove this.
     }
 
     public function registerApps($data)
@@ -1737,27 +1741,28 @@ class AppService extends AbstractService implements AppUpgrade
     {
         try {
             $this->beginTransaction();
+            $app_id = $this->getIdFromUuid('ox_app', $appId);
             // Remove Symlinks
             $appDetails = $this->getDataByParams('ox_app', array(), array('uuid' => $appId))->toArray();
             $this->removeAppAndExecutePackageDiscover($appDetails[0]['name']);
             $this->jobService->cancelAppJobs($appId);
 
-            // Page
-            $resultPage = $this->getDataByParams('ox_app_page', array(), array('app_id' => $this->getIdFromUuid('ox_app', $appId)))->toArray();
+            // Page Delete
+            $resultPage = $this->getDataByParams('ox_app_page', array(), array('app_id' => $app_id))->toArray();
             if (count($resultPage) > 0) {
                 foreach ($resultPage as $key => $value) {
                     $this->pageService->deletePage($appId, $value['uuid']);
                 }
             }
-            // Menu
-            $resultMenu = $this->getDataByParams('ox_app_menu', array(), array('app_id' => $this->getIdFromUuid('ox_app', $appId)))->toArray();
+            // Menu Delete
+            $resultMenu = $this->getDataByParams('ox_app_menu', array(), array('app_id' => $app_id))->toArray();
             if (count($resultMenu) > 0) {
                 foreach ($resultMenu as $key => $value) {
                     $this->menuItemService->deleteMenuItem($appId, $value['uuid']);
                 }
             }
 
-            // ENTITY
+            // Entity Identifier
             $entityRes = $this->entityService->getEntitys($appId);
             if (count($entityRes) > 0) {
                 $this->workflowService->deleteWorkflowLinkedToApp($appId);
@@ -1767,17 +1772,37 @@ class AppService extends AbstractService implements AppUpgrade
                                 inner join ox_app oxa on oxa.id = oxe.app_id
                                 where oxa.uuid = :appId";
                 $deleteParams = array('appId' => $appId);
-                $this->logger->info("STATEMENT DELETE $deleteQuery" . print_r($deleteParams, true));
+                $this->logger->info("ENTITY IDENTIFIERS DELETE: $deleteQuery" . print_r($deleteParams, true));
                 $this->executeUpdateWithBindParameters($deleteQuery, $deleteParams);
             }
+
+            // Entity Delete
+            // $deleteEntityQuery = "DELETE from ox_app_entity where app_id = :appId";
+            // $deleteEntityParams = array('appId' => $app_id);
+            // $this->logger->info("ENTITY TABLE DELETE $deleteEntityQuery" . print_r($deleteEntityParams, true));
+            // $this->executeQueryWithBindParameters($deleteEntityQuery, $deleteEntityParams);
+
+            // Delete Entity
+            if (count($entityRes) > 0) {
+                foreach ($entityRes as $value) {
+                    $this->logger->info("ENTITY TABLE DELETE For App $appId and Entity ID " . print_r($value['id'], true));
+                    $this->entityService->deleteEntity($appId, $value['uuid']);
+                }
+            }
+
+            //Business Roles Delete
             $this->businessRoleService->deleteBusinessRoleBasedOnAppId($appId);
             $this->removeRoleData($appId);
-            $result = $this->getDataByParams('ox_privilege', array(), array('app_id' => $this->getIdFromUuid('ox_app', $appId)))->toArray();
+            $result = $this->getDataByParams('ox_privilege', array(), array('app_id' => $app_id))->toArray();
             if (count($result) > 0) {
-                $this->deleteInfo('ox_privilege', $this->getIdFromUuid('ox_app', $appId));
+                $this->deleteInfo('ox_privilege', $app_id);
             }
+
+            // Delete App
             $this->deleteApp($appId);
             $this->logger->info("appId remapp----" . print_r($appId, true));
+
+            // Remove Deployed and Source folders
             $this->removeAppFromDeployedLocations($appId);
             $this->commit();
         } catch (Exception $e) {

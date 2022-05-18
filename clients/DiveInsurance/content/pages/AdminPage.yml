@@ -5,7 +5,7 @@ content:
     content:
       buttonList:
         - name: Premium Rates
-          icon: fad fa-money-bill-alt
+          icon: fas fa-money-bill-alt
           details:
             - type: AdminPage
               adminItem: PremiumRates
@@ -36,7 +36,7 @@ content:
                   - title: Coverage
                     field: coverage
         - name: State Tax
-          icon: fad fa-sack-dollar
+          icon: fas fa-sack-dollar
           details:
             - type: AdminPage
               adminItem: StateTax
@@ -60,7 +60,7 @@ content:
                     field: percentage
                     editor: numeric
         - name: Carrier Policy
-          icon: fad fa-file-invoice
+          icon: fas fa-file-invoice
           details:
             - type: AdminPage
               adminItem: CarrierPolicy
@@ -87,7 +87,7 @@ content:
                     field: state
                     editable: false
         - name: Surplus Lines
-          icon: fad fa-flag-usa
+          icon: fas fa-flag-usa
           details:
             - type: AdminPage
               adminItem: SurplusLines

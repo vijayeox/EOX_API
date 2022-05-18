@@ -38,3 +38,4 @@ view/node_modules/*
 /view
 /clients/skydrive
 /clients/skyward
+*.code-workspace

@@ -4285,7 +4285,8 @@
 							"type": "form",
 							"input": true,
 							"hideOnChildrenHidden": false,
-							"lazyLoad": false
+							"lazyLoad": false,
+							"revision": 382
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
@@ -4501,14 +4502,24 @@
 			"type": "button",
 			"event": "callApi",
 			"input": true
-		}, {
+		},{
+			"label": "Close",
+			"action": "custom",
+			"showValidations": false,
+			"tableView": false,
+			"key": "closeIndex",
+			"type": "button",
+			"input": true,
+			"custom": "data.cssContent = null;",
+			"customConditional": "show = data.cssContent != null;"
+		  }, {
 			"label": "Text Area",
 			"autoExpand": false,
 			"autocomplete": "off",
 			"hideLabel": true,
 			"tableView": true,
 			"key": "cssContent",
-			"customConditional": "show = data.cssContent;",
+			"customConditional": "show = data.cssContent != null;",
 			"type": "textarea",
 			"rows": 10,
 			"input": true
@@ -4526,14 +4537,24 @@
 			"type": "button",
 			"event": "callApi",
 			"input": true
-		}, {
+		},{
+			"label": "Close",
+			"action": "custom",
+			"showValidations": false,
+			"tableView": false,
+			"key": "closeJs",
+			"type": "button",
+			"input": true,
+			"custom": "data.jsContent = null;",
+			"customConditional": "show = data.jsContent != null;"
+		  }, {
 			"label": "Text Area",
 			"autoExpand": false,
 			"autocomplete": "off",
 			"hideLabel": true,
 			"tableView": true,
 			"key": "jsContent",
-			"customConditional": "show = data.jsContent;",
+			"customConditional": "show = data.jsContent != null;",
 			"type": "textarea",
 			"rows": 10,
 			"input": true

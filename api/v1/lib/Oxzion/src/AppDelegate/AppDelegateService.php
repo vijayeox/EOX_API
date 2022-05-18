@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\AppDelegate;
 
 use Exception;
@@ -64,8 +65,7 @@ class AppDelegateService extends AbstractService
         AppArtifactService $appArtifactService,
         OverdriveService $appOverdriveService,
         RateService $rateService
-    )
-    {
+    ) {
         $this->templateService = $templateService;
         $this->fileService = $fileService;
         $this->fieldService = $fieldService;
@@ -89,7 +89,7 @@ class AppDelegateService extends AbstractService
         $this->queryService = $queryService;
         $this->elasticService = $elasticService;
         $this->insuranceService = $insuranceService;
-        $this->appOverdriveService=$appOverdriveService;
+        $this->appOverdriveService = $appOverdriveService;
         $this->rateService = $rateService;
     }
 
@@ -165,7 +165,6 @@ class AppDelegateService extends AbstractService
                 if (method_exists($obj, "setFieldService")) {
                     $obj->setFieldService($this->fieldService);
                 }
-               
                 if (method_exists($obj, "setTemplateService")) {
                     $obj->setTemplateService($this->templateService);
                 }

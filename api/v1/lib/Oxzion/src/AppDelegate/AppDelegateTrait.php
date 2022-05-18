@@ -15,12 +15,6 @@ trait AppDelegateTrait
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function setAppId($appId)
-    {
-        $this->logger->info("SET APP ID");
-        $this->appId = $appId;
-    }
-    
     public function setAppDelegateService(AppDelegateService $appDelegateService, $appId)
     {
         $this->appId = $appId;
