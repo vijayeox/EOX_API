@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\AppDelegate;
 
 use Analytics\Service\QueryService;
@@ -54,9 +55,9 @@ trait AnalyticsTrait
         $this->entityName = $name;
     }
 
-    public function runQuery(Array $filters)
+    public function runQuery(array $filters)
     {
-        $this->logger->info("runQuery -> ".print_r($filters, true));
+        $this->logger->info("runQuery -> " . print_r($filters, true));
         return $this->queryService->previewQuery([
             'datasource_id' => $this->dataSource,
             'configuration' => $filters + ['app_name' => $this->appName, 'entity_name' => $this->entityName]

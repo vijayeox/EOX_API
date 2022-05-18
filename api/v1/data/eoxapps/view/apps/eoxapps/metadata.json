@@ -4,9 +4,10 @@
   "appId":"<<appid>>",
   "category": null,
   "autostart": true,
-  "singleton": true,  
+  "singleton": true,
   "icon": "icon.png",
   "icon_white": "icon_white.png",
+  "fontIcon": "<<fontIcon>>",
   "defaultAppforOrgs" : false,
   "server": "server.js",
   "title": {

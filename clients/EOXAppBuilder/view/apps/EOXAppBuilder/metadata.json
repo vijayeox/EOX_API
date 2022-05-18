@@ -7,7 +7,7 @@
     "singleton": true,
     "icon": "icon.svg",
     "icon_white": "icon_white.svg",
-    "fontIcon": "fad fa-desktop-alt",
+    "fontIcon": "fas fa-desktop-alt",
     "defaultAppforOrgs": true,
     "hidden": true,
     "server": "server.js",
