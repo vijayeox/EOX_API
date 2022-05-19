@@ -131,7 +131,7 @@ class UploadArtifact extends React.Component {
             {this.infoMessage}
           </h5>
         </div>
-          <div className="col-md-10">
+          <div className="col-md-12">
             <this.props.components.KendoFileUploader.Upload
               accept={this.fileExtension}
               autoUpload={false}
