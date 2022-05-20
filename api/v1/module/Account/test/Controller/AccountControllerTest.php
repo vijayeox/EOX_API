@@ -1105,11 +1105,11 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], '9068b460-2943-4508-bd4c-2b29238700f3');
-        $this->assertEquals($content['data'][0]['name'], 'Announcement 1');
+        $this->assertEquals($content['data'][0]['uuid'], '7ba66332-5f48-4c8a-b0ee-6ebfffda06d7');
+        $this->assertEquals($content['data'][0]['name'], 'Announcement 9');
         $this->assertEquals($content['data'][0]['accountId'], '53012471-2863-4949-afb1-e69b0891c98a');
-        $this->assertEquals($content['data'][1]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033f7a');
-        $this->assertEquals($content['data'][1]['name'], 'Announcement 2');
+        $this->assertEquals($content['data'][1]['uuid'], 'f825f46c-ab93-433d-84f8-cfbc118c38a1');
+        $this->assertEquals($content['data'][1]['name'], 'Announcement 8');
         $this->assertEquals(7, $content['total']);
     }
 
