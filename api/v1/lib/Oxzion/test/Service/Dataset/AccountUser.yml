@@ -1,0 +1,97 @@
+ox_app:
+    -
+        id: 299
+        name: DummyApp
+        uuid: a77ea120-b028-479b-8c6e-60476b6a4459
+        description: 'App for Dive Insurance'
+        category: EXAMPLE_CATEGORY
+        type: 2
+        isdefault: 0
+ox_address:
+  -
+    id: 8
+    address1: 'HSR'
+    address2: 'HSR'
+    city: 'Bangalore'
+    state: 'KARNATAKA'
+    country: 'India'
+    zip: 560080
+ox_organization:
+  -
+        id: 300
+        address_id: 8
+        uuid: 'b87ea120-b028-479b-8c6e-60476b6a4456'
+        created_by: 1
+ox_account:
+  -
+        id: 300
+        name: 'Sample Organization'
+        uuid: 'a77ea120-b028-479b-8c6e-60476b6a4456'
+        status: 'Active'
+        preferences: '{"currency":"INR","timezone":"Asia/Calcutta","dateformat":"dd/mm/yyyy"}'
+        contactid: 2
+        organization_id: 300
+ox_person:
+    - 
+        id: 6
+        firstname: 'Deepa'
+        lastname: 'Shree'
+        email: 'deepa@gmail.com'
+        date_of_birth: '1990-11-11'
+        gender: 'Female'
+        phone: '+91-1234567890'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1
+        uuid: '3eb1c5a3-8a82-4d5b-b60a-c648cf1e27de'
+ox_employee:
+    -
+        id: 6
+        date_of_join: '2018-11-11'
+        designation: 'IT ANALYST'
+        org_id: 300
+        person_id: 6
+        uuid: '4fb1c5a3-8a82-4d5b-b60a-c648cf1e27de' 
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1
+ox_user:
+  -
+        id: 6
+        uuid : '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de'
+        username: 'abc123'
+        password: '1619d7adc23f4f633f11014d2f22b7d8'
+        name: 'Deepa Shree'
+        account_id: 300
+        status: 'Active'
+        date_created: '2018-11-11 07:25:06'
+        date_modified: '2018-12-11 07:25:06'
+        created_by: 1
+        modified_by: 1
+        person_id: 6
+ox_account_user:
+  - id : 10
+    user_id : 6
+    account_id: 300
+    default: 1
+ox_app_registry:
+    -
+        id: 400
+        app_id: 299
+        account_id: 300
+ox_privilege:
+    -
+        id: 500
+        app_id: 299
+        name: MANAGE_MY_POLICY
+        permission_allowed: 3
+ox_business_role:
+    -
+        id: 500
+        version: 1
+        uuid: '2db1c5a3-8a82-4d5b-b60a-c648cf1e56ui'
+        name: "Business Role 1"
+        app_id: 299
+        created_by: 1

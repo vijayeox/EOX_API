@@ -767,15 +767,14 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals(4, count($content['data']));
-        $this->assertEquals($content['data'][0]['uuid'], "4fd99e8e-758f-11e9-b2d5-68ecc57cde45");
-        $this->assertEquals($content['data'][0]['name'], 'Admin Test');
-        $this->assertEquals($content['data'][0]['is_admin'], 1);
-        $this->assertEquals($content['data'][1]['uuid'], "768d1fb9-de9c-46c3-8d5c-23e0e484ce2e");
-        $this->assertEquals($content['data'][1]['name'], 'Cleveland Test');
-        $this->assertEquals($content['data'][2]['uuid'], "4fd9f04d-758f-11e9-b2d5-68ecc57cde45");
-        $this->assertEquals($content['data'][2]['name'], 'Employee Test');
-        $this->assertEquals($content['data'][3]['uuid'], "4fd9ce37-758f-11e9-b2d5-68ecc57cde45");
-        $this->assertEquals($content['data'][3]['name'], 'Manager Test');
+        $this->assertEquals($content['data'][0]['uuid'], "768d1fb9-de9c-46c3-8d5c-23e0e484ce2e");
+        $this->assertEquals($content['data'][0]['name'], 'Cleveland Test');
+        $this->assertEquals($content['data'][1]['uuid'], "4fd9f04d-758f-11e9-b2d5-68ecc57cde45");
+        $this->assertEquals($content['data'][1]['name'], 'Employee Test');
+        $this->assertEquals($content['data'][2]['uuid'], "4fd9ce37-758f-11e9-b2d5-68ecc57cde45");
+        $this->assertEquals($content['data'][2]['name'], 'Manager Test');
+        $this->assertEquals($content['data'][3]['uuid'], "4fd99e8e-758f-11e9-b2d5-68ecc57cde45");
+        $this->assertEquals($content['data'][3]['name'], 'Admin Test');
         $this->assertEquals($content['total'], 4);
     }
 
@@ -788,10 +787,10 @@ class AccountControllerTest extends ControllerTest
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals(2, count($content['data']));
-        $this->assertEquals($content['data'][0]['uuid'], "768d1fb9-de9c-46c3-8d5c-23e0e484ce2e");
-        $this->assertEquals($content['data'][0]['name'], 'Cleveland Test');
-        $this->assertEquals($content['data'][1]['uuid'], "4fd9f04d-758f-11e9-b2d5-68ecc57cde45");
-        $this->assertEquals($content['data'][1]['name'], 'Employee Test');
+        $this->assertEquals($content['data'][0]['uuid'], "4fd9f04d-758f-11e9-b2d5-68ecc57cde45");
+        $this->assertEquals($content['data'][0]['name'], 'Employee Test');
+        $this->assertEquals($content['data'][1]['uuid'], "4fd9ce37-758f-11e9-b2d5-68ecc57cde45");
+        $this->assertEquals($content['data'][1]['name'], 'Manager Test');
         $this->assertEquals($content['total'], 4);
     }
 
@@ -902,23 +901,17 @@ class AccountControllerTest extends ControllerTest
         $this->assertResponseStatusCode(200);
         $this->setDefaultAsserts();
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de');
-        $this->assertEquals($content['data'][0]['name'], 'Test Team');
-        $this->assertEquals($content['data'][0]['description'], 'Description Test Data');
+        $this->assertEquals($content['data'][0]['uuid'], '153f3e9e-eb07-4ca4-be78-34f715bd124');
+        $this->assertEquals($content['data'][0]['name'], 'Test Team 5');
+        $this->assertEquals($content['data'][0]['description'], 'Team Description');
         $this->assertEquals($content['data'][0]['managerId'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
-        $this->assertEquals($content['data'][0]['parent_id'], null);
-        $this->assertEquals($content['data'][0]['accountId'], '53012471-2863-4949-afb1-e69b0891c98a');
-        $this->assertEquals($content['data'][1]['uuid'], '153f3e9e-eb07-4ca4-be78-34f715bd124');
-        $this->assertEquals($content['data'][1]['name'], 'Test Team 5');
-        $this->assertEquals($content['data'][1]['description'], 'Team Description');
+        $this->assertEquals($content['data'][1]['uuid'], '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de');
+        $this->assertEquals($content['data'][1]['name'], 'Test Team');
+        $this->assertEquals($content['data'][1]['description'], 'Description Test Data');
         $this->assertEquals($content['data'][1]['managerId'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
-        $this->assertEquals($content['data'][2]['uuid'], '153f3e9e-eb07-4ca4-be78-34f715bd50db');
-        $this->assertEquals($content['data'][2]['name'], 'Test Team Once Again');
-        $this->assertEquals($content['data'][2]['description'], 'Description for the second test cases');
-        $this->assertEquals($content['data'][2]['managerId'], '4fd9ce37-758f-11e9-b2d5-68ecc57cde45');
-        $this->assertEquals($content['data'][2]['parent_id'], '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de');
-
-        $this->assertEquals($content['total'], 3);
+        $this->assertEquals($content['data'][1]['parent_id'], null);
+        $this->assertEquals($content['data'][1]['accountId'], '53012471-2863-4949-afb1-e69b0891c98a');
+        $this->assertEquals($content['total'], 2);
     }
 
     public function testGetAccountTeamsWithFilter()
@@ -948,9 +941,9 @@ class AccountControllerTest extends ControllerTest
         $this->assertEquals($content['status'], 'success');
         $this->assertEquals($content['data'][0]['uuid'], '153f3e9e-eb07-4ca4-be78-34f715bd124');
         $this->assertEquals($content['data'][0]['name'], 'Test Team 5');
-        $this->assertEquals($content['data'][1]['uuid'], '153f3e9e-eb07-4ca4-be78-34f715bd50db');
-        $this->assertEquals($content['data'][1]['name'], 'Test Team Once Again');
-        $this->assertEquals($content['total'], 3);
+        $this->assertEquals($content['data'][1]['uuid'], '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de');
+        $this->assertEquals($content['data'][1]['name'], 'Test Team');
+        $this->assertEquals($content['total'], 2);
     }
 
     public function testGetAccountTeamsWithPagsize()
@@ -961,9 +954,9 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de');
-        $this->assertEquals($content['data'][0]['name'], 'Test Team');
-        $this->assertEquals($content['total'], 3);
+        $this->assertEquals($content['data'][0]['uuid'], '153f3e9e-eb07-4ca4-be78-34f715bd124');
+        $this->assertEquals($content['data'][0]['name'], 'Test Team 5');
+        $this->assertEquals($content['total'], 2);
     }
 
     public function testGetAccountTeamsWithPagination()
@@ -974,9 +967,9 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], '153f3e9e-eb07-4ca4-be78-34f715bd124');
-        $this->assertEquals($content['data'][0]['name'], 'Test Team 5');
-        $this->assertEquals($content['total'], 3);
+        $this->assertEquals($content['data'][0]['uuid'], '2db1c5a3-8a82-4d5b-b60a-c648cf1e27de');
+        $this->assertEquals($content['data'][0]['name'], 'Test Team');
+        $this->assertEquals($content['total'], 2);
     }
 
     public function testGetAccountTeamsWithInvalidAccountId()
@@ -1015,11 +1008,11 @@ class AccountControllerTest extends ControllerTest
         $this->assertEquals($content['data'][0]['name'], 'New Project');
         $this->assertEquals($content['data'][0]['managerId'], '4fd9ce37-758f-11e9-b2d5-68ecc57cde45');
         $this->assertEquals($content['data'][0]['accountId'], '53012471-2863-4949-afb1-e69b0891c98a');
-        $this->assertEquals($content['data'][1]['uuid'], '886d7eff-6bae-4892-baf8-6fefc56cbf0b');
-        $this->assertEquals($content['data'][1]['name'], 'Test Project 1');
-        $this->assertEquals($content['data'][1]['managerId'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
-        $this->assertEquals($content['data'][2]['uuid'], 'ced672bb-fe33-4f0a-b153-f1d182a02603');
-        $this->assertEquals($content['data'][2]['name'], 'Test Project 2');
+        $this->assertEquals($content['data'][1]['uuid'], 'ced672bb-fe33-4f0a-b153-f1d182a02603');
+        $this->assertEquals($content['data'][1]['name'], 'Test Project 2');
+        $this->assertEquals($content['data'][2]['uuid'], '886d7eff-6bae-4892-baf8-6fefc56cbf0b');
+        $this->assertEquals($content['data'][2]['name'], 'Test Project 1');
+        $this->assertEquals($content['data'][2]['managerId'], '4fd99e8e-758f-11e9-b2d5-68ecc57cde45');
         $this->assertEquals($content['total'], 3);
     }
 
@@ -1075,8 +1068,8 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], '886d7eff-6bae-4892-baf8-6fefc56cbf0b');
-        $this->assertEquals($content['data'][0]['name'], 'Test Project 1');
+        $this->assertEquals($content['data'][0]['uuid'], 'ced672bb-fe33-4f0a-b153-f1d182a02603');
+        $this->assertEquals($content['data'][0]['name'], 'Test Project 2');
         $this->assertEquals($content['total'], 3);
     }
 
@@ -1158,8 +1151,8 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], '9068b460-2943-4508-bd4c-2b29238700f3');
-        $this->assertEquals($content['data'][0]['name'], 'Announcement 1');
+        $this->assertEquals($content['data'][0]['uuid'], '7ba66332-5f48-4c8a-b0ee-6ebfffda06d7');
+        $this->assertEquals($content['data'][0]['name'], 'Announcement 9');
         $this->assertEquals($content['total'], 7);
     }
 
@@ -1171,8 +1164,8 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['uuid'], 'e66157ee-47de-4ed5-a78e-8a9195033f7a');
-        $this->assertEquals($content['data'][0]['name'], 'Announcement 2');
+        $this->assertEquals($content['data'][0]['uuid'], 'f825f46c-ab93-433d-84f8-cfbc118c38a1');
+        $this->assertEquals($content['data'][0]['name'], 'Announcement 8');
         $this->assertEquals($content['total'], 7);
     }
 
@@ -1208,10 +1201,10 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['name'], 'ADMIN');
+        $this->assertEquals($content['data'][0]['name'], 'EMPLOYEE');
         $this->assertEquals($content['data'][0]['accountId'], '53012471-2863-4949-afb1-e69b0891c98a');
-        $this->assertEquals($content['data'][1]['name'], 'EMPLOYEE');
-        $this->assertEquals($content['data'][2]['name'], 'MANAGER');
+        $this->assertEquals($content['data'][1]['name'], 'MANAGER');
+        $this->assertEquals($content['data'][2]['name'], 'ADMIN');
         $this->assertEquals($content['total'], 3);
     }
 
@@ -1243,12 +1236,12 @@ class AccountControllerTest extends ControllerTest
     public function testGetAccountRolesWithPagsize()
     {
         $this->initAuthToken($this->adminUser);
-        $this->dispatch('/account/53012471-2863-4949-afb1-e69b0891c98a/roles?filter=[{"skip":0,"take":1}]', 'GET');
+        $this->dispatch('/account/53012471-2863-4949-afb1-e69b0891c98a/roles?filter=[{"skip":0,"take":3}]', 'GET');
         $this->assertResponseStatusCode(200);
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['name'], 'ADMIN');
+        $this->assertEquals($content['data'][0]['name'], 'EMPLOYEE');
         $this->assertEquals($content['total'], 3);
     }
 
@@ -1260,7 +1253,7 @@ class AccountControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals($content['data'][0]['name'], 'EMPLOYEE');
+        $this->assertEquals($content['data'][0]['name'], 'MANAGER');
         $this->assertEquals($content['total'], 3);
     }
 

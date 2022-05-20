@@ -143,9 +143,12 @@ class AccountService extends AbstractService
         if (!ArrayUtils::isKeyDefined($data, 'username')) {
             $data['username'] = $data['email'];
         }
-        $result = $this->userService->checkUserExists($data);
-        if ($result == 1) {
-            return $result;
+        $data['addExistingUserToNewAccount'] = isset($data['addExistingUserToNewAccount']) ? $data['addExistingUserToNewAccount'] :false;
+        if(!$data['addExistingUserToNewAccount']){
+            $result = $this->userService->checkUserExists($data);
+            if ($result == 1) {
+                return $result;
+            }
         }
         $user = new User();
         $person = new Person();
