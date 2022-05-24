@@ -641,6 +641,7 @@ class FileServiceTest extends AbstractServiceTest
         $sqlQuery2 = "SELECT * FROM ox_file where uuid = '".$data['uuid']."'";
         $sqlQuery2Result = $this->runQuery($sqlQuery2);
         $this->assertEquals(1, count($sqlQuery2Result));
+        $accountId = isset($accountId) ? $accountId : AuthContext::get(AuthConstants::ACCOUNT_ID);
         $fileId = $sqlQuery2Result[0]['id'];
         $startData = json_decode($sqlQuery2Result[0]['data'], true);
         if (isset($startData['entity_id'])) {
@@ -693,11 +694,27 @@ class FileServiceTest extends AbstractServiceTest
         if ($fileParticipantCount == 0) {
             return;
         }
-        $this->assertEquals(1, $sqlQuery2Result[0]['account_id']);
-        $this->assertEquals($dataset['ox_business_role'][1]['id'], $sqlQuery2Result[0]['business_role_id']);
+        $this->assertEquals($accountId, $sqlQuery2Result[0]['account_id']);
+        $sort = array();
+        foreach($sqlQuery2Result as $k=>$v) {
+            $sort['business_role_id'][$k] = $v['business_role_id'];
+        }
+        array_multisort($sort['business_role_id'], SORT_ASC,$sqlQuery2Result);
+        switch ($this->getName()) {
+            case "testFileCreateWithoutFormIdAndUnregisteredIdentifier":
+            case "testFileCreateWithRandomUuid":
+            case "testFileCreateWithExistingUuid":
+            case "testFileCreateWithEntityName":
+            case "testFileCreateWithEntityNameAndEntityId":
+                $this->assertEquals($dataset['ox_business_role'][1]['id'], $sqlQuery2Result[0]['business_role_id']);
+                break;
+            default: 
+                $this->assertEquals($dataset['ox_business_role'][0]['id'], $sqlQuery2Result[0]['business_role_id']);
+                break;
+        }
         if ($fileParticipantCount == 2) {
-            $this->assertEquals($dataset['ox_account'][0]['id'], $sqlQuery2Result[1]['account_id']);
-            $this->assertEquals($dataset['ox_business_role'][0]['id'], $sqlQuery2Result[1]['business_role_id']);
+            $this->assertEquals($dataset['ox_account'][0]['id'], $sqlQuery2Result[0]['account_id']);
+            $this->assertEquals($dataset['ox_business_role'][0]['id'], $sqlQuery2Result[0]['business_role_id']);
         }
     }
 
@@ -706,7 +723,6 @@ class FileServiceTest extends AbstractServiceTest
         $dataset = $this->dataset;
         $appUuid = $dataset['ox_app'][0]['uuid'];
         $formId = $dataset['ox_form'][0]['uuid'];
-        $entityId = $dataset['ox_app_entity'][0]['id'];
         $data = array('field1' => '32325', 'field2' => 2, 'entity_id' => 1 ,'app_id' => $appUuid, 'form_id' => $formId);
         $result = $this->fileService->createFile($data);
         $this->performFileAssertions($result, $data, 2);
@@ -723,7 +739,7 @@ class FileServiceTest extends AbstractServiceTest
         $entityId = $dataset['ox_app_entity'][0]['id'];
         $data = array('field1' => '32325', 'field2' => 2, 'entity_id' => 1 ,'app_id' => $appUuid, 'form_id' => $formId);
         $result = $this->fileService->createFile($data);
-        $this->performFileAssertions($result, $data, 2, [["field" => "field1", "id" => 1, "type" => "TEXT"]], $version = 1, 1);
+        $this->performFileAssertions($result, $data, 2, [["field" => "field1", "id" => 1, "type" => "TEXT"]], $version = 1, 100);
     }
 
     public function testFileCreateWithoutFormIdAndUnregisteredIdentifier()
@@ -872,6 +888,16 @@ class FileServiceTest extends AbstractServiceTest
         $this->assertArrayHasKey('field2', $data);
         $this->assertArrayNotHasKey('form_id', $data); //Fields that exist
         $this->assertArrayNotHasKey('workflowInstanceId', $data);
+    }
+
+    public function testFileCreate()
+    {
+        $dataset = $this->dataset;
+        $appUuid = $dataset['ox_app'][0]['uuid'];
+        $formId = $dataset['ox_form'][0]['uuid'];
+        $data = array('field1' => '32325', 'field2' => 2, 'entity_id' => 1 ,'app_id' => $appUuid, 'form_id' => $formId);
+        $result = $this->fileService->createFile($data);
+        $this->performFileAssertions($result, $data, 0);
     }
 
     public function testUpdateFileWithWorkflow()
@@ -1394,7 +1420,6 @@ class FileServiceTest extends AbstractServiceTest
         $query = "update ox_file set data = '".json_encode($data)."' where entity_id = $entityId";
         $this->executeUpdate($query);
         $this->fileService->reindexFile(['entity_id' => $entityId]);
-
         $sqlQueryResult = $this->runQuery($sqlQuery);
         $sqlQuery1Result = $this->runQuery($sqlQuery1);
         $this->assertEquals(0, count($sqlQueryResult));
@@ -1413,11 +1438,6 @@ class FileServiceTest extends AbstractServiceTest
             
             if ($sqlQueryResult[$key]['field_value_type'] == 'OTHER') {
                 $fieldValue = json_decode($fieldValue, true);
-            }
-            if ($key == 0) {
-                $this->assertEquals($data['datagrid'], $fieldValue);
-            } else {
-                $this->assertEquals($data['datagrid'][fmod($key-1, 2)][$sqlQueryResult[$key]['name']], $fieldValue);
             }
             switch ($sqlQueryResult[$key]['field_value_type']) {
                 case 'TEXT':

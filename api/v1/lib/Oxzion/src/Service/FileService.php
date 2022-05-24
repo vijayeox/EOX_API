@@ -103,9 +103,21 @@ class FileService extends AbstractService
         $fields = $data = $this->cleanData($data);
         $jsonData = json_encode($data);
         $this->logger->info("Data From Fileservice after encoding - " . print_r($jsonData, true));
-        $accountId = $this->businessParticipantService->getEntitySellerAccount($entityId);
+        
+        $accountId = isset($data['accountId']) ? $data['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
+        $accountId = $this->getIdFromUuid('ox_account', $accountId);
+        $selectAcc = "SELECT ob.account_id , ob.business_role_id
+        from ox_account_business_role ob 
+        inner join ox_account_offering oo on ob.id = oo.account_business_role_id
+        WHERE oo.entity_id = :entityId and ob.account_id = :accountId";
+        $params = array('entityId' => $entityId, 'accountId'=>$accountId);
+        $result = $this->executeQuerywithBindParameters($selectAcc, $params)->toArray();
+        if (count($result) < 0) {
+            throw new EntityNotFoundException("Entity Not Found");
+        }
+
         $data['uuid'] = $uuid;
-        $data['account_id'] = $accountId ? $accountId : AuthContext::get(AuthConstants::ACCOUNT_ID);
+        $data['account_id'] = $accountId;
         $data['created_by'] = AuthContext::get(AuthConstants::USER_ID);
         $data['date_created'] = date('Y-m-d H:i:s');
         $data['form_id'] = $formId;
