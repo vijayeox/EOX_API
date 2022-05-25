@@ -126,24 +126,37 @@ class FileIndexerService extends AbstractService
         return null;
     }
 
-    public function batchIndexer($appUuid, $startdate = null, $enddate = null)
+    public function batchIndexer($appUuid, $startdate = null, $enddate = null, array $batchSizeMap)
     {
-        $batchSize = $this->config['batch_size'];
+        if(isset($batchSizeMap) && !empty($batchSizeMap)) {
+            $currentArraySize = $batchSizeMap['arraySize'];
+            $differentialFactor = (int) ($currentArraySize / 8000000);
+            if($differentialFactor == 1) {
+                $batchSize = $batchSizeMap['batchSize'] / 2;
+            } else {
+                $batchSize = $batchSizeMap['batchSize'] / $differentialFactor;
+            }
+        } else {
+            $batchSize = $this->config['batch_size'];
+        }
+
         if (!isset($appUuid)) {
             throw new Exception("Incorrect App Id Specified", 1);
         }
         $appID = $this->getIdFromUuid('ox_app', $appUuid);
-        $select = "SELECT id from ox_file ";
+        $select = "SELECT ofi.id from ox_file ofi
+                inner join ox_app_entity oae on oae.id = ofi.entity_id
+                inner join ox_app oa on oa.id = oae.app_id ";
         if (isset($startdate) && !isset($enddate)) {
-            $where ="WHERE date_created > '$startdate'";
+            $where ="WHERE ofi.date_created > '$startdate'";
         } elseif (isset($startdate) && isset($enddate)) {
-            $where ="WHERE date_created > '$startdate' && date_created < '$enddate'";
+            $where ="WHERE ofi.date_created > '$startdate' && ofi.date_created < '$enddate'";
         } elseif (!isset($startdate) && isset($enddate)) {
-            $where ="WHERE date_created < '$enddate'";
+            $where ="WHERE ofi.date_created < '$enddate'";
         } else {
             return 0;
         }
-        $query = $select.$where;
+        $query = $select.$where." AND oa.uuid ='".$appUuid."'";
         try {
             $resultSet = $this->executeQuerywithParams($query)->toArray();
             $idlist = $batches = $fileIdsArray =array();
@@ -171,6 +184,12 @@ class FileIndexerService extends AbstractService
                     foreach ($bodys as $key => $value) {
                         $bodys[$key] = $this->getAllFieldsWithCorrespondingValues($value);
                     }
+                    $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
+                    if($arraySize > 8000000) {
+                        $batchSizeMap = ['needsReduction' => true, 'batchSize' => $batchSize, 'arraySize' => $arraySize];
+                        $this->batchIndexer($appUuid, $startdate = null, $enddate = null,$batchSizeMap);
+                    }
+
                     $indexIdList = array_column($bodys, 'id');
 
                     //Delete list
