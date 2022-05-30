@@ -433,13 +433,46 @@ class FileService extends AbstractService
         $fileData = json_decode($file['data'], true);
         $accountId = $file['account_id'];
         $query = "INSERT IGNORE INTO ox_file_participant (file_id, account_id, business_role_id)
-                  (SELECT $fileId, $accountId, ob.business_role_id
+                  (SELECT $fileId, ob.account_id, ob.business_role_id
                   from ox_account_business_role ob inner join ox_account_offering oo on ob.id = oo.account_business_role_id
-                  WHERE oo.entity_id = :entityId)";
-        $queryParams = ['entityId' => $entityId];
+                  WHERE oo.entity_id = :entityId and ob.account_id=:accountId)";
+        $queryParams = ['entityId' => $entityId,"accountId" => $accountId];
         $this->logger->info("File Part-- $query with params---" . print_r($queryParams, true));
         $this->executeUpdateWithBindParameters($query, $queryParams);
+
+
+        $select = "SELECT $fileId, ob.account_id, ob.business_role_id
+        from ox_account_business_role ob inner join ox_account_offering oo on ob.id = oo.account_business_role_id
+        WHERE oo.entity_id = :entityId and ob.account_id=:accountId";
+        $queryParams = ['entityId' => $entityId,"accountId" => $accountId];
+        $result = $this->executeQueryWithBindParameters($select, $queryParams)->toArray();
+
+        if(isset($file['buyerAccountId']) && $file['buyerAccountId']!='' && isset($file['sellerAccountId']) && $file['sellerAccountId']!='')
+        {
+            $buyerAccountId =  $this->getIdFromUuid('ox_account', $file['buyerAccountId']);
+            $sellerAccountId = $this->getIdFromUuid('ox_account', $file['sellerAccountId']);
+            $getSellerBuyer = "SELECT sbr.account_id as sellerAccountId, sbr.business_role_id as sellerRole, bbr.account_id as buyerAccountId, bbr.business_role_id as buyerRole from ox_business_relationship obr 
+                               inner join ox_account_business_role sbr on sbr.id = obr.seller_account_business_role_id 
+                               inner join ox_account_business_role bbr on bbr.id = obr.buyer_account_business_role_id 
+                               where  bbr.account_id = :buyerAccountId AND sbr.account_id = :sellerAccountId";
+
+            $sellerbuyerparams = ['buyerAccountId'=>$buyerAccountId,'sellerAccountId'=>$sellerAccountId];
+            
+            $this->logger->info("get seller buyer-- ".$getSellerBuyer."with params  ".print_r($sellerbuyerparams,true));
+            $result = $this->executeQuerywithBindParameters($getSellerBuyer,$sellerbuyerparams)->toArray();
+            $this->logger->info("get seller buyer result-- ".print_r($result,true));
+           if(count($result) > 0){
+                $insertParams = array("fileId" => $fileId, "buyerAccountId"=>$result[0]['buyerAccountId'], "buyerBusinessRoleId"=>$result[0]['buyerRole'],"sellerAccountId"=>$result[0]['sellerAccountId'], "sellerBusinessRoleId"=>$result[0]['sellerRole']);
+                $insert = "INSERT IGNORE INTO ox_file_participant (`file_id`, `account_id`, `business_role_id`)  VALUES (:fileId,:buyerAccountId,:buyerBusinessRoleId),(:fileId,:sellerAccountId,:sellerBusinessRoleId) ";
+                $insertresult = $this->executeQuerywithBindParameters($insert, $insertParams);
+    
+                $this->logger->info("get seller buyer insert query-- ".print_r($insert,true));
+                $this->logger->info("get seller buyer insert param-- ".print_r($insertParams,true));
+            }
+        }
+
         $query = "select identifier from ox_entity_identifier where entity_id = :entityId";
+        $queryParams = ['entityId' => $entityId];
         $result = $this->executeQueryWithBindParameters($query, $queryParams)->toArray();
         $identifier = null;
         $identifierField = null;

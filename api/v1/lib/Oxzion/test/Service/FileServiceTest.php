@@ -59,6 +59,9 @@ class FileServiceTest extends AbstractServiceTest
             case "testGetFileListWithWorkflowStatusCheckPositiveWithParticipant":
             case "testGetFileListWithEntityNameCheckPositiveWithParticipants":
             case "testGetFileListWithWorkflowStatusCheckPositiveForPolicyHolder":
+            case "testFileCreateWithBuyerSellerAccount":
+            case "testFileCreateWithWrongBuyerAccount":
+            case "testFileCreateWithWrongSellerAccount":
                 $dataset->addYamlFile(dirname(__FILE__) . "/Dataset/businessRole.yml");
                 break;
         }
@@ -111,6 +114,9 @@ class FileServiceTest extends AbstractServiceTest
             case "testGetFileListWithWorkflowStatusCheckPositiveWithParticipant":
             case "testGetFileListWithEntityNameCheckPositiveWithParticipants":
             case "testGetFileListWithWorkflowStatusCheckPositiveForPolicyHolder":
+            case "testFileCreateWithBuyerSellerAccount":
+            case "testFileCreateWithWrongBuyerAccount":
+            case "testFileCreateWithWrongSellerAccount":
                 $dataset = array_merge($dataset, Yaml::parseFile(dirname(__FILE__)."/Dataset/businessRole.yml"));
                 break;
         }
@@ -690,6 +696,8 @@ class FileServiceTest extends AbstractServiceTest
         $sqlQuery2 = "SELECT fp.* FROM ox_file_participant fp 
                         where file_id = $fileId order by account_id";
         $sqlQuery2Result = $this->runQuery($sqlQuery2);
+
+        print_r($sqlQuery2Result);
         $this->assertEquals($fileParticipantCount, count($sqlQuery2Result));
         if ($fileParticipantCount == 0) {
             return;
@@ -739,7 +747,7 @@ class FileServiceTest extends AbstractServiceTest
         $entityId = $dataset['ox_app_entity'][0]['id'];
         $data = array('field1' => '32325', 'field2' => 2, 'entity_id' => 1 ,'app_id' => $appUuid, 'form_id' => $formId);
         $result = $this->fileService->createFile($data);
-        $this->performFileAssertions($result, $data, 2, [["field" => "field1", "id" => 1, "type" => "TEXT"]], $version = 1, 100);
+        $this->performFileAssertions($result, $data, 1, [["field" => "field1", "id" => 1, "type" => "TEXT"]], $version = 1, 100);
     }
 
     public function testFileCreateWithoutFormIdAndUnregisteredIdentifier()
@@ -757,6 +765,37 @@ class FileServiceTest extends AbstractServiceTest
         $this->performFileAssertions($result, $data);
     }
 
+    public function testFileCreateWithBuyerSellerAccount()
+    {
+        $dataset = $this->dataset;
+        $appUuid = $dataset['ox_app'][0]['uuid'];
+        $formId = $dataset['ox_form'][0]['uuid'];
+        $data = array('field1' => '32325', 'field2' => 2, 'entity_id' => 1 ,'app_id' => $appUuid, 'form_id' => $formId,"buyerAccountId" => "1b371de7-0387-48ea-8f29-5d3704d96ad6","sellerAccountId" => "53012471-2863-4949-afb1-e69b0891c98a");
+        $result = $this->fileService->createFile($data);
+        $this->performFileAssertions($result, $data, 2);
+    }
+
+    public function testFileCreateWithWrongBuyerAccount()
+    {
+        $dataset = $this->dataset;
+        $appUuid = $dataset['ox_app'][0]['uuid'];
+        $formId = $dataset['ox_form'][0]['uuid'];
+        $data = array('field1' => '32325', 'field2' => 2, 'entity_id' => 1 ,'app_id' => $appUuid, 'form_id' => $formId,"buyerAccountId" => "1b371de7-0387-48ea-8f29-5d3704d96a0o","sellerAccountId" => "53012471-2863-4949-afb1-e69b0891c98a");
+        $result = $this->fileService->createFile($data);
+        $this->performFileAssertions($result, $data, 2);
+    }
+
+    public function testFileCreateWithIdentifier()
+    {
+        $dataset = $this->dataset;
+        $appUuid = $dataset['ox_app'][0]['uuid'];
+        $formId = $dataset['ox_form'][0]['uuid'];
+        $data = array('field1' => '32325', 'field2' => 2, 'entity_id' => 1 ,'app_id' => $appUuid, 'form_id' => $formId,"buyerAccountId" => "1b371de7-0387-48ea-8f29-5d3704d96ad6","sellerAccountId" => "53012471-2863-4949-afb1-e69b0891c75e");
+        $result = $this->fileService->createFile($data);
+        $this->performFileAssertions($result, $data, 0);
+    }
+
+   
     public function testFileCreateWithRandomUuid()
     {
         $dataset = $this->dataset;
@@ -2411,7 +2450,4 @@ class FileServiceTest extends AbstractServiceTest
         $this->assertEquals(1, count($result));
         $this->assertEquals(0, $result[0]['is_active']);
     }
-
-
-        
 }
