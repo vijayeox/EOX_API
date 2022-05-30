@@ -88,7 +88,7 @@ class FileIndexerService extends AbstractService
 
         //Need to store file data seperately as its a json string and perform actions on the same
         $data = $indexedData = null;
-        
+
         if (isset($result[0]) && isset($result[0]['id'])) {
             $app_name = $result[0]['app_name'];
             $indexedData = $this->getAllFieldsWithCorrespondingValues($result[0]);
@@ -98,7 +98,7 @@ class FileIndexerService extends AbstractService
             return $indexedData;
         } else {
             // Handle empty file data in case of some error
-            throw new ServiceException("Incorrect file uuid specified", "file.uuid.incorrect");        
+            throw new ServiceException("Incorrect file uuid specified", "file.uuid.incorrect");
         }
     }
 
@@ -112,7 +112,7 @@ class FileIndexerService extends AbstractService
         where file.uuid = :uuid";
         $params = array('uuid' => $fileUUId);
         $response = $this->executeQuerywithBindParameters($select, $params)->toArray();
-        
+
         if (count($response) == 0) {
             return 0;
         }

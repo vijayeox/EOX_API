@@ -118,7 +118,29 @@ class AppDelegateService extends AbstractService
 
     public function setAppDelegateService()
     {
-        $appDelegateService = new AppDelegateService($this->config, $this->dbAdapter, $this->documentBuilder, $this->templateService, $this->messageProducer, $this->fileService, $this->workflowInstanceService, $this->activityInstanceService, $this->userService, $this->commentService, $this->esignService, $this->fieldService, $this->accountService, $this->businessParticipantService, $this->queryService, $this->insuranceService, $this->teamService, $this->appService, $this->appArtifactService, $this->appOverdriveService, $this->rateService);
+        $appDelegateService = new AppDelegateService(
+            $this->config,
+            $this->dbAdapter,
+            $this->documentBuilder,
+            $this->templateService,
+            $this->messageProducer,
+            $this->fileService,
+            $this->workflowInstanceService,
+            $this->activityInstanceService,
+            $this->userService,
+            $this->commentService,
+            $this->esignService,
+            $this->fieldService,
+            $this->accountService,
+            $this->businessParticipantService,
+            $this->queryService,
+            $this->insuranceService,
+            $this->teamService,
+            $this->appService,
+            $this->appArtifactService,
+            $this->appOverdriveService,
+            $this->rateService
+        );
         return $appDelegateService;
     }
 
@@ -215,11 +237,9 @@ class AppDelegateService extends AbstractService
                 if (method_exists($obj, "setInsuranceService")) {
                     $obj->setInsuranceService($this->insuranceService);
                 }
-
                 if (method_exists($obj, "setAppOverdriveService")) {
                     $obj->setAppOverdriveService($this->appOverdriveService);
                 }
-
                 if (method_exists($obj, "setAppDelegateService")) {
                     $obj->setAppDelegateService($this->setAppDelegateService());
                 }
@@ -227,7 +247,6 @@ class AppDelegateService extends AbstractService
                     $obj->setRateService($this->rateService);
                 }
                 $persistenceService = $this->getPersistence($appId);
-
                 $output = $obj->execute($dataArray, $persistenceService);
                 if (!$output) {
                     $output = array();

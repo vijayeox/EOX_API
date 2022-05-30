@@ -1,4 +1,5 @@
 <?php
+
 namespace Oxzion\AppDelegate;
 
 use Oxzion\Service\AppService;
@@ -10,23 +11,26 @@ trait AppTrait
     protected $logger;
     private $appService;
     private $apArtifactService;
-    
+
     public function __construct()
     {
         $this->logger = Logger::getLogger(__CLASS__);
     }
-    
+
     public function setAppService(AppService $appService)
     {
         $this->logger->info("SET APP SERVICE");
         $this->appService = $appService;
     }
+
     public function setAppArtifactService(AppArtifactService $appArtifactService)
     {
         $this->logger->info("SET APP ARTIFACT SERVICE");
         $this->appArtifactService = $appArtifactService;
     }
-    protected function CreateAppWithOnlyAppDetails(&$data){
+
+    protected function CreateAppWithOnlyAppDetails(&$data)
+    {
         return $this->appService->createApp($data);
     }
 
@@ -35,8 +39,8 @@ trait AppTrait
         return $this->appService->updateApp($uuid, $data);
     }
 
-    protected function getArtifacts($appUuid, $artifactType){
+    protected function getArtifacts($appUuid, $artifactType)
+    {
         return $this->appArtifactService->getArtifacts($appUuid, $artifactType);
     }
-
 }
