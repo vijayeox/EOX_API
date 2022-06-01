@@ -759,8 +759,9 @@ class UserService extends AbstractService
             $accountId = AuthContext::get(AuthConstants::ACCOUNT_ID);
         }
         $where = "";
-        $pageSize = 20;
-        $offset = 0;
+        $filterArray = json_decode($filterParams['filter'], true);
+        $pageSize = isset($filterArray[0]['take']) ? $filterArray[0]['take'] : 20;
+        $offset = isset($filterArray[0]['skip']) ? $filterArray[0]['skip'] : 0;
         $sort = "name";
         $select = "SELECT ou.uuid, ou.username, ou.name, ou.icon, ou.timezone, ou.preferences,
         	au.uuid as accountId, usrp.firstname, usrp.lastname, usrp.email, usrp.date_of_birth, usrp.phone, usrp.gender,
