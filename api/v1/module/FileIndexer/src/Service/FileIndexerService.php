@@ -6,6 +6,7 @@ use Zend\Db\Adapter\AdapterInterface;
 use Oxzion\Messaging\MessageProducer;
 use Oxzion\ServiceException;
 use Zend\Log\Logger;
+use Oxzion\Utils\ArrayUtils;
 use Exception;
 
 class FileIndexerService extends AbstractService
@@ -128,21 +129,12 @@ class FileIndexerService extends AbstractService
 
     public function batchIndexer($appUuid, $startdate = null, $enddate = null, array $batchSizeMap)
     {
-        if(isset($batchSizeMap) && !empty($batchSizeMap)) {
-            $currentArraySize = $batchSizeMap['arraySize'];
-            $differentialFactor = (int) ($currentArraySize / 8000000);
-            if($differentialFactor == 1) {
-                $batchSize = $batchSizeMap['batchSize'] / 2;
-            } else {
-                $batchSize = $batchSizeMap['batchSize'] / $differentialFactor;
-            }
-        } else {
-            $batchSize = $this->config['batch_size'];
-        }
+        $batchSize = $this->config['batch_size'];
 
         if (!isset($appUuid)) {
             throw new Exception("Incorrect App Id Specified", 1);
         }
+
         $appID = $this->getIdFromUuid('ox_app', $appUuid);
         $select = "SELECT ofi.id from ox_file ofi
                 inner join ox_app_entity oae on oae.id = ofi.entity_id
@@ -157,6 +149,7 @@ class FileIndexerService extends AbstractService
             return 0;
         }
         $query = $select.$where." AND oa.uuid ='".$appUuid."'";
+
         try {
             $resultSet = $this->executeQuerywithParams($query)->toArray();
             $idlist = $batches = $fileIdsArray =array();
@@ -167,45 +160,24 @@ class FileIndexerService extends AbstractService
                 foreach ($batches as $batch) {
                     $fileIdsArray = $batch;
                     $fileIds = implode(',', $batch);
-                    //Index list
-                    $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entity_name,
-                    file.data as file_data, file.uuid as file_uuid, file.is_active,file.account_id,
-                    CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
-                    CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
-                    from ox_file as file
-                    left join ox_file_participant ofp on ofp.file_id = file.id
-                    INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
-                    INNER JOIN ox_app as app on entity.app_id = app.id
-                    INNER JOIN ox_field as field ON field.entity_id = entity.id
-                    where file.id in (".$fileIds.") AND app.id =".$appID." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
-                    $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
-                    $this->logger->info("Executing Query - $select");
-                    $bodys=$this->executeQuerywithParams($select)->toArray();
-                    foreach ($bodys as $key => $value) {
-                        $bodys[$key] = $this->getAllFieldsWithCorrespondingValues($value);
-                    }
+                    $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
+
                     $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
                     if($arraySize > 8000000) {
-                        $batchSizeMap = ['needsReduction' => true, 'batchSize' => $batchSize, 'arraySize' => $arraySize];
-                        $this->batchIndexer($appUuid, $startdate = null, $enddate = null,$batchSizeMap);
+                        $differentialFactor = $arraySize / 8000000;
+                        $newBatchSize = (int) ($batchSize / $differentialFactor);
+                        $this->logger->info("New batch size is -- $newBatchSize");
+                        $newBatches = array_chunk($batch,$newBatchSize);
+                        $this->logger->info("The new Batches are --".print_r($newBatches,true));
+                        foreach ($newBatches as $newBatch) {
+                            $fileIds = implode(',',$batch);
+                            $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
+                            $this->sendDataToElasticForBulk($fileIds,$bodys,$appID);
+                        }
+                        continue;
                     }
 
-                    $indexIdList = array_column($bodys, 'id');
-
-                    //Delete list
-                    $select = 'SELECT file.id from ox_file as file
-                    INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
-                    INNER JOIN ox_app as app on entity.app_id = app.id
-                    where file.id in ('.$fileIds.') AND app.id ='.$appID.' and file.is_active = 0';
-                    $list = $this->executeQuerywithParams($select)->toArray();
-                    $deleteIdList = array_column($list, 'id');
-
-                    if (isset($bodys[0]['app_name'])) {
-                        $app_name = $bodys[0]['app_name'];
-                    }
-                    if (isset($app_name)&&isset($bodys)) {
-                        $this->messageProducer->sendQueue(json_encode(array('index'=>  $app_name.'_index', 'operation' => 'Batch', 'type' => '_doc', 'idlist' => $indexIdList, 'deleteList' => $deleteIdList,'body' => $bodys)), 'elastic');
-                    }
+                    $this->sendDataToElasticForBulk($fileIds,$bodys,$appID);
                 }
                 return $bodys;
             }
@@ -217,6 +189,41 @@ class FileIndexerService extends AbstractService
             $this->logger->error($queryParams);
         } catch (Exception $e) {
             throw $e;
+        }
+    }
+
+    private function getFileDataFromFileIds($appID,$fileIds) {
+        $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entity_name,file.data as file_data, file.uuid as file_uuid, file.is_active,file.account_id,CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
+        from ox_file as file
+        left join ox_file_participant ofp on ofp.file_id = file.id
+        INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
+        INNER JOIN ox_app as app on entity.app_id = app.id
+        INNER JOIN ox_field as field ON field.entity_id = entity.id
+        where file.id in (".$fileIds.") AND app.id =".$appID." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
+        $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
+        $this->logger->info("Executing Query - $select");
+        $bodys=$this->executeQuerywithParams($select)->toArray();
+        foreach ($bodys as $key => $value) {
+            $bodys[$key] = $this->getAllFieldsWithCorrespondingValues($value);
+        }
+        return $bodys;
+    }
+
+    private function sendDataToElasticForBulk ($fileIds,$bodys,$appID) {
+        $indexIdList = array_column($bodys, 'id');
+
+        $select = 'SELECT file.id from ox_file as file
+        INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
+        INNER JOIN ox_app as app on entity.app_id = app.id
+        where file.id in ('.$fileIds.') AND app.id ='.$appID.' and file.is_active = 0';
+        $list = $this->executeQuerywithParams($select)->toArray();
+        $deleteIdList = array_column($list, 'id');
+
+        if (isset($bodys[0]['app_name'])) {
+            $app_name = $bodys[0]['app_name'];
+        }
+        if (isset($app_name)&&isset($bodys)) {
+            $this->messageProducer->sendQueue(json_encode(array('index'=>  $app_name.'_index', 'operation' => 'Batch', 'type' => '_doc', 'idlist' => $indexIdList, 'deleteList' => $deleteIdList,'body' => $bodys)), 'elastic');
         }
     }
 
