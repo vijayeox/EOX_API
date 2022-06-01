@@ -1,5 +1,5 @@
 {
-	"_id": "625d3e235e1a0d2aeb654345",
+	"_id": "62974df40b85bfea89107d89",
 	"type": "resource",
 	"tags": [],
 	"owner": "5d9350b4e2258c22a85c867a",
@@ -35,7 +35,7 @@
 		"input": false,
 		"components": [{
 			"label": "formsList",
-			"calculateValue": "var formsList = [];\nif (data.form !== \"\") {\n  formsList = data.form.map((i) => {\n    return { name: i.name, uuid: i.uuid };\n  });\n}\nvalue = formsList;",
+			"calculateValue": "var formsList = [];\ntry {\n  if (data.form !== \"\") {\n  formsList = data.form.map((i) => {\n    return { name: i.name, uuid: i.uuid };\n  });\n}\nvalue = formsList;\n}catch (error) {}\n",
 			"key": "formsList",
 			"type": "hidden",
 			"input": true,
@@ -99,10 +99,10 @@
 			"allowMultipleMasks": false,
 			"addons": [],
 			"inputType": "hidden",
-			"id": "ecor9bs"
+			"id": "elfnmfc"
 		}, {
 			"label": "pagesList",
-			"calculateValue": "var pagesList;\nif(data.pages){\n  pagesList = data.pages.map((i) => {\n return { name: i.name, uuid: i.uuid };\n});\nvalue = pagesList;\n}\n",
+			"calculateValue": "var pagesList;\ntry{\nif(data.pages){\n  pagesList = data.pages.map((i) => {\n return { name: i.name, uuid: i.uuid };\n});\nvalue = pagesList;\n}\n}\ncatch (error) {}\n",
 			"key": "pagesList",
 			"type": "hidden",
 			"input": true,
@@ -166,7 +166,7 @@
 			"allowMultipleMasks": false,
 			"addons": [],
 			"inputType": "hidden",
-			"id": "e8u6vw"
+			"id": "euymbxs"
 		}, {
 			"label": "Container",
 			"tableView": false,
@@ -241,10 +241,10 @@
 				"allowMultipleMasks": false,
 				"addons": [],
 				"inputType": "hidden",
-				"id": "ej671iq"
+				"id": "eehnype"
 			}, {
 				"label": "Previous Version of the App",
-				"calculateValue": "if(!value){\n  value = '1.0';\n}",
+				"calculateValue": "try {\n  if(!value){\n  value = '1.0';\n}\n}catch (error) {}",
 				"key": "previousVersion",
 				"type": "hidden",
 				"input": true,
@@ -309,7 +309,7 @@
 				"allowMultipleMasks": false,
 				"addons": [],
 				"inputType": "hidden",
-				"id": "e7pnp3k"
+				"id": "eh9vqdu"
 			}, {
 				"label": "Old App Name",
 				"key": "oldAppName",
@@ -377,7 +377,7 @@
 				"allowMultipleMasks": false,
 				"addons": [],
 				"inputType": "hidden",
-				"id": "ekqedei"
+				"id": "e41w55"
 			}, {
 				"label": "Columns",
 				"columns": [{
@@ -457,7 +457,7 @@
 						"displayMask": "",
 						"spellcheck": true,
 						"truncateMultipleSpaces": false,
-						"id": "ehsjb5"
+						"id": "eirz32"
 					}],
 					"width": 6,
 					"offset": 0,
@@ -475,8 +475,8 @@
 						"clearOnHide": false,
 						"validate": {
 							"required": true,
-							"custom": "if(data.app.name && data.app.name != ''){\n  valid = (data.app.name.match(/^[a-z0-9-]+$/i)) ? true : 'Application Name must Contain only Alphabets and Numbers.';\n}",
 							"maxLength": 25,
+							"custom": "try {\n  if(data?.app?.name && data?.app?.name != ''){\n  valid = (data.app.name.match(/^[a-z0-9-]+$/i)) ? true : 'Application Name must Contain only Alphabets and Numbers.';\n}\n}catch (error) {}",
 							"customPrivate": false,
 							"strictDateValidation": false,
 							"multiple": false,
@@ -490,7 +490,7 @@
 							"name": "Readonly on Edit",
 							"trigger": {
 								"type": "javascript",
-								"javascript": "if(data.app.uuid && data.app.uuid != \"\"){\n  result=true;\n}else {\n  result=false;\n}"
+								"javascript": "if(data?.app?.uuid && data?.app?.uuid != \"\"){\n  result=true;\n}else {\n  result=false;\n}"
 							},
 							"actions": [{
 								"name": "Non Editable",
@@ -559,7 +559,7 @@
 						"inputMask": "",
 						"displayMask": "",
 						"truncateMultipleSpaces": false,
-						"id": "ewt491j"
+						"id": "e8pbged"
 					}],
 					"width": 6,
 					"offset": 0,
@@ -633,7 +633,7 @@
 				"tree": false,
 				"lazyLoad": false,
 				"autoAdjust": false,
-				"id": "ecn4gg"
+				"id": "ev5afkj"
 			}, {
 				"label": "Columns",
 				"columns": [{
@@ -713,7 +713,7 @@
 						"displayMask": "",
 						"spellcheck": true,
 						"truncateMultipleSpaces": false,
-						"id": "euwl1yn"
+						"id": "e27psr"
 					}],
 					"width": 6,
 					"offset": 0,
@@ -861,7 +861,7 @@
 						},
 						"customOptions": {},
 						"useExactSearch": false,
-						"id": "e53c8a"
+						"id": "eb52ng3"
 					}],
 					"width": 6,
 					"offset": 0,
@@ -935,7 +935,7 @@
 				"tree": false,
 				"lazyLoad": false,
 				"autoAdjust": false,
-				"id": "etas6jg"
+				"id": "eqytl7r"
 			}, {
 				"label": "Columns",
 				"columns": [{
@@ -1019,7 +1019,7 @@
 						"privateDownload": false,
 						"imageSize": "200",
 						"fileMinSize": "0KB",
-						"id": "ee44662"
+						"id": "e2zqwve"
 					}],
 					"width": 6,
 					"offset": 0,
@@ -1033,6 +1033,7 @@
 						"tooltip": "BOT Icon will be visible in the App Bot Channel if Form Comments is enabled",
 						"tableView": true,
 						"storage": "url",
+						"image": true,
 						"uploadOnly": true,
 						"webcam": true,
 						"fileTypes": [{
@@ -1104,11 +1105,10 @@
 						"showWordCount": false,
 						"allowMultipleMasks": false,
 						"addons": [],
-						"image": false,
 						"privateDownload": false,
 						"imageSize": "200",
 						"fileMinSize": "0KB",
-						"id": "ep18l88"
+						"id": "etaloji"
 					}],
 					"width": 6,
 					"offset": 0,
@@ -1117,10 +1117,10 @@
 					"size": "md",
 					"currentWidth": 6
 				}],
-				"hideOnChildrenHidden": false,
 				"key": "columns",
-				"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=true;\n}else {\n  show=false;\n}",
+				"customConditional": "// try {\n  if(data?.app?.uuid && data?.app?.uuid != \"\"){\n  show=true;\n  }else {\n  show=false;\n  }\n// }\n// catch(error){}",
 				"type": "columns",
+				"hideOnChildrenHidden": false,
 				"tableView": false,
 				"input": false,
 				"placeholder": "",
@@ -1183,7 +1183,7 @@
 				"tree": false,
 				"lazyLoad": false,
 				"autoAdjust": false,
-				"id": "errs9yb"
+				"id": "em9q377"
 			}, {
 				"label": "Application Icon",
 				"tooltip": "The Application Icon will be visible in the Application Menu",
@@ -1259,7 +1259,7 @@
 				"displayMask": "",
 				"spellcheck": true,
 				"truncateMultipleSpaces": false,
-				"id": "edddk5o"
+				"id": "e1gs3v"
 			}, {
 				"label": "Run automatically at startup",
 				"description": "If Enabled will Auto Start the Application Once the User Logs in",
@@ -1328,20 +1328,20 @@
 				"inputType": "checkbox",
 				"value": "",
 				"name": "",
-				"id": "ezyq67u"
+				"id": "emi9rc"
 			}, {
 				"title": "Notifications",
-				"theme": "info",
+				"theme": "primary",
+				"collapsible": false,
+				"key": "notifications",
+				"type": "panel",
+				"label": "Notifications",
 				"breadcrumbClickable": true,
 				"buttonSettings": {
 					"previous": true,
 					"cancel": true,
 					"next": true
 				},
-				"collapsible": false,
-				"key": "notifications",
-				"type": "panel",
-				"label": "Notifications",
 				"input": false,
 				"tableView": false,
 				"components": [{
@@ -1410,7 +1410,7 @@
 					"inputType": "checkbox",
 					"value": "",
 					"name": "",
-					"id": "ey1k6r"
+					"id": "e5je7kx"
 				}, {
 					"title": "Comment would follow the format as shown below:",
 					"breadcrumbClickable": true,
@@ -1511,7 +1511,7 @@
 								"inputMask": "",
 								"displayMask": "",
 								"truncateMultipleSpaces": false,
-								"id": "e1xbzew"
+								"id": "e3prbmp"
 							}],
 							"offset": 0,
 							"push": 0,
@@ -1593,7 +1593,7 @@
 						"tree": false,
 						"lazyLoad": false,
 						"autoAdjust": false,
-						"id": "e67sva8"
+						"id": "e9qqfn"
 					}],
 					"placeholder": "",
 					"prefix": "",
@@ -1651,7 +1651,7 @@
 					"lazyLoad": false,
 					"theme": "default",
 					"breadcrumb": "default",
-					"id": "enzwdcc"
+					"id": "ekgu1z"
 				}],
 				"placeholder": "",
 				"prefix": "",
@@ -1713,7 +1713,7 @@
 				"tree": false,
 				"lazyLoad": false,
 				"breadcrumb": "default",
-				"id": "eb769jk"
+				"id": "ef2l9n9"
 			}],
 			"placeholder": "",
 			"prefix": "",
@@ -1773,7 +1773,7 @@
 			"addons": [],
 			"tree": true,
 			"lazyLoad": false,
-			"id": "edrcrz"
+			"id": "ee58fnb"
 		}, {
 			"label": "Create App",
 			"hideLabel": true,
@@ -1783,7 +1783,7 @@
 			"defaultValue": "Please click on the Create Application button before you proceed",
 			"validateOn": "blur",
 			"validate": {
-				"custom": "if (data.app.name.length > 0 && data.app.category.length > 0) {\n  valid = data.app.uuid.length > 0\n      ? true\n      : \"Create App to proceed further\";\n} else {\n  valid = true;\n}",
+				"custom": "try{\nif (data?.app?.name.length > 0 && data?.app?.category?.length > 0) {\n  valid = data.app.uuid.length > 0\n      ? true\n      : \"Create App to proceed further\";\n}\nelse {\n  valid = true;\n}\n}catch (error) {}\n\n",
 				"required": false,
 				"customPrivate": false,
 				"strictDateValidation": false,
@@ -1794,7 +1794,7 @@
 				"pattern": ""
 			},
 			"key": "textFieldValidate",
-			"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=false;\n}else {\n  show=true;\n}",
+			"customConditional": "if(data?.app?.uuid && data?.app?.uuid != \"\"){\n  show=false;\n}else {\n  show=true;\n}",
 			"attributes": {
 				"style": "color:black"
 			},
@@ -1852,7 +1852,7 @@
 			"inputMask": "",
 			"displayMask": "",
 			"truncateMultipleSpaces": false,
-			"id": "eykn5i4"
+			"id": "ewvovbm"
 		}, {
 			"label": "Create Application",
 			"action": "event",
@@ -1867,12 +1867,12 @@
 			"properties": {
 				"commands": "[{\"command\":\"delegate\",\"delegate\":\"CreateAppWithAppDetails\"}]"
 			},
-			"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=false;\n}else {\n  show=true;\n}",
+			"customConditional": "if(data?.app?.uuid && data?.app?.uuid != \"\"){\nshow=false;\n}else {\n  show=true;\n}\n",
 			"logic": [{
 				"name": "Disable",
 				"trigger": {
 					"type": "javascript",
-					"javascript": "result = data.app.name.match(/^[a-z0-9-]+$/i) && data.app.name.length > 0 && data.app.category.length > 0;"
+					"javascript": "if(data && data?.app){\n  if(data?.app?.name && data?.app?.category)\n  result = data.app.name.match(/^[a-z0-9-]+$/i) && data.app.name.length > 0 && data.app.category.length > 0;\n  }\nelse{\n    result = false;\n}"
 				},
 				"actions": [{
 					"name": "Disable",
@@ -1944,7 +1944,7 @@
 			"rightIcon": "",
 			"block": false,
 			"disableOnInvalid": false,
-			"id": "emox839"
+			"id": "eceauri"
 		}],
 		"allowPrevious": false,
 		"placeholder": "",
@@ -2007,7 +2007,7 @@
 		"tree": false,
 		"lazyLoad": false,
 		"breadcrumb": "default",
-		"id": "e2mh5n"
+		"id": "encgct5"
 	}, {
 		"title": "Business Roles",
 		"breadcrumbClickable": true,
@@ -2223,7 +2223,7 @@
 							"clearOnHide": false,
 							"validate": {
 								"required": true,
-								"custom": "if (data.org.zip && data.org.zip != \"\") {\n  if (data.org.zip.length <= 12) {\n    valid = data.org.zip.match(/^[0-9\\s-]*$/)\n      ? true\n      : \"Please enter a valid Zip Code for your region.\";\n  } else {\n    valid =\n      data.org.zip.length > 12\n        ? \"Please enter a valid Zip Code for your region.\"\n        : true;\n  }\n}"
+								"custom": "try {\n  if (data?.org?.zip && data?.org?.zip != \"\") {\n  if (data?.org?.zip?.length <= 12) {\n    valid = data.org.zip.match(/^[0-9\\s-]*$/)\n      ? true\n      : \"Please enter a valid Zip Code for your region.\";\n  } else {\n    valid =\n      data.org.zip.length > 12\n        ? \"Please enter a valid Zip Code for your region.\"\n        : true;\n  }\n}}catch (error) {}"
 							},
 							"key": "zip",
 							"type": "textfield",
@@ -2397,7 +2397,7 @@
 								"disabled": true,
 								"tableView": true,
 								"clearOnHide": false,
-								"calculateValue": "if(data.org && data.org.contact && data.org.contact.firstname && data.org.contact.lastname){\n    var username = data.org.contact.firstname.toLowerCase() + data.org.contact.lastname.toLowerCase();\n    value = username.split(\" \").join(\"\");\n}",
+								"calculateValue": "try {\n  if(data.org && data.org.contact && data.org.contact.firstname && data.org.contact.lastname){\n    var username = data.org.contact.firstname.toLowerCase() + data.org.contact.lastname.toLowerCase();\n    value = username.split(\" \").join(\"\");\n}\n}catch (error) {}",
 								"allowCalculateOverride": true,
 								"validate": {
 									"required": true
@@ -2553,7 +2553,6 @@
 				"reorder": false,
 				"addAnother": "Add Privilege",
 				"addAnotherPosition": "bottom",
-				"defaultOpen": false,
 				"layoutFixed": false,
 				"enableRowGroups": false,
 				"initEmpty": false,
@@ -2565,10 +2564,11 @@
 				"clearOnHide": false,
 				"validate": {
 					"minLength": 1,
-					"custom": "if (data.privilege) {\n  if (data.privilege.length > 0) {\n    valid =\n      data.privilege.length == new Set(data.privilege.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same privilege more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+					"custom": "try {\n  if (data?.privilege?.length > 0) {\n  valid =\n    data.privilege.length == new Set(data.privilege.map((i) => i.name.replace(/\\s/g,''))).size\n      ? true\n      : \"You cannot have the same privilege more than once.\";\n} else {\n  valid = true;\n}\n}catch (error) {}"
 				},
 				"key": "privilege",
 				"type": "datagrid",
+				"defaultOpen": false,
 				"noFirstRow": false,
 				"input": true,
 				"components": [{
@@ -2591,6 +2591,7 @@
 					"label": "Permission",
 					"optionsLabelPosition": "right",
 					"tooltip": "Please select the Highest Level of permissions the Privilege may have",
+					"customClass": "align-items-center",
 					"inline": true,
 					"tableView": false,
 					"defaultValue": {
@@ -2789,7 +2790,6 @@
 				"reorder": false,
 				"addAnother": "Add Role",
 				"addAnotherPosition": "bottom",
-				"defaultOpen": false,
 				"layoutFixed": false,
 				"enableRowGroups": false,
 				"initEmpty": false,
@@ -2802,16 +2802,19 @@
 					}],
 					"default": false,
 					"privileges": [{
-						"permission": ""
-					}]
+						"permission": "",
+						"privilege_name": {}
+					}],
+					"businessRole": {}
 				}],
 				"clearOnHide": false,
 				"validate": {
 					"minLength": 1,
-					"custom": "if (data.role) {\n  if (data.role.length > 0) {\n    valid =\n      data.role.length == new Set(data.role.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same role more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+					"custom": "try{\n  if (data?.role?.length > 0) {\n  valid =\n    data.role.length == new Set(data.role.map((i) => i.name.replace(/\\s/g,''))).size\n      ? true\n      : \"You cannot have the same role more than once.\";\n} else {\n  valid = true;\n}\n}catch (error) {}\n"
 				},
 				"key": "role",
 				"type": "datagrid",
+				"defaultOpen": false,
 				"noFirstRow": false,
 				"input": true,
 				"components": [{
@@ -2848,7 +2851,7 @@
 					}],
 					"clearOnHide": false,
 					"validate": {
-						"custom": "try {\n  if (row.privilegesDuplicate) {\n    if (row.privilegesDuplicate.length > 0) {\n      valid =\n        row.privilegesDuplicate.length ==\n        new Set(\n          row.privilegesDuplicate.map((i) =>\n            i.privilege_name.name.replace(/\\s/g, \"\")\n          )\n        ).size\n          ? true\n          : \"You cannot have a same privilege more than once.\";\n    } else {\n      valid = true;\n    }\n  }\n} catch (error) {}"
+						"custom": "try {\n    if (row?.privilegesDuplicate?.length > 0) {\n      valid =\n        row.privilegesDuplicate.length ==\n        new Set(\n          row.privilegesDuplicate.map((i) =>\n            i.privilege_name.name.replace(/\\s/g, \"\")\n          )\n        ).size\n          ? true\n          : \"You cannot have a same privilege more than once.\";\n    } else {\n      valid = true;\n    }\n} catch (error) {}"
 					},
 					"key": "privileges",
 					"type": "datagrid",
@@ -2863,7 +2866,7 @@
 						"tableView": true,
 						"dataSrc": "custom",
 						"data": {
-							"custom": "if(data.privilege){\n  values = data.privilege.map(item =>item)\n} else {\n  values = [];\n}"
+							"custom": "if(data?.privilege){\n  values = data.privilege.map(item =>item)\n} else {\n  values = [];\n}"
 						},
 						"template": "<span>{{ item.name }}</span>",
 						"clearOnHide": false,
@@ -2907,7 +2910,7 @@
 						"clearOnHide": false,
 						"validate": {
 							"required": true,
-							"custom": "var selectedMax = 0;\nvar permissionMax = 0;\nif (row.privilege_name.permission['15'] == true) {\n  permissionMax = 15;\n}\nelse if (row.privilege_name.permission['7'] == true) {\n  permissionMax = 7;\n}\nelse if (row.privilege_name.permission['3'] == true) {\n  permissionMax = 3;\n}\nelse if (row.privilege_name.permission['1'] == true) {\n  permissionMax = 1;\n}\n\nif (row.permission['15'] == true) {\n  selectedMax = 15;\n}\nelse if (row.permission['7'] == true) {\n  selectedMax = 7;\n}\nelse if (row.permission['3'] == true) {\n  selectedMax = 3;\n}\nelse if (row.permission['1'] == true) {\n  selectedMax = 1;\n}\nvalid =\n  selectedMax <= permissionMax\n    ? true\n    : \"Please select a valid permission level\";"
+							"custom": "try{\nvar selectedMax = 0;\nvar permissionMax = 0;\n\nif (row?.privilege_name?.permission?.permission['15'] == true) {\n  permissionMax = 15;\n}\nelse if (row?.privilege_name?.permission?.permission['7'] == true) {\n  permissionMax = 7;\n}\nelse if (row?.privilege_name?.permission?.permission['3'] == true) {\n  permissionMax = 3;\n}\nelse if (row?.privilege_name?.permission?.permission['1'] == true) {\n  permissionMax = 1;\n}\n\n\nif (row?.permission?.permission['15'] == true) {\n  selectedMax = 15;\n}\nelse if (row?.permission?.permission['7'] == true) {\n  selectedMax = 7;\n}\nelse if (row?.permission?.permission['3'] == true) {\n  selectedMax = 3;\n}\nelse if (row?.permission?.permission['1'] == true) {\n  selectedMax = 1;\n}\nvalid =\n  selectedMax <= permissionMax\n    ? true\n    : \"Please select a valid permission level\";\n}catch(error){}"
 						},
 						"key": "permission",
 						"logic": [{
@@ -3053,7 +3056,7 @@
 							"name": "Check Name",
 							"trigger": {
 								"type": "javascript",
-								"javascript": "if(row.privilege_name){\ntry {\n    result = row.privilege_name.name.length > 0\n  } catch {\n    result = false;\n  }\n} else {\n  result = false;\n}"
+								"javascript": "try {\n  result = row.privilege_name.name.length > 0\n} catch(error) {\n  result = false;\n}\n"
 							},
 							"actions": [{
 								"name": "action",
@@ -3073,7 +3076,7 @@
 					"tableView": false,
 					"dataSrc": "custom",
 					"data": {
-						"custom": "if(data.businessRole){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
+						"custom": "if(data?.businessRole){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
 					},
 					"template": "<span>{{ item.name }}</span>",
 					"clearOnHide": false,
@@ -3084,7 +3087,7 @@
 				}, {
 					"label": "Default Role",
 					"redrawOn": "defaultRole",
-					"calculateValue": "if(data.defaultRole){\n  value = data.defaultRole == row.name ? true : false;\n} else {\n  value = false;\n}",
+					"calculateValue": "try{\n  if(data?.defaultRole && row?.name){\n  value = (data.defaultRole == row.name) ? true : false;\n  } else {\n  value = false;\n  }\n}catch(error){}",
 					"key": "default",
 					"type": "hidden",
 					"input": true,
@@ -3598,9 +3601,9 @@
 										"label": "Entity View",
 										"tableView": false,
 										"redrawOn": "entity.enable_view",
-										"calculateValue": "if(value == []){\n  delete(value);\n}",
+										"calculateValue": "try{\n  if(value == []){\n  delete(value);\n}\n}\ncatch(error){}",
 										"key": "pageContent",
-										"customConditional": "if(row.enable_view == true || row.enable_view == 'true'){\n  show = true;\n} else {\n  show = false;\n}",
+										"customConditional": "if(row?.enable_view == true || row?.enable_view == 'true'){\n  show = true;\n} else {\n  show = false;\n}",
 										"type": "container",
 										"input": true,
 										"components": [{
@@ -3772,7 +3775,7 @@
 									"tableView": false,
 									"dataSrc": "custom",
 									"data": {
-										"custom": "if(data.businessRole){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
+										"custom": "if(data?.businessRole){\n  values = data.businessRole.map(item =>item)\n} else {\n  values = [];\n}"
 									},
 									"template": "<span>{{ item.name }}</span>",
 									"key": "businessRole",
@@ -3840,9 +3843,9 @@
 			"persistent": false,
 			"redrawOn": "entity",
 			"clearOnHide": false,
-			"calculateValue": "function getUniqueListBy(arr, key) {\n    return [...new Map(arr.map(item => [item[key], item])).values()]\n}\nconst arr1 = getUniqueListBy(data.form, 'name');\nvalue = arr1;",
+			"calculateValue": "try{\nfunction getUniqueListBy(arr, key) {\n    return [...new Map(arr.map(item => [item[key], item])).values()]\n}\nconst arr1 = getUniqueListBy(data.form, 'name');\nvalue = arr1;\n}catch(error){}",
 			"validate": {
-				"custom": "/*if (data.formDuplicate) {if (data.formDuplicate.length > 0) {\n    console.log(\"\"\"\"\"\"\"\"\"\");\n    console.log(data.formDuplicate.length);\n    valid =\n      data.formDuplicate.length == new Set(data.formDuplicate.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same form more than once.\";\n  } else {\n    valid = true;\n  }\n}*/"
+				"custom": "/*if (data.formDuplicate) {if (data.formDuplicate.length > 0) {\n    valid =\n      data.formDuplicate.length == new Set(data.formDuplicate.map((i) => i.name.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same form more than once.\";\n  } else {\n    valid = true;\n  }\n}*/"
 			},
 			"key": "formDuplicate",
 			"type": "datagrid",
@@ -3855,7 +3858,7 @@
 				"disabled": true,
 				"tableView": true,
 				"clearOnHide": false,
-				"calculateValue": "try {\n  if (row.template_file.length > 0) {\n    value =\n      row.template_file.length > 0\n        ? row.template_file.split(\".\")[0]\n        : \"\";\n  }else{\n    value = \"\";\n  }\n} catch (error) {}",
+				"calculateValue": "try {\n  if(row.template_file){\n     if (row.template_file.length > 0) {\n    value =\n      row.template_file.length > 0\n        ? row.template_file.split(\".\")[0]\n        : \"\";\n  }else{\n    value = \"\";\n  }\n}\n} catch (error) {}",
 				"key": "name",
 				"type": "textfield",
 				"hideOnChildrenHidden": false,
@@ -3868,7 +3871,7 @@
 				"tableView": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "if(data.entity){\nvalues = data.entity.map(item=>item.name)\nif(row[component.key] && !values.includes(row[component.key])){\n  row[component.key] = \"\";\n}\n} else {\nvalues = [];\n}"
+					"custom": "try {\nif(data?.entity){\nvalues = data.entity.map(item=>item.name)\nif(row?.row[component.key] && !values.includes(row[component.key])){\n  row[component.key] = \"\";\n}\n} else {\nvalues = [];\n}\n}catch(error){}"
 				},
 				"clearOnHide": false,
 				"key": "entity",
@@ -3876,7 +3879,7 @@
 					"name": "Check if form Uploaded",
 					"trigger": {
 						"type": "javascript",
-						"javascript": "result = (row.template.length > 0);"
+						"javascript": "result = (row?.template?.length > 0);"
 					},
 					"actions": [{
 						"name": "Set Mandatory",
@@ -3895,7 +3898,7 @@
 						"simple": {
 							"show": true
 						},
-						"javascript": "result = (row.template.length <= 0);"
+						"javascript": "result = (row?.template?.length <= 0);"
 					},
 					"actions": [{
 						"name": "Not Mandatory",
@@ -3912,7 +3915,7 @@
 				"input": true
 			}, {
 				"label": "Form Uuid",
-				"calculateValue": "try {\n  if (\n    !(value.length > 1) &&\n    row.template_file &&\n    row.template_file.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
+				"calculateValue": "try {\nif (\n  !(value.length > 1) &&\n  row?.template_file &&\n  row?.template_file?.length > 0\n) {\n  value = utils.guid();\n}\n} catch (error) {}\n",
 				"key": "uuid",
 				"type": "hidden",
 				"input": true,
@@ -3924,7 +3927,7 @@
 				"tableView": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "if(data.listOFForms){\n  values = data.listOFForms.map(item=>item.name +'.json')\n}else {\nvalues = [];\n}"
+					"custom": "if(data?.listOFForms){\n  values = data.listOFForms.map(item=>item.name +'.json')\n}else {\nvalues = [];\n}"
 				},
 				"clearOnHide": false,
 				"key": "template_file",
@@ -3933,7 +3936,7 @@
 			}]
 		}, {
 			"label": "Actual Form API Key",
-			"calculateValue": "if(data.formDuplicate){\n  try {\n  value = data.formDuplicate.map((i) => {\n    return { name: i.name, entity: i.entity, template_file: i.template_file,uuid: i.uuid , template:i.template};\n  });\n} catch (error) {}\n}",
+			"calculateValue": "try {\nvalue = data.formDuplicate.map((i) => {\n  return { name: i.name, entity: i.entity, template_file: i.template_file,uuid: i.uuid , template:i.template};\n});\n} catch (error) {}",
 			"key": "form",
 			"type": "hidden",
 			"input": true,
@@ -3972,7 +3975,7 @@
 			}],
 			"clearOnHide": false,
 			"validate": {
-				"custom": "if (data.workflowDuplicate) {\n  if (data.workflowDuplicate.length > 0) {\n  valid =\n      data.workflowDuplicate.length == new Set(data.workflowDuplicate.map((i) => i.bpmn_file.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same workflow more than once.\";\n  } else {\n    valid = true;\n  }\n}"
+				"custom": "try{\n  if (data?.workflowDuplicate) {\n  if (data?.workflowDuplicate?.length > 0) {\n  valid =\n      data.workflowDuplicate.length == new Set(data.workflowDuplicate.map((i) => i.bpmn_file.replace(/\\s/g,''))).size\n        ? true\n        : \"You cannot have the same workflow more than once.\";\n  } else {\n    valid = true;\n  }\n}\n}catch(error){}"
 			},
 			"key": "workflowDuplicate",
 			"type": "datagrid",
@@ -3999,7 +4002,7 @@
 				"multiple": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "if(data.entity){\nvalues = data.entity.map(item=>item.name)\n} else {\nvalues = []\n}"
+					"custom": "try{\n  if(data?.entity){\n  values = data.entity.map(item=>item.name)\n  } else {\n  values = []\n  }\n}catch(error){}"
 				},
 				"clearOnHide": false,
 				"validate": {
@@ -4010,7 +4013,7 @@
 					"name": "Check if form Uploaded",
 					"trigger": {
 						"type": "javascript",
-						"javascript": "result = (row.template.length > 0);"
+						"javascript": "result = (row?.template?.length > 0);"
 					},
 					"actions": [{
 						"name": "Set Mandatory",
@@ -4026,7 +4029,7 @@
 					"name": "Forms Not Uploaded",
 					"trigger": {
 						"type": "javascript",
-						"javascript": "result = (row.template.length <= 0);"
+						"javascript": "result = (row?.template?.length <= 0);"
 					},
 					"actions": [{
 						"name": "Not Mandatory",
@@ -4044,7 +4047,7 @@
 				"searchThreshold": 0.3
 			}, {
 				"label": "Workflow Uuid",
-				"calculateValue": "try {\n  if (\n    !(value.length > 1) && row.template_file &&\n    row.template_file.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
+				"calculateValue": "try {\n    if (\n      !(value.length > 1) && row?.template_file &&\n      row?.template_file?.length > 0\n    ) {\n      value = utils.guid();\n    }\n} catch (error) {}\n",
 				"key": "uuid",
 				"type": "hidden",
 				"input": true,
@@ -4056,7 +4059,7 @@
 				"tableView": true,
 				"dataSrc": "custom",
 				"data": {
-					"custom": "if(data.listOFWorkflows){\n  values = data.listOFWorkflows.map(item=>item.name +'.bpmn')\n}else {\nvalues = [];\n}"
+					"custom": "if(data?.listOFWorkflows){\n  values = data.listOFWorkflows.map(item=>item.name +'.bpmn')\n}else {\nvalues = [];\n}"
 				},
 				"clearOnHide": false,
 				"key": "bpmn_file",
@@ -4065,7 +4068,7 @@
 			}]
 		}, {
 			"label": "Actual Workflow API Key",
-			"calculateValue": "if(data.workflowDuplicate){\n  try {\n  value = data.workflowDuplicate.map((i) => {\n    return { name: i.name, entity: i.entity, bpmn_file: i.bpmn_file,uuid: i.uuid };\n  });\n} catch (error) {}\n}",
+			"calculateValue": "try {\nvalue = data.workflowDuplicate.map((i) => {\n  return { name: i.name, entity: i.entity, bpmn_file: i.bpmn_file,uuid: i.uuid };\n});\n} catch (error) {}\n",
 			"key": "workflow",
 			"type": "hidden",
 			"input": true,
@@ -4133,7 +4136,7 @@
 				"hideOnChildrenHidden": false
 			}, {
 				"label": "UUID",
-				"calculateValue": "try {\n  if (\n    !(value.length > 1) &&\n    row.name &&\n    row.name.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
+				"calculateValue": "try {\n  if (\n    !(value.length > 1) &&\n    row?.name &&\n    row?.name?.length > 0\n  ) {\n    value = utils.guid();\n  }\n} catch (error) {}\n",
 				"key": "uuid",
 				"type": "hidden",
 				"input": true,
@@ -4143,7 +4146,7 @@
 				"tooltip": "The Job Data Payload",
 				"keyLabel": "Name",
 				"tableView": false,
-				"calculateValue": "if(Array.isArray(value) && value.length == 0){\n  value = {};\n}",
+				"calculateValue": "try{\n  if(Array.isArray(value) && value.length == 0){\n  value = {};\n}\n}catch(error){}",
 				"key": "data",
 				"type": "datamap",
 				"input": true,
@@ -4239,7 +4242,7 @@
 									"hideOnChildrenHidden": false
 								}, {
 									"label": "Page UUID",
-									"calculateValue": "function uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\ntry {\n\tif (!(value.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}\n",
+									"calculateValue": "function uuidv4() {\n  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);\n    return v.toString(16);\n  });\n}\ntry {\n\tif (!(value?.length > 1)) {\n\t\tvalue = utils.guid();\n\t}\n} catch (error) {}\n",
 									"key": "uuid",
 									"type": "hidden",
 									"input": true,
@@ -4279,14 +4282,15 @@
 							"label": "Page Content Form",
 							"tableView": false,
 							"form": "5f21c1bdbba30150d672d0cf",
+							"revision": 387,
 							"useOriginalRevision": true,
-							"calculateValue": "if(data.pagesList){\n  if(value && value.data){\n    value.data.pagesList = data.pagesList\n    value.data.formsList = data.formsList\n  }\n}",
+							"calculateValue": "try {\n  if(data?.pagesList){\n  if(value && value?.data){\n    value.data.pagesList = data.pagesList\n    value.data.formsList = data.formsList\n  }\n}\n}catch(error){}",
 							"key": "pageContent",
 							"type": "form",
 							"input": true,
 							"hideOnChildrenHidden": false,
 							"lazyLoad": false,
-							"revision": 382
+							"formRevision": 387
 						}, {
 							"label": "Page Content",
 							"calculateValue": "value = row.pageContent",
@@ -4295,7 +4299,7 @@
 								"name": "Set Content",
 								"trigger": {
 									"type": "javascript",
-									"javascript": "if(row.pageContent){\n  if(row.pageContent.data.content){\n    if(row.pageContent.data.content.length > 0){\n      result = true;\n    } else {\n      result = false;\n    }\n  } else {\n    result = false;\n  }\n} else {\n result = false;\n}"
+									"javascript": "if(row?.pageContent?.data?.content){\n  if(row?.pageContent?.data?.content?.length > 0){\n    result = true;\n  } else {\n    result = false;\n  }\n} else {\n  result = false;\n}"
 								},
 								"actions": [{
 									"name": "Results",
@@ -4418,7 +4422,7 @@
 					"tableView": true,
 					"dataSrc": "custom",
 					"data": {
-						"custom": "if(data.pages){\nvalues = data.pages.map(item=>item.name)\n} else {\nvalues = [];\n}"
+						"custom": "if(data?.pages){\nvalues = data.pages.map(item=>item.name)\n} else {\nvalues = [];\n}"
 					},
 					"clearOnHide": false,
 					"validate": {
@@ -4435,7 +4439,7 @@
 					"tableView": true,
 					"dataSrc": "custom",
 					"data": {
-						"custom": "var privArray = [];\nif(data.privilege){\ndata.privilege.map((i) => {\n  if (i.permission['1'] == true) {\n    privArray.push({\n      key: i.name + \"_READ\",\n      name: i.name + \"_READ\",\n    });\n  }\n  if (i.permission['3'] == true) {\n    privArray.push({\n      key: i.name + \"_WRITE\",\n      name: i.name + \"_WRITE\",\n    });\n  }\n  if (i.permission['7'] == true) {\n    privArray.push({\n      key: i.name + \"_CREATE\",\n      name: i.name + \"_CREATE\",\n    });\n  }\n  if (i.permission['15'] == true) {\n    privArray.push({\n      key: i.name + \"_DELETE\",\n      name: i.name + \"_DELETE\",\n    });\n  }\n});\n}\nvalues = privArray.length > 0 ? privArray : [];\n"
+						"custom": "var privArray = [];\ntry{\nif(data?.privilege){\n  data.privilege.map((i) => {\n  if (i.permission['1'] == true) {\n    privArray.push({\n      key: i.name + \"_READ\",\n      name: i.name + \"_READ\",\n    });\n  }\n  if (i.permission['3'] == true) {\n    privArray.push({\n      key: i.name + \"_WRITE\",\n      name: i.name + \"_WRITE\",\n    });\n  }\n  if (i.permission['7'] == true) {\n    privArray.push({\n      key: i.name + \"_CREATE\",\n      name: i.name + \"_CREATE\",\n    });\n  }\n  if (i.permission['15'] == true) {\n    privArray.push({\n      key: i.name + \"_DELETE\",\n      name: i.name + \"_DELETE\",\n    });\n  }\n});\n}\nvalues = privArray.length > 0 ? privArray : [];\n}catch(error){}\n\n"
 					},
 					"valueProperty": "key",
 					"template": "<span>{{ item.name }}</span>",
@@ -4451,11 +4455,11 @@
 					"tableView": true,
 					"dataSrc": "custom",
 					"data": {
-						"custom": "if(data.menu){\nvalues = data.menu.map(item=>item.name);\n} else {\nvalues = [];\n}"
+						"custom": "if(data?.menu){\nvalues = data.menu.map(item=>item.name);\n} else {\nvalues = [];\n}"
 					},
 					"clearOnHide": false,
 					"validate": {
-						"custom": "if(row && input){\n  valid = input == row.name ? \"Cannot Parent the menu to itself!\" : true;\n}"
+						"custom": "try{\n  if(row && input){\n  valid = input == row.name ? \"Cannot Parent the menu to itself!\" : true;\n}}catch(error){}"
 					},
 					"key": "parent",
 					"type": "select",
@@ -4481,38 +4485,63 @@
 			"cancel": true,
 			"next": true
 		},
+		"navigateOnEnter": false,
+		"saveOnEnter": false,
+		"scrollToTop": false,
 		"collapsible": false,
 		"key": "page9",
-		"customConditional": "if(data.app.uuid && data.app.uuid != \"\"){\n  show=true;\n}else {\n  show=false;\n}",
+		"customConditional": "if(data?.app?.uuid && data?.app?.uuid != \"\"){\n  show=true;\n}else {\n  show=false;\n}",
 		"type": "panel",
 		"label": "Edit CSS",
 		"input": false,
 		"tableView": false,
 		"components": [{
-			"label": "Edit Index.scss",
-			"action": "event",
-			"showValidations": false,
-			"theme": "info",
-			"tableView": false,
-			"key": "editIndexScss",
-			"properties": {
-				"api": "{ \t\"api\": { \t\t\"method\": \"GET\", \t\t\"url\": \"app/{{data.app.uuid}}/cssFile\" \t} }"
-			},
-			"customConditional": "show = !data.cssContent;",
-			"type": "button",
-			"event": "callApi",
-			"input": true
-		},{
-			"label": "Close",
-			"action": "custom",
-			"showValidations": false,
-			"tableView": false,
-			"key": "closeIndex",
-			"type": "button",
-			"input": true,
-			"custom": "data.cssContent = null;",
-			"customConditional": "show = data.cssContent != null;"
-		  }, {
+			"label": "Columns",
+			"columns": [{
+				"components": [{
+					"label": "Edit Index.scss",
+					"action": "event",
+					"showValidations": false,
+					"tableView": false,
+					"key": "editIndexScss",
+					"properties": {
+						"api": "{ \t\"api\": { \t\t\"method\": \"GET\", \t\t\"url\": \"app/{{data.app.uuid}}/cssFile\" \t} }"
+					},
+					"customConditional": "show = !data.cssContent;",
+					"type": "button",
+					"event": "callApi",
+					"input": true
+				}],
+				"width": 2,
+				"offset": 0,
+				"push": 0,
+				"pull": 0,
+				"size": "xs",
+				"currentWidth": 2
+			}, {
+				"components": [{
+					"label": "Close",
+					"action": "custom",
+					"showValidations": false,
+					"tableView": false,
+					"key": "closeCss",
+					"type": "button",
+					"custom": "data.cssContent = false;",
+					"customConditional": "show = data.cssContent != null;",
+					"input": true
+				}],
+				"width": 2,
+				"offset": 0,
+				"push": 0,
+				"pull": 0,
+				"size": "xs",
+				"currentWidth": 2
+			}],
+			"key": "columns",
+			"type": "columns",
+			"input": false,
+			"tableView": false
+		}, {
 			"label": "Text Area",
 			"autoExpand": false,
 			"autocomplete": "off",
@@ -4524,30 +4553,52 @@
 			"rows": 10,
 			"input": true
 		}, {
-			"label": "Edit Index",
-			"action": "event",
-			"showValidations": false,
-			"theme": "info",
-			"tableView": false,
-			"key": "editIndexJs",
-			"properties": {
-				"api": "{ \t\"api\": { \t\t\"method\": \"GET\", \t\t\"url\": \"app/{{data.app.uuid}}/jsIndex\" \t} }"
-			},
-			"customConditional": "show = !data.jsContent;",
-			"type": "button",
-			"event": "callApi",
-			"input": true
-		},{
-			"label": "Close",
-			"action": "custom",
-			"showValidations": false,
-			"tableView": false,
-			"key": "closeJs",
-			"type": "button",
-			"input": true,
-			"custom": "data.jsContent = null;",
-			"customConditional": "show = data.jsContent != null;"
-		  }, {
+			"label": "Columns",
+			"columns": [{
+				"components": [{
+					"label": "Edit Index",
+					"action": "event",
+					"showValidations": false,
+					"tableView": false,
+					"key": "editIndexJs",
+					"properties": {
+						"api": "{ \t\"api\": { \t\t\"method\": \"GET\", \t\t\"url\": \"app/{{data.app.uuid}}/jsIndex\" \t} }"
+					},
+					"customConditional": "show = !data.jsContent;",
+					"type": "button",
+					"event": "callApi",
+					"input": true
+				}],
+				"width": 2,
+				"offset": 0,
+				"push": 0,
+				"pull": 0,
+				"size": "md",
+				"currentWidth": 2
+			}, {
+				"components": [{
+					"label": "Close",
+					"action": "custom",
+					"showValidations": false,
+					"tableView": false,
+					"key": "closeJs",
+					"customConditional": "show = data.jsContent != null;",
+					"type": "button",
+					"custom": "data.jsContent = null;",
+					"input": true
+				}],
+				"width": 2,
+				"offset": 0,
+				"push": 0,
+				"pull": 0,
+				"size": "md",
+				"currentWidth": 2
+			}],
+			"key": "columns1",
+			"type": "columns",
+			"input": false,
+			"tableView": false
+		}, {
 			"label": "Text Area",
 			"autoExpand": false,
 			"autocomplete": "off",
@@ -4565,7 +4616,7 @@
 			"calculateValue": "value = '1.0';",
 			"allowCalculateOverride": true,
 			"validate": {
-				"custom": "if (input && input != \"\") {\n    valid = input.match(/^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)$/)\n      ? true\n      : \"App Version should be numeric\";\n  \n}"
+				"custom": "try{\n  if (input && input != \"\") {\n    valid = input.match(/^[+-]?([0-9]+\\.?[0-9]*|\\.[0-9]+)$/)\n      ? true\n      : \"App Version should be numeric\";\n  \n}}catch(error){}"
 			},
 			"key": "appVersion",
 			"type": "textfield",
@@ -4573,9 +4624,9 @@
 		}]
 	}],
 	"revisions": "current",
-	"_vid": 888,
+	"_vid": 907,
 	"_vnote": "",
-	"_vuser": "mukuld",
+	"_vuser": "bhanupriyac",
 	"title": "EOX App",
 	"display": "wizard",
 	"access": [{
@@ -4646,7 +4697,7 @@
 		"roles": [],
 		"type": "team_admin"
 	}],
-	"controller": "var s = document.createElement(\"script\");\ns.src = \"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\";\ns.onload = function (e) {\n  var appendCustomButtonTimer = setInterval(() => {\n    if (\n      document.getElementById(\n        \"formio_loader_1fa0d5c0-b428-499a-a490-37e4349c1060\"\n      )\n    ) {\n      var dataGridDeleteIcons = document.getElementsByClassName(\n        \"fa-times-circle-o\"\n      );\n      dataGridDeleteIcons = Array.from(dataGridDeleteIcons);\n      if (dataGridDeleteIcons.length > 0) {\n        dataGridDeleteIcons.map((item) => {\n          item.classList.add(\"fa-times-circle\");\n          item.classList.remove(\"fa-times-circle-o\");\n        });\n      }\n    } else {\n      appendCustomButtonTimer ? clearInterval(appendCustomButtonTimer) : null;\n    }\n  }, 1000);\n};\ndocument.head.appendChild(s);",
+	"controller": "var s = document.createElement(\"script\");\ns.src = \"https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js\";\ns.onload = function (e) {\n  var appendCustomButtonTimer = setInterval(() => {\n    if (\n      document.getElementById(\n        \"formio_loader_1fa0d5c0-b428-499a-a490-37e4349c1060\"\n      )\n    ) {\n      var dataGridDeleteIcons = document.getElementsByClassName(\n        \"fa-times-circle-o\"\n      );\n      dataGridDeleteIcons = Array.from(dataGridDeleteIcons);\n      if(dataGridDeleteIcons){\n      if (dataGridDeleteIcons.length > 0) {\n        dataGridDeleteIcons.map((item) => {\n          item.classList.add(\"fa-times-circle\");\n          item.classList.remove(\"fa-times-circle-o\");\n        });\n      }\n      }\n    } else {\n      appendCustomButtonTimer ? clearInterval(appendCustomButtonTimer) : null;\n    }\n  }, 1000);\n};\ndocument.head.appendChild(s);",
 	"properties": {
 		"showBreadcrumbs": "true",
 		"submission_commands": "[{\"command\":\"delegate\",\"delegate\":\"CleanYml\"}]",
@@ -4659,6 +4710,6 @@
 	"path": "eoxapp",
 	"project": "5d70a2198e9aff60caf3c170",
 	"created": "2020-07-26T18:44:45.687Z",
-	"modified": "2022-04-18T10:32:03.338Z",
+	"modified": "2022-06-01T11:31:00.635Z",
 	"_rid": "5f1dcf1d37629f8f62d14d8a"
 }
