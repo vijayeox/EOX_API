@@ -84,20 +84,27 @@ class RoleService extends AbstractService
                 $result = $this->executeQueryWithBindParameters($queryString, $params);
             }
 
+            $businessRoleId = isset($data['business_role_id'])? $data['business_role_id']: 'NULL';
+
             if (!isset($roleId) && isset($rolename)) {
-                $select = "SELECT id,uuid from ox_role where name = '" . $rolename . "' $clause";
+                $select = "SELECT id,uuid,business_role_id,account_id from ox_role where name = '" . $rolename . "' $clause";
                 $result = $this->executeQueryWithBindParameters($select, $params)->toArray();
                 if (count($result) > 0) {
                     $roleId = $result[0]['id'];
                     $data['id'] = $roleId;
-                    $data['uuid'] = $result[0]['uuid'];
+                    $roleUuid = $result[0]['uuid'];
+                    if(isset($businessRoleId) && $businessRoleId != $result[0]['business_role_id']){
+                        $roleId = NULL;
+                        $data['id'] = NULL;
+                        $roleUuid = isset($data['uuid']) ? $data['uuid'] : UuidUtil::uuid();
+                    }
+                    $data['uuid'] = $roleUuid;
                 }
             }
-
-            $businessRoleId = isset($data['business_role_id'])? $data['business_role_id']: 'NULL';
             if (isset($roleId) && $roleId != null) {
                 $update = "UPDATE `ox_role` SET `name`= '" . $data['name'] . "', business_role_id = $businessRoleId, `description`= '" .
                             $data['description'] . "', `default_role`= '" . $data['default'] . "' WHERE `id` = '" . $roleId . "' AND name not in ('ADMIN', 'MANAGER', 'EMPLOYEE') $clause";
+                $this->logger->info("UPATED QUERY ----".$update);
                 $result1 = $this->executeUpdateWithBindParameters($update, $params);
                 $count = $result1->getAffectedRows();
             } else {
@@ -105,22 +112,42 @@ class RoleService extends AbstractService
                     throw new ServiceException("Role name cannot be empty", "role.name.empty");
                 }
                 $inputData['uuid'] = $data['uuid'] = isset($data['uuid']) ? $data['uuid'] : UuidUtil::uuid();
+
+                $this->logger->info("FINAL INSERT VALUE \n".print_r($data,true). "\n AccountID ----".$accountId);
+                
                 $data['is_system_role'] = isset($data['is_system_role']) ? $data['is_system_role'] : 0;
                 $data['default'] = $data['default'] ? 1 :0;
-                $insert = "INSERT into `ox_role` (`name`,`description`,`uuid`,`account_id`,`is_system_role`, `default_role`, business_role_id, app_id) 
-                            VALUES ('" . $rolename . "','" . $data['description'] . "','" . $data['uuid'] . "'," . ($accountId ? $accountId : 'NULL') . ",'" . $data['is_system_role'] . "','" . $data['default'] . "', $businessRoleId," . (isset($data['app_id']) ? $data['app_id'] : 'NULL') . ")";
-                $result1 = $this->runGenericQuery($insert);
-                $count = $result1->getAffectedRows();
-                if ($count > 0) {
-                    $roleId = $result1->getGeneratedValue();
-                } else {
-                    throw new ServiceException("Could not save Role", 'role.save.failed');
+
+                $executeInsert = "Yes";
+
+                if(isset($businessRoleId) && $businessRoleId != "" && $businessRoleId != 'NULL' && isset($accountId) && $accountId != "") { 
+                    $select  = "SELECT * from ox_account_business_role where account_id =:accountId and business_role_id =:businessRoleId";
+                    $queryparams = array("accountId" => $accountId,"businessRoleId" => $businessRoleId);
+                    $result = $this->executeQueryWithBindParameters($select, $queryparams)->toArray();
+                    $this->logger->info("DUPLICATE ENTRY ISSUE \n".count($result));
+                    if(count($result) == 0){
+                        $this->logger->info("UNWANTED DATA .... \n ".print_r($data,true));
+                        $executeInsert = "No";
+                    }
                 }
-            }
-            if (isset($data['privileges'])) {
-                $privileges = $data['privileges'];
-                $appId = isset($data['app_id']) ? $data['app_id'] : null;
-                $this->updateRolePrivileges($roleId, $data['privileges'], $accountId, $appId);
+                $this->logger->info("EXEUTEINSERT VALUE DATA .... \n ".$executeInsert);
+                if($executeInsert == "Yes"){
+                    $this->logger->info("VALID DATA .... \n ".print_r($data,true));
+                    $insert = "INSERT into `ox_role` (`name`,`description`,`uuid`,`account_id`,`is_system_role`, `default_role`, business_role_id, app_id) 
+                            VALUES ('" . $rolename . "','" . $data['description'] . "','" . $data['uuid'] . "'," . ($accountId ? $accountId : 'NULL') . ",'" . $data['is_system_role'] . "','" . $data['default'] . "', $businessRoleId," . (isset($data['app_id']) ? $data['app_id'] : 'NULL') . ")";
+                    $result1 = $this->runGenericQuery($insert);
+                    $count = $result1->getAffectedRows();
+                    if ($count > 0) {
+                        $roleId = $result1->getGeneratedValue();
+                    } else {
+                        throw new ServiceException("Could not save Role", 'role.save.failed');
+                    }
+                    if (isset($data['privileges'])) {
+                        $privileges = $data['privileges'];
+                        $appId = isset($data['app_id']) ? $data['app_id'] : null;
+                        $this->updateRolePrivileges($roleId, $data['privileges'], $accountId, $appId);
+                    }
+                } 
             }
             $this->commit();
         } catch (Exception $e) {
@@ -404,6 +431,7 @@ class RoleService extends AbstractService
         if (isset($role['business_role_id'])) {
             $query .= " AND r.business_role_id = ".$role['business_role_id'];
         }
+        $this->logger->info("updateDefaultRolePrivileges --------\n".print_r($role,true),"--------\n-------Query---\n".$query);
         $count = $this->runGenericQuery($query);
         if (!$count) {
             throw new ServiceException("Failed to update role privileges", "failed.update.default.privileges");

@@ -1788,10 +1788,63 @@ public function testDeployAppOnSaveAppCss()
         $this->assertEquals(1, count($result));
         $this->assertEquals(date('Y-m-d'), date_create($result[0]['date_created'])->format('Y-m-d'));
     }
-    // NEED TO ADD INSTALL/UNINSTALL TESTS -SADHITHA
+    //NEED TO ADD INSTALL/UNINSTALL TESTS -SADHITHA
+
+    public function testDeployAppWithBusinessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $select = "SELECT * from ox_business_role";
+        $result = $this->executeQueryTest($select);
+     
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[0]['id'];
+        $result1 = $this->executeQueryTest($select);
+        $this->assertEquals($result1[0]['name'], "Manage Executive");
+        $this->assertEquals($result1[0]['uuid'], "caddaf9f-64eb-4e57-8176-3647a59ecbc4");
+        $this->assertEquals($result1[1]['name'], "Safety Director");
+        $this->assertEquals($result1[1]['uuid'], "18ed4d29-7188-482e-b544-67797c319935");
+        $this->assertEquals(count($result1),6);
+
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[1]['id'];
+        $result2 = $this->executeQueryTest($select);
+        $this->assertEquals($result2[0]['name'], "Manage Executives");
+        $this->assertEquals($result2[0]['uuid'], "efcbf9d6-b867-4810-a88d-8c5d01c11067");
+        $this->assertEquals($result2[1]['name'], "Compliance Manager");
+        $this->assertEquals($result2[1]['uuid'], "7d73ada4-8e1c-436d-8c27-17503ac7e254");
+        $this->assertEquals(count($result2),5);
+        
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[2]['id'];
+        $result3 = $this->executeQueryTest($select);
+        $this->assertEquals($result3[0]['name'], "Manage Drivers");
+        $this->assertEquals($result3[0]['uuid'], "d3ef9902-3bf8-4d70-8c79-129e6bc4e45c");
+        $this->assertEquals(count($result3),1);
+    }
+
+    public function testDeployAppWithSameBusinessRoleforTwoAccount()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $select = "SELECT * from ox_business_role";
+        $result = $this->executeQueryTest($select);
+     
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[0]['id'];
+        $result1 = $this->executeQueryTest($select);
+        $this->assertEquals($result1[0]['name'], "Manage Executive");
+        $this->assertEquals($result1[0]['uuid'], "caddaf9f-64eb-4e57-8176-3647a59ecbc4");
+
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[1]['id'];
+        $result2 = $this->executeQueryTest($select);
+        $this->assertEquals($result2[0]['name'], "Manage Executives");
+        $this->assertEquals($result2[0]['uuid'], "efcbf9d6-b867-4810-a88d-8c5d01c11067");
+    }
 
     
-
     /* HARI */
     public function testGetAccountOnForInstall()
     {
