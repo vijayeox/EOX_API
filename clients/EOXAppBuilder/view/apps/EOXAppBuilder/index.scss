@@ -97,7 +97,7 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
             }
         }
     }
-}
+ }
   .datagrid-table{
     
     .table .datagrid-table .table-bordered td{
@@ -129,4 +129,14 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
   .form-group .has-feedback .formio-component .formio-component-datagrid .formio-component-content .formio-component-label-hidden, .card .card-body .bg-light, .table .table-striped .table-bordered td{
     border: none;
   }
-}
+
+  .k-grid th {
+    padding: 0.1rem 0.2rem !important;    
+  }
+  .k-grid td {
+    padding: 0.4rem 0.2rem !important;
+  }
+  .k-grid-column-menu.k-grid-filter{
+    padding: 15px 0px 0px 0px;
+  }
+ }
