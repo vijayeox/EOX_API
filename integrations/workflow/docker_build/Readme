@@ -1,0 +1,9 @@
+This Dockerfile is just for setting environment for building workflow through jenkins on application servers. Please do not alter this Dockefile and its entrypoint. Please consult the DevOps Team  before making changes to any build procedures.
+
+1)To build the Dockerfile run this command from docker_build directory
+
+sudo docker build -t workflow_build .
+
+2) To enter into bash shell of the container run this from integrations/workflow directory
+
+docker run -it -v ${PWD}:/camunda --entrypoint bash workflow_build
