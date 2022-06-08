@@ -139,4 +139,24 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
   .k-grid-column-menu.k-grid-filter{
     padding: 15px 0px 0px 0px;
   }
- }
+
+  input, span, label{
+    font-size: 14px;
+    color: #275362;
+  }
+  .form-control{
+    padding: 0.25rem 0.5rem;
+  }
+  .datagrid-table{
+    td,th{
+    padding: 0.4rem !important;
+    }
+  }
+  .formio-button-remove-row{
+    padding: 0 !important;
+    background: transparent !important;
+    color: #6C757D !important;
+    border: none !important;
+  }
+}
+
