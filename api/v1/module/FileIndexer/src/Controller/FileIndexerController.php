@@ -107,7 +107,7 @@ namespace FileIndexer\Controller;
             $this->log->info(FileIndexerController::class.":Batch indexing ");
             $this->log->info("Params- ".json_encode($params));
             try {
-                $response = $this->fileIndexerService->batchIndexer($appUuid, $startdate, $enddate);
+                $response = $this->fileIndexerService->batchIndexer($appUuid, $startdate, $enddate,array());
                 if ($response) {
                     $this->log->info(FileIndexerController::class.":Files have been Indexed");
                     return $this->getSuccessResponseWithData($response);
