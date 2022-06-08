@@ -97,5 +97,65 @@ body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) {
             }
         }
     }
-}
-}
+ }
+  .datagrid-table{
+    
+    .table .datagrid-table .table-bordered td{
+      border: none;
+    }
+
+    th {
+    font-weight: normal;
+    color: #9e9e9e;
+    font-size: 14px;
+    }
+    tr {
+      td {
+        border: none;
+      }
+    }
+  }
+  td{
+    .card-body{
+      border:none;
+      padding: 0.5rem  ;
+      background-color: #fff !important;
+    }
+  }
+  .formio-dialog-content{
+    background-color: #fff !important;
+  }
+  
+  .form-group .has-feedback .formio-component .formio-component-datagrid .formio-component-content .formio-component-label-hidden, .card .card-body .bg-light, .table .table-striped .table-bordered td{
+    border: none;
+  }
+
+  .k-grid th {
+    padding: 0.1rem 0.2rem !important;    
+  }
+  .k-grid td {
+    padding: 0.4rem 0.2rem !important;
+  }
+  .k-grid-column-menu.k-grid-filter{
+    padding: 15px 0px 0px 0px;
+  }
+
+  input, span, label{
+    font-size: 14px;
+    color: #275362;
+  }
+  .form-control{
+    padding: 0.25rem 0.5rem;
+  }
+  .datagrid-table{
+    td,th{
+    padding: 0.4rem !important;
+    }
+  }
+  .formio-button-remove-row{
+    padding: 0 !important;
+    background: transparent !important;
+    color: #6C757D !important;
+    border: none !important;
+  }
+ }

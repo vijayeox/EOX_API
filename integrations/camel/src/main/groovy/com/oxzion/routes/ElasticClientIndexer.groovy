@@ -76,15 +76,15 @@ class ElasticClientIndexer extends RouteBuilder {
                         new BasicCredentialsProvider();
                         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USERNAME, PASSWORD));
                         def output = JsonOutput.toJson(object.body)
-                        RestClientBuilder builder = RestClient.builder(new HttpHost(HOST, PORT, "https")).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+                        try{
+                            RestClientBuilder builder = RestClient.builder(new HttpHost(HOST, PORT, "https")).setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
                             @Override
                             public HttpAsyncClientBuilder customizeHttpClient(
                                 HttpAsyncClientBuilder httpClientBuilder) {
                                 return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
                             }
                             });
-                        def client = new RestHighLevelClient(builder)
-                        try{
+                            def client = new RestHighLevelClient(builder)
                             if(operation == 'Index')
                             {
                                 def request = new IndexRequest(indexName,type,ID)
@@ -143,7 +143,6 @@ class ElasticClientIndexer extends RouteBuilder {
                                 throw new Exception("Incorrect operation specified :" + operation)
                             }
                             client.close();
-                            builder.close();
                         }
                         catch(ElasticsearchException ex)
                         {
