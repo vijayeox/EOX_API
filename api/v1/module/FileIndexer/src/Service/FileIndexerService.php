@@ -161,22 +161,21 @@ class FileIndexerService extends AbstractService
                     $fileIdsArray = $batch;
                     $fileIds = implode(',', $batch);
                     $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
-
                     $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
-                    if($arraySize > 8000000) {
-                        $differentialFactor = $arraySize / 8000000;
-                        $newBatchSize = (int) ($batchSize / $differentialFactor);
-                        $this->logger->info("New batch size is -- $newBatchSize");
+                    if($arraySize > 6500000) {
+                        $differentialFactor = $arraySize / 6500000;
+                        $newBatchSize = ceil($batchSize / $differentialFactor);
+                        $this->logger->info("the new batch size is ---".$newBatchSize);
                         $newBatches = array_chunk($batch,$newBatchSize);
-                        $this->logger->info("The new Batches are --".print_r($newBatches,true));
                         foreach ($newBatches as $newBatch) {
-                            $fileIds = implode(',',$batch);
+                            $fileIds = implode(',',$newBatch);
                             $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
+                            $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
+                            $this->logger->info("The new array size is --$arraySize");
                             $this->sendDataToElasticForBulk($fileIds,$bodys,$appID);
                         }
                         continue;
                     }
-
                     $this->sendDataToElasticForBulk($fileIds,$bodys,$appID);
                 }
                 return $bodys;
