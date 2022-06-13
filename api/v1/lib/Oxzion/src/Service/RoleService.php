@@ -93,7 +93,7 @@ class RoleService extends AbstractService
                     $roleId = $result[0]['id'];
                     $data['id'] = $roleId;
                     $roleUuid = $result[0]['uuid'];
-                    if(isset($businessRoleId) && $businessRoleId != $result[0]['business_role_id']){
+                    if(isset($businessRoleId) && $businessRoleId != NULL && $businessRoleId != 'NULL' && $businessRoleId != $result[0]['business_role_id']){
                         $roleId = NULL;
                         $data['id'] = NULL;
                         $roleUuid = isset($data['uuid']) ? $data['uuid'] : UuidUtil::uuid();
@@ -130,11 +130,13 @@ class RoleService extends AbstractService
                         $executeInsert = "No";
                     }
                 }
+
                 $this->logger->info("EXEUTEINSERT VALUE DATA .... \n ".$executeInsert);
                 if($executeInsert == "Yes"){
                     $this->logger->info("VALID DATA .... \n ".print_r($data,true));
                     $insert = "INSERT into `ox_role` (`name`,`description`,`uuid`,`account_id`,`is_system_role`, `default_role`, business_role_id, app_id) 
                             VALUES ('" . $rolename . "','" . $data['description'] . "','" . $data['uuid'] . "'," . ($accountId ? $accountId : 'NULL') . ",'" . $data['is_system_role'] . "','" . $data['default'] . "', $businessRoleId," . (isset($data['app_id']) ? $data['app_id'] : 'NULL') . ")";
+                    $this->logger->info("ROLE SERVICE QUERY -----".$insert);
                     $result1 = $this->runGenericQuery($insert);
                     $count = $result1->getAffectedRows();
                     if ($count > 0) {
