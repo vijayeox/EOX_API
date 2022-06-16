@@ -2049,4 +2049,56 @@ public function testDeployAppOnSaveAppCss()
         $result = $this->executeQueryTest($select);
         $this->assertEquals(count($result), 1);        
     }
+
+    public function testAccountCreationRoleBusinnessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive1.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Contract Carrier","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+        $accountId = $result[0]['id'];
+        $select = "SELECT * from ox_role where account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 3);
+
+        $select = "SELECT * from ox_role_privilege as orp where orp.account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 54);   
+    }
+
+    public function testAccountCreationRoleSameBusinnessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive1.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Insurance Carrier","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+        $accountId = $result[0]['id'];
+        $select = "SELECT * from ox_role where account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 4);
+
+        $select = "SELECT * from ox_role_privilege as orp where orp.account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 55);   
+    }
 }
