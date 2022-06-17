@@ -64,7 +64,7 @@ namespace FileIndexer\Controller;
             }
             catch (ServiceException $e) {
                 return $this->getErrorResponse("Failure to Index File as incorrect uuid is specified", 404);
-            } 
+            }
             catch (Exception $e) {
                 return $this->getErrorResponse("Failure to Index File ", 400);
             }

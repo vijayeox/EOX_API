@@ -94,7 +94,7 @@ class ProjectService extends AbstractService
     {
         $errorMessage = "You do not have permissions to get the project list";
         $accountId = $this->checkProjectAccount($params, $errorMessage);
-        
+
         $sql = $this->getSqlObject();
         $select = $sql->select();
         $select->from('ox_project')
@@ -111,7 +111,7 @@ class ProjectService extends AbstractService
     {
         $data = $inputData;
         $errorMessage = "You do not have permissions create project";
-  
+
         $accountId = $this->checkProjectAccount($params, $errorMessage);
         $data['account_id'] = $accountId;
         $accountId = $this->getUuidFromId('ox_account', $accountId);
@@ -223,7 +223,7 @@ class ProjectService extends AbstractService
         } else {
             $data['parent_id'] = NULL;
         }
-        
+
         $obj = $this->table->getByUuid($id, array());
         if (is_null($obj)) {
             throw new ServiceException("Updating non-existent Project", "non.existent.project", OxServiceException::ERR_CODE_NOT_FOUND);
@@ -337,14 +337,14 @@ class ProjectService extends AbstractService
     public function getProjectsOfUserById($userId, $accountId = null)
     {
         $accountId = isset($accountId) ? $this->getIdFromUuid('ox_account', $accountId) :  AuthContext::get(AuthConstants::ACCOUNT_ID);
-        $queryString = "SELECT ox_project.id,ox_project.uuid,ox_project.name,a.uuid as accountId, 
+        $queryString = "SELECT ox_project.id,ox_project.uuid,ox_project.name,a.uuid as accountId,
                                 ox_project.manager_id,ox_project.description,
                                 ox_project.isdeleted,parent.uuid as parent_identifier,
-                                ox_project.created_by, ox_user.username as manager_username, 
+                                ox_project.created_by, ox_user.username as manager_username,
                                 ox_user.uuid as manager_uuid from ox_project
                         inner join ox_account a on a.id = ox_project.account_id
-                        inner join ox_user_project on ox_user_project.project_id = ox_project.id 
-                        inner join ox_user on ox_project.manager_id = ox_user.id 
+                        inner join ox_user_project on ox_user_project.project_id = ox_project.id
+                        inner join ox_user on ox_project.manager_id = ox_user.id
                         left join ox_project as parent on ox_project.parent_id = parent.id ";
         $where = "where ox_user_project.user_id ='" . $userId . "' AND ox_project.isdeleted!=1";
         $order = "order by ox_project.id";
@@ -430,17 +430,17 @@ class ProjectService extends AbstractService
         }
         $projectId = $obj->id;
         $userSingleArray = array_map('current', $userArray);
-        $queryString = "SELECT ox_user.id,ox_user.uuid, ox_user.username 
-                        FROM ox_user_project 
-                        inner join ox_user on ox_user.id = ox_user_project.user_id 
+        $queryString = "SELECT ox_user.id,ox_user.uuid, ox_user.username
+                        FROM ox_user_project
+                        inner join ox_user on ox_user.id = ox_user_project.user_id
                         where ox_user_project.project_id = $projectId
                          and ox_user_project.user_id not in (" . implode(',', $userSingleArray) . ")";
         $deletedUser = $this->executeQuerywithParams($queryString)->toArray();
-        $query = "SELECT u.id,u.uuid, u.username, up.user_id, oup.firstname, oup.lastname, 
-                        oup.email , u.timezone 
-                    FROM ox_user_project up 
-                    right join ox_user u on u.id = up.user_id and up.project_id = $projectId 
-                    right join ox_person oup on oup.id = u.person_id 
+        $query = "SELECT u.id,u.uuid, u.username, up.user_id, oup.firstname, oup.lastname,
+                        oup.email , u.timezone
+                    FROM ox_user_project up
+                    right join ox_user u on u.id = up.user_id and up.project_id = $projectId
+                    right join ox_person oup on oup.id = u.person_id
                     where u.id in (" . implode(',', $userSingleArray) . ") and up.user_id is null";
         $insertedUser = $this->executeQuerywithParams($query)->toArray();
         try {
@@ -449,9 +449,9 @@ class ProjectService extends AbstractService
                 ->delete('ox_user_project')
                 ->where(['project_id' => $projectId]);
             $result = $this->executeQuery($delete);
-            $query = "INSERT into ox_user_project(user_id,project_id) 
-                        (Select ox_user.id, $projectId AS project_id 
-                        from ox_user 
+            $query = "INSERT into ox_user_project(user_id,project_id)
+                        (Select ox_user.id, $projectId AS project_id
+                        from ox_user
                         where ox_user.id in (" . implode(',', $userSingleArray) . "))";
             $resultInsert = $this->runGenericQuery($query);
             if (count($resultInsert) != count($userArray)) {
@@ -511,10 +511,10 @@ class ProjectService extends AbstractService
         $sort = " ORDER BY " . $sort;
         // Done Twice  - one for admin and one for PPM App
         $queryString = "SELECT oxp.name,oxp.description,oxp.uuid,oxp.date_created,
-                        ou.uuid as managerId,sub.uuid as parentId,ou.uuid as manager_id,sub.uuid as parent_id 
-                        from ox_project as oxp 
-                        INNER JOIN ox_user as ou on oxp.manager_id = ou.id 
-                        INNER JOIN ox_project as sub on sub.id = oxp.parent_id 
+                        ou.uuid as managerId,sub.uuid as parentId,ou.uuid as manager_id,sub.uuid as parent_id
+                        from ox_project as oxp
+                        INNER JOIN ox_user as ou on oxp.manager_id = ou.id
+                        INNER JOIN ox_project as sub on sub.id = oxp.parent_id
                         where oxp.parent_id = $id and oxp.isdeleted <> 1".
                         $where. " " . $sort;
         $resultSet = $this->executeQuerywithParams($queryString);
