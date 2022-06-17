@@ -193,6 +193,20 @@ return [
                     ],
                 ],
             ],
+            'searchIndexfield' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/searchIndex[/:entityName]',
+                    'constraints' => [
+                        'appId' => UuidUtil::UUID_PATTERN
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\FieldController::class,
+                        'action' => "searchIndex",
+                        'method' => 'GET'
+                    ],
+                ],
+            ],
             'appDelegate' => [
                 'type' => Segment::class,
                 'options' => [
