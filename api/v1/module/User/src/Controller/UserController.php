@@ -635,4 +635,20 @@ class UserController extends AbstractApiController
             }
         }
     }
+
+    public function insertActivityTimeAction()
+    {
+        $params = $this->params()->fromRoute();
+        if (AuthContext::get(AuthConstants::USER_ID)) {
+            try {
+                $count = $this->userService->insertActivityTime($params['activity']);
+            } catch (Exception $e) {
+                return $this->getErrorResponse("Insert log Failure", 404, array("message" => $e->getMessage()));
+            }
+            return $this->getSuccessResponse();
+        } else {
+            return $this->getErrorResponse("Invalid Username", 401);
+        }
+    }
+
 }

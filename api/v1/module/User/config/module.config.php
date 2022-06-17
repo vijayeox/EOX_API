@@ -366,6 +366,17 @@ return [
                     ],
                 ],
             ],
+            'insert_activity' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/user/me/activity/:activity',
+                    'defaults' => [
+                        'controller' => Controller\UserController::class,
+                        'method' => 'POST',
+                        'action' => 'insertActivityTime',
+                    ],
+                ],
+            ]
         ],
     ],
     'view_manager' => [
