@@ -92,6 +92,7 @@
             <directory>./module/Contact/test</directory>
             <directory>./module/Privilege/test</directory>
             <directory>./module/PaymentGateway/test</directory>
+            <directory>./module/UserAuditLog/test</directory>
         </testsuite> 
         <testsuite name="Esign Fixtures">
             <directory>./module/Esign/test</directory>

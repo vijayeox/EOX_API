@@ -46,7 +46,7 @@ class UserAuditLogService extends AbstractService
                     $lastloginresult = $this->executeQuery($lastloginquery)->toArray();
 
 
-                    if($jwtToken !== $lastloginresult[0]['jwtToken']){
+                    if($lastloginresult && $jwtToken !== $lastloginresult[0]['jwtToken']){
                         $jwtKey = $this->config['jwtKey'];
                         $jwtAlgo = $this->config['jwtAlgo'];
                         $decodeToken = \Oxzion\Jwt\JwtHelper::decodeJwtToken($lastloginresult[0]['jwtToken'], $jwtKey, $jwtAlgo);
@@ -80,7 +80,7 @@ class UserAuditLogService extends AbstractService
             );
             $query = "INSERT into ox_user_audit_log (`user_id`, `account_id`, `activity_time`, `activity`, `jwtToken`) 
                       VALUES (:userId, :accountId, :activityTime, :activity, :jwtToken)";
-            $res = $this->executeUpdateWithBindParameters($query, $params);
+            $res = $this->executeUpdateWithBindParameters($query, $params);    
         } catch (Exception $e) {
             throw $e;
         } 
