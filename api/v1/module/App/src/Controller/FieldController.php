@@ -138,4 +138,11 @@ class FieldController extends AbstractApiController
         }
         return $this->getSuccessResponseWithData($result);
     }
+
+    public function searchIndexAction()
+    {
+        $params = $this->params()->fromRoute();
+        $result = $this->fieldService->getSearchIndexFields($params);
+        return $this->getSuccessResponseWithData($result);
+    }
 }

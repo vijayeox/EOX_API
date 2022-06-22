@@ -28,6 +28,11 @@ org:
             lastname: User
             email: admin@hub.com
         preferences: '{}'
+        businessOffering:
+            -
+                businessRole: 'Insurance Carrier'
+                entity:
+                    - 'On Trac Compliance'
     -
         name: OnTrac
         uuid: 6b88905a-fa7b-47a4-af18-a5eed6ade5c5
