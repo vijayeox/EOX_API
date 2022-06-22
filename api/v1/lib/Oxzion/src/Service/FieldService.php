@@ -206,4 +206,25 @@ class FieldService extends AbstractService
         }
         return $type;
     }
+
+    public function getSearchIndexFields($data){
+        $entityId = null;
+        if(isset($data['entityName']) && $data['entityName'] != ""){
+            $select = "SELECT id from ox_app_entity where name =:entityName";
+            $params = ['entityName' => $data['entityName']];
+            $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
+            $entityId = $response[0]['id'];
+        }
+        if(isset($data['entity_id'])){
+            $entityId = $data['entity_id'];
+        }
+        $clause = " ";
+        if($entityId){
+            $clause = " and entity_id =:entityId";
+        }
+        $select  = "SELECT name,text from ox_field where search_index = 1".$clause;
+        $params = ['entityId' => $entityId];
+        $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
+        return $response;
+    }
 }

@@ -31,6 +31,7 @@ class Field extends Entity
         'date_created'=>null,
         'date_modified'=>null,
         'index' => 0,
+        'search_index' => 0,
         'sequence' => null,
         'isdeleted' => 0,
         'uuid' =>0,

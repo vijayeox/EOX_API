@@ -42,7 +42,7 @@ class FieldControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = (array) json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'success');
-        $this->assertEquals(count($content['data']), 8);
+        $this->assertEquals(count($content['data']), 10);
         $this->assertEquals($content['data'][0]['id'] > 0, true);
         $this->assertEquals($content['data'][0]['name'], 'field1');
         $this->assertEquals($content['data'][1]['id'] > 1, true);
@@ -162,5 +162,42 @@ class FieldControllerTest extends ControllerTest
         $this->setDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true);
         $this->assertEquals($content['status'], 'error');
+    }
+
+    public function testSearchIndex()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/searchIndex', 'POST');
+        $this->assertResponseStatusCode(200);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals(count($content['data']), 5);
+        $this->assertEquals($content['data'][0]['name'], 'field1');
+        $this->assertEquals($content['data'][1]['name'], 'padi_number');
+        $this->assertEquals($content['data'][2]['name'], 'policy_document');
+    }
+
+    public function testSearchIndexWithEntity()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/searchIndex/entity1', 'POST');
+        $this->assertResponseStatusCode(200);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals(count($content['data']), 4);
+        $this->assertEquals($content['data'][0]['name'], 'field1');
+        $this->assertEquals($content['data'][1]['name'], 'padi_number');
+        $this->assertEquals($content['data'][2]['name'], 'policy_document');
+    }
+
+    public function testSearchIndexWithOtherEntity()
+    {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/app/1c0f0bc6-df6a-11e9-8a34-2a2ae2dbcce4/searchIndex/entity2', 'POST');
+        $this->assertResponseStatusCode(200);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals(count($content['data']), 1);
+        $this->assertEquals($content['data'][0]['name'], 'policy_period');
     }
 }
