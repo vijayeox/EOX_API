@@ -1585,7 +1585,7 @@ class UserService extends AbstractService
         $update = $sql->update('ox_user')->set($updatedData);
         $result = $this->executeUpdate($update);
         return $updatedData;
-    }
+	}
 
     public function addExistingUserToNewAccount($data,$useruuid)
     {

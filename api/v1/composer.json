@@ -116,7 +116,8 @@
       "Kra\\": "module/Kra/src/",
       "Profile\\": "module/Profile/src",
       "Rate\\": "module/Rate/src",
-      "Integrations\\": "module/Integrations/src"
+      "Integrations\\": "module/Integrations/src",
+      "UserAuditLog\\":"module/UserAuditLog/src"
     }
   },
   "autoload-dev": {
