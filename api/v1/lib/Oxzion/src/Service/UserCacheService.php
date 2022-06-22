@@ -198,30 +198,35 @@ class UserCacheService extends AbstractService
         }
     }
 
-    public function getCache($id = null, $appId = null, $userId = null)
+    public function getCache($id = null, $appId = null, $userId = null, $data = [])
     {
-        $sql = $this->getSqlObject();
         $params = array();
-        if (isset($userId)) {
-            $params['user_id'] = $userId;
-        }
-        if (isset($appId)) {
-            if ($app = $this->getIdFromUuid('ox_app', $appId)) {
-                $appId = $app;
-            } else {
-                $appId = $appId;
-            }
-        } else {
-            $appId = null;
-        }
-        if (isset($appId)) {
-            $params['app_id'] = $appId;
-        }
-        if (isset($id)) {
+        if (!empty($id)) {
             $params['id'] = $id;
         }
+        if (!empty($appId)) {
+            if ($app = $this->getIdFromUuid('ox_app', $appId)) {
+                $appId = $app;
+            }
+            $params['app_id'] = $appId;
+        }
+        if (!empty($userId)) {
+            $params['user_id'] = $userId;
+        }
+        if (!empty($data['formId'])) {
+            if ($form = $this->getIdFromUuid('ox_form', $data['formId'])) {
+                $data['formId'] = $form;
+            }
+            $params['form_id'] = $data['formId'];
+        }
+        if (!empty($data['workflowId'])) {
+            if ($workflow = $this->getIdFromUuid('ox_workflow', $data['workflowId'])) {
+                $data['workflowId'] = $workflow;
+            }
+            $params['workflow_id'] = $data['workflowId'];
+        }
         $params['deleted'] = 0;
-        $select = $sql->select();
+        $select = $this->getSqlObject()->select();
         $select->from('ox_user_cache')
             ->columns(array("*"))
             ->where($params);
@@ -229,10 +234,7 @@ class UserCacheService extends AbstractService
         if (count($response) == 0) {
             return $response;
         }
-        if ($content = json_decode($response[0]['content'], true)) {
-            return $content;
-        } else {
-            return array('content' => $response[0]['content']);
-        }
+        return ($content = json_decode($response[0]['content'], true)) ? $content : array('content' => $response[0]['content']);
     }
+
 }
