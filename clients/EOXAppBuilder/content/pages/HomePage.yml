@@ -4,6 +4,10 @@ content:
     -
         type: ReactComponent
         content:
+            reactId: appStudioComp
+    -
+        type: ReactComponent
+        content:
             reactId: inputFocuserComp
     -
         type: RenderButtons

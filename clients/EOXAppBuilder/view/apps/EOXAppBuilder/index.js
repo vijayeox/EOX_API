@@ -1,5 +1,6 @@
 import osjs from "osjs";
 import { EOXApplication, React, ReactDOM } from "oxziongui";
+import AppStudioComp from "./custom-components/app-studio/app-studio";
 import SampleComponentDownload from "./custom-components/download-sample-component";
 import HeaderActions from "./custom-components/header-actions/header-actions";
 import InputFocuserComp from "./custom-components/input-focuser";
@@ -65,7 +66,8 @@ const register = (core, args, options, metadata) => {
             installManager: InstallManager,
             headerActions: HeaderActions,
             sampleComponentDownload: SampleComponentDownload,
-            inputFocuserComp : InputFocuserComp
+            inputFocuserComp : InputFocuserComp,
+            appStudioComp : AppStudioComp
           }}
         />,
         $content
