@@ -269,6 +269,19 @@ class FileIndexerService extends AbstractService
         }
     }
 
+    private function typeCastToSting($value ,$dataType) {
+        switch($dataType) {
+            case 'date':
+            case 'text':
+            case 'datetime':
+                return (string) $value;
+                break;
+            default:
+                return $value;
+                break;
+        }
+    }
+
     public function getAllFieldsWithCorrespondingValues($result)
     {
         $entityId = $result['entity_id'];
@@ -292,7 +305,11 @@ class FileIndexerService extends AbstractService
                     unset($data[$key]);
                     continue;
                 }
-                $toBeIndexedArray[$key] = (isset($data[$key]) && !empty($data[$key])) ?$data[$key] : $this->checkTypeAndReturnDefault($value);
+                if(isset($data[$key]) && !empty($data[$key])) {
+                    $toBeIndexedArray[$key] = $this->typeCastToSting($data[$key],$value);
+                } else {
+                    $toBeIndexedArray[$key] = $this->checkTypeAndReturnDefault($value);
+                }
             } else {
                 $toBeIndexedArray[$key] = null;
             }

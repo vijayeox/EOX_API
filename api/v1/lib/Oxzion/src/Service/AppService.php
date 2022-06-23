@@ -20,6 +20,7 @@ use Oxzion\InvalidParameterException;
 use Oxzion\Messaging\MessageProducer;
 use Oxzion\Model\App;
 use Oxzion\Model\AppTable;
+use Oxzion\OxServiceException;
 use Oxzion\ServiceException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\AppRegistryService;
@@ -1856,5 +1857,41 @@ class AppService extends AbstractService implements AppUpgrade
     public function getAppBusinessRole($appId)
     {
         return $this->businessRoleService->getBusinessRoleByName($appId);
+    }
+
+    public function getAppRolePrivilege($data)
+    {
+        $appId = $accountId = null;
+        $additionalClause = '';
+        $params = array();
+        if(isset($data['appId']) && UuidUtil::isValidUuid($data['appId'])) {
+            $appId = $this->getIdFromUuid('ox_app',$data['appId']);
+            $params['appId'] = $appId;
+        } else {
+            throw new ServiceException("Incorrect app id specified","incorrect.app.id",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        }
+
+        if(isset($data['accountId'])) {
+            if(UuidUtil::isValidUuid($data['accountId'])) {
+                $accountId = $this->getIdFromUuid('ox_account',$data['accountId']);
+                if($accountId === '') {
+                    throw new ServiceException("Incorrect account id specified","incorrect.account.id",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+                }
+                $additionalClause = " AND ox_role_privilege.account_id =:accountId";
+                $params['accountId'] = $accountId;
+            } else {
+                throw new ServiceException("Incorrect account id specified","incorrect.account.id",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+            }
+        }
+
+        $query = "SELECT ox_role_privilege.id,ox_role_privilege.role_id, 
+                ox_role.name as role_name,ox_role_privilege.privilege_name,ox_role_privilege.permission,ox_role_privilege.account_id, ox_role_privilege.app_id,ox_app.name
+                from ox_role_privilege
+                left join ox_app on ox_role_privilege.app_id = ox_app.id
+                inner join ox_role on ox_role.id = ox_role_privilege.role_id
+                where ox_role_privilege.app_id = :appId ".$additionalClause."
+                order by ox_role_privilege.role_id";
+        $result = $this->executeQueryWithBindParameters($query, $params)->toArray();
+        return $result;
     }
 }

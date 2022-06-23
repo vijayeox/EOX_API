@@ -449,4 +449,24 @@ class AppController extends AbstractApiController
             return $this->exceptionToResponse($e);
         }
     }
+
+    /**
+     * GET List of Roles and Privileges for an App API
+     * @api
+     * @link /app/appId/appRolePrivilege
+     * @method GET
+     * @return array Returns a JSON Response list of Roles and privileges per App.
+     */
+    public function getAppRolePrivilegeAction()
+    {
+        $data = $this->params()->fromRoute();
+        $this->log->info("Get Roles and Privilege List- " . print_r($data, true));
+        try {
+            $result = $this->appService->getAppRolePrivilege($data);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+        return $this->getSuccessResponseWithData($result);
+    }
 }
