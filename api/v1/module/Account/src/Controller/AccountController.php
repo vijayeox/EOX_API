@@ -216,6 +216,24 @@ class AccountController extends AbstractApiController
     }
 
     /**
+     * Check Account User API
+     * @api
+     * @link /account/:accountId/usercheck/:username
+     * @method GET
+     **/
+    public function checkAccountUserAction()
+    {
+        $params = $this->params()->fromRoute();
+        try {
+            $result = $this->accountService->checkAccountUser($params);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+        return $this->getSuccessStringResponse("No user found");
+    }
+
+    /**
      * GET Account Teams API
      * @api
      * @link /account/:accountId/teams
