@@ -1130,6 +1130,20 @@ return [
                     ],
                 ],
             ],
+            'appRolePrivilege' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId[/account/:accountId]/appRolePrivilege',
+                    'defaults' => [
+                        'controller' => Controller\AppController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppRolePrivilege',
+                        'access' => [
+                            'getAppRolePrivilege' => ['MANAGE_ROLE_READ'],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [
