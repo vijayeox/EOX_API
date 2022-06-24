@@ -635,4 +635,5 @@ class UserController extends AbstractApiController
             }
         }
     }
+
 }

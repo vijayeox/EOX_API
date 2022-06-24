@@ -643,7 +643,7 @@ public function testDeployAppWithBusinessOffering()
     $query = "SELECT * from ox_role
                 WHERE business_role_id is not null OR account_id = $accountId ORDER BY name";
     $role = $this->executeQueryTest($query);
-    $this->assertEquals(7, count($role));
+    $this->assertEquals(6, count($role));
     $this->assertEquals($yaml['role'][0]['name'], $role[1]['name']);
     $this->assertEquals(null, $role[1]['account_id']);
     $this->assertEquals($businessRole[0]['id'], $role[1]['business_role_id']);
@@ -657,20 +657,11 @@ public function testDeployAppWithBusinessOffering()
     $query = "SELECT rp.*,r.name,r.business_role_id from ox_role_privilege rp
                 inner join ox_role r on r.id = rp.role_id WHERE r.business_role_id is not null and rp.account_id is not null and rp.app_id=".$appId." order by r.name";
     $rolePrivilege = $this->executeQueryTest($query);
-    $this->assertEquals(3, count($rolePrivilege));
+    $this->assertEquals(1, count($rolePrivilege));
     $this->assertEquals($yaml['role'][0]['privileges'][0]['privilege_name'], $rolePrivilege[0]['privilege_name']);
     $this->assertEquals($yaml['role'][0]['privileges'][0]['permission'], $rolePrivilege[0]['permission']);
     $this->assertEquals($role[2]['id'], $rolePrivilege[0]['role_id']);
     $this->assertEquals($appId, $rolePrivilege[0]['app_id']);
-    $this->assertEquals($accountId, $rolePrivilege[1]['account_id']);
-    $this->assertEquals($appId, $rolePrivilege[1]['app_id']);
-    $this->assertEquals($yaml['role'][1]['privileges'][0]['privilege_name'], $rolePrivilege[2]['privilege_name']);
-    $this->assertEquals($yaml['role'][1]['privileges'][0]['permission'], $rolePrivilege[2]['permission']);
-    $this->assertEquals($role[6]['id'], $rolePrivilege[2]['role_id']);
-    $this->assertEquals($appId, $rolePrivilege[2]['app_id']);
-    $this->assertEquals($yaml['role'][1]['privileges'][1]['privilege_name'], $rolePrivilege[1]['privilege_name']);
-    $this->assertEquals($yaml['role'][1]['privileges'][1]['permission'], $rolePrivilege[1]['permission']);
-    $this->assertEquals($appId, $rolePrivilege[2]['app_id']);
 
     $query = "select * from ox_account_business_role where account_id = $accountId";
     $accountBusinessRole = $this->executeQueryTest($query);
@@ -1788,10 +1779,63 @@ public function testDeployAppOnSaveAppCss()
         $this->assertEquals(1, count($result));
         $this->assertEquals(date('Y-m-d'), date_create($result[0]['date_created'])->format('Y-m-d'));
     }
-    // NEED TO ADD INSTALL/UNINSTALL TESTS -SADHITHA
+    //NEED TO ADD INSTALL/UNINSTALL TESTS -SADHITHA
+
+    public function testDeployAppWithBusinessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $select = "SELECT * from ox_business_role";
+        $result = $this->executeQueryTest($select);
+     
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[0]['id'];
+        $result1 = $this->executeQueryTest($select);
+        $this->assertEquals($result1[0]['name'], "Manage Executive");
+        $this->assertEquals($result1[0]['uuid'], "caddaf9f-64eb-4e57-8176-3647a59ecbc4");
+        $this->assertEquals($result1[1]['name'], "Safety Director");
+        $this->assertEquals($result1[1]['uuid'], "18ed4d29-7188-482e-b544-67797c319935");
+        $this->assertEquals(count($result1),6);
+
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[1]['id'];
+        $result2 = $this->executeQueryTest($select);
+        $this->assertEquals($result2[0]['name'], "Manage Executives");
+        $this->assertEquals($result2[0]['uuid'], "efcbf9d6-b867-4810-a88d-8c5d01c11067");
+        $this->assertEquals($result2[1]['name'], "Compliance Manager");
+        $this->assertEquals($result2[1]['uuid'], "7d73ada4-8e1c-436d-8c27-17503ac7e254");
+        $this->assertEquals(count($result2),5);
+        
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[2]['id'];
+        $result3 = $this->executeQueryTest($select);
+        $this->assertEquals($result3[0]['name'], "Manage Drivers");
+        $this->assertEquals($result3[0]['uuid'], "d3ef9902-3bf8-4d70-8c79-129e6bc4e45c");
+        $this->assertEquals(count($result3),1);
+    }
+
+    public function testDeployAppWithSameBusinessRoleforTwoAccount()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $select = "SELECT * from ox_business_role";
+        $result = $this->executeQueryTest($select);
+     
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[0]['id'];
+        $result1 = $this->executeQueryTest($select);
+        $this->assertEquals($result1[0]['name'], "Manage Executive");
+        $this->assertEquals($result1[0]['uuid'], "caddaf9f-64eb-4e57-8176-3647a59ecbc4");
+
+        $select = "SELECT * from ox_role where account_id is NULL and business_role_id = ".$result[1]['id'];
+        $result2 = $this->executeQueryTest($select);
+        $this->assertEquals($result2[0]['name'], "Manage Executives");
+        $this->assertEquals($result2[0]['uuid'], "efcbf9d6-b867-4810-a88d-8c5d01c11067");
+    }
 
     
-
     /* HARI */
     public function testGetAccountOnForInstall()
     {
@@ -1838,5 +1882,223 @@ public function testDeployAppOnSaveAppCss()
         $this->setDefaultAsserts();
         $content = json_decode($this->getResponse()->getContent(), true); 
         $this->assertEquals($content['status'], 'success'); 
+    }
+
+    public function testDeployAppWithAccount()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+
+        $select = "SELECT * from ox_business_role";
+        $result = $this->executeQueryTest($select);
+        $select = "SELECT oxr.name as roleName,oa.name as accountName,oxr.business_role_id from ox_role as oxr join ox_account as oa on oa.id = oxr.account_id where oa.name = 'HUB' and oxr.business_role_id = ".$result[0]['id'];
+        $result1 = $this->executeQueryTest($select);
+        $this->assertEquals(count($result1), 6); 
+
+        $select = "SELECT oxr.name as roleName,oa.name as accountName,oxr.business_role_id from ox_role as oxr join ox_account as oa on oa.id = oxr.account_id where oa.name = 'OnTrac' and oxr.business_role_id = ".$result[1]['id'];
+        $result1 = $this->executeQueryTest($select);
+        $this->assertEquals(count($result1), 5); 
+    }
+
+    public function testRegisterUserWithBusinessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Independent Contractor","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+
+        $select = "SELECT * from ox_role where account_id = ".$result[0]['id'];
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 4);
+
+        $select = "SELECT DISTINCT oabr.*,obr.name,obr.uuid,oxr.name as roleName from ox_account_business_role as oabr join ox_account as oa on oa.id = oabr.account_id join ox_business_role as obr on obr.id = oabr.business_role_id join ox_role as oxr on obr.id = oxr.business_role_id where oa.name = 'Solomon Yates'";  
+        $result = $this->executeQueryTest($select);
+
+        $this->assertEquals($result[0]['name'], 'Independent Contractor');
+        $this->assertEquals($result[0]['uuid'], 'f915fe2a-790e-4940-a576-5b1001febdd3');
+        $this->assertEquals($result[0]['roleName'], 'Manage Drivers');
+        $this->assertEquals(count($result), 1);
+    }
+
+    public function testRegisterUserWithBusinessRoleAndMultipleRoles()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Insurance Carrier","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+
+        $select = "SELECT * from ox_role where account_id = ".$result[0]['id'];
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 9);
+
+        $select = "SELECT DISTINCT oabr.*,obr.name,obr.uuid,oxr.name as roleName from ox_account_business_role as oabr join ox_account as oa on oa.id = oabr.account_id join ox_business_role as obr on obr.id = oabr.business_role_id join ox_role as oxr on obr.id = oxr.business_role_id where oa.name = 'Solomon Yates'";  
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals($result[0]['name'], 'Insurance Carrier');
+        $this->assertEquals($result[0]['uuid'], '19d8f4c3-e79d-425b-9e23-e1fc3808cfdd');
+        $this->assertEquals($result[0]['roleName'], 'Manage Executive');
+        $this->assertEquals($result[1]['uuid'], '19d8f4c3-e79d-425b-9e23-e1fc3808cfdd');
+        $this->assertEquals($result[1]['roleName'], 'Safety Director');
+        $this->assertEquals($result[2]['uuid'], '19d8f4c3-e79d-425b-9e23-e1fc3808cfdd');
+        $this->assertEquals($result[2]['roleName'], 'Manage Underwriting');
+        $this->assertEquals($result[3]['uuid'], '19d8f4c3-e79d-425b-9e23-e1fc3808cfdd');
+        $this->assertEquals($result[3]['roleName'], 'Account Manager');
+        $this->assertEquals(count($result), 6);
+    }
+
+    public function testdeployAppWithNewBusinessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Contract Carrier","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+
+        $select = "SELECT * from ox_role where account_id = ".$result[0]['id'];
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 8);
+
+        $select = "SELECT DISTINCT oabr.*,obr.name,obr.uuid,oxr.name as roleName from ox_account_business_role as oabr join ox_account as oa on oa.id = oabr.account_id join ox_business_role as obr on obr.id = oabr.business_role_id join ox_role as oxr on obr.id = oxr.business_role_id where oa.name = 'Solomon Yates'";  
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals($result[0]['name'], 'Contract Carrier');
+        $this->assertEquals($result[0]['uuid'], 'f55f36c4-00d8-48f3-851d-793274658b37');
+        $this->assertEquals($result[0]['roleName'], 'Manage Executives');
+        $this->assertEquals($result[1]['uuid'], 'f55f36c4-00d8-48f3-851d-793274658b37');
+        $this->assertEquals($result[1]['roleName'], 'Compliance Manager');
+        $this->assertEquals($result[2]['uuid'], 'f55f36c4-00d8-48f3-851d-793274658b37');
+        $this->assertEquals($result[2]['roleName'], 'Safety Director');
+        $this->assertEquals($result[3]['uuid'], 'f55f36c4-00d8-48f3-851d-793274658b37');
+        $this->assertEquals($result[3]['roleName'], 'Manage Independent Contractor');
+        $this->assertEquals(count($result), 5);
+    }
+
+    public function testdeployAppWithRoleAndPrivileges()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        
+        $select = "SELECT * from ox_role_privilege where account_id IS NULL";
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 70);
+    }
+
+    public function testdeployAppWithAccountRolePrivileges()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Contract Carrier","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+        $accountId = $result[0]['id'];
+        $select = "SELECT * from ox_role where account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 8);
+
+        $select = "SELECT * from ox_role_privilege as orp where orp.account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 59);
+
+        $select = "SELECT * from ox_role_privilege as orp join ox_role as oxr on orp.role_id = oxr.id where orp.account_id = ".$accountId." and oxr.name = 'Manage Executives'";
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 1);
+
+        $select = "SELECT * from ox_role_privilege as orp join ox_role as oxr on orp.role_id = oxr.id where orp.account_id = ".$accountId." and oxr.name = 'Compliance Manager'";
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 1);        
+    }
+
+    public function testAccountCreationRoleBusinnessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive1.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Contract Carrier","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+        $accountId = $result[0]['id'];
+        $select = "SELECT * from ox_role where account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 3);
+
+        $select = "SELECT * from ox_role_privilege as orp where orp.account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 54);   
+    }
+
+    public function testAccountCreationRoleSameBusinnessRole()
+    {
+        $this->setUpTearDownHelper->setupAppDescriptor('applicationhubdrive1.yml');
+        $this->initAuthToken($this->adminUser);
+        $path = __DIR__ . '/../../sampleapp/';
+        $data = ['path' => $path];
+        $this->dispatch('/app/deployapp', 'POST', $data);
+        $sel = "select * from ox_app where uuid = 'a4b1f073-fc20-477f-a804-1aa206938c42'";
+        $res = $this->executeQueryTest($sel);
+        $data = '{"firstname":"Solomon","lastname":"Yates","address1":"Test Address","country":"India","email":"xapil@mailinator.com","type" :"BUSINESS","businessRole":"Insurance Carrier","IcLastName":"Yates","autoLiability":true,"cargoInsurance":true,"city":"Obcaecati facere dol","effectiveDate":"","iCEmail":"xapil@mailinator.com","iCFirstName":"Solomon","identifier_field":"iCEmail","name":"Solomon Yates","state":"Colorado","street1IC":"Laboriosam modi cum","zip":63284,"appId":"a4b1f073-fc20-477f-a804-1aa206938c42","entity_name":"On Trac Compliance","fileId":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","uuid":"5849fa67-ad9a-4a23-a343-ae3ae5e99761","accountId":null,"app_id":"'.$res[0]['id'].'","workFlowId":null,"attachments":[{"fullPath":"/app/api/v1/config/autoload/../../data/file_docs/6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","file":"6b88905a-fa7b-47a4-af18-a5eed6ade5c5/5849fa67-ad9a-4a23-a343-ae3ae5e99761/OnTracRSPComplianceChecklistTemplate.pdf","originalName":"OnTracRSPComplianceChecklistTemplate.pdf","type":"file/pdf"}],"version":2}';
+        $data = json_decode($data, true);
+        $registrationService = $this->getRegistrationService();
+        $registrationService->registerAccount($data);
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $select = "SELECT id from ox_account where name = 'Solomon Yates'";
+        $result = $this->executeQueryTest($select);
+        $accountId = $result[0]['id'];
+        $select = "SELECT * from ox_role where account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 4);
+
+        $select = "SELECT * from ox_role_privilege as orp where orp.account_id = ".$accountId;
+        $result = $this->executeQueryTest($select);
+        $this->assertEquals(count($result), 55);   
     }
 }

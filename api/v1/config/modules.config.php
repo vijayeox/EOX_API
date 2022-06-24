@@ -45,5 +45,6 @@ return [
     'Kra',
     'Profile',
     'Rate',
-    'Integrations'
+    'Integrations',
+    'UserAuditLog'
 ];

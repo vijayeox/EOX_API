@@ -143,9 +143,12 @@ class AccountService extends AbstractService
         if (!ArrayUtils::isKeyDefined($data, 'username')) {
             $data['username'] = $data['email'];
         }
-        $result = $this->userService->checkUserExists($data);
-        if ($result == 1) {
-            return $result;
+        $data['addExistingUserToNewAccount'] = isset($data['addExistingUserToNewAccount']) ? $data['addExistingUserToNewAccount'] :false;
+        if(!$data['addExistingUserToNewAccount']){
+            $result = $this->userService->checkUserExists($data);
+            if ($result == 1) {
+                return $result;
+            }
         }
         $user = new User();
         $person = new Person();
@@ -945,9 +948,11 @@ class AccountService extends AbstractService
             {
                 $query_media="SELECT id, uuid, extension, type, path, created_id, account_id, created_date, file_name as name FROM ox_attachment WHERE uuid='$media_uuid'";
                 $resultSetMedia = $this->executeQuerywithParams($query_media)->toArray();
-                $resultSetMedia[0]['size'] =  file_exists($resultSetMedia[0]['path'])? filesize($resultSetMedia[0]['path']):"";
-                $resultSetMedia[0]['url'] = $this->config['baseUrl'] . '/resource/'. $resultSetMedia[0]['uuid'];
-                $resultSet[$i]['upload']=$resultSetMedia;
+                if (sizeof($resultSetMedia) > 0) {
+                    $resultSetMedia[0]['size'] =  file_exists($resultSetMedia[0]['path'])? filesize($resultSetMedia[0]['path']):"";
+                    $resultSetMedia[0]['url'] = $this->config['baseUrl'] . '/resource/'. $resultSetMedia[0]['uuid'];
+                    $resultSet[$i]['upload']=$resultSetMedia;
+                }   
             }
            $i++; 
         }

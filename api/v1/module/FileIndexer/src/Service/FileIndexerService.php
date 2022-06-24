@@ -89,7 +89,7 @@ class FileIndexerService extends AbstractService
 
         //Need to store file data seperately as its a json string and perform actions on the same
         $data = $indexedData = null;
-        
+
         if (isset($result[0]) && isset($result[0]['id'])) {
             $app_name = $result[0]['app_name'];
             $indexedData = $this->getAllFieldsWithCorrespondingValues($result[0]);
@@ -99,7 +99,7 @@ class FileIndexerService extends AbstractService
             return $indexedData;
         } else {
             // Handle empty file data in case of some error
-            throw new ServiceException("Incorrect file uuid specified", "file.uuid.incorrect");        
+            throw new ServiceException("Incorrect file uuid specified", "file.uuid.incorrect");
         }
     }
 
@@ -113,7 +113,7 @@ class FileIndexerService extends AbstractService
         where file.uuid = :uuid";
         $params = array('uuid' => $fileUUId);
         $response = $this->executeQuerywithBindParameters($select, $params)->toArray();
-        
+
         if (count($response) == 0) {
             return 0;
         }
@@ -161,22 +161,21 @@ class FileIndexerService extends AbstractService
                     $fileIdsArray = $batch;
                     $fileIds = implode(',', $batch);
                     $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
-
                     $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
-                    if($arraySize > 8000000) {
-                        $differentialFactor = $arraySize / 8000000;
-                        $newBatchSize = (int) ($batchSize / $differentialFactor);
-                        $this->logger->info("New batch size is -- $newBatchSize");
+                    if($arraySize > 6500000) {
+                        $differentialFactor = $arraySize / 6500000;
+                        $newBatchSize = ceil($batchSize / $differentialFactor);
+                        $this->logger->info("the new batch size is ---".$newBatchSize);
                         $newBatches = array_chunk($batch,$newBatchSize);
-                        $this->logger->info("The new Batches are --".print_r($newBatches,true));
                         foreach ($newBatches as $newBatch) {
-                            $fileIds = implode(',',$batch);
+                            $fileIds = implode(',',$newBatch);
                             $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
+                            $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
+                            $this->logger->info("The new array size is --$arraySize");
                             $this->sendDataToElasticForBulk($fileIds,$bodys,$appID);
                         }
                         continue;
                     }
-
                     $this->sendDataToElasticForBulk($fileIds,$bodys,$appID);
                 }
                 return $bodys;

@@ -84,4 +84,8 @@ trait FileTrait
     {
         return $this->fileService->getWorkflowInstanceStartDataFromFileId($fileId);
     }
+
+    protected function getUserFileAssignments($appId, $data){
+        return $this->fileService->getAssignments($appId, $data);
+    }
 }
