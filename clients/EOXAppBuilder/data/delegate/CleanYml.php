@@ -88,8 +88,8 @@ class CleanYml extends AbstractAppDelegate
             $pageData['content'] = array('tabs' => $pageData['tabs']);
             $this->cleanTabSegment($pageData['content']['tabs']);
         }
-        if ($pageData['type'] == 'Comment' && isset($pageData['fileId']) && isset($pageData['content']) && !empty($pageData['content'])) {
-            $pageData['content'] = $pageData['fileId'];
+        if ($pageData['type'] == 'Comment'){
+            $pageData['content'] = isset($pageData['fileId'])? $pageData['fileId'] : null;
             $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content'] ) );
         }
     }

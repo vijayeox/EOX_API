@@ -465,18 +465,25 @@ class UserService extends AbstractService
         $password = $data['password'];
         try {
             $this->beginTransaction();
-            $result = $this->createUser($params, $data);
-            $select = "SELECT au.id from `ox_account_user` au
-                        inner join ox_user u on u.id = au.user_id
-                        where u.uuid = :userId and au.account_id = :accountId";
-            $queryParams = ['userId' => $data['uuid'], 'accountId' => $account['id']];
-            $resultSet = $this->executeQueryWithBindParameters($select, $queryParams)->toArray();
-            $response = $this->addUserRole($resultSet[0]['id'], 'ADMIN');
-            if ($response == 2) {
-                //Did not find admin role so add Add all roles of account
-                $roles = $this->getDataByParams('ox_role', array('name'), array('account_id' => $account['id']))->toArray();
-                foreach ($roles as $key => $value) {
-                    $this->addUserRole($resultSet[0]['id'], $value);
+            $account['addExistingUserToNewAccount'] = isset($account['addExistingUserToNewAccount']) ? $account['addExistingUserToNewAccount'] :false;
+            if($account['addExistingUserToNewAccount']){
+                $data['uuid'] = $account['userUuid'];
+                $data['accountId'] = $account['uuid'];
+                $this->addExistingUserToNewAccount($data,$account['userUuid']);
+            }else{
+                $result = $this->createUser($params, $data);
+                $select = "SELECT au.id from `ox_account_user` au
+                            inner join ox_user u on u.id = au.user_id
+                            where u.uuid = :userId and au.account_id = :accountId";
+                $queryParams = ['userId' => $data['uuid'], 'accountId' => $account['id']];
+                $resultSet = $this->executeQueryWithBindParameters($select, $queryParams)->toArray();
+                $response = $this->addUserRole($resultSet[0]['id'], 'ADMIN');
+                if ($response == 2) {
+                    //Did not find admin role so add Add all roles of account
+                    $roles = $this->getDataByParams('ox_role', array('name'), array('account_id' => $account['id']))->toArray();
+                    foreach ($roles as $key => $value) {
+                        $this->addUserRole($resultSet[0]['id'], $value);
+                    }
                 }
             }
             $this->commit();
@@ -1579,5 +1586,34 @@ class UserService extends AbstractService
         $update = $sql->update('ox_user')->set($updatedData);
         $result = $this->executeUpdate($update);
         return $updatedData;
+	}
+
+    public function addExistingUserToNewAccount($data,$useruuid)
+    {
+        $accountId = $this->getIdFromUuid('ox_account', $data['accountId']);
+        $updateQuery = "UPDATE ox_user SET account_id =:accountId where uuid =:uuid";
+        $params1 = array("accountId" => $accountId,"uuid" => $useruuid);
+        $this->executeUpdateWithBindParameters($updateQuery, $params1);
+
+        $userId = $this->getIdFromUuid('ox_user',$useruuid);
+        $updateQuery2 = "UPDATE ox_account_user SET account_id =".$accountId." where user_id =".$userId;
+        $this->executeUpdateWithBindParameters($updateQuery2, array());
+
+        $select = "SELECT * from ox_account_user where user_id =".$userId;
+        $result1 = $this->executeQueryWithBindParameters($select, array())->toArray();
+        
+        $form = new User($this->table);
+        $form->loadByUuid($useruuid);
+        $userdata = array_merge($form->getProperties(), $data);
+
+        if (!isset($userdata['address1']) || empty($userdata['address1'])) {
+            $addressData = $this->addressService->getOrganizationAddress($data['accountId']);
+            $this->unsetAddressData($addressData, $data);
+            $userdata = array_merge($data, $addressData);
+        }
+        $this->personService->updatePerson($userdata['person_id'], $userdata);
+        $response = $this->addUserRole($result1[0]['id'], 'ADMIN');
+        
+        $this->empService->updateEmployeeDetails($userdata);
     }
 }

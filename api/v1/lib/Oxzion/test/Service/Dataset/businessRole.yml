@@ -114,3 +114,8 @@ ox_file_participant:
     file_id: 20 
     business_role_id: 101
     account_id: 1
+ox_business_relationship:
+  -
+    seller_account_business_role_id: 1
+    buyer_account_business_role_id: 2
+

@@ -1,0 +1,84 @@
+app:
+    name: HubDrive
+    uuid: a4b1f073-fc20-477f-a804-1aa206938c42
+    description: Compliance
+    category: EXAMPLE_CATEGORY
+    type: 2
+    autostart: true
+    status: 4
+    isdefault: false
+    logo: default_app.png
+    start_options: null
+    title: Compliance
+    app_properties: '{"chat_notification":"","appIdentifiers":""}'
+org:
+    -
+        name: HUB
+        uuid: 5060e4d5-006a-4054-85c0-bbf78579412d
+        email: admin@hub.com
+        address1: '6 bCenterpoint'
+        address2: Dr.
+        city: 'La Palma'
+        state: CA
+        zip: 90623
+        country: 'United States of America'
+        contact:
+            username: HubAdmin
+            firstname: Admin
+            lastname: User
+            email: admin@hub.com
+        preferences: '{}'
+        businessOffering:
+            -
+                businessRole: 'Insurance Carrier'
+                entity:
+                    - 'Independent Contractor'
+businessRole:
+    -
+        name: 'Insurance Carrier'
+        uuid: 19d8f4c3-e79d-425b-9e23-e1fc3808cfdd
+privilege:
+    -
+        name: MANAGE_EXECUTIVE
+        permission: 3
+role:
+    -
+        name: 'Manage Executive'
+        privileges:
+            -
+                privilege_name: MANAGE_EXECUTIVE
+                permission: 3
+        uuid: caddaf9f-64eb-4e57-8176-3647a59ecbc4
+        businessRole:
+            name: 'Insurance Carrier'
+entity:
+    -
+        name: 'Independent Contractor'
+        start_date_field: start_date
+        end_date_field: end_date
+        status_field: status
+        subscriber_field: observers
+        ryg_rule: ''
+        statusField: ''
+        title: '${entity_name} ${name}'
+        enable_documents: true
+        enable_comments: true
+        enable_view: false
+        pageContent:
+            data:
+                content:
+                    -
+                        type: HTMLViewer
+                        page_id: ''
+                        htmlContent: ''
+                        externalDataSource: ''
+                        formSource: ''
+                        form_name: {  }
+                        formUrl: ''
+                        urlPostParams: ''
+                        dashboard_uuid: ''
+                        url: ''
+                        content: ''
+                        useRowData: false
+            metadata: {  }
+ 
