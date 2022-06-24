@@ -10,7 +10,7 @@ class AbstractController extends AbstractApiController
     public function __construct(InsuranceService $insuranceService, String $handle)
     {
         parent::__construct();
-        $this->imsService = $insuranceService->getService('IMS', ['handle' => $handle]);
+        $this->imsService = $insuranceService->getService('IMS', ['defaultConfig' => true, 'handle' => $handle]);
     }
 
     public function getFunctionStructureAction()
