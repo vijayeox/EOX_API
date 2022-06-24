@@ -1,44 +1,50 @@
-div[class="formio-dialog formio-dialog-theme-default component-settings"]{
-    div[ref="dialogContents"]{
-      div{
-        h3[ref="dialogHeader"]{
+div[class="formio-dialog formio-dialog-theme-default component-settings"] {
+  div[ref="dialogContents"] {
+    div {
+      h3[ref="dialogHeader"] {
+        visibility: hidden;
+        position: relative;
+        &:after {
+          position: absolute;
+          font-size: 1.5rem;
+          left: 0;
+          visibility: visible;
+          content: "Do you want to close ?";
+        }
+      }
+
+      div {
+        justify-content: unset !important;
+        flex-direction: row-reverse;
+        gap: 5px;
+        padding: 0px;
+
+        button[ref="dialogYesButton"] {
           visibility: hidden;
           position: relative;
-          &:after{
-            position: absolute;
-            font-size: 1.5rem;
-            left: 0;
+
+          &::after {
+            content: "Yes";
             visibility: visible;
-            content: 'Do you want to close ?';
-          }
-        }
-  
-        div{
-          justify-content: unset !important;
-          flex-direction: row-reverse;
-          gap: 5px;
-          padding: 0px;
-  
-          button[ref="dialogYesButton"]{
-            visibility: hidden;
-            position: relative;
-  
-            &::after{
-              content: 'Yes';
-              visibility: visible;
-              position: absolute;
-              left: 0;
-              height: 100%;
-              width: 100%;
-              border-radius: 5px;
-              background: #2f70fa;
-              top: 0;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            }
+            position: absolute;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            border-radius: 5px;
+            background: #2f70fa;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
       }
     }
   }
+}
+.grid-reoder-custom > table > tbody > tr > td:first-child {
+  width: 10px;
+  button::before {
+    content: "\f0dc" !important;
+  }
+}

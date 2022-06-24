@@ -92,6 +92,23 @@ class CleanYml extends AbstractAppDelegate
             $pageData['content'] = isset($pageData['fileId'])? $pageData['fileId'] : null;
             $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content'] ) );
         }
+        if ($pageData['type'] == 'ActivityLog'){
+            $pageData['content'] = '{{uuid}}';
+            $pageData['type'] = 'History';
+            $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content'] ) );
+        }
+        if ($pageData['type'] == 'RenderButtons'){
+            $pageData['content'] = $pageData['buttons'];
+            for($i = 0; $i < count($pageData['content']); $i++){
+                    $pageData['content'][$i]['details'][] = array(
+                        'type' => isset($pageData['content'][$i]['type']) ? $pageData['content'][$i]['type'] : null, 
+                        'form_id' => isset($pageData['content'][$i]['form_id']) ? $pageData['content'][$i]['form_id'] : null);
+            }
+            unset($pageData['content'][$i]['type']);
+            unset($pageData['content'][$i]['form_id']);
+            $pageData['content'] = array('buttonList' => $pageData['content']);
+            $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content', 'buttons'] ) );
+        }
     }
 
     private function cleanUpyml(&$newPageData){ 
