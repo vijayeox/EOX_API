@@ -454,12 +454,12 @@ class ElasticService
         }
         $q['track_total_hits'] = true;
         $this->logger->debug('Elastic query:');
-        $this->logger->debug(json_encode($q, JSON_PRETTY_PRINT));
+        $this->logger->debug(json_encode($q));
         $this->elasticQuery = json_encode($q);
         $data['query'] = json_encode($q);
         $data["data"] = $this->client->search($q);
         $this->logger->debug('Data from elastic:');
-        $this->logger->debug(json_encode($data, JSON_PRETTY_PRINT));
+        $this->logger->debug(json_encode($data));
         return $data;
     }
 
