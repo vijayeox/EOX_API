@@ -48,3 +48,28 @@ div[class="formio-dialog formio-dialog-theme-default component-settings"] {
     content: "\f0dc" !important;
   }
 }
+.custom-formio-render-button{
+  .formio-component-buttonList>label{
+    display: none;
+  }
+  .renderbtns-button-list-details{
+    margin: 0;
+    &>.col-form-label{
+      display: none;
+    }
+    table{
+      border: 0;
+      thead,tfoot{
+        display: none;
+      }
+      tbody>tr{
+        td:first-child{
+          padding: 0 !important;
+        }
+        td:last-child{
+          display: none;
+        }
+      }
+    }
+  }
+}
