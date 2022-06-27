@@ -98,16 +98,7 @@ class CleanYml extends AbstractAppDelegate
             $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content'] ) );
         }
         if ($pageData['type'] == 'RenderButtons'){
-            $pageData['content'] = $pageData['buttons'];
-            for($i = 0; $i < count($pageData['content']); $i++){
-                    $pageData['content'][$i]['details'][] = array(
-                        'type' => isset($pageData['content'][$i]['type']) ? $pageData['content'][$i]['type'] : null, 
-                        'form_id' => isset($pageData['content'][$i]['form_id']) ? $pageData['content'][$i]['form_id'] : null);
-            }
-            unset($pageData['content'][$i]['type']);
-            unset($pageData['content'][$i]['form_id']);
-            $pageData['content'] = array('buttonList' => $pageData['content']);
-            $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content', 'buttons'] ) );
+            $pageData = array_intersect_key( $pageData, array_flip( ['renderContent', 'content','type'] ) );
         }
     }
 
