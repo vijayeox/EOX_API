@@ -1,17 +1,28 @@
 #!/bin/bash
 
+execOptions() {
+	containerName=`docker container ls -la -f name="$dirName" --format "{{.Names}}"`
+	containerStatus=`docker container inspect --format="{{.State.Status}}" $containerName`
+	if [ "$containerStatus" != "exited" ]; then
+		while true; do
+			case $startOptions in
+				[Ii]* ) echo "==================================================";
+						echo "			Logs";
+						echo "==================================================";
+						docker logs -n100 -f "$containerName";
+						break;;
+				[Yy]* ) docker exec -it "$containerName" bash; break;;
+				[Nn]* ) break;;
+					* ) read -p "Do you wish to enter the container or display logs?(y/n/i)" startOptions;;
+			esac
+		done
+		exit
+	fi
+}
+
 if [ ! -f ./.env ]; then
 	echo "Please set .env file up"
 	exit
-fi
-
-dirName="$(tr [A-Z] [a-z] <<< "${PWD##*/}")"
-containerName=$dirName'-wf-1'
-containerStatus="$(docker container inspect --format="{{.State.Status}}" $containerName)"
-
-if [ $containerStatus != "exited" ]; then
-	echo "Stopping container if already running..."
-	docker stop $containerName
 fi
 
 IP=`hostname -I | awk '{ print $1 }'`
@@ -26,6 +37,24 @@ do
 		[Ii]* ) startOptions="i";;
 	esac
 done
+
+dirName="$(tr [A-Z] [a-z] <<< "${PWD##*/}")";
+containerName=`docker container ls -la -f name="$dirName" --format "{{.Names}}"`
+if [ "$containerName" ]; then
+	containerStatus=`docker container inspect --format="{{.State.Status}}" $containerName`
+	if [ "$containerStatus" != "exited" ] && [ "$startOptions" == "i" ] || [ "$startOptions" == "y" ]; then
+		currentIp=`docker exec -it $containerName printenv -0 DB_HOST`
+		echo ""
+		if [ "$currentIp" == "$IP" ]; then
+			read -p "Do you want to restart the service?(y/n)" restart
+			if [ "$restart" == "n" ]; then
+				execOptions startOptions containerName
+			fi
+		fi
+	fi
+	echo "Stopping container if already running..."
+	docker stop "$containerName"
+fi
 
 sed -ri -e "s/([0-9]{1,3}\.){3}[0-9]{1,3}/$IP/" .env
 export $(cat .env | sed 's/#.*//g' | xargs)
@@ -48,17 +77,6 @@ if [ "http://$IP:8080" != "$applicationurl" ]; then
 
 fi
 
-if [ $startOptions == "i" ]; then
-	IP="$IP" docker-compose up --build
-else
-	IP="$IP" docker-compose up -d --build
-	echo "Camunda is being served in the background on port 8090/camunda";
-	while true; do
-		case $startOptions in
-			[Yy]* ) docker exec -it "${dirName//_}-wf-1" bash; break;;
-			[Nn]* ) break;;
-				* ) read -p "Do you wish to enter the container?(y/n)" startOptions;;
-		esac
-	done
-
-fi
+docker-compose up -d --build
+echo "Camunda is being served in the background on port 8090/camunda";
+execOptions startOptions containerName
