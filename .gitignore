@@ -34,3 +34,4 @@
 *.DS_Store
 /clients/skydrive
 /clients/skyward
+*.code-workspace

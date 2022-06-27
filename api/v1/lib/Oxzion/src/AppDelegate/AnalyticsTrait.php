@@ -23,6 +23,7 @@ trait AnalyticsTrait
         $this->queryService = $queryService;
     }
     public function setConfig($data)
+    // public function setQueryConfig($data)
     {
         $this->logger->info("SET Config -> " . print_r($data, true));
         foreach ($data as $key => $value) {
@@ -63,4 +64,5 @@ trait AnalyticsTrait
             'configuration' => $filters + ['app_name' => $this->appName, 'entity_name' => $this->entityName]
         ]);
     }
+
 }

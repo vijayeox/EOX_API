@@ -21,9 +21,6 @@ class UuidUtil
 
     public static function isValidUuid($uuid)
     {
-        if (!is_string($uuid) || (preg_match('/^'.self::UUID_PATTERN.'$/', $uuid) !== 1)) {
-            return false;
-        }
-        return true;
+        return ValidationUtils::isValid('uuid', $uuid);
     }
 }

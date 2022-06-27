@@ -10,7 +10,7 @@ class AbstractController extends AbstractApiController
     public function __construct(InsuranceService $insuranceService, String $handle)
     {
         parent::__construct();
-        $this->imsService = $insuranceService->getService('IMS', ['handle' => $handle]);
+        $this->imsService = $insuranceService->getService('IMS', ['defaultConfig' => true, 'handle' => $handle]);
     }
 
     public function getFunctionStructureAction()
@@ -22,7 +22,7 @@ class AbstractController extends AbstractApiController
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        return $this->getSuccessResponseWithData($response, 201);
+        return $this->getSuccessResponseWithData(($response) ? $response : [], 201);
     }
 
     public function getList()
@@ -39,7 +39,7 @@ class AbstractController extends AbstractApiController
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        return $this->getSuccessResponseWithData($response, 201);
+        return $this->getSuccessResponseWithData(($response) ? $response : [], 201);
     }
 
     public function create($data)
@@ -55,7 +55,7 @@ class AbstractController extends AbstractApiController
             $this->log->error($e->getMessage(), $e);
             return $this->exceptionToResponse($e);
         }
-        return $this->getSuccessResponseWithData($response, 201);
+        return $this->getSuccessResponseWithData(($response) ? $response : [], 201);
     }
 
 }
