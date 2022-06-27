@@ -62,6 +62,8 @@ export $(cat ./ProcessEngine/src/main/resources/application.properties | sed 's/
 
 if [ "http://$IP:8080" != "$applicationurl" ]; then
 
+	chmod 777 ./ProcessEngine/src/main/resources
+	rm ./ProcessEngine/src/main/resources/application.properties
 	cp ./ProcessEngine/src/main/resources/application.properties.example ./ProcessEngine/src/main/resources/application.properties
 
 	sed -ri -e "s/([0-9]{1,3}\.){3}[0-9]{1,3}/$IP/" ./ProcessEngine/src/main/resources/application.properties
