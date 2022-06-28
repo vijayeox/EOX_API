@@ -74,6 +74,20 @@ return [
                     ],
                 ],
             ],
+            'checkAccountEmail' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/account/:accountId/emailcheck/:email',
+                    'defaults' => [
+                        'controller' => Controller\AccountController::class,
+                        'method' => 'GET',
+                        'action' => 'checkAccountEmail',
+                        'access' => [
+                            'checkAccountEmail' => ['MANAGE_USER_WRITE'], //Since this check is done before writing and should be done by an admin
+                        ],
+                    ],
+                ],
+            ],
             'getListofAdminUsers' => [
                 'type' => Segment::class,
                 'options' => [
