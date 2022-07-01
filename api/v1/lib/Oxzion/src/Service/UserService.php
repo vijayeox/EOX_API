@@ -766,10 +766,7 @@ class UserService extends AbstractService
         } else {
             $accountId = AuthContext::get(AuthConstants::ACCOUNT_ID);
         }
-        $where = "";
-        $filterArray = json_decode($filterParams['filter'], true);
-        $pageSize = isset($filterArray[0]['take']) ? $filterArray[0]['take'] : 20;
-        $offset = isset($filterArray[0]['skip']) ? $filterArray[0]['skip'] : 0;
+        $where = $pageSize = $offset = $limit = "";
         $sort = "name";
         $select = "SELECT ou.uuid, ou.username, ou.name, ou.icon, ou.timezone, ou.preferences,
         	au.uuid as accountId, usrp.firstname, usrp.lastname, usrp.email, usrp.date_of_birth, usrp.phone, usrp.gender,
@@ -799,7 +796,9 @@ class UserService extends AbstractService
                     $sort = $filterArray[0]['sort'];
                     $sort = FilterUtils::sortArray($sort, self::$userField);
                 }
-                $pageSize = $filterArray[0]['take'];
+                $pageSize = isset($filterArray[0]['take']) ? $filterArray[0]['take'] : 20;
+                $offset = isset($filterArray[0]['skip']) ? $filterArray[0]['skip'] : 0;
+                $limit = " LIMIT " . $pageSize . " offset " . $offset;
             }
             if (isset($filterParams['exclude'])) {
                 $where .= (strlen($where) > 0 ? " AND " : " WHERE ") . "ou.uuid NOT in ('" . implode("','", $filterParams['exclude']) . "') ";
@@ -810,7 +809,6 @@ class UserService extends AbstractService
         if (!empty($sort)) {
             $sort = " ORDER BY " . $sort;
         }
-        $limit = " LIMIT " . $pageSize . " offset " . $offset;
         $resultSet = $this->executeQuerywithParams($cntQuery . $where);
         $count = $resultSet->toArray()[0]['count'];
         $query = $select . " " . $from . " " . $where . " " . $sort . " " . $limit;

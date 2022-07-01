@@ -1087,8 +1087,8 @@ class AccountService extends AbstractService
         return $sort;
     }
 
-    public function checkAccountUser($params) {
-
+    public function checkAccountUser($params)
+    {
         if(isset($params['accountId']) && UuidUtil::isValidUuid($params['accountId'])) {
             $accountId = $this->getIdFromUuid('ox_account',$params['accountId']);
             if($accountId === '') {
@@ -1108,11 +1108,42 @@ class AccountService extends AbstractService
                     inner join ox_account au on au.id = ou.account_id
                     inner join ox_person per on per.id = ou.person_id
                     LEFT join ox_address as oa on per.address_id = oa.id
-                    where ou.username = :username OR per.email = :username AND au.id = :accountId ";
+                    where ou.username = :username AND au.id = :accountId ";
         $params = ['username' => $username,'accountId' => $accountId];
         $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
         if ($response[0]['count'] > 0) {
-            throw new ServiceException("User/Email already exists", "user.already.exists", OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+            throw new ServiceException("User already exists", "user.already.exists", OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        } else {
+            return;
+        }
+    }
+
+    public function checkAccountEmail($params)
+    {
+        if(isset($params['accountId']) && UuidUtil::isValidUuid($params['accountId'])) {
+            $accountId = $this->getIdFromUuid('ox_account',$params['accountId']);
+            if($accountId === '') {
+                throw new ServiceException("Incorrect Account specified",'incorrect.account.specified',OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+            }
+        } else {
+            throw new InvalidParameterException('Account Id is not specified or incorrect');
+        }
+        if(isset($params['email'])) {
+            $email = $params['email'];
+        } else {
+            throw new InvalidParameterException('Email is not specified');
+        }
+
+        $select = "SELECT count(per.email) as count
+                    from ox_user as ou
+                    inner join ox_account au on au.id = ou.account_id
+                    inner join ox_person per on per.id = ou.person_id
+                    LEFT join ox_address as oa on per.address_id = oa.id
+                    where per.email = :email AND au.id = :accountId ";
+        $params = ['email' => $email,'accountId' => $accountId];
+        $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
+        if ($response[0]['count'] > 0) {
+            throw new ServiceException("Email already exists", "email.already.exists", OxServiceException::ERR_CODE_PRECONDITION_FAILED);
         } else {
             return;
         }
