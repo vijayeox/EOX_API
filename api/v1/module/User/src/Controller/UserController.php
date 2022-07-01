@@ -168,7 +168,7 @@ class UserController extends AbstractApiController
                 $projects = $this->projectService->getProjectsOfUserById($userid, $accountId);
                 $roles = $this->userService->getRolesofUser($accountId, $uuid);
                 if (!empty($projects)) {
-                    $result['data'][$i]['project'] = $projects;
+                    $result['data'][$i]['project'] = $projects[0];
                 }
                 if (!empty($roles)) {
                     $result['data'][$i]['role'] = $roles;
