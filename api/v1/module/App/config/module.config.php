@@ -1144,6 +1144,20 @@ return [
                     ],
                 ],
             ],
+            'getAppFormFields' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/form/:formName/fields',
+                    'defaults' => [
+                        'controller' => Controller\AppController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppFormFields',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

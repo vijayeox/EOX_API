@@ -43,4 +43,9 @@ trait AppTrait
     {
         return $this->appArtifactService->getArtifacts($appUuid, $artifactType);
     }
+
+    protected function getAppFormFields($formName,$appId){
+        return $this->appService->getAppFormFields($formName,$appId);
+    }
+
 }
