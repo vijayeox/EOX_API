@@ -208,23 +208,32 @@ class FieldService extends AbstractService
     }
 
     public function getSearchIndexFields($data){
+        $this->logger->info("Search Index Fields ----".print_r($data,true));
         $entityId = null;
-        if(isset($data['entityName']) && $data['entityName'] != ""){
-            $select = "SELECT id from ox_app_entity where name =:entityName";
-            $params = ['entityName' => $data['entityName']];
+        try {
+            if(isset($data['entityName']) && $data['entityName'] != ""){
+                $select = "SELECT id from ox_app_entity where name =:entityName";
+                $params = ['entityName' => $data['entityName']];
+                $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
+                if(count($response) == 0){
+                    throw new ServiceException("Entity not found", "entity.not.found");
+                }
+                $entityId = $response[0]['id'];
+            }
+            if(isset($data['entity_id'])){
+                $entityId = $data['entity_id'];
+            }
+            $clause = " ";
+            if($entityId){
+                $clause = " and entity_id =:entityId";
+            }
+            $select  = "SELECT name,text from ox_field where search_index = 1".$clause;
+            $params = ['entityId' => $entityId];
             $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
-            $entityId = $response[0]['id'];
+        } catch (Exception $e) {
+            $this->logger->error($e->getMessage(), $e);
+            throw $e;
         }
-        if(isset($data['entity_id'])){
-            $entityId = $data['entity_id'];
-        }
-        $clause = " ";
-        if($entityId){
-            $clause = " and entity_id =:entityId";
-        }
-        $select  = "SELECT name,text from ox_field where search_index = 1".$clause;
-        $params = ['entityId' => $entityId];
-        $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
         return $response;
     }
 }
