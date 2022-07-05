@@ -862,6 +862,7 @@ class UserService extends AbstractService
         }
         $activeAccount = $this->getActiveAccount(AuthContext::get(AuthConstants::ACCOUNT_ID));
         if ($activeAccount) {
+            $activeAccount['preferences'] = json_decode($activeAccount['preferences'], true);
             $result['active_account'] = $activeAccount;
             $result['accountId'] = $activeAccount['accountId'];
             $result['id'] = AuthContext::get(AuthConstants::ACCOUNT_ID);
@@ -884,7 +885,7 @@ class UserService extends AbstractService
 
     public function getActiveAccount($accountId)
     {
-        $select = "SELECT au.uuid as accountId, au.name
+        $select = "SELECT au.uuid as accountId, au.name, au.preferences
                     from ox_account au
                     where au.id =:id";
         $params = array("id" => $accountId);
