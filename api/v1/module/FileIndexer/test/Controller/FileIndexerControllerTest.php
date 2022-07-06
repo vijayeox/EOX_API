@@ -223,7 +223,7 @@ class FileIndexerControllerTest extends ControllerTest
     {
         //Scenario where file id does not exist
         $this->initAuthToken($this->adminUser);
-        $data = ['id' => 101];
+        $data = ['id' => 'd13d0c68-98c9-11e9-adc5-308d99c9145b'];
         $this->dispatch('/fileindexer/remove', 'POST', $data);
         if (enableElastic==0) {
             $mockRestClient = $this->getMockRestClientForFileIndexerService();
@@ -580,4 +580,449 @@ class FileIndexerControllerTest extends ControllerTest
         $this->assertEquals($content['status'], 'error');
         $this->assertEquals($content['message'], 'Failure to Index File ');
     }
+
+
+    public function testCreateWithSearchIndexTrue()
+    {
+        //Scenario where both workflow_instance_id and activity_instance_id exists
+        $this->initAuthToken($this->adminUser);
+        $data = ['id' => 101,'searchIndex' => true];
+        $this->dispatch('/fileindexer', 'POST', $data);
+        if (enableActiveMQ == 0) {
+            $mockMessageProducer = $this->getMockMessageProducer();
+            $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+        }
+        if (enableElastic==0) {
+            $mockRestClient = $this->getMockRestClientForFileIndexerService();
+            $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+              '_index' => 'sampleapp_index',
+              '_type' => '_doc',
+              '_id' => '101',
+              '_version' => 1,
+              '_seq_no' => 0,
+              '_primary_term' => 1,
+              'found' => true,
+              '_source' =>
+              array(
+                'id' => '101',
+                'app_name' => 'SampleApp',
+                'entity_id' => '1',
+                'entity_name' => 'sampleEntity1',
+                'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                'is_active' => '1',
+                'account_id' => '1',
+                'fields' => '{"field1" : "field1text","field3" : "field3text"}',
+                'field3' => 3,
+                'field4' => 4,
+            ),
+          ))));
+        }
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertMatchedRouteName('index');
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data']['id'], $data['id']);
+        $this->assertEquals($content['data']['entityName'], 'sampleEntity1');
+        $this->assertEquals($content['data']['fields'], '{"field1" : "field1text","field3" : "field3text"}');
+    }
+
+    public function testCreateWithSearchIndexFalse()
+    {
+        //Scenario where both workflow_instance_id and activity_instance_id exists
+        $this->initAuthToken($this->adminUser);
+        $data = ['id' => 101,'searchIndex' => false];
+        $this->dispatch('/fileindexer', 'POST', $data);
+        if (enableActiveMQ == 0) {
+            $mockMessageProducer = $this->getMockMessageProducer();
+            $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+        }
+        if (enableElastic==0) {
+            $mockRestClient = $this->getMockRestClientForFileIndexerService();
+            $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+              '_index' => 'sampleapp_index',
+              '_type' => '_doc',
+              '_id' => '101',
+              '_version' => 1,
+              '_seq_no' => 0,
+              '_primary_term' => 1,
+              'found' => true,
+              '_source' =>
+              array(
+                'id' => '101',
+                'app_name' => 'SampleApp',
+                'entity_id' => '1',
+                'entity_name' => 'sampleEntity1',
+                'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                'is_active' => '1',
+                'account_id' => '1',
+                'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                'field3' => 3,
+                'field4' => 4,
+            ),
+          ))));
+        }
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertMatchedRouteName('index');
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data']['id'], $data['id']);
+        $this->assertEquals($content['data']['entityName'], 'sampleEntity1');
+        $this->assertEquals($content['data']['fields'], '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}');
+    }
+
+    public function testCreateWithoutSearchIndex()
+    {
+        //Scenario where both workflow_instance_id and activity_instance_id exists
+        $this->initAuthToken($this->adminUser);
+        $data = ['id' => 101];
+        $this->dispatch('/fileindexer', 'POST', $data);
+        if (enableActiveMQ == 0) {
+            $mockMessageProducer = $this->getMockMessageProducer();
+            $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+        }
+        if (enableElastic==0) {
+            $mockRestClient = $this->getMockRestClientForFileIndexerService();
+            $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+              '_index' => 'sampleapp_index',
+              '_type' => '_doc',
+              '_id' => '101',
+              '_version' => 1,
+              '_seq_no' => 0,
+              '_primary_term' => 1,
+              'found' => true,
+              '_source' =>
+              array(
+                'id' => '101',
+                'app_name' => 'SampleApp',
+                'entity_id' => '1',
+                'entity_name' => 'sampleEntity1',
+                'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                'is_active' => '1',
+                'account_id' => '1',
+                'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                'field3' => 3,
+                'field4' => 4,
+            ),
+          ))));
+        }
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertMatchedRouteName('index');
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data']['id'], $data['id']);
+        $this->assertEquals($content['data']['entityName'], 'sampleEntity1');
+        $this->assertEquals($content['data']['fields'], '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}');
+    }
+
+    public function testIndexFile()
+    {
+        //Scenario where both workflow_instance_id and activity_instance_id exists
+        $this->initAuthToken($this->adminUser);
+        $data = $data = ['uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145b'];
+        $this->dispatch('/fileindexer/file', 'POST', $data);
+        if (enableActiveMQ == 0) {
+            $mockMessageProducer = $this->getMockMessageProducer();
+            $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+        }
+        if (enableElastic==0) {
+            $mockRestClient = $this->getMockRestClientForFileIndexerService();
+            $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+              '_index' => 'sampleapp_index',
+              '_type' => '_doc',
+              '_id' => '101',
+              '_version' => 1,
+              '_seq_no' => 0,
+              '_primary_term' => 1,
+              'found' => true,
+              '_source' =>
+              array(
+                'id' => '101',
+                'app_name' => 'SampleApp',
+                'entity_id' => '1',
+                'entity_name' => 'sampleEntity1',
+                'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                'is_active' => '1',
+                'account_id' => '1',
+                'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                'field1' => 3,
+                'field2' => 4,
+                'field3' => 3,
+                'field4' => 4
+            ),
+          ))));
+        }
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data']['file_uuid'], $data['uuid']);
+        $this->assertEquals($content['data']['entityName'], 'sampleEntity1');
+        $this->assertEquals($content['data']['fields'], '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}');
+    }
+
+    public function testIndexFileWithSearchIndexTrue()
+    {
+        //Scenario where both workflow_instance_id and activity_instance_id exists
+        $this->initAuthToken($this->adminUser);
+        $data = $data = ['uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145b','searchIndex' => true];
+        $this->dispatch('/fileindexer/file', 'POST', $data);
+        if (enableActiveMQ == 0) {
+            $mockMessageProducer = $this->getMockMessageProducer();
+            $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+        }
+        if (enableElastic==0) {
+            $mockRestClient = $this->getMockRestClientForFileIndexerService();
+            $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+              '_index' => 'sampleapp_index',
+              '_type' => '_doc',
+              '_id' => '101',
+              '_version' => 1,
+              '_seq_no' => 0,
+              '_primary_term' => 1,
+              'found' => true,
+              '_source' =>
+              array(
+                'id' => '101',
+                'app_name' => 'SampleApp',
+                'entity_id' => '1',
+                'entity_name' => 'sampleEntity1',
+                'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                'is_active' => '1',
+                'account_id' => '1',
+                'fields' => '{"field1" : "field1text","field3" : "field3text"}',
+                'field1' => 3,
+                'field' => 4,
+            ),
+          ))));
+        }
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data']['file_uuid'], $data['uuid']);
+        $this->assertEquals($content['data']['entityName'], 'sampleEntity1');
+        $this->assertEquals($content['data']['fields'], '{"field1" : "field1text","field3" : "field3text"}');
+    }
+
+    public function testIndexFileWithSearchIndexFalse()
+    {
+        //Scenario where both workflow_instance_id and activity_instance_id exists
+        $this->initAuthToken($this->adminUser);
+        $data = $data = ['uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145b','searchIndex' => false];
+        $this->dispatch('/fileindexer/file', 'POST', $data);
+        if (enableActiveMQ == 0) {
+            $mockMessageProducer = $this->getMockMessageProducer();
+            $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+        }
+        if (enableElastic==0) {
+            $mockRestClient = $this->getMockRestClientForFileIndexerService();
+            $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+              '_index' => 'sampleapp_index',
+              '_type' => '_doc',
+              '_id' => '101',
+              '_version' => 1,
+              '_seq_no' => 0,
+              '_primary_term' => 1,
+              'found' => true,
+              '_source' =>
+              array(
+                'id' => '101',
+                'app_name' => 'SampleApp',
+                'entity_id' => '1',
+                'entity_name' => 'sampleEntity1',
+                'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                'is_active' => '1',
+                'account_id' => '1',
+                'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                'field1' => 3,
+                'field2' => 4,
+                'field3' => 3,
+                'field4' => 4
+            ),
+          ))));
+        }
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['data']['file_uuid'], $data['uuid']);
+        $this->assertEquals($content['data']['entityName'], 'sampleEntity1');
+        $this->assertEquals($content['data']['fields'], '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}');
+    }
+
+    public function testIndexFileWithWrongFileId()
+    {
+        //Scenario where both workflow_instance_id and activity_instance_id exists
+        $this->initAuthToken($this->adminUser);
+        $data = $data = ['uuid' => '68-98c9-11e9-adc5-308d99c9145b','searchIndex' => false];
+        $this->dispatch('/fileindexer/file', 'POST', $data);
+        $content = (array)json_decode($this->getResponse()->getContent(), true);
+        $this->assertResponseStatusCode(404);
+        $this->setDefaultAsserts();
+        $this->assertEquals($content['status'], 'error');
+        $this->assertEquals($content['message'],'Failure to Index File as incorrect uuid is specified');
+    }
+
+    
+    public function testBatchIndexWithSearchIndexTrue()
+        {
+            //Only start date is provided
+            $this->initAuthToken($this->adminUser);
+            $data = ["app_id" => "5965c47d-7bc8-4ae6-ab6c-916c8d78e10f","start_date" => "2019-12-19 11:03:08","searchIndex" => true];
+            $this->dispatch('/fileindexer/batch', 'POST', $data);
+            if (enableElastic==0) {
+                $mockRestClient = $this->getMockRestClientForFileIndexerService();
+                $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+                '_index' => 'sampleapp_index',
+                '_type' => '_doc',
+                '_id' => '102',
+                '_version' => 1,
+                '_seq_no' => 0,
+                '_primary_term' => 1,
+                'found' => true,
+                '_source' =>
+                array(
+                    'id' => '102',
+                    'app_name' => 'SampleApp',
+                    'entity_id' => '1',
+                    'entity_name' => 'sampleEntity1',
+                    'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                    'is_active' => '1',
+                    'account_id' => '1',
+                    'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                    'user_id' => null,
+                    'workflow_instance_id' => '1',
+                    'status' => 'In Progress',
+                    'activity_instance_id' => '[activityInstanceId]',
+                    'workflow_name' => 'Test Workflow 1',
+                    'activities' => '{"Task" : "In Progress","Test Form 2" : "In Progress"}',
+                    'field3' => 3,
+                    'field4' => 4,
+                ),
+                ))));
+                $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/103")->once()->andReturn(array("body" => json_encode(array(
+                '_index' => 'sampleapp_index',
+                '_type' => '_doc',
+                '_id' => '103',
+                '_version' => 5,
+                '_seq_no' => 43,
+                '_primary_term' => 1,
+                'found' => true,
+                '_source' =>
+                array(
+                    'id' => '103',
+                    'app_name' => 'SampleApp',
+                    'entity_id' => '1',
+                    'name' => 'sampleEntity1',
+                    'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145d',
+                    'is_active' => '1',
+                    'account_id' => '1',
+                    'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                    'user_id' => null,
+                    'workflow_instance_id' => null,
+                    'status' => null,
+                    'activity_instance_id' => null,
+                    'workflow_name' => null,
+                    'activities' => null,
+                    'field4' => 4,
+                ),
+                ))));
+            }
+            if (enableActiveMQ == 0) {
+                $mockMessageProducer = $this->getMockMessageProducer();
+                $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+            }
+            $content = (array)json_decode($this->getResponse()->getContent(), true);
+
+            $this->assertResponseStatusCode(200);
+            $this->setDefaultAsserts();
+            $this->assertMatchedRouteName('batchindex');
+            $this->assertEquals($content['status'], 'success');
+            $this->assertEquals($content['data'][0]['id'], 102);
+            $this->assertEquals($content['data'][1]['id'], 103);
+            $this->assertEquals($content['data'][0]['field3'], 3);
+        }
+
+        public function testBatchIndexWithSearchIndexFalse()
+        {
+            //Only start date is provided
+            $this->initAuthToken($this->adminUser);
+            $data = ["app_id" => "5965c47d-7bc8-4ae6-ab6c-916c8d78e10f","start_date" => "2019-12-19 11:03:08","searchIndex" => false];
+            $this->dispatch('/fileindexer/batch', 'POST', $data);
+            if (enableElastic==0) {
+                $mockRestClient = $this->getMockRestClientForFileIndexerService();
+                $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/102")->once()->andReturn(array("body" => json_encode(array(
+                '_index' => 'sampleapp_index',
+                '_type' => '_doc',
+                '_id' => '102',
+                '_version' => 1,
+                '_seq_no' => 0,
+                '_primary_term' => 1,
+                'found' => true,
+                '_source' =>
+                array(
+                    'id' => '102',
+                    'app_name' => 'SampleApp',
+                    'entity_id' => '1',
+                    'entity_name' => 'sampleEntity1',
+                    'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145c',
+                    'is_active' => '1',
+                    'account_id' => '1',
+                    'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                    'user_id' => null,
+                    'workflow_instance_id' => '1',
+                    'status' => 'In Progress',
+                    'activity_instance_id' => '[activityInstanceId]',
+                    'workflow_name' => 'Test Workflow 1',
+                    'activities' => '{"Task" : "In Progress","Test Form 2" : "In Progress"}',
+                    'field3' => 3,
+                    'field4' => 4,
+                ),
+                ))));
+                $mockRestClient->expects('get')->with("localhost:".$this->config['elasticsearch']['port']."/sampleapp_index/_doc/103")->once()->andReturn(array("body" => json_encode(array(
+                '_index' => 'sampleapp_index',
+                '_type' => '_doc',
+                '_id' => '103',
+                '_version' => 5,
+                '_seq_no' => 43,
+                '_primary_term' => 1,
+                'found' => true,
+                '_source' =>
+                array(
+                    'id' => '103',
+                    'app_name' => 'SampleApp',
+                    'entity_id' => '1',
+                    'name' => 'sampleEntity1',
+                    'file_uuid' => 'd13d0c68-98c9-11e9-adc5-308d99c9145d',
+                    'is_active' => '1',
+                    'account_id' => '1',
+                    'fields' => '{"field1" : "field1text","field2" : "field2text","field3" : "field3text","field4" : "field4text"}',
+                    'user_id' => null,
+                    'workflow_instance_id' => null,
+                    'status' => null,
+                    'activity_instance_id' => null,
+                    'workflow_name' => null,
+                    'activities' => null,
+                    'field4' => 4,
+                ),
+                ))));
+            }
+            if (enableActiveMQ == 0) {
+                $mockMessageProducer = $this->getMockMessageProducer();
+                $mockMessageProducer->expects('sendTopic')->with(Mockery::any(), 'elastic')->once()->andReturn();
+            }
+            $content = (array)json_decode($this->getResponse()->getContent(), true);
+            $this->assertResponseStatusCode(200);
+            $this->setDefaultAsserts();
+            $this->assertMatchedRouteName('batchindex');
+            $this->assertEquals($content['status'], 'success');
+            $this->assertEquals($content['data'][0]['id'], 102);
+            $this->assertEquals($content['data'][1]['id'], 103);
+            $this->assertEquals($content['data'][0]['field3'], 3);
+            $this->assertEquals($content['data'][0]['field4'], 4);
+        }
+
 }

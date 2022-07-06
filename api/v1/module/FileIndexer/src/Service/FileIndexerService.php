@@ -29,9 +29,13 @@ class FileIndexerService extends AbstractService
         $this->messageProducer = $messageProducer;
     }
 
-    public function getRelevantDetails($fileId)
+    public function getRelevantDetails($fileId,$searchIndex = false)
     {
         if (isset($fileId)) {
+            $where = "";
+            if($searchIndex){
+                $where = " AND field.search_index = 1 ";
+            }
             $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
             file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,
             CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
@@ -41,7 +45,9 @@ class FileIndexerService extends AbstractService
             INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
             INNER JOIN ox_app as app on entity.app_id = app.id
             INNER JOIN ox_field as field ON field.entity_id = entity.id
-            where file.id = ".$fileId." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
+            where file.id = ".$fileId.$where." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
+
+       
             $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
             $this->logger->info("Executing Query - $select");
             $body=$this->executeQuerywithParams($select)->toArray();
@@ -114,14 +120,14 @@ class FileIndexerService extends AbstractService
     public function deleteDocument($fileUUId)
     {
         $this->logger->info("In FileIndexer Delete. Id:".$fileUUId);
+
         $select = "SELECT file.id as id,app.name as name
         from ox_file as file
         INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
         INNER JOIN ox_app as app on entity.app_id = app.id
-        where file.uuid = :uuid";
+        where file.uuid = '".$fileUUId."'";
         $params = array('uuid' => $fileUUId);
         $response = $this->executeQuerywithBindParameters($select, $params)->toArray();
-
         if (count($response) == 0) {
             return 0;
         }
