@@ -309,7 +309,7 @@ class ActivityInstanceService extends AbstractService
                         if ($candidate['type'] == 'assignee') {
                             $assignee = 1;
                         }
-                        $teamQuery = $this->executeQuerywithParams("SELECT * FROM `ox_role` WHERE `name` = '" . $candidate['roleid'] . "';")->toArray();
+                        $teamQuery = $this->executeQuerywithParams("SELECT * FROM `ox_role` WHERE `name` = '" . $candidate['roleid'] . "' AND account_id = ".$accountId.";")->toArray();
                         if ($teamQuery) {
                             $insert = "INSERT INTO `ox_file_assignee` (`activity_instance_id`,`role_id`)
                             VALUES (:activityInstanceId,:roleId)";

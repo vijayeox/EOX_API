@@ -1,5 +1,4 @@
 <?php
-
 namespace Oxzion\AppDelegate;
 
 use Oxzion\AppDelegate\AppDelegateService;
@@ -16,14 +15,9 @@ trait AppDelegateTrait
         $this->logger = Logger::getLogger(__CLASS__);
     }
 
-    public function setAppIdInAppDelegate($appId)
+    public function setAppDelegateService(AppDelegateService $appDelegateService, $appId)
     {
-        $this->logger->info("SET APP ID");
         $this->appId = $appId;
-    }
-
-    public function setAppDelegateService($appDelegateService)
-    {
         $this->appDelegateService = $appDelegateService;
     }
 
