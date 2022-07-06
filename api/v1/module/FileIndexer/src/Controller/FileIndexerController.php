@@ -53,12 +53,13 @@ namespace FileIndexer\Controller;
             // Get the uuid entered
             $params = $this->extractPostData();
             $uuid  = isset($params['uuid']) ? $params['uuid'] : null;
+            $searchIndex = isset($params['searchIndex']) ? $params['searchIndex'] : false;
             if ($uuid == null) {
                 //Handle no uuid being present
                 return $this->getErrorResponse("uuid must be provided", 404);
             }
             try {
-                $response = $this->fileIndexerService->indexFile($uuid);
+                $response = $this->fileIndexerService->indexFile($uuid,$searchIndex);
                 $this->log->info(FileIndexerController::class.":File has been Indexed");
                 return $this->getSuccessResponseWithData($response);
             }
@@ -104,10 +105,11 @@ namespace FileIndexer\Controller;
             $startdate = isset($params['start_date']) ? $params['start_date'] : null;
             $enddate = isset($params['end_date']) ? $params['end_date'] : null;
             $appUuid = isset($params['app_id']) ? $params['app_id'] : null;
+            $searchIndex = isset($params['searchIndex']) ? $params['searchIndex'] : false;
             $this->log->info(FileIndexerController::class.":Batch indexing ");
             $this->log->info("Params- ".json_encode($params));
             try {
-                $response = $this->fileIndexerService->batchIndexer($appUuid, $startdate, $enddate,array());
+                $response = $this->fileIndexerService->batchIndexer($appUuid, $startdate, $enddate,array(),$searchIndex);
                 if ($response) {
                     $this->log->info(FileIndexerController::class.":Files have been Indexed");
                     return $this->getSuccessResponseWithData($response);
