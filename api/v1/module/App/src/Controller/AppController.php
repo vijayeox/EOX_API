@@ -469,4 +469,18 @@ class AppController extends AbstractApiController
         }
         return $this->getSuccessResponseWithData($result);
     }
+
+    public function getAppFormFieldsAction(){
+        $data = $this->params()->fromRoute();
+        $this->log->info(__CLASS__ . "-> \n Get FormFields- " . print_r($data, true));
+        try {
+            $appUuid = $this->params()->fromRoute()['appId'];
+            $formName = $this->params()->fromRoute()['formName'].'.json';
+            $result = $this->appService->getAppFormFields($formName,$appUuid);
+            return $this->getSuccessResponseWithData($result);
+        } catch (Exception $e) {
+            $this->log->error($e->getMessage(), $e);
+            return $this->exceptionToResponse($e);
+        }
+    }
 }

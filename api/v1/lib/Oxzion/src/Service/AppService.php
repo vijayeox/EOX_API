@@ -1900,4 +1900,30 @@ class AppService extends AbstractService implements AppUpgrade
         $result = $this->executeQueryWithBindParameters($query, $params)->toArray();
         return $result;
     }
+
+    public function getAppFormFields($formName,$appId){
+        $this->logger->info("Get App Form Fields ---".$formName);
+        if(!isset($appId)){
+            throw new ServiceException("Entity not found","entity.not.found",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        }
+        try{
+            $destination = $this->getAppSourceAndDeployDirectory($appId);
+            $appSourceDir = $destination['sourceDir'];
+            $data = array();
+            $data['template'] = file_get_contents($appSourceDir . '/content/forms/' . $formName);
+            $parseForm = $this->formService->parseForm($data,null);
+            $fields = array();
+            foreach($parseForm['fields'] as $key => $value){
+                $field = array();
+                $field['name'] = $value['name'];
+                $field['text'] = $value['text'];
+                $field['data_type'] = $value['data_type'];
+                array_push($fields,$field);
+            }
+        }catch(Exception $e){
+            $this->logger->error($e->getMessage(), $e);
+            throw $e;
+        }
+        return $fields;
+    }
 }

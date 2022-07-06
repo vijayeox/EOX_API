@@ -228,7 +228,7 @@ class FormService extends AbstractService
         return $response[0];
     }
 
-    private function parseForm(&$data, $fieldReference)
+    public function parseForm(&$data, $fieldReference)
     {
         if (isset($data['template']) && is_array($data['template'])) {
             $data['template'] = json_encode($data['template']);
