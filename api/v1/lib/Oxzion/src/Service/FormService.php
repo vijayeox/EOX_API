@@ -179,7 +179,16 @@ class FormService extends AbstractService
     {
         $this->logger->info("EXECUTING GET FORM");
         try {
-            $queryString = "Select name, app_id, uuid from ox_form where uuid=? and isdeleted=?";
+            $queryString = "SELECT
+            of.name,
+            of.app_id,
+            of.uuid,
+            ae.name as entity_name
+          FROM
+            ox_form of
+          JOIN ox_app_entity ae
+           ON of.entity_id = ae.id 
+          where of.uuid=? and of.isdeleted=?";
             $queryParams = array($uuid, 0);
             $this->logger->info("GET FORM QUERY-- $queryString with params--" . print_r($queryParams, true));
             $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();

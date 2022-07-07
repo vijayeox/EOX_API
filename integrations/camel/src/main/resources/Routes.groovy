@@ -43,7 +43,7 @@ routes {
 
 		['from':'activemq:queue:FILE_ADDED', 			'to':["${callback.URL}/callback/file/update"]],
 		['from':'activemq:queue:FILE_UPDATED', 			'to':["${callback.URL}/callback/file/update"]],
-		['from':'activemq:queue:FILE_UPDATED_WITH_UUID','to':["${callback.URL}/fileindexer/file"]],												  
+		['from':'activemq:queue:FILE_UPDATED_WITH_UUID','to':["${callback.URL}/fileindexer/file"]],
 		['from':'activemq:queue:FILE_DELETED', 			'to':["${callback.URL}/fileindexer/remove"]],
 		['from':'activemq:topic:PROCESS_BATCH_INDEX',	'to':["${callback.URL}/fileindexer/batch"]],
 
@@ -53,8 +53,6 @@ routes {
 
 		['from':'activemq:topic:ADD_CALENDAR_EVENT', 	'to':["${callback.URL}/callback/calendar/addevent"]],
 
-		['from':'activemq:topic:SEND_SMS', 				'to':["${callback.URL}/callback/communication/sendsms"]],
-		['from':'activemq:topic:MAKE_CALL', 			'to':["${callback.URL}/callback/communication/makecall"]],
 		['from':'activemq:topic:UPDATE_CHAT_PROFILE_PICTURE', 'to':["${callback.URL}/callback/chat/updateprofilepicture"]]
 	]
 }

@@ -224,7 +224,7 @@ class EsignService extends AbstractService
                 'name' => $signer['participant']['name'],
                 'email' => $signer['participant']['email'],
                 'phone' => empty($signer['participant']['phone']) ? '' : $signer['participant']['phone'],
-                'sms' => empty($signer['participant']['phone']) ? false : (isset($signer['participant']['sms']) ? $signer['participant']['sms'] : true)
+                'sms' => empty($signer['participant']['phone']) ? false : (isset($signer['participant']['sms']) ? $signer['participant']['sms'] : false)
 
             ];
             foreach ($signer['fields'] as $key => $field) {

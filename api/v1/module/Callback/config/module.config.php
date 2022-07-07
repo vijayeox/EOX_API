@@ -342,26 +342,6 @@ return [
                     ],
                 ],
             ],
-            'sendsmsfromcallback' => [
-                'type'    => Segment::class,
-                'options' => [
-                    'route'    => '/callback/communication/sendsms',
-                    'defaults' => [
-                        'controller' => Controller\CommunicationCallbackController::class,
-                        'action' => 'sendSms',
-                    ],
-                ],
-            ],
-            'makecallfromcallback' => [
-                'type'    => Segment::class,
-                'options' => [
-                    'route'    => '/callback/communication/makecall',
-                    'defaults' => [
-                        'controller' => Controller\CommunicationCallbackController::class,
-                        'action' => 'makeCall',
-                    ],
-                ],
-            ],
             'updateProfilePicture' => [
                 'type'    => Segment::class,
                 'options' => [
@@ -371,10 +351,9 @@ return [
                         'action' => 'updateProfilePicture',
                     ],
                 ],
-            ],
-        ],
+            ]
+        ]
     ],
-    
      'view_manager' => [
         // We need to set this up so that we're allowed to return JSON
         // responses from our controller.

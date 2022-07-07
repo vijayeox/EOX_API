@@ -393,16 +393,12 @@ class AccountService extends AbstractService
         if (isset($accountData['uuid'])) {
             
             try {
-                if(empty($this->getAccountIdByUuid($accountData['uuid'])))
-                {
+                if(empty($this->getAccountIdByUuid($accountData['uuid']))) {
                     $this->createAccount($accountData, null);
-                }
-                else
-                {
+                } else {
                     $this->updateAccount($accountData['uuid'], $accountData, null);
-                    return;
                 }
-                
+                return;
             } catch (Exception $e) {
                 if (!$e instanceof EntityNotFoundException) {
                     throw $e;

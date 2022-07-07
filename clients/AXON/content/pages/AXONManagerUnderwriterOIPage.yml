@@ -1,7 +1,0 @@
-name: 'Underwriter'
-description: 'Shows Underwriter OI'
-content:
-    -
-        type: DashboardManager
-        content:
-            uuid: 4044c80f-4d63-45ee-a447-16f49ac88272
