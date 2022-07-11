@@ -108,7 +108,25 @@ menu:
   - name: Manage Policies
     privilege: MANAGE_POLICY_APPROVAL_WRITE
     page: Manage Policies
-      
+entity:
+  -
+    name: dummyEntity1
+    start_date_field: start_date
+    end_date_field: end_date
+    status_field: status
+    subscriber_field: subscriber
+    title: ''
+    enable_documents: false
+    enable_comments: false
+    enable_view: false
+    enable_auditlog: false
+    participantRole:
+        - {  }
+    identifiers:
+        -
+            identifier: email
+    enable_print: false
+    entity_uuid: 04f7ee3f-a759-41b4-b4a3-b1b1f1198016
 workflow:
   - name: Individual Liability
     uuid: f0efea9e-7863-4368-a9b2-baa1a1603067

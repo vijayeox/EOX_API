@@ -66,7 +66,7 @@ role:
 entity:
     -
         name: 'Group Liability'
-        uuid: 444165c1-ae53-4d3e-b111-6cd5f9e8beef
+        entity_uuid: 444165c1-ae53-4d3e-b111-6cd5f9e8beef
         start_date_field: start_date
         end_date_field: end_date
         status_field: policyStatus
@@ -78,7 +78,7 @@ entity:
                 businessRole: 'Policy Holder'
     -
         name: 'Personal Liability'
-        uuid: 034165c1-ae53-4d3e-b111-6cd5f9e8be4e
+        entity_uuid: 034165c1-ae53-4d3e-b111-6cd5f9e8be4e
         start_date_field: start_date
         end_date_field: end_date
         status_field: policyStatus
