@@ -59,6 +59,7 @@ class DocumentBuilder
         if ($options && isset($options['prepend'])) {
             $prepend = $options['prepend'];
         }
+        $options['encoding'] = "utf-8";
 
         if ($options && isset($options['generateOptions'])) {
             $generateOptions = $options['generateOptions'];
@@ -68,7 +69,12 @@ class DocumentBuilder
 
     public function fillPDFForm($template, $data, $destination, bool $flattenFields = false)
     {
-        $templatePath =$this->templateService->getTemplatePath($template, $data);
+        if (strpos($template, DIRECTORY_SEPARATOR) !== false && file_exists($template)) {
+            $templatePath = pathinfo($template, PATHINFO_DIRNAME);
+            $template = basename($template);
+        } else {
+            $templatePath = $this->templateService->getTemplatePath($template, $data);
+        }
         $this->logger->info("fillPDFForm Full Template Path \n" . $templatePath . "/" . $template);
         return $this->documentGenerator->fillPDFForm($templatePath."/".$template, $data, $destination, $flattenFields);
     }
@@ -100,11 +106,11 @@ class DocumentBuilder
         return;
     }
 
-    public function mergePDF(array $sourceArray, $destination, $hasFields = false)
+    public function mergePDF(array $sourceArray, $destination, $hasFields = false, $pdfOptions = [])
     {
         $this->logger->info("Merge documents");
         if ($hasFields) {
-            return $this->documentGenerator->mergePdf($sourceArray, $destination);
+            return $this->documentGenerator->mergePdf($sourceArray, $destination, $pdfOptions);
         } else {
             return $this->documentGenerator->mergeDocuments($sourceArray, $destination);
         }

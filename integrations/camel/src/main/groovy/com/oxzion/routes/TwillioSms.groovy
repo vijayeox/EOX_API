@@ -30,37 +30,34 @@ public class TwillioSms extends RouteBuilder {
 	@Autowired
 	private Environment env
 
-    //@PostConstruct
-	//public void init() {
-		//Twilio.init(env.getProperty("twillio.accountSid"), env.getProperty("twillio.authToken"))
-	//}
-	
+    @PostConstruct
+	public void init() {}
+
 	@Override
 	public void configure() {
-		
-				from("activemq:queue:twillio_sms").doTry().process(new Processor() {
-					public void process(Exchange exchange) throws Exception {
-                        logger.info("Sending twillio sms")
-						def jsonSlurper = new JsonSlurper()
-						def messageIn  = exchange.getIn()
-						def object = jsonSlurper.parseText(exchange.getMessage().getBody() as String)
-						// def messageIn  = exchange.getMessage().getBody() as String
-						logger.info("Processing Email with payload ${object}")
-						//Message message = Message.creator(new PhoneNumber(object.to as String),
-								// new PhoneNumber(env.getProperty("twillio.fromNumber")),
-								// object.body as String).create();
-
-						logger.info("Message sent is "+message.getBody());
-					}
-				}).log("Received body ").doCatch(Exception.class).process(new Processor() {
-					void process(Exchange exchange) throws Exception {
-						Exception exception = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT)
-						def params = [to: 'twillio_sms']
-						def jsonparams = new JsonBuilder(params).toPrettyString()
-						def stackTrace = new JsonBuilder(exception).toPrettyString()
-						ErrorLog.log('activemq_queue',stackTrace,exchange.getMessage().getBody().toString(),jsonparams)
-						System.out.println("handling ex")
-					}
-				})
+		from("activemq:queue:twillio_sms").doTry().process(new Processor() {
+			public void process(Exchange exchange) throws Exception {
+				logger.info("Sending twillio sms")
+				def jsonSlurper = new JsonSlurper()
+				def object = jsonSlurper.parseText(exchange.getMessage().getBody() as String)
+				logger.info("Processing Message with payload ${object}")
+				Twilio.init(object.config.accountSid  as String, object.config.authToken  as String)
+				Message message = Message.creator(
+					new PhoneNumber(object.to as String),
+					new PhoneNumber(object.config.from  as String),
+					object.body as String
+				).create();
+				logger.info("Message sent!");
+			}
+		}).log("Received body ").doCatch(Exception.class).process(new Processor() {
+			void process(Exchange exchange) throws Exception {
+				Exception exception = (Exception) exchange.getProperty(Exchange.EXCEPTION_CAUGHT)
+				def params = [to: 'twillio_sms']
+				def jsonparams = new JsonBuilder(params).toPrettyString()
+				def stackTrace = new JsonBuilder(exception).toPrettyString()
+				ErrorLog.log('activemq_queue', stackTrace,exchange.getMessage().getBody().toString(),jsonparams)
+				System.out.println("handling ex")
+			}
+		})
 	}
 }

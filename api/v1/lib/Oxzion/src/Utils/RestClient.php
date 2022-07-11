@@ -9,9 +9,9 @@ class RestClient
 {
     private $client;
     
-    public function __construct($baseUrl, $params=array())
+    public function __construct($baseUrl, $params = array())
     {
-        $config = ['verify' => false,'timeout'  => 400.0];
+        $config = ['verify' => false,'timeout' => 400.0];
         if (isset($baseUrl)) {
             $config['base_uri'] = $baseUrl;
         }

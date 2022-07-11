@@ -62,7 +62,7 @@ class CleanYml extends AbstractAppDelegate
         }
 
         if ($pageData['type'] == 'Form') {
-            $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId'];
+            $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId', 'readOnly'];
             $pageData = array_intersect_key( $pageData, array_flip( $whitelist ) );
         }
 
@@ -98,6 +98,9 @@ class CleanYml extends AbstractAppDelegate
             $pageData = array_intersect_key( $pageData, array_flip( ['type' ,'content'] ) );
         }
         if ($pageData['type'] == 'RenderButtons'){
+            if(isset($pageData['renderContent'])){
+                $pageData['content'] = $pageData['renderContent'];
+            }
             $pageData = array_intersect_key( $pageData, array_flip( ['renderContent', 'content','type'] ) );
         }
     }
@@ -123,7 +126,7 @@ class CleanYml extends AbstractAppDelegate
                 $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
             }
             if ($newPageData['details'][0]['type'] == 'Form') {
-                $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId'];
+                $whitelist = ['type' ,'template_file','form_id', 'formSource','form_name','parentFileId', 'fileId', 'readOnly'];
                 $newPageData['details'][0] = array_intersect_key( $newPageData['details'][0], array_flip( $whitelist ) );
             }
             if ($newPageData['details'][0]['type'] == 'API') {

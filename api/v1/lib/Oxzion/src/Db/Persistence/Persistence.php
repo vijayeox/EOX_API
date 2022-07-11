@@ -290,12 +290,20 @@ class Persistence extends AbstractService
                 } else {
                     array_push($parsedArray['WHERE'], $expAndOperator);
                 }
-                $exp_const = array("expr_type" => "const", "base_expr" => " 0 )", "sub_tree" => "");
+                $exp_const = array("expr_type" => "const", "base_expr" => " 0 ", "sub_tree" => "");
                 $exp_operator = array("expr_type" => "operator", "base_expr" => "=", "sub_tree" => "");
                 $exp_colref = array("expr_type" => "colref", "base_expr" => $tableAliasName . " . ox_app_account_id", "sub_tree" => "", "no_quotes" =>
                     array( "delim" => "", "parts" => array("0" => "ox_app_account_id") )
                 );
                 array_push($parsedArray['WHERE'], $exp_colref, $exp_operator, $exp_const);
+
+                $exp_const = array("expr_type" => "const", "base_expr" => "null )", "sub_tree" => "");
+                $exp_operator = array("expr_type" => "operator", "base_expr" => "is", "sub_tree" => "");
+                $exp_colref = array("expr_type" => "colref", "base_expr" => $tableAliasName . " . ox_app_account_id", "sub_tree" => "", "no_quotes" =>
+                    array( "delim" => "", "parts" => array("0" => "ox_app_account_id") )
+                );
+                $expOrOperator = array("expr_type" => "operator", "base_expr" => "OR", "sub_tree" => "");
+                array_push($parsedArray['WHERE'], $expOrOperator, $exp_colref, $exp_operator, $exp_const);
             }
         }
         return $parsedArray;
