@@ -29,9 +29,13 @@ class FileIndexerService extends AbstractService
         $this->messageProducer = $messageProducer;
     }
 
-    public function getRelevantDetails($fileId)
+    public function getRelevantDetails($fileId,$searchIndex = false)
     {
         if (isset($fileId)) {
+            $where = "";
+            if($searchIndex){
+                $where = " AND field.search_index = 1 ";
+            }
             $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
             file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,
             CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
@@ -41,7 +45,9 @@ class FileIndexerService extends AbstractService
             INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
             INNER JOIN ox_app as app on entity.app_id = app.id
             INNER JOIN ox_field as field ON field.entity_id = entity.id
-            where file.id = ".$fileId." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
+            where file.id = ".$fileId.$where." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
+
+       
             $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
             $this->logger->info("Executing Query - $select");
             $body=$this->executeQuerywithParams($select)->toArray();
@@ -70,9 +76,13 @@ class FileIndexerService extends AbstractService
         }
     }
 
-    public function indexFile($fileUuid)
+    public function indexFile($fileUuid,$searchIndex = false)
     {
         //Get all file data and relevant parameters
+        $where = "";
+        if($searchIndex){
+            $where = " AND field.search_index = 1";
+        }
         $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
             file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,file.date_created,file.date_modified,
             CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
@@ -82,7 +92,7 @@ class FileIndexerService extends AbstractService
             INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
             INNER JOIN ox_app as app on entity.app_id = app.id
             INNER JOIN ox_field as field ON field.entity_id = entity.id
-            where file.uuid = :uuid";
+            where file.uuid = :uuid".$where;
         $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
         $params = array('uuid' => $fileUuid);
         $result = $this->executeQuerywithBindParameters($select, $params)->toArray();
@@ -92,11 +102,15 @@ class FileIndexerService extends AbstractService
 
         if (isset($result[0]) && isset($result[0]['id'])) {
             $app_name = $result[0]['app_name'];
-            $indexedData = $this->getAllFieldsWithCorrespondingValues($result[0]);
-            $this->logger->info("\nINDEXED DATA :".print_r($indexedData, true));
-            //Sending it to the elastic queue
-            $this->messageProducer->sendQueue(json_encode(array('index'=>  $app_name.'_index','body' => $indexedData,'id' => $indexedData['id'], 'operation' => 'Index', 'type' => '_doc')), 'elastic');
-            return $indexedData;
+            if ($result[0]['fields'] != "") {
+                $indexedData = $this->getAllFieldsWithCorrespondingValues($result[0],$searchIndex);
+                $this->logger->info("\nINDEXED DATA :".print_r($indexedData, true));
+                //Sending it to the elastic queue
+                $this->messageProducer->sendQueue(json_encode(array('index'=>  $app_name.'_index','body' => $indexedData,'id' => $indexedData['id'], 'operation' => 'Index', 'type' => '_doc')), 'elastic');
+                return $indexedData;
+            }else{
+                throw new ServiceException("Incorrect file uuid specified", "file.uuid.incorrect");
+            }
         } else {
             // Handle empty file data in case of some error
             throw new ServiceException("Incorrect file uuid specified", "file.uuid.incorrect");
@@ -106,14 +120,14 @@ class FileIndexerService extends AbstractService
     public function deleteDocument($fileUUId)
     {
         $this->logger->info("In FileIndexer Delete. Id:".$fileUUId);
+
         $select = "SELECT file.id as id,app.name as name
         from ox_file as file
         INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
         INNER JOIN ox_app as app on entity.app_id = app.id
-        where file.uuid = :uuid";
+        where file.uuid = '".$fileUUId."'";
         $params = array('uuid' => $fileUUId);
         $response = $this->executeQuerywithBindParameters($select, $params)->toArray();
-
         if (count($response) == 0) {
             return 0;
         }
@@ -127,7 +141,7 @@ class FileIndexerService extends AbstractService
         return null;
     }
 
-    public function batchIndexer($appUuid, $startdate = null, $enddate = null, array $batchSizeMap)
+    public function batchIndexer($appUuid, $startdate = null, $enddate = null, array $batchSizeMap,$searchIndex = false)
     {
         $batchSize = $this->config['batch_size'];
 
@@ -160,7 +174,7 @@ class FileIndexerService extends AbstractService
                 foreach ($batches as $batch) {
                     $fileIdsArray = $batch;
                     $fileIds = implode(',', $batch);
-                    $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
+                    $bodys = $this->getFileDataFromFileIds($appID,$fileIds,$searchIndex);
                     $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
                     if($arraySize > 6500000) {
                         $differentialFactor = $arraySize / 6500000;
@@ -169,7 +183,7 @@ class FileIndexerService extends AbstractService
                         $newBatches = array_chunk($batch,$newBatchSize);
                         foreach ($newBatches as $newBatch) {
                             $fileIds = implode(',',$newBatch);
-                            $bodys = $this->getFileDataFromFileIds($appID,$fileIds);
+                            $bodys = $this->getFileDataFromFileIds($appID,$fileIds,$searchIndex);
                             $arraySize = mb_strlen(serialize((array)$bodys), '8bit');
                             $this->logger->info("The new array size is --$arraySize");
                             $this->sendDataToElasticForBulk($fileIds,$bodys,$appID);
@@ -191,19 +205,23 @@ class FileIndexerService extends AbstractService
         }
     }
 
-    private function getFileDataFromFileIds($appID,$fileIds) {
+    private function getFileDataFromFileIds($appID,$fileIds,$searchIndex) {
+        $where = "";
+        if($searchIndex){
+            $where = " AND field.search_index = 1 ";
+        }
         $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entity_name,file.data as file_data, file.uuid as file_uuid, file.is_active,file.account_id,CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
         from ox_file as file
         left join ox_file_participant ofp on ofp.file_id = file.id
         INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
         INNER JOIN ox_app as app on entity.app_id = app.id
         INNER JOIN ox_field as field ON field.entity_id = entity.id
-        where file.id in (".$fileIds.") AND app.id =".$appID." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
+        where file.id in (".$fileIds.") AND app.id =".$appID.$where." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
         $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
         $this->logger->info("Executing Query - $select");
         $bodys=$this->executeQuerywithParams($select)->toArray();
         foreach ($bodys as $key => $value) {
-            $bodys[$key] = $this->getAllFieldsWithCorrespondingValues($value);
+            $bodys[$key] = $this->getAllFieldsWithCorrespondingValues($value,$searchIndex);
         }
         return $bodys;
     }
@@ -282,7 +300,7 @@ class FileIndexerService extends AbstractService
         }
     }
 
-    public function getAllFieldsWithCorrespondingValues($result)
+    public function getAllFieldsWithCorrespondingValues($result,$searchIndex = false)
     {
         $entityId = $result['entity_id'];
         $app_name = $result['app_name'];
@@ -290,8 +308,12 @@ class FileIndexerService extends AbstractService
         if($result['participants']){
             $result['participants'] = json_decode($result['participants'], true);;
         }
+        $where = "";
+        if($searchIndex){
+            $where = " AND search_index = 1";
+        }
         //get all fields for a particular entity
-        $selectFields = "Select name,data_type from ox_field where entity_id = :entity_id AND parent_id IS NULL AND data_type NOT IN ('file') AND isdeleted = 0";
+        $selectFields = "Select name,data_type from ox_field where entity_id = :entity_id AND parent_id IS NULL AND data_type NOT IN ('file') AND isdeleted = 0".$where;
         $params = array('entity_id' => $entityId);
         $fieldResult = $this->executeQuerywithBindParameters($selectFields, $params)->toArray();
         $fieldArray = array_column($fieldResult, 'data_type','name');
