@@ -59,8 +59,8 @@ class ErrorHandler
                 'message' => $exception->getMessage(),
                 'stacktrace' => $exception->getTraceAsString()
             );
+            self::$logger->error(print_r($exceptionJson, true));
         }
-        self::$logger->error(print_r($exceptionJson, true));
         
         // if(isset($_ENV['ENV']) && strtolower($_ENV['ENV']) != 'production'){
         $errorJson['error'] = $error;
