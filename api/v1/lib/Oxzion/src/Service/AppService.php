@@ -205,7 +205,18 @@ class AppService extends AbstractService implements AppUpgrade
                 return $appSourceDir . '/view/apps/eoxapps';
             }
         }
-        return $this->loadAppDescriptor($appSourceDir);
+        $appData = $this->loadAppDescriptor($appSourceDir);
+
+        $entity = isset($appData['entity']) ? $appData['entity'] : null;
+        if(isset($entity) && sizeof($entity) > 0){
+            foreach($entity as $key => $value){
+                if(!isset($value['entity_uuid'])){
+                    $appData['entity'][$key]['entity_uuid'] = $this->entityService->getEntityByName($uuid, $value['name'])['uuid'];  
+                }
+            }
+        }
+        return $appData;
+        
     }
 
     public function createApp(&$data)
@@ -867,8 +878,7 @@ class AppService extends AbstractService implements AppUpgrade
                 $data = $form;
                 $entity = $this->entityService->getEntityByName($appUuid, $data['entity']);
                 if (!$entity) {
-                    $entity = array('name' => $data['entity']);
-                    $result = $this->entityService->saveEntity($appUuid, $entity);
+                    throw new ServiceException($data['entity'].' entity not found for the app '.$appUuid, 'ENTITY_NOT_FOUND', 0);
                 }
                 $data['entity_id'] = $entity['id'];
                 if (isset($data['template_file'])) {
@@ -1023,8 +1033,7 @@ class AppService extends AbstractService implements AppUpgrade
                 if ($result == 0) {
                     $entity = $this->entityService->getEntityByName($yamlData['app']['uuid'], $entityName);
                     if (!$entity) {
-                        $entity = array('name' => $entityName);
-                        $result = $this->entityService->saveEntity($yamlData['app']['uuid'], $entity);
+                        throw new ServiceException($entityName.' entity not found for the app '.$appUuid, 'ENTITY_NOT_FOUND', 0);
                     }
                     if (isset($value['uuid']) && isset($entity['id'])) {
                         $bpmnFilePath = $path . "content/workflows/" . $value['bpmn_file'];
@@ -1593,8 +1602,21 @@ class AppService extends AbstractService implements AppUpgrade
                 $entity = $entityData;
                 $entity['generic_attachment_config'] = json_encode(array("attachmentField" => isset($entity['chatAttachmentField']) ? $entity['chatAttachmentField'] : ""));
                 $entity['assoc_id'] = $assoc_id;
-                $entityRec = $this->entityService->getEntityByName($appId, $entity['name']);
+                $entityRec = null;
+                if(isset($entity['entity_uuid'])){
+                    try{
+                        $entityRec = $this->entityService->getEntity($entity['entity_uuid'],$appId);
+                    }catch(Exception $e){
+                        $entityRec = null;
+                    }
+                }
+                
+                if(!$entityRec){
+                    $entityRec = $this->entityService->getEntityByName($appId, $entity['name']);
+                }
+
                 if (!$entityRec) {
+                    $entity['uuid'] = isset($entity['entity_uuid']) ? $entity['entity_uuid'] : null;
                     $result = $this->entityService->saveEntity($appId, $entity);
                 } else {
                     $entity['id'] = $entityRec['id'];
