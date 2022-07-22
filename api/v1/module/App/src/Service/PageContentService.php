@@ -71,7 +71,7 @@ class PageContentService extends AbstractService
         try {
             $select = "DELETE from ox_page_content where page_id =?";
             $deleteQuery = array($pageId);
-            $result = $this->executeQuerywithBindParameters($select, $deleteQuery);
+            $this->executeQuerywithBindParameters($select, $deleteQuery);
             foreach ($data as $key => $value) {
                 if (isset($value['form_id']) && (empty($value['form_id']) || $value['form_id'] == '')) {
                     unset($value['form_id']);

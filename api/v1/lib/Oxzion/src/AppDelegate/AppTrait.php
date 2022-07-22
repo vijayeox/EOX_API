@@ -48,4 +48,8 @@ trait AppTrait
         return $this->appService->getAppFormFields($formName,$appId);
     }
 
+    protected function getAppFormProperties($formName,$appId){
+        return $this->appService->getAppFormProperties($formName,$appId);
+    }
+
 }
