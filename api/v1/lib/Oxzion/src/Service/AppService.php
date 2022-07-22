@@ -1940,6 +1940,7 @@ class AppService extends AbstractService implements AppUpgrade
                 $field['name'] = $value['name'];
                 $field['text'] = $value['text'];
                 $field['data_type'] = $value['data_type'];
+                $field['search_index']=false;
                 array_push($fields,$field);
             }
         }catch(Exception $e){
