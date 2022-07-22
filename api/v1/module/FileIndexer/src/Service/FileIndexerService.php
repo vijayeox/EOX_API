@@ -37,14 +37,16 @@ class FileIndexerService extends AbstractService
                 $where = " AND field.search_index = 1 ";
             }
             $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
-            file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,
+            file.data as file_data, file.uuid as file_uuid, file.version , file.is_active, file.account_id,
             CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
-            CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
+            CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants,
+            CONCAT('{' , '\"', 'form', '\" :\"' , GROUP_CONCAT(DISTINCT(form.uuid)), '\"}') as form_data
             from ox_file as file
             left join ox_file_participant ofp on ofp.file_id = file.id
             INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
             INNER JOIN ox_app as app on entity.app_id = app.id
             INNER JOIN ox_field as field ON field.entity_id = entity.id
+            INNER JOIN ox_form AS form ON form.entity_id = file.entity_id 
             where file.id = ".$fileId.$where." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
 
        
@@ -84,15 +86,17 @@ class FileIndexerService extends AbstractService
             $where = " AND field.search_index = 1";
         }
         $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entityName,
-            file.data as file_data, file.uuid as file_uuid, file.is_active, file.account_id,file.date_created,file.date_modified,
-            CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
-            CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
-            from ox_file as file
-            left join ox_file_participant ofp on ofp.file_id = file.id
-            INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
-            INNER JOIN ox_app as app on entity.app_id = app.id
-            INNER JOIN ox_field as field ON field.entity_id = entity.id
-            where file.uuid = :uuid".$where;
+        file.data as file_data, file.uuid as file_uuid, file.is_active, file.version, file.account_id,file.date_created,file.date_modified,
+        CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,
+        CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants,
+        CONCAT('{' , '\"', 'form', '\" :\"' , GROUP_CONCAT(DISTINCT(form.uuid)), '\"}') as form_data
+        from ox_file as file
+        left join ox_file_participant ofp on ofp.file_id = file.id
+        INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
+        INNER JOIN ox_app as app on entity.app_id = app.id
+        INNER JOIN ox_field as field ON field.entity_id = entity.id
+        INNER JOIN ox_form AS form ON form.entity_id = file.entity_id 
+        where file.uuid = :uuid".$where;
         $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
         $params = array('uuid' => $fileUuid);
         $result = $this->executeQuerywithBindParameters($select, $params)->toArray();
@@ -210,12 +214,14 @@ class FileIndexerService extends AbstractService
         if($searchIndex){
             $where = " AND field.search_index = 1 ";
         }
-        $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, entity.name as entity_name,file.data as file_data, file.uuid as file_uuid, file.is_active,file.account_id,CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants
+        $select = "SELECT file.id as id,app.name as app_name, entity.id as entity_id, file.version , entity.name as entity_name,file.data as file_data, file.uuid as file_uuid, file.is_active,file.account_id,CONCAT('{', GROUP_CONCAT(CONCAT('\"', field.name, '\" : \"',COALESCE(field.text, field.name),'\"') SEPARATOR ','), '}') as fields,CONCAT('[',GROUP_CONCAT(DISTINCT ofp.account_id SEPARATOR ','),']') as participants,
+        CONCAT('{' , '\"', 'form', '\" :\"' , GROUP_CONCAT(DISTINCT(form.uuid)), '\"}') as form_data
         from ox_file as file
         left join ox_file_participant ofp on ofp.file_id = file.id
         INNER JOIN ox_app_entity as entity ON file.entity_id = entity.id
         INNER JOIN ox_app as app on entity.app_id = app.id
         INNER JOIN ox_field as field ON field.entity_id = entity.id
+        INNER JOIN ox_form AS form ON form.entity_id = file.entity_id
         where file.id in (".$fileIds.") AND app.id =".$appID.$where." GROUP BY file.id,app_name,entity.id, entity.name,file_data,file_uuid,file.is_active, file.account_id";
         $this->runGenericQuery("SET SESSION group_concat_max_len = 1000000;");
         $this->logger->info("Executing Query - $select");
