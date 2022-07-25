@@ -17,7 +17,7 @@ class LoadAppData extends AbstractAppDelegate
     public function execute(array $data, Persistence $persistenceService)
     {
         $this->logger->info("Data in the delegate LoadAppData----".print_r($data,true));
-        if (isset($data['app']['uuid'])) {
+        if (isset($data['app']['uuid']) && $data['app']['uuid'] != "") {
             $data['listOFForms']  =  $this->getArtifacts($data['app']['uuid'], 'form');  
             $data['listOFWorkflows']  =  $this->getArtifacts($data['app']['uuid'], 'workflow');
             if(!empty($data['pages'])) { 
