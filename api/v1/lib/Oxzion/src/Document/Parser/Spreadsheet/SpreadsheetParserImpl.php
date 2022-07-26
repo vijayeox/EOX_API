@@ -73,15 +73,13 @@ class SpreadsheetParserImpl implements SpreadsheetParser
     *   filter (SpreadsheetFilter) - Optional to filter out columns or rows.
     *
     */
-    public function parseDocument(array $parserOptions = array())
+    public function parseDocument(array $parserOptions = [])
     {
-        if (isset($parserOptions['worksheet'])) {
-            $worksheet = $parserOptions['worksheet'];
-            if (is_string($worksheet)) {
-                $worksheet = array($worksheet);
-            }
+        if (!empty($parserOptions['worksheet'])) {
+            $worksheet = ($parserOptions['worksheet'] === 'ALL_SHEETS') ? $this->getSheetNames() : $parserOptions['worksheet'];
+            if (!is_array($worksheet)) $worksheet = [$worksheet];
         } else {
-            $worksheet = array($this->getSheetNames()[0]);
+            $worksheet = [current($this->getSheetNames())];
         }
         $rowMapper = null;
         if (isset($parserOptions['rowMapper'])) {
@@ -108,7 +106,9 @@ class SpreadsheetParserImpl implements SpreadsheetParser
             $spreadsheet = $this->reader->load($this->file);
             $worksheetData = $spreadsheet->getActiveSheet();
 
-            if ($rowMapper) {
+            if (!empty($parserOptions['range']) && !empty($parserOptions['range'][$sheetName])) {
+                $data[$sheetName] = $worksheetData->rangeToArray($parserOptions['range'][$sheetName]);
+            } elseif ($rowMapper) {
                 $list = $worksheetData->toArray();
                 foreach ($list as $index => $rowData) {
                     $rowMapper->mapRow($rowData);
