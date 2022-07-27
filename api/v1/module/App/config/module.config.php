@@ -1130,6 +1130,34 @@ return [
                     ],
                 ],
             ],
+            'appRolePrivilege' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId[/account/:accountId]/appRolePrivilege',
+                    'defaults' => [
+                        'controller' => Controller\AppController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppRolePrivilege',
+                        'access' => [
+                            'getAppRolePrivilege' => ['MANAGE_ROLE_READ'],
+                        ],
+                    ],
+                ],
+            ],
+            'getAppFormFields' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/app/:appId/form/:formName/fields',
+                    'defaults' => [
+                        'controller' => Controller\AppController::class,
+                        'method' => 'GET',
+                        'action' => 'getAppFormFields',
+                        'access' => [
+                            // SET ACCESS CONTROL
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [

@@ -8,11 +8,13 @@ class SOAPUtils extends \SoapClient
 {
     private $xml;
     private $options;
+    public static $logger;
 
     public function __construct(String $wsdl, Array $options = [])
     {
-        parent::__construct($wsdl, $options);
+        parent::__construct($wsdl, $options /* + ['trace' => true] */);
         $this->processXml($wsdl, $options);
+        self::$logger = \Logger::getLogger(__CLASS__);
     }
 
     public function setHeader(string $namespace, string $name, $data, bool $mustUnderstand = false)
@@ -35,14 +37,32 @@ class SOAPUtils extends \SoapClient
         $this->setHeader('http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd', 'Security', $soapVar, true);
     }
 
-    public function makeCall(string $function, array $data = [], bool $clean = true)
+    public function makeCall(string $function, array $data = [], bool $clean = true, bool $validate = true)
     {
-        if ($errors = $this->getValidData($function, $data)) {
+        // $orgData = $data;
+        if ($validate && ($errors = $this->getValidData($function, $data))) {
             throw new ServiceException(json_encode($errors), 'validation.errors', OxServiceException::ERR_CODE_NOT_ACCEPTABLE);
         }
         try {
+            self::$logger->info(get_class()." SOAPCall ".$function." - " . json_encode($data));
             $response = $this->{$function}($data);
+            self::$logger->info(get_class()." SOAPCall response ".$function." - " . json_encode($response));
+            // if ($function == "AddQuoteWithAutocalculateDetails") {
+            //     echo "<pre>";print_r([
+            //         "function" => $function,
+            //         "data" => $data,
+            //         // "orgData" => $orgData,
+            //         // 'functionStruct' => $this->getFunctionStruct($function),
+            //         "client" => $this,
+            //         // "response" => $this->{$function}($data)
+            //     ]);
+            //     exit;
+            // } else {
+            //     $response = $this->{$function}($data);
+            // }
         } catch (\Exception $e) {
+            // echo "<pre>";print_r(["function" => $function,"data" => $data]);exit;
+            self::$logger->info(get_class()." SOAPCall Exception ".$function." - " . print_r($e->getMessage(), true));
             throw new ServiceException($e->getMessage(), 'soap.call.errors', OxServiceException::ERR_CODE_INTERNAL_SERVER_ERROR);
         }
         if ($clean) {
@@ -91,11 +111,11 @@ class SOAPUtils extends \SoapClient
             if (!isset($data[$key])) {
                 if (!$value['required']) continue;
                 $errors[$key] = 'Required Field';
-            } elseif (isset($value['nillable']) && !$value['nillable'] && !$data[$key]) {
+            } elseif (isset($value['nillable']) && !$value['nillable'] && (!$data[$key] && !is_bool($data[$key]))) {
                 $errors[$key] = 'Value cannot be Nill';
             } else {
                 if (!empty($value['type'])) {
-                    switch ($value['type']) {
+                    switch (strtolower($value['type'])) {
                         case 'enumeration':
                             $tempData = ['data' => $data[$key], 'options' => $value['enumeration']];
                             $valid = ValidationUtils::isValid('inArray', $tempData, true);
@@ -103,6 +123,8 @@ class SOAPUtils extends \SoapClient
                         case 'pattern':
                             $tempData = ['data' => $data[$key], 'regex' => '/'.$value['pattern'].'/m'];
                             $valid = ValidationUtils::isValid('regex', $tempData, true);
+                            break;
+                        case 'base64binary':
                             break;
                         default:
                             $valid = ValidationUtils::isValid($value['type'], $data[$key], true);

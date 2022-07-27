@@ -20,6 +20,7 @@ use Oxzion\InvalidParameterException;
 use Oxzion\Messaging\MessageProducer;
 use Oxzion\Model\App;
 use Oxzion\Model\AppTable;
+use Oxzion\OxServiceException;
 use Oxzion\ServiceException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\AppRegistryService;
@@ -170,7 +171,7 @@ class AppService extends AbstractService implements AppUpgrade
         WHERE ar.account_id=:accountId AND ap.status <> :status AND ap.name <> \'' . AppService::EOX_RESERVED_APP_NAME . '\'';
         $queryParams = [
             'accountId' => AuthContext::get(AuthConstants::ACCOUNT_ID),
-            'status' => App::DELETED,
+            'status' => App::DELETED
         ];
         $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
         if (empty($resultSet)) {
@@ -189,7 +190,7 @@ class AppService extends AbstractService implements AppUpgrade
         $queryParams = [
             'accountId' => AuthContext::get(AuthConstants::ACCOUNT_ID),
             'statusDeleted' => App::DELETED,
-            'uuid' => $uuid,
+            'uuid' => $uuid
         ];
         $resultSet = $this->executeQueryWithBindParameters($queryString, $queryParams)->toArray();
         if (is_null($resultSet) || empty($resultSet)) {
@@ -204,7 +205,18 @@ class AppService extends AbstractService implements AppUpgrade
                 return $appSourceDir . '/view/apps/eoxapps';
             }
         }
-        return $this->loadAppDescriptor($appSourceDir);
+        $appData = $this->loadAppDescriptor($appSourceDir);
+
+        $entity = isset($appData['entity']) ? $appData['entity'] : null;
+        if(isset($entity) && sizeof($entity) > 0){
+            foreach($entity as $key => $value){
+                if(!isset($value['entity_uuid'])){
+                    $appData['entity'][$key]['entity_uuid'] = $this->entityService->getEntityByName($uuid, $value['name'])['uuid'];  
+                }
+            }
+        }
+        return $appData;
+        
     }
 
     public function createApp(&$data)
@@ -215,7 +227,7 @@ class AppService extends AbstractService implements AppUpgrade
             'type' => App::MY_APP,
             'isdefault' => false,
             'category' => 'Unassigned',
-            'status' => App::IN_DRAFT,
+            'status' => App::IN_DRAFT
         ]);
         //Assign user input values AFTER assigning default values.
         $appData = $data['app'];
@@ -726,8 +738,10 @@ class AppService extends AbstractService implements AppUpgrade
         if (isset($yamlData['job'])) {
             $appUuid = $yamlData['app']['uuid'];
             $this->processDeletedJobs($yamlData['job'], $appUuid);
-            foreach ($yamlData['job'] as $data) {
+            foreach ($yamlData['job'] as &$job) {
                 try {
+                    $job['uuid'] = isset($job['uuid']) ? $job['uuid'] : UuidUtil::uuid();
+                    $data = $job;
                     if (!isset($data['name']) || !isset($data['url']) || !isset($data['uuid']) || !isset($data['cron'])) {
                         throw new ServiceException('Job Name/url/uuid/cron not specified', 'job.details.not.specified');
                     }
@@ -864,8 +878,7 @@ class AppService extends AbstractService implements AppUpgrade
                 $data = $form;
                 $entity = $this->entityService->getEntityByName($appUuid, $data['entity']);
                 if (!$entity) {
-                    $entity = array('name' => $data['entity']);
-                    $result = $this->entityService->saveEntity($appUuid, $entity);
+                    throw new ServiceException($data['entity'].' entity not found for the app '.$appUuid, 'ENTITY_NOT_FOUND', 0);
                 }
                 $data['entity_id'] = $entity['id'];
                 if (isset($data['template_file'])) {
@@ -1020,8 +1033,7 @@ class AppService extends AbstractService implements AppUpgrade
                 if ($result == 0) {
                     $entity = $this->entityService->getEntityByName($yamlData['app']['uuid'], $entityName);
                     if (!$entity) {
-                        $entity = array('name' => $entityName);
-                        $result = $this->entityService->saveEntity($yamlData['app']['uuid'], $entity);
+                        throw new ServiceException($entityName.' entity not found for the app '.$appUuid, 'ENTITY_NOT_FOUND', 0);
                     }
                     if (isset($value['uuid']) && isset($entity['id'])) {
                         $bpmnFilePath = $path . "content/workflows/" . $value['bpmn_file'];
@@ -1055,18 +1067,18 @@ class AppService extends AbstractService implements AppUpgrade
             [
                 "type" => "app",
                 "sourceFolder" => $appPath . "view/apps/",
-                "viewLink" => $this->config['APPS_FOLDER'],
+                "viewLink" => $this->config['APPS_FOLDER']
             ],
             [
                 "type" => "theme",
                 "sourceFolder" => $appPath . "view/themes/",
-                "viewLink" => $this->config['THEME_FOLDER'],
+                "viewLink" => $this->config['THEME_FOLDER']
             ],
             [
                 "type" => "gui",
                 "sourceFolder" => $appPath . "view/gui/",
-                "viewLink" => $this->config['GUI_FOLDER'],
-            ],
+                "viewLink" => $this->config['GUI_FOLDER']
+            ]
         );
         $buildFolders = [];
         foreach ($defaultFolders as $folderConfig) {
@@ -1098,7 +1110,7 @@ class AppService extends AbstractService implements AppUpgrade
                             $this->setupLink($targetName, $linkName);
                             array_push($buildFolders, [
                                 "path" => $targetName,
-                                "type" => $folderConfig["type"],
+                                "type" => $folderConfig["type"]
                             ]);
                         }
                     }
@@ -1109,8 +1121,12 @@ class AppService extends AbstractService implements AppUpgrade
         if (count($buildFolders) > 0) {
             array_push($buildFolders, [
                 "path" => $this->config['APPS_FOLDER'] . "../bos/",
-                "type" => "bos",
+                "type" => "bos"
             ]);
+            $this->logger->info("\nRunning App installer (View) - " . json_encode(
+                ["folders" => $buildFolders],
+                JSON_PRETTY_PRINT
+            ));
             $restClient = $this->restClient;
             $output = json_decode($restClient->post(
                 ($this->config['applicationUrl'] . "/installer"),
@@ -1467,7 +1483,7 @@ class AppService extends AbstractService implements AppUpgrade
         $app->assign([
             'status' => App::DELETED,
             'name' => $app->toArray()['id'] . '_' . $app->toArray()['name'],
-            'uuid' => UuidUtil::uuid(),
+            'uuid' => UuidUtil::uuid()
         ]);
         try {
             $this->beginTransaction();
@@ -1532,7 +1548,7 @@ class AppService extends AbstractService implements AppUpgrade
                     $appObj->assign([
                         'start_options' => isset($app['options']) ? json_encode($app['options']) : null,
                         'status' => App::PUBLISHED,
-                        'type' => App::PRE_BUILT,
+                        'type' => App::PRE_BUILT
                     ]);
                     $appObj->setCreatedBy(1);
                     $appObj->setCreatedDate(date('Y-m-d H:i:s'));
@@ -1586,8 +1602,21 @@ class AppService extends AbstractService implements AppUpgrade
                 $entity = $entityData;
                 $entity['generic_attachment_config'] = json_encode(array("attachmentField" => isset($entity['chatAttachmentField']) ? $entity['chatAttachmentField'] : ""));
                 $entity['assoc_id'] = $assoc_id;
-                $entityRec = $this->entityService->getEntityByName($appId, $entity['name']);
+                $entityRec = null;
+                if(isset($entity['entity_uuid'])){
+                    try{
+                        $entityRec = $this->entityService->getEntity($entity['entity_uuid'],$appId);
+                    }catch(Exception $e){
+                        $entityRec = null;
+                    }
+                }
+                
+                if(!$entityRec){
+                    $entityRec = $this->entityService->getEntityByName($appId, $entity['name']);
+                }
+
                 if (!$entityRec) {
+                    $entity['uuid'] = isset($entity['entity_uuid']) ? $entity['entity_uuid'] : null;
                     $result = $this->entityService->saveEntity($appId, $entity);
                 } else {
                     $entity['id'] = $entityRec['id'];
@@ -1643,7 +1672,7 @@ class AppService extends AbstractService implements AppUpgrade
                 }
                 $individualEntry = array(
                     'workflow_id' => $workflowId,
-                    'entity_id' => $entityData['id'],
+                    'entity_id' => $entityData['id']
                 );
                 array_push($data, $individualEntry);
             }
@@ -1793,7 +1822,7 @@ class AppService extends AbstractService implements AppUpgrade
         $request = array();
         array_push($request, [
             "path" => $this->config['APPS_FOLDER'] . "../bos/",
-            "type" => "bos",
+            "type" => "bos"
         ]);
         $restClient = $this->restClient;
         $output = json_decode($restClient->post(
@@ -1856,5 +1885,68 @@ class AppService extends AbstractService implements AppUpgrade
     public function getAppBusinessRole($appId)
     {
         return $this->businessRoleService->getBusinessRoleByName($appId);
+    }
+
+    public function getAppRolePrivilege($data)
+    {
+        $appId = $accountId = null;
+        $additionalClause = '';
+        $params = array();
+        if(isset($data['appId']) && UuidUtil::isValidUuid($data['appId'])) {
+            $appId = $this->getIdFromUuid('ox_app',$data['appId']);
+            $params['appId'] = $appId;
+        } else {
+            throw new ServiceException("Incorrect app id specified","incorrect.app.id",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        }
+
+        if(isset($data['accountId'])) {
+            if(UuidUtil::isValidUuid($data['accountId'])) {
+                $accountId = $this->getIdFromUuid('ox_account',$data['accountId']);
+                if($accountId === '') {
+                    throw new ServiceException("Incorrect account id specified","incorrect.account.id",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+                }
+                $additionalClause = " AND ox_role_privilege.account_id =:accountId";
+                $params['accountId'] = $accountId;
+            } else {
+                throw new ServiceException("Incorrect account id specified","incorrect.account.id",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+            }
+        }
+
+        $query = "SELECT ox_role_privilege.id,ox_role_privilege.role_id, 
+                ox_role.name as role_name,ox_role_privilege.privilege_name,ox_role_privilege.permission,ox_role_privilege.account_id, ox_role_privilege.app_id,ox_app.name
+                from ox_role_privilege
+                left join ox_app on ox_role_privilege.app_id = ox_app.id
+                inner join ox_role on ox_role.id = ox_role_privilege.role_id
+                where ox_role_privilege.app_id = :appId ".$additionalClause."
+                order by ox_role_privilege.role_id";
+        $result = $this->executeQueryWithBindParameters($query, $params)->toArray();
+        return $result;
+    }
+
+    public function getAppFormFields($formName,$appId){
+        $this->logger->info("Get App Form Fields ---".$formName);
+        if(!isset($appId)){
+            throw new ServiceException("Entity not found","entity.not.found",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        }
+        try{
+            $destination = $this->getAppSourceAndDeployDirectory($appId);
+            $appSourceDir = $destination['sourceDir'];
+            $data = array();
+            $data['template'] = file_get_contents($appSourceDir . '/content/forms/' . $formName);
+            $parseForm = $this->formService->parseForm($data,null);
+            $fields = array();
+            foreach($parseForm['fields'] as $key => $value){
+                $field = array();
+                $field['name'] = $value['name'];
+                $field['text'] = $value['text'];
+                $field['data_type'] = $value['data_type'];
+                $field['search_index']=false;
+                array_push($fields,$field);
+            }
+        }catch(Exception $e){
+            $this->logger->error($e->getMessage(), $e);
+            throw $e;
+        }
+        return $fields;
     }
 }

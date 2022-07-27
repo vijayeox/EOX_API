@@ -196,12 +196,25 @@ class DocumentGeneratorImpl implements DocumentGenerator
         return $result;
     }
 
-    public function mergePdf(array $pdfs, string $destination)
+    public function mergePdf(array $pdfs, string $destination, $options = [])
     {
-        $pdfObj = new PDFTK();
-        foreach ($pdfs as $pdf) {
-            if (!is_file($pdf)) throw new Exception("File does not exist at ".$pdf, 404);
-            $pdfObj->addFile($pdf);
+        if (!empty($options)) {
+            $pdfObj = new PDFTK($pdfs);
+            foreach ($options as $type => $option) {
+                switch ($type) {
+                    case 'combine':
+                        foreach ($option as $catOption) {
+                            $pdfObj->cat($catOption['start'], $catOption['end'], $catOption['pdf']);
+                        }
+                        break;
+                }
+            }
+        } else {
+            $pdfObj = new PDFTK();
+            foreach ($pdfs as $pdf) {
+                if (!is_file($pdf)) throw new Exception("File does not exist at ".$pdf, 404);
+                $pdfObj->addFile($pdf);
+            }
         }
         $result = $pdfObj->needAppearances()
                         ->saveAs($destination);

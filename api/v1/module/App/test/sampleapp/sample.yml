@@ -4,3 +4,6 @@ app:
     category: EXAMPLE_CATEGORY
     type: 2
     autostart: true
+entity:
+    -
+        name: "Entity1"

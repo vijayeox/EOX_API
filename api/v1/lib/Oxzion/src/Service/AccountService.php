@@ -12,6 +12,7 @@ use Oxzion\Security\SecurityManager;
 use Oxzion\ServiceException;
 use Oxzion\OxServiceException;
 use Oxzion\EntityNotFoundException;
+use Oxzion\InvalidParameterException;
 use Oxzion\Service\AbstractService;
 use Oxzion\Service\EntityService;
 use Oxzion\Service\AppRegistryService;
@@ -392,16 +393,12 @@ class AccountService extends AbstractService
         if (isset($accountData['uuid'])) {
             
             try {
-                if(empty($this->getAccountIdByUuid($accountData['uuid'])))
-                {
+                if(empty($this->getAccountIdByUuid($accountData['uuid']))) {
                     $this->createAccount($accountData, null);
-                }
-                else
-                {
+                } else {
                     $this->updateAccount($accountData['uuid'], $accountData, null);
-                    return;
                 }
-                
+                return;
             } catch (Exception $e) {
                 if (!$e instanceof EntityNotFoundException) {
                     throw $e;
@@ -1088,6 +1085,68 @@ class AccountService extends AbstractService
     {
         $sort = FilterUtils::sortArray($sort, $fieldName);
         return $sort;
+    }
+
+    public function checkAccountUser($params)
+    {
+        if(isset($params['accountId']) && UuidUtil::isValidUuid($params['accountId'])) {
+            $accountId = $this->getIdFromUuid('ox_account',$params['accountId']);
+            if($accountId === '') {
+                throw new ServiceException("Incorrect Account specified",'incorrect.account.specified',OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+            }
+        } else {
+            throw new InvalidParameterException('Account Id is not specified or incorrect');
+        }
+        if(isset($params['username'])) {
+            $username = $params['username'];
+        } else {
+            throw new InvalidParameterException('Username is not specified');
+        }
+
+        $select = "SELECT count(ou.username) as count
+                    from ox_user as ou
+                    inner join ox_account au on au.id = ou.account_id
+                    inner join ox_person per on per.id = ou.person_id
+                    LEFT join ox_address as oa on per.address_id = oa.id
+                    where ou.username = :username AND au.id = :accountId ";
+        $params = ['username' => $username,'accountId' => $accountId];
+        $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
+        if ($response[0]['count'] > 0) {
+            throw new ServiceException("User already exists", "user.already.exists", OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        } else {
+            return;
+        }
+    }
+
+    public function checkAccountEmail($params)
+    {
+        if(isset($params['accountId']) && UuidUtil::isValidUuid($params['accountId'])) {
+            $accountId = $this->getIdFromUuid('ox_account',$params['accountId']);
+            if($accountId === '') {
+                throw new ServiceException("Incorrect Account specified",'incorrect.account.specified',OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+            }
+        } else {
+            throw new InvalidParameterException('Account Id is not specified or incorrect');
+        }
+        if(isset($params['email'])) {
+            $email = $params['email'];
+        } else {
+            throw new InvalidParameterException('Email is not specified');
+        }
+
+        $select = "SELECT count(per.email) as count
+                    from ox_user as ou
+                    inner join ox_account au on au.id = ou.account_id
+                    inner join ox_person per on per.id = ou.person_id
+                    LEFT join ox_address as oa on per.address_id = oa.id
+                    where per.email = :email AND au.id = :accountId ";
+        $params = ['email' => $email,'accountId' => $accountId];
+        $response = $this->executeQueryWithBindParameters($select, $params)->toArray();
+        if ($response[0]['count'] > 0) {
+            throw new ServiceException("Email already exists", "email.already.exists", OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        } else {
+            return;
+        }
     }
     // YET TO BE DONE
     // private function setUpOrgAssociationRelation(&$data){

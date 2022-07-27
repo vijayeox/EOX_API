@@ -25,6 +25,7 @@ use Oxzion\Service\AccountService;
 use Oxzion\EntityNotFoundException;
 use Oxzion\Service\BusinessParticipantService;
 use \Analytics\Service\QueryService;
+use Oxzion\Service\ElasticService;
 use oxzion\Insurance\InsuranceService;
 use Oxzion\Service\AppService;
 use App\Service\AppArtifactService;
@@ -57,6 +58,7 @@ class AppDelegateService extends AbstractService
         AccountService $accountService,
         BusinessParticipantService $businessParticipantService,
         QueryService $queryService,
+        ElasticService $elasticService,
         InsuranceService $insuranceService,
         TeamService $teamService,
         AppService $appService,
@@ -85,6 +87,7 @@ class AppDelegateService extends AbstractService
         $this->accountService = $accountService;
         $this->businessParticipantService = $businessParticipantService;
         $this->queryService = $queryService;
+        $this->elasticService = $elasticService;
         $this->insuranceService = $insuranceService;
         $this->appOverdriveService = $appOverdriveService;
         $this->rateService = $rateService;
@@ -134,6 +137,7 @@ class AppDelegateService extends AbstractService
             $this->accountService,
             $this->businessParticipantService,
             $this->queryService,
+            $this->elasticService,
             $this->insuranceService,
             $this->teamService,
             $this->appService,
@@ -234,6 +238,9 @@ class AppDelegateService extends AbstractService
                 if (method_exists($obj, "setQueryService")) {
                     $obj->setQueryService($this->queryService);
                 }
+                if (method_exists($obj, "setElasticService")) {
+                    $obj->setElasticService($this->elasticService);
+                }
                 if (method_exists($obj, "setInsuranceService")) {
                     $obj->setInsuranceService($this->insuranceService);
                 }
@@ -241,7 +248,7 @@ class AppDelegateService extends AbstractService
                     $obj->setAppOverdriveService($this->appOverdriveService);
                 }
                 if (method_exists($obj, "setAppDelegateService")) {
-                    $obj->setAppDelegateService($this->setAppDelegateService());
+                    $obj->setAppDelegateService($this->setAppDelegateService(), $appId);
                 }
                 if (method_exists($obj, "setRateService")) {
                     $obj->setRateService($this->rateService);

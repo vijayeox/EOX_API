@@ -1279,4 +1279,44 @@ class AccountControllerTest extends ControllerTest
         $this->assertEquals($content['data'], array());
         $this->assertEquals($content['total'], 0);
     }
+
+    public function testcheckAccountUserWithCorrectEmail() {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/account/53012471-2863-4949-afb1-e69b0891c98a/usercheck/admin1@eoxvantage.in', 'GET');
+        $this->assertResponseStatusCode(412);
+        $this->setDefaultAsserts();
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'error');
+        $this->assertEquals($content['message'], 'User/Email already exists');
+    }
+
+    public function testcheckAccountUserWithCorrectUsername() {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/account/53012471-2863-4949-afb1-e69b0891c98a/usercheck/admintest', 'GET');
+        $this->assertResponseStatusCode(412);
+        $this->setDefaultAsserts();
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'error');
+        $this->assertEquals($content['message'], 'User/Email already exists');
+    }
+
+    public function testcheckAccountUserWithIncorrectEmail() {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/account/53012471-2863-4949-afb1-e69b0891c98a/usercheck/lmn', 'GET');
+        $this->assertResponseStatusCode(200);
+        $this->setDefaultAsserts();
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'success');
+        $this->assertEquals($content['message'], 'No user found');
+    }
+
+    public function testcheckAccountUserWithIncorrectAccount() {
+        $this->initAuthToken($this->adminUser);
+        $this->dispatch('/account/53012471-2863-4949-afb1-e69b0891c98b/usercheck/admintest', 'GET');
+        $this->assertResponseStatusCode(412);
+        $this->setDefaultAsserts();
+        $content = (array) json_decode($this->getResponse()->getContent(), true);
+        $this->assertEquals($content['status'], 'error');
+        $this->assertEquals($content['message'], 'Incorrect Account specified');
+    }
 }

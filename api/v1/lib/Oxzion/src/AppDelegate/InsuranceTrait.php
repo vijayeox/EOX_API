@@ -16,27 +16,27 @@ trait InsuranceTrait
     {
         $this->logger = Logger::getLogger(__CLASS__);
     }
-    public function setInsuranceService(InsuranceService $insuranceService)
+    public function setInsuranceService(InsuranceService $service)
     {
-        $this->insuranceService = $insuranceService;
+        $this->service = $service;
     }
     // $data can have ["service" => "IMS", "config" => "ProducerFunctions"]
-    public function setServiceType($data)
+    public function setInsuranceConfig($data)
     {
-        $this->logger->info("Set Service -> " . print_r($data, true));
-        $this->service = $this->insuranceService->getService($data['client'], $data);
+        $this->logger->info("Set insuranceService -> " . print_r($data, true));
+        $this->insuranceService = $this->service->getService($data['client'], $data);
     }
 
     // eg. call $service->search(["searchString" => "demo", "startWith" => true]);
     public function __call($method, $params)
     {
-        $this->logger->info("Call Service -> " . print_r([$method, $params], true));
+        $this->logger->info("Call insuranceService -> " . print_r([$method, $params], true));
         if (method_exists($this, $method)) {
             call_user_func_array($this->$method, $params);
-        } elseif (method_exists($this->service, $method)) {
-            return call_user_func_array($this->service->$method, $params);
+        } elseif (method_exists($this->insuranceService, $method)) {
+            return call_user_func_array($this->insuranceService->$method, $params);
         } else {
-            throw new ServiceException("Method not avaliable for " . get_class($this->service), 'method.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
+            throw new ServiceException("Method not avaliable for " . get_class($this->insuranceService), 'method.not.found', OxServiceException::ERR_CODE_NOT_FOUND);
         }
     }
 

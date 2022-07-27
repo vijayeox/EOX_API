@@ -50,4 +50,7 @@ RUN mkdir -p /app/clients
 RUN mkdir -p /app/api/v1 && \
     mv /var/www /var/www2 && \
     ln -s /app/api/v1 /var/www
+
+RUN chmod 755 /app/api/v1
+RUN chmod -R 755 /app/clients
 WORKDIR /var/www
