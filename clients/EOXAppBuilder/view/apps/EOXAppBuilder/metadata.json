@@ -11,7 +11,7 @@
     "defaultAppforOrgs": true,
     "hidden": true,
     "server": "server.js",
-    "formio_endpoint": "https:\/\/onboarding-eoxvantage.form.io",
+    "formio_endpoint": "https:\/\/eoxproductsupport.form.io",
     "maximizeOnStart": true,
     "title": {
         "en_EN": "App Studio"
