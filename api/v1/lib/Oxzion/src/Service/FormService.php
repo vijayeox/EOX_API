@@ -62,7 +62,8 @@ class FormService extends AbstractService
             $count = $this->table->save($form);
             $id = $this->table->getLastInsertValue();
             $data['id'] = $id;
-            $generateFields = $this->generateFields($template['fields'], $appId, $id, $template['form']['entity_id']);
+            $indexFieldList = isset($data['fields']) ? $data['fields'] : array();
+            $generateFields = $this->generateFields($template['fields'], $appId, $id, $template['form']['entity_id'],$indexFieldList);
             $data['fields'] = $generateFields;
             $this->commit();
         } catch (Exception $e) {
@@ -112,7 +113,8 @@ class FormService extends AbstractService
                 $this->rollback();
                 return 0;
             }
-            $generateFields = $this->generateFields($template['fields'], $this->getIdFromUuid('ox_app', $appUuid), $this->getIdFromUuid('ox_form', $formUuid), $existingForm['entity_id']);
+            $indexFieldList = isset($data['fields']) ? $data['fields'] : array();
+            $generateFields = $this->generateFields($template['fields'], $this->getIdFromUuid('ox_app', $appUuid), $this->getIdFromUuid('ox_form', $formUuid), $existingForm['entity_id'],$indexFieldList);
             $this->commit();
         } catch (Exception $e) {
             $this->rollback();
@@ -149,6 +151,8 @@ class FormService extends AbstractService
         }
         return $count;
     }
+
+
 
     public function getForms($appUuid = null, $filterArray = array())
     {
@@ -254,7 +258,7 @@ class FormService extends AbstractService
         return $template;
     }
 
-    private function generateFields($fieldsList = array(), $appId, $formId, $entityId)
+    private function generateFields($fieldsList = array(), $appId, $formId, $entityId,$indexFieldList = array())
     {
         try {
             $existingFieldsQuery = "select ox_field.* from ox_field where ox_field.entity_id=" . $entityId . ";";
@@ -266,7 +270,7 @@ class FormService extends AbstractService
         $fieldsCreated = array();
         $fieldIdArray = array();
         foreach ($fieldsList as $field) {
-            $this->saveField($existingFields, $field, $fieldsCreated, $fieldIdArray, $appId, $formId, $entityId);
+            $this->saveField($existingFields, $field, $fieldsCreated, $fieldIdArray, $appId, $formId, $entityId,$indexFieldList);
         }
         $existingFormFieldsQuery = "select ox_field.* from ox_field INNER JOIN ox_form_field ON ox_form_field.field_id=ox_field.id where ox_form_field.form_id=" . $formId . ";";
         $existingFormFields = $this->executeQuerywithParams($existingFormFieldsQuery);
@@ -300,7 +304,7 @@ class FormService extends AbstractService
         }
     }
 
-    private function saveField(&$existingFields, &$field, &$fieldsCreated, &$fieldIdArray, $appId, $formId, $entityId)
+    private function saveField(&$existingFields, &$field, &$fieldsCreated, &$fieldIdArray, $appId, $formId, $entityId,$indexFieldList = array())
     {
         $foundField = false;
         if (isset($field['parent'])) {
@@ -329,6 +333,15 @@ class FormService extends AbstractService
         $oxField->exchangeArray($field);
         $fieldData = $oxField->toArray();
         try {
+            if(isset($indexFieldList) && sizeof($indexFieldList) > 0 && !isset($fieldData['parent_id'])){
+                foreach($indexFieldList as $key => $value){
+                    $this->logger->info('indexfieldList value ----'.print_r($value,true));
+                    if($fieldData['name'] == $value['name']){
+                        $fieldData = array_merge($fieldData,$value);
+                    }                      
+                }   
+            }
+            $this->logger->info("PROCESS FORM SAVE FIELD DATA ----".print_r($fieldData,true));
             $fieldResult = $this->fieldService->saveField($appId, $fieldData);
             $fieldIdArray[] = $fieldData['id'];
             $fieldsCreated[] = $fieldData;

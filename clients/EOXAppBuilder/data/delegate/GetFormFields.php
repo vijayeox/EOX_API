@@ -24,7 +24,7 @@ class GetFormFields extends AbstractAppDelegate
         }
         $appId = $data['formAppId'];
         try{
-            $data['fieldsList'] = $this->getAppFormFields($data['template_file'],$appId);
+            $data['fields'] = $this->getAppFormFields($data['template_file'],$appId);
             $this->logger->info("Data out of delegate----".print_r($data,true));
         }catch(Exception $e){
             throw $e;

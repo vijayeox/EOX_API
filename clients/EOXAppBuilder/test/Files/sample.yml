@@ -1,0 +1,122 @@
+app:
+    name: EOXAppBuilder
+    description: 'App for EOX AppBuilder'
+    category: EXAMPLE_CATEGORY
+    type: 1
+    autostart: false
+    autoinstall: true
+    version: 1
+    uuid: 41b77ef3-41db-4a52-8eb8-ba3ac9a9d771
+    status: 4
+    isdefault: false
+    logo: default_app.png
+    start_options: null
+    title: App Studio
+    fontIcon: "fas fa-desktop-alt"
+    app_properties: '{"chat_notification":"","appIdentifiers":""}'
+checkOrg: true 
+org:
+    name: 'EOX Vantage1'
+    uuid: b0923de7-0387-48ea-8f29-5d3704d96a46
+    email: helpdesk@vantageagora.com
+    address1: '23611 Chagrin Blvd, Ste 320'
+    address2: 'Beachwood, Ohio 44122'
+    city: Beachwood
+    state: Ohio
+    zip: 44122
+    contact:
+        username: supportadmin
+        firstname: Support
+        lastname: Admin
+        email: helpdesk@vantageagora.com
+    preferences: '{}'
+    country: 'United States of America'
+privilege:
+    -
+        name: MANAGE_APPLICATION
+        permission: 3
+    -
+        name: MANAGE_INSTALL_APP
+        permission: 3
+    -
+        name: MANAGE_DEPLOY_APP
+        permission: 3
+role:
+    -
+        name: 'App Developer'
+        privileges:
+            -
+                privilege_name: MANAGE_APPLICATION
+                permission: 3
+            -
+                privilege_name: MANAGE_INSTALL_APP
+                permission: 3
+            -
+                privilege_name: MANAGE_DEPLOY_APP
+                permission: 3
+        uuid: 33818081-b18d-456d-a74d-0493a20a2887
+pages:
+    -
+        page_name: HomePage.yml
+        uuid: d5b33dce-df14-4193-adfe-de27a6d37ddf
+    -
+        page_name: FormManager.yml
+        uuid: 76953fc8-7269-494d-b126-6ea45a07a007
+    -
+        page_name: WorkflowManager.yml
+        uuid: ca339e6a-4257-4567-9f70-3dab049615f7
+    -
+        page_name: InstallManager.yml
+        uuid: 96953fc8-7269-494d-b126-6ea45a07a007
+    -
+        page_name: DelegateManager.yml
+        uuid: 7302ba08-5ea3-11ec-bf63-0242ac130002
+    -
+        page_name: TemplateManager.yml
+        uuid: 7302bd3c-5ea3-11ec-bf63-0242ac130002
+    -
+        page_name: InstallationManager.yml
+        uuid: bcbb536a-d9aa-4bed-8b3c-6ad3d2449be6
+    -
+        page_name: UninstalledManager.yml
+        uuid: 83c014a0-54d4-4dd1-9ebf-55680b5e7d71
+    -
+        page_name: AppUpgrade.yml
+        uuid: f922ab50-84b6-11ec-a8a3-0242ac120002
+    -
+        page_name: PdfTransformer.yml
+        uuid: 25b6b9d2-9f69-11ec-b909-0242ac120002
+    -
+        page_name: Migraton.yml
+        uuid: f5d87830-af1d-11ec-b909-0242ac120002
+    -
+        page_name: ComponentManager.yml
+        uuid: 63cb348f-e3e1-4459-8338-40f0acbcf173
+menu:
+    -
+        name: 'Manage EOX Apps'
+        icon: 'fas fa-home'
+        page_uuid: d5b33dce-df14-4193-adfe-de27a6d37ddf
+        uuid: 2f6aef7e-d0a4-11ea-87d0-0242ac130003
+        privilege: MANAGE_APPLICATION_READ
+entity:
+    -
+        name: 'App Description'
+        override_data: true
+        field:
+            -
+                name: status
+                text: Status
+                index: true
+                data_type: text
+            -
+                name: documents
+                text: Documents
+                data_type: document
+form:
+    -
+        name: 'EOX App Form'
+        uuid: 1fa0d5c0-b428-499a-a490-37e4349c1060
+        description: 'Sample form for eox apps'
+        template_file: eoxApp.json
+        entity: 'App Description'

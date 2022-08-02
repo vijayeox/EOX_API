@@ -1,0 +1,9 @@
+ox_app:
+  - id: 99
+    name: "Demo APP"
+    uuid: "1276b333-e155-433e-a0c9-cb1fb92e99fa"
+    category: "OTHERS"
+    date_created: "2019-06-26 00:00:00"
+    type: '2'
+    status: 1
+    created_by: 1
