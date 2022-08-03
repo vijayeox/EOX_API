@@ -25,6 +25,7 @@ use Oxzion\Service\RoleService;
 use Oxzion\Service\TemplateService;
 use Oxzion\Utils\BosUtils;
 use Oxzion\Utils\FilterUtils;
+use Oxzion\Utils\ArrayUtils;
 use Oxzion\Utils\UuidUtil;
 use Oxzion\ValidationException;
 
@@ -358,7 +359,8 @@ class UserService extends AbstractService
     }
     private function updateUserProjects($userId, $project, $accountId)
     {
-        $projectSingleArray = array_map('current', $project);
+        $newProject = ArrayUtils::removeElementWithValueMultiArray($project, "id");
+        $projectSingleArray = array_map('current', $newProject);
         $params = [
             'userId' => $userId,
             'accountId' => !is_numeric($accountId) ? $accountId : $this->getUuidFromId('ox_account', $accountId),
