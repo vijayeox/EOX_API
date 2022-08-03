@@ -132,4 +132,11 @@ class ArrayUtils
     public static function compareMultiDimensionalArrays($arr1,$arr2) {
         return ArrayDiffMultidimensional::compare($arr1, $arr2);
     }
+
+    public static function removeElementWithValueMultiArray($array, $key){
+        foreach($array as $subKey => $subArray){
+            unset($array[$subKey][$key]);
+        }
+        return $array;
+   }
 }
