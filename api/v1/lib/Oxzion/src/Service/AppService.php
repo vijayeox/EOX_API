@@ -367,6 +367,7 @@ class AppService extends AbstractService implements AppUpgrade
                         $this->performMigration($ymlData, $path);
                         break;
                     case 'entity':
+
                         $this->processEntity($ymlData);
                         break;
                     case 'migration':
@@ -853,6 +854,7 @@ class AppService extends AbstractService implements AppUpgrade
         $this->logger->info("Deploy App - Process Page with YamlData ");
         if (isset($yamlData['pages'])) {
             $appUuid = $yamlData['app']['uuid'];
+           // print_r($yamlData['pages']);
             foreach ($yamlData['pages'] as &$pageData) {
                 if (isset($pageData['page_name']) && !empty($pageData['page_name']) && file_exists($path . 'content/pages/' . $pageData['page_name'])) {
                     $page = Yaml::parse(file_get_contents($path . 'content/pages/' . $pageData['page_name']));
@@ -1657,6 +1659,7 @@ class AppService extends AbstractService implements AppUpgrade
                 }
             }
         }
+
     }
 
     private function assignWorkflowToEntityMapping($entityArray, $workflowUuid, $appUuid)
@@ -1925,15 +1928,8 @@ class AppService extends AbstractService implements AppUpgrade
 
     public function getAppFormFields($formName,$appId){
         $this->logger->info("Get App Form Fields ---".$formName);
-        if(!isset($appId)){
-            throw new ServiceException("Entity not found","entity.not.found",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
-        }
         try{
-            $destination = $this->getAppSourceAndDeployDirectory($appId);
-            $appSourceDir = $destination['sourceDir'];
-            $data = array();
-            $data['template'] = file_get_contents($appSourceDir . '/content/forms/' . $formName);
-            $parseForm = $this->formService->parseForm($data,null);
+            $parseForm = $this->appFormParse($appId,$formName);
             $fields = array();
             foreach($parseForm['fields'] as $key => $value){
                 $field = array();
@@ -1948,5 +1944,29 @@ class AppService extends AbstractService implements AppUpgrade
             throw $e;
         }
         return $fields;
+    }
+
+    public function getAppFormProperties($formName,$appId){
+        $this->logger->info("Get App Form properties ---".$formName);
+        try{
+            $parseForm = $this->appFormParse($appId,$formName);
+            $properties = $parseForm['form']['properties'];
+        }catch(Exception $e){
+            $this->logger->error($e->getMessage(), $e);
+            throw $e;
+        }
+        return $properties;
+    }
+
+    private function appFormParse($appId,$formName){
+        if(!isset($appId)){
+            throw new ServiceException("Entity not found","entity.not.found",OxServiceException::ERR_CODE_PRECONDITION_FAILED);
+        }
+        $destination = $this->getAppSourceAndDeployDirectory($appId);
+        $appSourceDir = $destination['sourceDir'];
+        $data = array();
+        $data['template'] = file_get_contents($appSourceDir . '/content/forms/' . $formName);
+        $parseForm = $this->formService->parseForm($data,null);
+        return $parseForm;
     }
 }

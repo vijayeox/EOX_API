@@ -236,6 +236,9 @@ class CleanYml extends AbstractAppDelegate
                 if (isset($value['field']) && array_key_exists('name', $value['field'][0]) && empty($value['field'][0]['name'])) {
                     unset($value['field']);
                 }
+                $value['field'] = isset($value['field']) ? $value['field'] : array();
+                $this->indexFieldsValidate($value['field'],'index');
+               
                 if (isset($value['participantRoleDuplicate'])) {
                     unset($value['participantRoleDuplicate']);
                 }
@@ -274,7 +277,17 @@ class CleanYml extends AbstractAppDelegate
 
         if (isset($descriptorData["form"]) && empty($descriptorData['form'][0]['name'])) {
             unset($descriptorData["form"]);
+        }else{
+            $i = 0;
+            foreach($descriptorData['form'] as $key => $value){
+                if(isset($value['fields'])){
+                    $this->indexFieldsValidate($descriptorData['form'][$i]['fields'],'search_index');
+                    $i++;
+                }
+            }
         }
+
+
         if (isset($descriptorData["job"]) && empty($descriptorData['job'][0]['name'])) {
             unset($descriptorData["job"]);
         }
@@ -338,5 +351,20 @@ class CleanYml extends AbstractAppDelegate
         
 
         return $descriptorData;
+    }
+
+    private function indexFieldsValidate(&$fieldList,$indexField){
+        $field = array_column($fieldList,'name');
+        $requiredFields = array('name','start_date','end_date','created_by','status','assigned_to');
+        foreach($requiredFields as $value2){
+            $newField = array();
+            if(!in_array($value2,$field)){
+                $newField['name'] = $value2;
+                $newField['text'] = $value2;
+                $newField['data_type'] = ($value2 == 'start_date' || $value2 == 'end_date') ? 'date' : 'text';
+                $newField[$indexField] = true;
+                $fieldList = array_merge($fieldList,array($newField));
+            }
+        }
     }
 }
