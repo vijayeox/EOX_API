@@ -6,24 +6,27 @@ use Logger;
 use Oxzion\Service\AbstractService;
 use Symfony\Component\Yaml\Yaml;
 use Oxzion\EntityNotFoundException;
+use Oxzion\Transformer\ExcelJsonTransformer;
 
 class JsonTransformerService extends AbstractService
 {
     private $fileExt = ".yml";
+    private $excelExt = ".xlsx";
     protected $logger;
     private $attributeTransformer;
-    public function __construct($config, AttributeTransformer $attributeTransformer)
+    public function __construct($config, AttributeTransformer $attributeTransformer, ExcelJsonTransformer $excelTransformer)
     {
         $this->config = $config;
         $this->logger = Logger::getLogger(__CLASS__);
         $this->attributeTransformer = $attributeTransformer;
+        $this->excelTransformer = $excelTransformer;
         $this->transformerDir = $this->config['TRANSFORMER_FOLDER'];
         if (!is_dir($this->transformerDir)) {
             mkdir($this->transformerDir, 0777, true);
         }
     }
 
-    public function transform($appId, $directive, &$dataArray = array(), $returnNewArray = false)
+    public function transform($appId, $directive, &$dataArray = array(), $returnNewArray = false, $mapperType)
     {
         $this->logger->info("TRANSFORM ---".print_r($dataArray,true));          
         try {
@@ -33,16 +36,40 @@ class JsonTransformerService extends AbstractService
             $this->logger->info("TRANSFORM RESULT---".print_r($result,true));          
             if ($result) {
                 // Process the data
-                foreach ($result['transform'] as $key => $value) {
-                    foreach ($value['src'] as $key => $srcValue) {
-                        if (!empty($returnArray)) {
-                            $this->transformData($appId, $srcValue, $value, $returnArray);
-                        }else{
-                            if (isset($srcValue['path'])) {
-                                $newArray[$srcValue['path']] = $dataArray[$srcValue['path']];
+                if($mapperType == 'PDF') {
+                    foreach ($result['transform'] as $key => $value) {
+                        foreach ($value['src'] as $key => $srcValue) {
+                            if (!empty($returnArray)) {
+                                $this->transformData($appId, $srcValue, $value, $returnArray);
+                            }else{
+                                if (isset($srcValue['path'])) {
+                                    $newArray[$srcValue['path']] = $dataArray[$srcValue['path']];
+                                }
+                                $this->transformData($appId, $srcValue, $value, $newArray);
                             }
-                            $this->transformData($appId, $srcValue, $value, $newArray);
                         }
+                    }
+                }
+                else {
+                    $excelData = array();
+                    $templateData = $this->excelTransformer->transformData($result,$dataArray);
+                    array_push(
+                        $excelData,
+                        [
+                            "fileId" => $dataArray['fileId'],
+                            "appId" => $dataArray['appId'],
+                            "orgId" => $dataArray['accountId'],
+                            "mapping" => [
+                                "filename" => $directive.$this->excelExt,
+                                "data" => $templateData
+                            ]
+
+                        ]
+                    );
+                    if (!empty($returnArray)) {
+                        $returnArray['excelInfo'] = $excelData;
+                    } else {
+                        $newArray = array_merge($newArray,$excelData);
                     }
                 }
                 $returnArray = empty($returnArray) ? $newArray :  $returnArray;
@@ -83,4 +110,6 @@ class JsonTransformerService extends AbstractService
             $returnArray[$value['target']] = $field;
         }
     }
+
+    
 }

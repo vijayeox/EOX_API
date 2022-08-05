@@ -58,6 +58,10 @@ class Module implements ConfigProviderInterface
                     $dbAdapter = $container->get(AdapterInterface::class);
                     return new \Contact\Service\ContactService($container->get('config'), $dbAdapter, $container->get(\Contact\Model\ContactTable::class), $container->get(AddressService::class));
                 },
+                Service\DocumentCallbackService::class => function ($container) {
+                    return new Service\DocumentCallbackService($container->get('config'),
+                    $container->get(\Oxzion\Service\FileService::class));
+                },
                 \Contact\Model\ContactTable::class => function ($container) {
                     $tableGateway = $container->get(\Contact\Model\ContactTableGateway::class);
                     return new \Contact\Model\ContactTable($tableGateway);
@@ -100,6 +104,9 @@ class Module implements ConfigProviderInterface
                 },
                 Controller\CommentController::class => function ($container) {
                     return new Controller\CommentController($container->get(Service\CommentsService::class));
+                },
+                Controller\DocumentCallbackController::class => function ($container) {
+                    return new Controller\DocumentCallbackController($container->get(Service\DocumentCallbackService::class));
                 },
             ],
         ];

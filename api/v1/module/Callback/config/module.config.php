@@ -351,8 +351,18 @@ return [
                         'action' => 'updateProfilePicture',
                     ],
                 ],
-            ]
-        ]
+            ],
+            'saveExcel' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/callback/document/saveexcel',
+                    'defaults' => [
+                        'controller' => Controller\DocumentCallbackController::class,
+                        'action' => 'saveExcel',
+                    ],
+                ],
+            ],
+        ],
     ],
      'view_manager' => [
         // We need to set this up so that we're allowed to return JSON
