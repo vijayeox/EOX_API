@@ -588,7 +588,58 @@ class CommandService extends AbstractService
         $this->messageProducer->sendQueue($payload, 'mail');
     }
 
-    private function generateExcel(){}
+    private function generateExcel($params) {
+        if (!$params || empty($params)) {
+            return $params;
+        }
+        $fileUUID = isset($params['uuid']) ? $params['uuid'] : isset($params['fileId']) ? $params['fileId'] : null;
+        $accountId = isset($params['accountId']) ? $params['accountId'] : AuthContext::get(AuthConstants::ACCOUNT_UUID);
+        $fileDestination = ArtifactUtils::getDocumentFilePath($this->config['APP_DOCUMENT_FOLDER'], $fileUUID, array('accountId' => $accountId));
+
+        $excelData = $generatedDocumentsList = $processingData = [];
+
+        if(isset($params['transformer'])){
+            $params['directive'] = $params['transformer'];
+            $params['mapperType'] = 'excel';
+            $processingData = $this->jsonTransform($params,true);
+        }
+
+        $excelData = isset($processingData['excelInfo']) ? $processingData['excelInfo'] : $processingData;
+
+        if (count($excelData) > 0) {
+            file_put_contents($fileDestination['absolutePath'] . "excelMapperInput.json", json_encode($excelData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            array_push(
+                $generatedDocumentsList,
+                [
+                    "fullPath" => $fileDestination['absolutePath'] . "excelMapperInput.json",
+                    "file" => $fileDestination['relativePath'] . "excelMapperInput.json",
+                    "created_date" => date('Y-m-d H:i:s'),
+                    "originalName" => "excelMapperInput.json",
+                    "type" => "file/json"
+                ]
+            );
+            $params["documents"] = $generatedDocumentsList;
+            $params['documentsToBeGenerated'] = count($excelData);
+            $params['documentsSelectedCount'] = count($excelData) + count($generatedDocumentsList) - 1;
+            $params["status"] = "Processing";
+        }
+        $this->logger->info("Completed Excel Generation with data- " . json_encode($params, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        if (count($excelData) > 0) {
+            $ExcelTemplateMapperServiceURL = $this->config['excelConfig']['excelMapperURL'];
+            $callbackURL = $this->config['excelConfig']['callbackURL'];
+
+            foreach ($excelData as $excelItem) {
+                $excelItem["postURL"] = $callbackURL;
+                $response = $this->restClient->post(
+                    $ExcelTemplateMapperServiceURL,
+                    $excelItem
+                );
+                $this->logger->info("Excel Mapper POST Request for " . $excelItem["fileId"] . "\n" . $response);
+            }
+        }
+
+    }
 
     protected function eSign(&$data){
         $fileUUID = isset($data['uuid']) ? $data['uuid'] : $data['fileId'];
@@ -682,6 +733,7 @@ class CommandService extends AbstractService
         // When a Transfer Yml is provided, only the data of the fields mentioned in the YML will be returned back to the user Else the entire formdata is returned back.
         if(isset($params['transformer'])){
             $params['directive'] = $params['transformer'];
+            $params['mapperType'] = 'pdf';
             $processingData = $this->jsonTransform($params,true);
         }else{
             $this->processData($params);
@@ -1058,11 +1110,25 @@ class CommandService extends AbstractService
             $appId = UuidUtil::isValidUuid($appId)? $appId : $this->getUuidFromId('ox_app', $appId);
             $directive = $data['directive'];
             unset($data['directive']);
+            $mapperType = null;
         } else {
             $this->logger->info("App Id or Transform Directive is Not Specified");
             throw new EntityNotFoundException("App Id or Transform Directive Not Specified");
         }
-        $response = $this->jsonTransformerService->transform($appId, $directive, $data, $returnNewArray);
+        if(isset($data['mapperType'])) {
+            if(strcasecmp('pdf',$data['mapperType']) == 0) {
+                $mapperType = 'PDF';
+            } elseif (strcasecmp('excel',$data['mapperType']) == 0) {
+                $mapperType = 'EXCEL';
+            } else {
+                $this->logger->info("Mapper Type is Incorrect");
+                throw new EntityNotFoundException("Mapper Type Incorrect");
+            }
+        } else {
+            $this->logger->info("Mapper Type is Not Specified");
+            throw new EntityNotFoundException("Mapper Type Not Specified");
+        }
+        $response = $this->jsonTransformerService->transform($appId, $directive, $data, $returnNewArray, $mapperType);
         $this->logger->info("Data in Json Transform before return--- " . print_r($response, true));
         return $response;
     }

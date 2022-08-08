@@ -603,10 +603,14 @@ class Module
                 Transformer\AttributeTransformer::class => function ($container) {
                     return new Transformer\AttributeTransformer($container->get('config'));
                 },
+                Transformer\ExcelJsonTransformer::class => function ($container) {
+                    return new Transformer\ExcelJsonTransformer();
+                },
                 Transformer\JsonTransformerService::class => function ($container) {
                     return new Transformer\JsonTransformerService(
                         $container->get('config'),
-                        $container->get(Transformer\AttributeTransformer::class)
+                        $container->get(Transformer\AttributeTransformer::class),
+                        $container->get(Transformer\ExcelJsonTransformer::class)
                     );
                 },
                 Service\UserCacheService::class => function ($container) {
